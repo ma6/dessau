@@ -36,12 +36,54 @@ const ICONS_DIR = join(ROOT, 'dds/icons');
 const UPSTREAM = 'https://raw.githubusercontent.com/ionic-team/ionicons/main';
 
 /**
- * Role name → Ionicons file name.
+ * Role name → Ionicons file name, and optionally the reason a role is in the set
+ * without a caller.
  *
  * The two-layer naming is deliberate. Symbol ids describe the ROLE
  * (`dds-icon-error`), not the picture (`alert-circle`), so the glyph behind a
  * role can be swapped once, here, rather than at every call site — and a
  * component never depends on what an icon happens to look like today.
+ *
+ * -----------------------------------------------------------------------------
+ * When the role you need is not here: ADD IT. Do not reuse a near one.
+ * -----------------------------------------------------------------------------
+ *
+ * This is the rule that matters most in this file, because breaking it is free
+ * and looks like nothing. A `<use>` pointing at the wrong role resolves, renders,
+ * passes every check, and ships a picture that means something else. Four of them
+ * accumulated before anyone wrote this down: a SUN on the "show password" button,
+ * a DOCUMENT on both the upload zone and the download link, and the navigation
+ * HAMBURGER on an overflow menu.
+ *
+ * Each was one line away from correct. What was missing was not care — it was an
+ * icon, and permission to add one.
+ *
+ * So: adding a line here is the cheap, expected, correct move. Ionicons has around
+ * 1,300 icons and Dessau ships the handful it names; the constraint is the naming,
+ * not the count. Pick the outline variant, give it a ROLE name rather than a
+ * picture name, and add the caller in the same change.
+ *
+ * A Unicode glyph is not the escape hatch either — `✓` is announced as "check
+ * mark" mid-sentence and renders in whatever font happens to have it.
+ * `scripts/check-icons.mjs` rejects those by name.
+ *
+ * -----------------------------------------------------------------------------
+ * The third element: why a role can exist with no caller
+ * -----------------------------------------------------------------------------
+ *
+ * `check-icons.mjs` reports a symbol that no page uses as dead weight, which is
+ * what keeps this set small. But that rule, unqualified, is also the pressure that
+ * produced the four misuses above: it forbids adding an icon until something
+ * already needs it, and the moment something needs it, the nearest existing symbol
+ * is right there.
+ *
+ * So a role may be declared with a third element — the reason it belongs in the
+ * vocabulary without a caller. It is written into the sprite as
+ * `data-dds-vocabulary`, `check-icons.mjs` exempts it on that declaration alone,
+ * and it prints the list every run so the exemption is argued rather than silent.
+ *
+ * It is an exemption, not a loophole: "a product might want it" is not a reason.
+ * Completing a direction family is, which is the only thing using it today.
  */
 const ICON_MAP = [
   {
@@ -57,16 +99,24 @@ const ICON_MAP = [
   {
     group: 'Navigation',
     icons: [
+      /* Both families are complete: four chevrons, four arrows. A direction is
+         the one kind of role where the caller cannot be the test of whether it
+         belongs — "up" is meaningful because "down" is, not because a page in
+         this repository happens to point at it this week.
+
+         `chevron-up` was previously left out on the grounds that a disclosure
+         rotates `chevron-down` by 180deg. Disclosures still do, and should: the
+         rotation animates the change and keeps the two states unmistakably the
+         same control. But that is one component's technique, and it was doing
+         duty as a reason the vocabulary should have a hole in it. */
       ['chevron-down', 'chevron-down-outline'],
-      /* No `chevron-up`. A disclosure rotates `chevron-down` by 180deg, which
-         animates the change and needs one symbol instead of two — so an "up"
-         chevron had no caller and was weight in every page's sprite. Rotating also
-         keeps the two states unmistakably the same control, which two separate
-         glyphs do not guarantee. `scripts/check-icons.mjs` is what noticed. */
+      ['chevron-up', 'chevron-up-outline', 'Completes the chevron family. A disclosure still rotates chevron-down.'],
       ['chevron-left', 'chevron-back-outline'],
       ['chevron-right', 'chevron-forward-outline'],
-      ['arrow-right', 'arrow-forward-outline'],
+      ['arrow-up', 'arrow-up-outline', 'Completes the arrow family.'],
+      ['arrow-down', 'arrow-down-outline', 'Completes the arrow family.'],
       ['arrow-left', 'arrow-back-outline'],
+      ['arrow-right', 'arrow-forward-outline'],
       ['external', 'open-outline'],
     ],
   },
@@ -75,11 +125,31 @@ const ICON_MAP = [
     icons: [
       ['close', 'close-outline'],
       ['search', 'search-outline'],
+      /* `funnel-outline`, not Ionicons' `filter-outline` — which is the three
+         horizontal sliders, and reads as "adjust settings" rather than "narrow
+         this list". The funnel is the one convention nobody has to be taught. */
+      ['filter', 'funnel-outline'],
       ['plus', 'add-outline'],
       ['minus', 'remove-outline'],
       ['edit', 'create-outline'],
       ['trash', 'trash-outline'],
+      /* Direction carries the meaning here, so both exist rather than one being
+         flipped: `download-outline` is a tray receiving an arrow, and flipping it
+         gives an arrow leaving a tray, which is not what uploading looks like. */
+      ['download', 'download-outline'],
+      ['upload', 'cloud-upload-outline'],
+      /* Two different things, and the reason `more` is now in the set: `menu` is
+         the hamburger, which in Dessau means SITE NAVIGATION and nothing else.
+         An overflow menu on a toolbar row is `more`. Using the hamburger for both
+         teaches a reader that the same picture means two unrelated things. */
       ['menu', 'menu-outline'],
+      ['more', 'ellipsis-horizontal-outline'],
+      /* The reveal toggle on a password field. Two symbols rather than one plus a
+         CSS strike-through: the crossed-out eye is drawn to stay legible at 1em,
+         and a pseudo-element line would not follow `currentColor` through a
+         button's hover state. */
+      ['eye', 'eye-outline'],
+      ['eye-off', 'eye-off-outline'],
     ],
   },
   {
@@ -87,6 +157,9 @@ const ICON_MAP = [
     icons: [
       ['location', 'location-outline'],
       ['document', 'document-text-outline'],
+      /* A label attached to a thing — a category, a policy line. Not a chip:
+         a chip is the control, the tag is what it is about. */
+      ['tag', 'pricetag-outline'],
       ['inbox', 'file-tray-outline'],
       ['sun', 'sunny-outline'],
       ['moon', 'moon-outline'],
@@ -177,6 +250,21 @@ const HEADER = `<?xml version="1.0" encoding="UTF-8"?>
   depending on what an icon happens to look like today. The Ionicons source name
   is kept in a comment above each symbol so the mapping stays traceable.
 
+  If the role you need is not here, ADD IT to ICON_MAP and re-run the build.
+  Pointing an existing role at a new meaning costs nothing, renders, passes every
+  check — and ships a picture that means something else.
+
+  ---------------------------------------------------------------------------
+  \`data-dds-vocabulary\`
+  ---------------------------------------------------------------------------
+
+  A symbol carrying that attribute is in the set deliberately without a caller in
+  this repository, and the comment above it says why. Only the direction families
+  use it: all four chevrons and all four arrows exist because a direction is
+  meaningful as a set, not because each one is pointed at today.
+  \`scripts/check-icons.mjs\` reads the attribute, and lists every symbol carrying
+  it on each run.
+
   ---------------------------------------------------------------------------
   Colour
   ---------------------------------------------------------------------------
@@ -218,8 +306,17 @@ let count = 0;
 for (const { group, icons } of ICON_MAP) {
   parts.push(`\n    <!-- ${group} ${'-'.repeat(Math.max(4, 66 - group.length))} -->\n`);
 
-  for (const [role, upstreamName] of icons) {
+  for (const [role, upstreamName, vocabularyReason] of icons) {
     const svg = await fetchText(`${UPSTREAM}/src/svg/${upstreamName}.svg`);
+
+    /* The reason travels into the sprite as a comment, not only as the attribute.
+       The attribute is what the checker reads; the sentence is what the next
+       person reads, and "why is this here if nothing uses it" is exactly the
+       question a bare flag invites and cannot answer. */
+    const note = vocabularyReason
+      ? `\n    <!-- Ionicons: ${upstreamName} · no caller by design: ${vocabularyReason} -->\n`
+      : `\n    <!-- Ionicons: ${upstreamName} -->\n`;
+
     /* `fill="currentColor"` on the <symbol> rather than on every child.
        `fill` is an inherited SVG property, so this gives the solid parts of an
        icon (the dot on an "i", the dot under a "!") the container's colour, while
@@ -227,13 +324,15 @@ for (const { group, icons } of ICON_MAP) {
        Without it those solid parts default to black and stay black in dark mode —
        a genuinely invisible dot on a dark surface. */
     parts.push(
-      `\n    <!-- Ionicons: ${upstreamName} -->\n` +
-        `    <symbol id="dds-icon-${role}" viewBox="0 0 512 512" fill="currentColor">\n` +
+      note +
+        `    <symbol id="dds-icon-${role}" viewBox="0 0 512 512" fill="currentColor"` +
+        (vocabularyReason ? ' data-dds-vocabulary' : '') +
+        `>\n` +
         convert(svg) +
         `\n    </symbol>\n`
     );
     count++;
-    console.log(`  ${role} ← ${upstreamName}`);
+    console.log(`  ${role} ← ${upstreamName}${vocabularyReason ? '  (no caller by design)' : ''}`);
   }
 }
 

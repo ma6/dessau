@@ -281,6 +281,24 @@
     min-inline-size: 0;
   }
 
+  /* Which icon the reveal toggle shows.
+
+     Driven by `aria-pressed`, not by a class the script also has to set. The
+     state is already in the attribute — it has to be, because that is what gets
+     announced — and a class tracking it in parallel is one more thing that can
+     end up disagreeing with what a screen reader says.
+
+     The icon names the ACTION, matching the button's accessible name: an eye
+     while the password is masked ("Show password"), a struck-through eye while it
+     is revealed ("Hide password"). The visible feedback for the state itself is
+     the field, which is either dots or characters — unmissable, and it is why
+     this button gets away with keeping one name in both states. */
+  [data-dds-password-toggle] .dds-password-show { display: inline-block; }
+  [data-dds-password-toggle] .dds-password-hide { display: none; }
+
+  [data-dds-password-toggle][aria-pressed="true"] .dds-password-show { display: none; }
+  [data-dds-password-toggle][aria-pressed="true"] .dds-password-hide { display: inline-block; }
+
   /* A one-time code. ONE input, not six boxes — see the note above. Monospace
      and letter-spaced so the digits are countable, which is the only legitimate
      reason the six-box version looks appealing. */
@@ -336,6 +354,17 @@
   .dds-filtering-split {
     display: grid;
     gap: var(--dds-space-lg);
+  }
+
+  /* The filter rail names itself. An `aside` is a landmark, and an unnamed
+     complementary landmark is indistinguishable from every other one when a
+     screen reader lists them — "complementary", with nothing to choose between.
+     A heading, referenced with `aria-labelledby`, is the name, and it is the
+     natural home for the filter icon. */
+  .dds-filtering-aside {
+    display: flex;
+    flex-direction: column;
+    gap: var(--dds-space-sm);
   }
 
   /* Filters move from above the results to a column beside them at 52rem. That

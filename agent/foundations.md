@@ -316,6 +316,64 @@ scale entirely. That is one of the better reasons to use them.
 
 ---
 
+## Icons
+
+A sprite built from Ionicons by `scripts/build-icons.mjs`, inlined into every page
+by `scripts/sync-icons.mjs`, referenced as
+`<svg class="dds-icon" aria-hidden="true"><use href="#dds-icon-check"/></svg>`.
+
+Symbol ids name the **role**, not the picture: `dds-icon-error`, never
+`dds-icon-alert-circle`. Which Ionicon backs a role is decided in one place and
+changes no markup.
+
+### If the role you need is not in the set, add it
+
+Do not point an existing role at a new meaning. That is the one icon mistake no
+script can catch: the `<use>` resolves, the icon renders, every check passes, and
+the interface shows a picture that means something else. Four had accumulated
+before this was written down — a **sun** on the "show password" button, a
+**document** on both the upload zone and the download link, and the navigation
+**hamburger** on an overflow menu.
+
+Adding a line to `ICON_MAP` is the expected move, not an escalation. Ionicons has
+around 1,300 icons; the constraint is the naming and the caller, not the count.
+
+A Unicode glyph is not the alternative. `check-icons.mjs` rejects twenty-five
+characters by name, and the reason is in that file.
+
+### The set today
+
+| Group | Roles |
+| --- | --- |
+| Status | `check` `check-circle` `warning` `error` `info` |
+| Navigation | `chevron-down` `chevron-up` `chevron-left` `chevron-right` `arrow-up` `arrow-down` `arrow-left` `arrow-right` `external` |
+| Actions | `close` `search` `filter` `plus` `minus` `edit` `trash` `download` `upload` `menu` `more` `eye` `eye-off` |
+| Objects | `location` `document` `tag` `inbox` `sun` `moon` |
+
+`menu` is the hamburger and means **site navigation**; an overflow menu is `more`.
+`document` is a file; getting one is `download`, sending one is `upload`. A role
+means one thing everywhere, or it means nothing.
+
+### Adding an icon
+
+1. Is there a role that already **means** this? If yes, use it. A role that merely
+   looks close is not one.
+2. Pick the Ionicons **outline** variant and add `[role, 'name-outline']` to the
+   right group in `ICON_MAP`.
+3. Add the caller in the same change. An icon with no caller is reported by
+   `check-icons.mjs` — unless step 4 applies.
+4. If it genuinely belongs in the vocabulary without a caller, add a third element
+   saying why. It is written into the sprite as `data-dds-vocabulary` and listed on
+   every check run. Completing a direction family is a reason; "a product might
+   want it" is not.
+5. `node scripts/build-icons.mjs` (needs network), then
+   `node scripts/sync-icons.mjs`.
+6. `node scripts/check-icons.mjs` and `node scripts/sync-icons.mjs --check`.
+7. It appears in `reference/foundations.html#icons` on its own — the gallery reads
+   the sprite from the page at runtime.
+
+---
+
 ## Theming
 
 `color-scheme` is bound to the active theme, so native controls — date pickers,

@@ -35,10 +35,18 @@
  * No error, no warning, no fallback — just empty space where an icon was meant to
  * be. That is the single easiest thing to miss in a page full of working icons.
  *
+ * What it cannot catch, and the reason the rule above is written where it is: a
+ * `<use>` pointing at the WRONG role. `#dds-icon-sun` on a "show password" button
+ * resolves, renders, and is a picture of the sun. Only a person reading the markup
+ * sees that. The countermeasure is not a check, it is that the set contains the
+ * role you need — see `ICON_MAP` in `scripts/build-icons.mjs`, which says so at
+ * the point where a missing role is felt.
+ *
  * Zero dependencies, Node stdlib only. Exit code 1 on any finding.
  * @catches A Unicode glyph or emoji used as an icon, a `content:` escape drawing
  *   one, a `<use>` naming a symbol that is not on the page (which renders as
- *   nothing at all), and a symbol no page uses.
+ *   nothing at all), and a symbol no page uses and no one has declared a reason
+ *   for.
  *
  */
 
@@ -123,8 +131,8 @@ const GLYPHS = [
   { char: '✔', name: 'HEAVY CHECK MARK', instead: 'the check icon' },
   { char: '→', name: 'RIGHTWARDS ARROW', instead: 'the arrow-right icon' },
   { char: '←', name: 'LEFTWARDS ARROW', instead: 'the arrow-left icon' },
-  { char: '↑', name: 'UPWARDS ARROW', instead: 'a chevron icon' },
-  { char: '↓', name: 'DOWNWARDS ARROW', instead: 'a chevron icon' },
+  { char: '↑', name: 'UPWARDS ARROW', instead: 'the arrow-up icon' },
+  { char: '↓', name: 'DOWNWARDS ARROW', instead: 'the arrow-down icon' },
   { char: '▸', name: 'BLACK RIGHT-POINTING SMALL TRIANGLE', instead: 'the chevron-right icon' },
   { char: '▾', name: 'BLACK DOWN-POINTING SMALL TRIANGLE', instead: 'the chevron-down icon' },
   { char: '▴', name: 'BLACK UP-POINTING SMALL TRIANGLE', instead: 'the chevron-up icon' },
@@ -135,8 +143,12 @@ const GLYPHS = [
   { char: '☰', name: 'TRIGRAM FOR HEAVEN', instead: 'the menu icon' },
   { char: '⚠', name: 'WARNING SIGN', instead: 'the warning icon' },
   { char: 'ℹ', name: 'INFORMATION SOURCE', instead: 'the info icon' },
-  { char: '★', name: 'BLACK STAR', instead: 'a drawn icon' },
-  { char: '☆', name: 'WHITE STAR', instead: 'a drawn icon' },
+  /* There is no star in the set, which is the point: the fix is to add one to
+     `ICON_MAP` in scripts/build-icons.mjs, not to type the character. Every entry
+     in this list is a role the set either has or should gain — none of them is a
+     reason to reuse a role that means something else. */
+  { char: '★', name: 'BLACK STAR', instead: 'a drawn icon — add one to ICON_MAP' },
+  { char: '☆', name: 'WHITE STAR', instead: 'a drawn icon — add one to ICON_MAP' },
   { char: '☀', name: 'BLACK SUN WITH RAYS', instead: 'the sun icon' },
   { char: '☽', name: 'FIRST QUARTER MOON', instead: 'the moon icon' },
 ];
@@ -207,13 +219,26 @@ for (const path of files) {
 /** Every icon used on any page, so an unused symbol can be judged across the set. */
 const usedAnywhere = new Set();
 const spriteSymbols = new Set();
+/**
+ * Symbols the sprite marks `data-dds-vocabulary` — in the set deliberately
+ * without a caller here, with the reason in the comment above them. Today that is
+ * only the direction families: "up" is meaningful because "down" is, not because
+ * a page in this repository happens to point at it this week.
+ */
+const declaredVocabulary = new Set();
 
 for (const path of files.filter((p) => p.endsWith('.html'))) {
   const source = await readFile(join(ROOT, path), 'utf8');
 
-  const symbols = new Set(
-    [...source.matchAll(/<symbol[^>]+id="([^"]+)"/g)].map((m) => m[1])
-  );
+  const symbols = new Set();
+  for (const [, attributes] of source.matchAll(/<symbol\b([^>]*)>/g)) {
+    const id = (attributes.match(/\bid="([^"]+)"/) || [])[1];
+    if (!id) continue;
+    symbols.add(id);
+    if (id.startsWith('dds-icon-') && /\bdata-dds-vocabulary\b/.test(attributes)) {
+      declaredVocabulary.add(id);
+    }
+  }
   for (const id of symbols) if (id.startsWith('dds-icon-')) spriteSymbols.add(id);
 
   const used = [...source.matchAll(/<use[^>]+(?:xlink:)?href="#([^"]+)"/g)];
@@ -233,21 +258,59 @@ for (const path of files.filter((p) => p.endsWith('.html'))) {
  * A symbol no page uses at all is dead weight in every page load. Checked across
  * the whole set rather than per page: the sprite is shared deliberately, so one
  * page carrying icons it does not use is the design, not a finding.
+ *
+ * The exception, and why it exists: unqualified, this rule says an icon may not be
+ * added until something already needs it — and at the moment something needs it,
+ * the nearest existing symbol is right there and resolves. That is how a SUN ended
+ * up on a "show password" button and the navigation HAMBURGER on an overflow menu.
+ * Both rendered. Both passed this check.
+ *
+ * So a role may be declared in `ICON_MAP` with a reason it belongs without a
+ * caller; the build writes that as `data-dds-vocabulary` and the reason as the
+ * comment above the symbol. The exemption is granted on the declaration alone —
+ * and every exempt symbol is listed on each run, so it stays an argument someone
+ * made rather than a silent hole in the rule.
  */
 for (const id of spriteSymbols) {
-  if (!usedAnywhere.has(id)) {
-    report(
-      `<symbol id="${id}"> is in the sprite but no page uses it — ` +
-        `drop it from scripts/build-icons.mjs`
-    );
-  }
+  if (usedAnywhere.has(id) || declaredVocabulary.has(id)) continue;
+  report(
+    `<symbol id="${id}"> is in the sprite but no page uses it — ` +
+      `give it a caller, or declare in scripts/build-icons.mjs why it belongs ` +
+      `without one`
+  );
 }
+
+/**
+ * The other half of the exemption: a declaration that has quietly acquired a
+ * caller is no longer an exemption, it is an untidy one. Not a failure — the icon
+ * is in use and correct — but worth saying, because the reason attached to it has
+ * stopped being the reason it is there.
+ */
+const nowUsed = [...declaredVocabulary].filter((id) => usedAnywhere.has(id));
 
 /* ------------------------------------------------------------------ report */
 
 if (findings.length) {
   console.log('');
   for (const finding of findings) console.log(`  ${finding}`);
+}
+
+/* Printed on every run, pass or fail. An exemption nobody sees is an exemption
+   nobody revisits, and the whole point of declaring it was to keep it arguable. */
+if (declaredVocabulary.size) {
+  console.log(
+    `\n  In the set without a caller, by declaration ` +
+      `(see ICON_MAP in scripts/build-icons.mjs):`
+  );
+  for (const id of [...declaredVocabulary].sort()) {
+    console.log(`    ${id}${usedAnywhere.has(id) ? '  — now has a caller' : ''}`);
+  }
+  if (nowUsed.length) {
+    console.log(
+      `\n  ${nowUsed.length} of them are now used. The declaration is no longer ` +
+        `what keeps them\n  in the set, so it can go.`
+    );
+  }
 }
 
 console.log(

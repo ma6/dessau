@@ -123,7 +123,7 @@
      Markup:
        <div class="dds-upload" data-dds-upload>
          <div class="dds-upload-zone">
-           <svg class="dds-icon" aria-hidden="true"><use href="#dds-icon-document"/></svg>
+           <svg class="dds-icon" aria-hidden="true"><use href="#dds-icon-upload"/></svg>
            <label>
              <span class="dds-button dds-button-secondary">Choose files</span>
              <input class="dds-sr-only" type="file" multiple

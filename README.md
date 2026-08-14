@@ -173,6 +173,13 @@ Then reference an icon by role:
 file breaks `currentColor` silently — the icon renders, in black, regardless of
 theme. Re-run the command whenever you update Dessau.
 
+**If the role you need is not in the set, ask for it — do not borrow a near one.**
+`#dds-icon-document` on a download link resolves, renders and passes every check,
+and it is a picture of a document. The set is meant to grow: open an issue naming
+the role and what it is for. The full list and the reasoning are in
+[`agent/foundations.md`](agent/foundations.md#icons) and on the
+[foundations reference page](reference/foundations.html#icons).
+
 ### 4. Load only the behaviour you use
 
 Every component renders correctly with **CSS alone**. These add behaviour the

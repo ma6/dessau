@@ -236,6 +236,34 @@ upstream version a path came from or whether it was edited.
 carries those as inline attributes, and a CSS declaration would beat them and fill
 every outline icon solid. `sync-icons.mjs --check` guards the inline copies.
 
+**Amended (#14) — the set grows by addition, never by reuse.** A missing role is
+added to `ICON_MAP`; an existing role is never pointed at a new meaning. This is
+the one icon mistake nothing can check: the `<use>` resolves, the icon renders,
+every script passes, and the interface shows a picture that means something else.
+Four had accumulated — a sun on "show password", a document on both the upload zone
+and the download link, and the navigation hamburger on an overflow menu — so the
+rule is now stated in `ICON_MAP`, in `agent/foundations.md` and in
+`reference/foundations.html#icons`, which is to say at all three places someone
+arrives from.
+
+**Amended (#14) — two reversals that made that rule affordable.**
+
+*`chevron-up` returns, and the direction families are complete.* It was left out
+because a disclosure rotates `chevron-down` by 180deg. Disclosures still do, and
+should — the rotation animates the change and keeps both states unmistakably the
+same control. But that is one component's technique, and it was standing in for a
+reason the vocabulary should be missing a direction. All four chevrons and all four
+arrows now exist.
+
+*The unused-symbol rule gains a declared exemption.* `check-icons.mjs` reports a
+symbol no page uses, which is what keeps the set small — and, unqualified, is also
+what produced the four misuses: it forbids adding an icon until something already
+needs it, and at that moment the nearest existing symbol is right there. A role may
+now be declared in `ICON_MAP` with the reason it belongs without a caller; the build
+emits `data-dds-vocabulary`, the checker exempts it on that declaration, and prints
+every exempt symbol on each run. Three use it: `chevron-up`, `arrow-up`,
+`arrow-down`. "A product might want it" is not a reason.
+
 ---
 
 ## 011 — German is the default locale; formatting via `Intl`

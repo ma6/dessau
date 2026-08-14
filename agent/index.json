@@ -543,7 +543,7 @@
     {
       "name": "icon",
       "purpose": "A decorative glyph beside text.",
-      "notFor": "Carrying meaning on its own — the control gets the name.",
+      "notFor": "Carrying meaning on its own — the control gets the name. And never a role borrowed for a meaning it does not have: a wrong <use> resolves, renders and passes every check. If the role is missing, add it to ICON_MAP in scripts/build-icons.mjs — see agent/foundations.md#icons.",
       "classes": [
         ".dds-icon",
         ".dds-icon-lg",
