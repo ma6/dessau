@@ -171,33 +171,80 @@ test('the active first-level entry is distinguishable by more than colour', asyn
   ).not.toBe(other.shadow);
 });
 
-test('the header keeps DOM, visual and tab order in agreement when narrow', async ({ page }) => {
-  await page.setViewportSize(NARROW);
-  await page.goto('/reference/content.html');
+test('the header is the same height on every page', async ({ page }) => {
+  await page.setViewportSize(WIDE);
 
-  await page.locator('.ref-nav-toggle').click();
+  const heights = new Map();
+
+  for (const file of PAGES) {
+    await page.goto(`/reference/${file}`);
+    const box = await page.locator('.ref-header').boundingBox();
+    heights.set(file, Math.round(box.height));
+  }
 
   /**
-   * The panel takes a full row of its own at narrow widths, so anything after it in the
-   * DOM is pushed below it while appearing above — and a keyboard user tabs down into
-   * the menu and then back up. The theme toggle is therefore before the navigation.
+   * Three of the pages are a group of one and have no second row. Without a reserved
+   * height the header changed size when moving between them — and it is sticky, so the
+   * whole page shifted under the pointer on every navigation.
    */
-  const order = await page.evaluate(() => {
-    const boxes = [...document.querySelectorAll(
-      '.ref-header-inner > *'
-    )].map((el) => ({
-      tag: el.className || el.tagName,
-      top: Math.round(el.getBoundingClientRect().top),
-    }));
-    return boxes;
-  });
+  const distinct = new Set(heights.values());
 
-  // Vertical position must never decrease as DOM order advances.
-  for (let i = 1; i < order.length; i += 1) {
+  expect(
+    distinct.size,
+    'the header is not the same height everywhere, so it resizes as you navigate: ' +
+      [...heights].map(([f, h]) => `${f}=${h}`).join(', ')
+  ).toBe(1);
+});
+
+test('the collapsed menu does not change the header height', async ({ page }) => {
+  await page.setViewportSize(NARROW);
+  await page.goto('/reference/components.html');
+
+  const header = page.locator('.ref-header');
+  const closed = (await header.boundingBox()).height;
+
+  await page.locator('.ref-nav-toggle').click();
+  await expect(page.locator('#ref-nav-panel')).toBeVisible();
+
+  const open = (await header.boundingBox()).height;
+
+  /**
+   * The panel is an overlay below the header, not a row inside it. In flow it took the
+   * full width, which pushed the theme toggle onto a third row — so opening the menu
+   * both grew the header and reordered it.
+   */
+  expect(
+    Math.round(open),
+    'opening the menu changed the header height, so the page jumps under the pointer'
+  ).toBe(Math.round(closed));
+});
+
+test('the theme toggle is the last control in the header row', async ({ page }) => {
+  for (const size of [WIDE, NARROW]) {
+    await page.setViewportSize(size);
+    await page.goto('/reference/components.html');
+
+    const positions = await page.evaluate(() => {
+      const inRow = [...document.querySelectorAll('.ref-header-inner > *')].filter(
+        // The overlay is out of flow, so it is not part of the row.
+        (el) => getComputedStyle(el).position !== 'absolute'
+      );
+      return inRow.map((el) => ({
+        name: el.className || el.tagName,
+        end: Math.round(el.getBoundingClientRect().right),
+      }));
+    });
+
+    const last = positions[positions.length - 1];
+
     expect(
-      order[i].top,
-      `"${order[i].tag}" sits above "${order[i - 1].tag}" while coming after it in the ` +
-        `DOM — focus would jump backwards up the page`
-    ).toBeGreaterThanOrEqual(order[i - 1].top);
+      last.name,
+      `at ${size.width}px the last control in the header row is "${last.name}" — ` +
+        `a utility control belongs at the end, which is where it is looked for`
+    ).toContain('theme-toggle');
+
+    // And it really is the rightmost thing, not merely last in the DOM.
+    const rightmost = Math.max(...positions.map((p) => p.end));
+    expect(last.end, 'the theme toggle is not the rightmost control').toBe(rightmost);
   }
 });

@@ -35,6 +35,9 @@
 }
 
 .ref-header-inner {
+  /* The containing block for the collapsed navigation overlay. */
+  position: relative;
+
   display: flex;
   flex-wrap: wrap;
   align-items: center;
@@ -78,31 +81,36 @@
    where the toggle is actually displayed, which means the failure direction is
    right: with no JavaScript, or before enhancement runs, the navigation is
    present rather than behind a button that does nothing. */
+/* Narrow: an overlay BELOW the header, not a row inside it.
+   ----------------------------------------------------------------------------
+   Out of flow on purpose. As a flex row it took the full width, which pushed
+   everything after it in the DOM — the theme toggle — onto a third row while
+   appearing above it. Moving the toggle before the navigation fixed the focus
+   order and put it in an odd place instead.
+
+   Out of flow, neither problem exists: the header row keeps its height, the
+   toggle stays at the end where it belongs, and DOM order still matches visual
+   order because an overlay is not in the row at all. */
 .ref-nav-panel {
-  /* Its own row, so the two levels never compete with the brand for space. */
-  flex-basis: 100%;
+  position: absolute;
+  inset-inline: 0;
+  inset-block-start: 100%;
+  z-index: var(--dds-z-dropdown);
+
   display: flex;
   flex-direction: column;
   gap: var(--dds-space-2xs);
+
+  padding: var(--dds-space-sm) var(--dds-space-md);
+  background-color: var(--dds-color-surface-raised);
+  border-block-end: var(--dds-border-thin) solid var(--dds-color-border-default);
+  box-shadow: var(--dds-elevation-md);
 }
 
-/* The utilities sit together at the end of the first row. The theme toggle comes
-   BEFORE the navigation in the DOM, deliberately: the panel takes a full row of its
-   own at narrow widths, so anything after it in the DOM would be pushed to a third
-   row while appearing above it — a keyboard user would tab down into the menu and
-   then back up. DOM order, visual order and tab order agree everywhere instead.
-
-   The cost is that the theme toggle sits left of the navigation on a wide screen
-   rather than right of it. That is a convention, not a requirement; focus order is
-   the requirement. */
-.ref-theme-toggle,
-.ref-header-inner > .dds-theme-toggle {
-  margin-inline-start: auto;
-}
-
+/* The menu button is pushed to the end of the row; the theme toggle follows it,
+   which is where a utility control is looked for. */
 .ref-nav-toggle {
-  /* Already pushed right by the toggle before it; only the gap is needed. */
-  margin-inline-start: var(--dds-space-2xs);
+  margin-inline-start: auto;
 }
 
 /* Only where the toggle exists to reopen it. */
@@ -820,6 +828,13 @@
      the navigation unreachable — the trap the site header component documents. */
   .ref-nav-panel,
   .ref-nav-panel[hidden] {
+    /* Back in flow, and no longer an overlay. */
+    position: static;
+    padding: 0;
+    background: none;
+    border-block-end: 0;
+    box-shadow: none;
+
     display: flex;
     flex-basis: auto;
     /* Stacked, not side by side. Two levels in one row read as one long list again —
@@ -829,6 +844,24 @@
     align-items: flex-end;
     gap: 0;
     margin-inline-start: auto;
+
+    /* Room for the second row whether or not this page has one.
+       ----------------------------------------------------------------------
+       Three of the pages are a group of one and get no second row. Without a
+       reserved height the header changed size when moving between them — and it
+       is sticky, so the whole page shifted under the pointer on every
+       navigation.
+
+       Reserving is better than the alternatives: giving those pages a second row
+       containing only themselves is a choice that is not a choice, and
+       restructuring the groups so none has a single child would distort the
+       structure to serve a layout constraint. Calculated from the same values the
+       rows are built from, so it tracks a change to either. */
+    min-block-size: calc(
+      2.25rem + var(--dds-space-2xs) + var(--dds-space-2xs) +
+      var(--dds-border-thin) + 2rem
+    );
+    justify-content: center;
   }
 
   /* The second row sits directly under its parent, sharing an edge with it. */
