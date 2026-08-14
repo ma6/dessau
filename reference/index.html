@@ -9,6 +9,7 @@
 <title>Dessau — Foundations for digital products</title>
 <meta name="description" content="Dessau is a reusable foundation for building digital products: principles, design foundations, components, patterns and machine-readable context for coding agents.">
 <meta name="color-scheme" content="dark light">
+<link rel="icon" href="assets/brand/dessau-icon.svg" type="image/svg+xml">
 
 <!-- Blocking on purpose: the theme must be on <html> before the first paint,
      or a reader who chose dark mode gets a white flash on every navigation. -->
@@ -197,6 +198,11 @@
   <header class="ref-header">
     <div class="dds-container ref-header-inner" style="--dds-container-width: var(--dds-container-xl)">
       <a class="ref-brand" href="index.html">
+        <!-- Decorative: the link already says "Dessau" in text, so the mark adds
+             nothing to the accessible name. It is a masked span rather than an
+             <img> because the brand takes the colour of the text — see
+             reference.css and docs/brand.md. -->
+        <span class="ref-brand-mark" aria-hidden="true"></span>
         Dessau
         <span class="ref-brand-sub">Foundations for digital products</span>
       </a>

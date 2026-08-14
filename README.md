@@ -297,6 +297,7 @@ scripts/     zero-dependency verification tooling
 | [`DECISIONS.md`](DECISIONS.md) | Lasting architectural decisions, and why |
 | [`LESSONS_LEARNED.md`](LESSONS_LEARNED.md) | Reusable experience from real work |
 | [`docs/typography.md`](docs/typography.md) | The type decision, alternatives, and self-hosting |
+| [`docs/brand.md`](docs/brand.md) | The mark, the logo and the icon — and the one colour rule |
 
 ---
 

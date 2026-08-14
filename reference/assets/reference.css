@@ -80,6 +80,41 @@
   color: var(--dds-color-text-default);
 }
 
+/* The brand mark — assets/brand/dessau-mark.svg.
+   ----------------------------------------------------------------------------
+   A MASK rather than an `<img>`, and that is the whole point: the brand is always
+   the colour of the text beside it. An `<img>` cannot be, because an SVG loaded
+   as an image is its own document with nothing to inherit from — `currentColor`
+   there resolves to black, in both themes, silently. The mask takes only the
+   shape and lets `background-color` supply the colour, so the mark follows the
+   theme exactly, including a site theme that disagrees with the operating system.
+
+   Everything sits inside `@supports`, so a browser without mask support gets no
+   box at all rather than a solid rectangle of `currentColor` where the mark
+   should be. The mark is decorative — the link says "Dessau" in text — so absent
+   is the correct failure, and the accessible name does not change either way.
+
+   Sized in `em`: `--dds-font-size-lg` is a `clamp()`, and a mark in `rem` would
+   drift away from the word beside it as the viewport changes the type size.
+   `aspect-ratio` carries the drawing's own proportion so only one length is ever
+   written down here. */
+@supports (mask-image: url("brand/dessau-mark.svg")) {
+  .ref-brand-mark {
+    display: inline-block;
+    align-self: center;
+    flex-shrink: 0;
+
+    block-size: 1.15em;
+    aspect-ratio: 92.323 / 100;
+
+    background-color: currentColor;
+    mask-image: url("brand/dessau-mark.svg");
+    mask-size: contain;
+    mask-repeat: no-repeat;
+    mask-position: center;
+  }
+}
+
 .ref-brand-sub {
   font-family: var(--dds-font-body);
   font-size: var(--dds-font-size-xs);

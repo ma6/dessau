@@ -523,3 +523,61 @@ it. That means a handful of process terms appear in `AGENTS.md`,
 `agent/principles.md` and `README.md` — always as prohibitions. The whitelabel audit
 lists each as a justified exception rather than dropping the term from its search, so
 the same word appearing as real content would still fail the gate.
+
+---
+
+## 024 — The reference site has a brand; DDS still does not
+
+**Supersedes** the "Brand assets" bullet of 023, and only that bullet. The rest of
+023 stands.
+
+**Decision.** Dessau has a mark, a logo and an icon, in
+[`reference/assets/brand/`](reference/assets/brand/). They are **not** in `dds/`,
+are not exported by `scripts/bundle.mjs`, and no component, token or pattern refers
+to them. A product adopting DDS still receives no brand of ours.
+
+**Why the old entry was half right.** "Dessau is a foundation, not a brand" is
+correct about the *design system* and wrong about the *reference site*. The
+reference is not the foundation: it is a product that consumes the foundation, and
+it already says so — `assets/fonts.css` opens by explaining that DDS ships no font
+binaries while the reference, being a product, self-hosts three. A product with no
+favicon and no identity is not a worked example of anything. The directory boundary
+keeps both halves true.
+
+**Not in the icon sprite.** `dds/icons/icons.svg` is inlined into every page by
+`scripts/sync-icons.mjs`, so a mark added there would land in every consuming
+product and a white-labelling product would have to remember to strip it. Icons are
+a foundation (021); a logo is the opposite of one.
+
+**The colour rule: the brand is always the colour of the text.** No brand colour,
+no field, no second palette. The mark and the logo are pure `currentColor`.
+
+That has a consequence which is easy to get wrong, so it is written down here as
+well as in `docs/brand.md`: **the mark can never be an `<img>`.** An SVG loaded as
+an image is its own document with nothing to inherit from, so `currentColor` there
+resolves to black — in both themes, with no error. The reference header therefore
+uses the file as a CSS **mask** over `background-color: currentColor`, inside an
+`@supports` so that a browser without mask support renders no box rather than a
+solid rectangle. Inlining the SVG is the other correct option.
+
+**The favicon is the one exception, and it is not a loophole.** A tab strip has no
+text to inherit from, so `dessau-icon.svg` states `#201e1a` and `#f4f2ee` and
+switches them on `prefers-color-scheme`, in a scoped class rather than on `:root`
+so the file cannot restyle a page it is inlined into. Anything *inside* a page uses
+the mark instead, which follows the site's own theme even when that disagrees with
+the operating system.
+
+**The wordmark is Inter Black, and that was measured, not chosen.** The mark's
+stroke is 0.29 of its cap height; Inter's weight axis was instanced and the stem
+measured at every stop (0.128 at 400 through 0.271 at 900). 900 is the only weight
+that stands beside the mark without looking like an accident. The outlines are
+baked into the file because an SVG used as an image gets no fonts from the
+document.
+
+**Cost.** Two literal colours exist in the icon and do not follow a token change,
+and the wordmark's outlines cannot be regenerated without rewriting the variable
+font instancer that produced them. Both are recorded in `docs/brand.md` so the
+search finds them.
+
+**Reversal condition.** If the reference site is ever moved out of this repository,
+the brand goes with it and this entry goes back to reading like 023.

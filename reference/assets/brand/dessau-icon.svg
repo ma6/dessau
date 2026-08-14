@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Dessau — icon
+
+  The mark on a square canvas, for the favicon and anywhere else that needs a
+  standalone file rather than a shape to inherit colour.
+
+  (Separators are "=" because a double hyphen inside an XML comment is fatal.
+  See dessau-mark.svg.)
+
+  ===========================================================================
+  Why this file carries colour at all
+  ===========================================================================
+
+  The rule for the brand is that it is always the colour of the text beside it.
+  A favicon has no text beside it: it is loaded as an image, in a browser tab
+  strip, with no document to inherit from, so currentColor there resolves to
+  black and disappears on a dark tab strip.
+
+  So this one file states the two values and switches them on the reader's
+  colour scheme. The class is scoped rather than styling :root, so that
+  inlining this file into a page cannot reach out and restyle the page.
+
+      light scheme   #201e1a   the stone-950 ink
+      dark scheme    #f4f2ee   the stone-100 paper
+
+  If a browser ignores the media query, the light value applies. That is the
+  right way round: most tab strips are light, and the failure is then invisible
+  rather than a black mark on black.
+
+  Everything INSIDE a page uses dessau-mark.svg instead, as a mask over
+  background-color: currentColor, which follows the theme exactly, including a
+  site theme that disagrees with the operating system.
+
+  ===========================================================================
+  Why the seam is wider here
+  ===========================================================================
+
+  The mark's seam between stem and bowl is 6.08 units, which is 0.76 of a pixel
+  at 16 px: it closes, and the two pieces read as one. This file opens it to
+  8.08 so something survives. That is an optical size, in the sense the
+  opsz axis of a typeface means it, and it is the ONLY difference from the mark.
+  Rendered at 16, 32 and 120 px before the number was chosen: 2 more units is
+  visible at 32 px and hinted at 16 px, and 5 more starts to read as two
+  separate shapes.
+
+  The letter fills 78% of the canvas rather than a more composed 60%, for the
+  same reason: a favicon is 16 px and a composed one turns to mush.
+-->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128"
+     role="img" aria-labelledby="dessau-icon-title">
+  <title id="dessau-icon-title">Dessau</title>
+  <style>
+    .dessau-glyph { fill: #201e1a; }
+    @media (prefers-color-scheme: dark) {
+      .dessau-glyph { fill: #f4f2ee; }
+    }
+  </style>
+  <g class="dessau-glyph" transform="translate(16.839 14)">
+    <path d="M0.203 0.203C0.087 0.29 0 22.798 0 50.174L0 99.942L28.679 99.942L28.679 0L14.542 0C6.75 0 0.29 0.087 0.203 0.203Z"/>
+    <path d="M36.994 0.145C36.849 0.29 36.762 6.808 36.762 14.687L36.762 28.969L63.124 28.969L63.124 71.553L50.03 71.611L36.907 71.698L36.82 85.863L36.762 100L44.787 99.855C51.594 99.739 53.275 99.623 55.592 99.102C67.991 96.321 78.68 89.079 85.575 78.795C88.645 74.218 91.571 67.439 92.672 62.428C94.323 54.925 94.149 45.162 92.238 37.949C87.66 20.8 75.725 7.966 59.271 2.578C54.144 0.869 50.146 0.261 43.136 0.087C39.862 0 37.11 0.029 36.994 0.145Z"/>
+  </g>
+</svg>

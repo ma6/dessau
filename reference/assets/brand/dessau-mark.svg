@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Dessau — brand mark
+
+  The D, drawn by hand as a logo mark rather than set as type: a detached bar,
+  a bowl, and an open notch where a letter would have a closed counter. The
+  file below is that drawing, unchanged in shape.
+
+  NOTE ON THESE COMMENTS: a standalone .svg is parsed as XML, where a double
+  hyphen inside a comment is a FATAL error, and a custom property name starts
+  with one. So the separators here are "=" and tokens are named without their
+  prefix. The icon sprite in dds/icons can use hyphens freely because it is
+  inlined into HTML, which is lenient. This file is not.
+
+  ===========================================================================
+  What was changed, and what was not
+  ===========================================================================
+
+  Nothing about the shape. The source drawing carried a transform
+  (matrix(0.1, 0, 0, -0.1, -154, 623), a y-flip from the design tool); it has
+  been multiplied into the coordinates so the file needs no transform to be
+  read, and the result was scaled so the letter is exactly 100 units tall.
+
+  Every number is therefore a percentage of the cap height, and the measurements
+  can be read straight off the path:
+
+      cap height          100
+      ink width            92.323      0.923 of the cap
+      stem                 28.68 wide
+      seam                  6.08       between stem and bowl
+      bar                  28.97       top and bottom of the bowl
+      notch                90.9 wide by 42.6 deep, open to the left
+
+  A stroke of 0.29 against the cap makes this heavier than Inter Black, which
+  is 0.271. That is the number the wordmark in dessau-logo.svg is fitted to.
+
+  Two artefacts of the original drawing are preserved rather than tidied: the
+  stem is 99.942 tall against the bowl's 100, and the outer corners carry a
+  curve of about 0.2 units. Both are far below a pixel at any real size.
+
+  ===========================================================================
+  Colour
+  ===========================================================================
+
+  currentColor, always. The mark takes the colour of the text around it, which
+  also means it CANNOT be used as an img src: there it has nothing to inherit
+  from and renders black. Inline it, or use it as a CSS mask over
+  background-color: currentColor, which is what the reference header does. The
+  favicon is a separate file for exactly this reason. See docs/brand.md.
+
+  Two paths, both solid. The notch is part of the bowl's outline rather than a
+  counter, so there is no hole and no fill-rule to get wrong.
+-->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 92.323 100" fill="currentColor"
+     role="img" aria-labelledby="dessau-mark-title">
+  <title id="dessau-mark-title">Dessau</title>
+  <path d="M0.203 0.203C0.087 0.29 0 22.798 0 50.174L0 99.942L28.679 99.942L28.679 0L14.542 0C6.75 0 0.29 0.087 0.203 0.203Z"/>
+  <path d="M34.994 0.145C34.849 0.29 34.762 6.808 34.762 14.687L34.762 28.969L61.124 28.969L61.124 71.553L48.03 71.611L34.907 71.698L34.82 85.863L34.762 100L42.787 99.855C49.594 99.739 51.275 99.623 53.592 99.102C65.991 96.321 76.68 89.079 83.575 78.795C86.645 74.218 89.571 67.439 90.672 62.428C92.323 54.925 92.149 45.162 90.238 37.949C85.66 20.8 73.725 7.966 57.271 2.578C52.144 0.869 48.146 0.261 41.136 0.087C37.862 0 35.11 0.029 34.994 0.145Z"/>
+</svg>
