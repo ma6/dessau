@@ -45,8 +45,8 @@
  * Zero dependencies, Node stdlib only. Exit code 1 on any finding.
  * @catches A Unicode glyph or emoji used as an icon, a `content:` escape drawing
  *   one, a `<use>` naming a symbol that is not on the page (which renders as
- *   nothing at all), and a symbol no page uses and no one has declared a reason
- *   for.
+ *   nothing at all), a script building a `<use>` for a symbol the sprite does not
+ *   have, and a symbol nothing uses and no one has declared a reason for.
  *
  */
 
@@ -249,6 +249,37 @@ for (const path of files.filter((p) => p.endsWith('.html'))) {
       report(
         `${path}: <use href="#${id}"> has no matching <symbol> on the page — ` +
           `it renders as empty space. Run: node scripts/sync-icons.mjs`
+      );
+    }
+  }
+}
+
+/**
+ * A script naming a symbol is a caller too.
+ *
+ * Not every icon reaches the page through hand-written markup: an enhancement
+ * that builds a control builds its icon with it — the file list in an upload, the
+ * reveal toggle on a password field. Reading only HTML, this check called those
+ * symbols dead weight and told the maintainer to delete the only artwork the
+ * component has.
+ *
+ * The names are matched as string literals, with or without the leading `#`,
+ * because both spellings occur: `href="#" + id` and `setAttribute('href',
+ * '#dds-icon-close')`. An id assembled at runtime from a fragment is invisible
+ * here, exactly as it is to any reader of the file.
+ */
+const ICON_ID_IN_SCRIPT = /['"`]#?(dds-icon-[a-z0-9]+(?:-[a-z0-9]+)*)['"`]/g;
+
+for (const path of files.filter((p) => p.endsWith('.js'))) {
+  const source = stripComments(await readFile(join(ROOT, path), 'utf8'), path);
+
+  for (const [, id] of source.matchAll(ICON_ID_IN_SCRIPT)) {
+    usedAnywhere.add(id);
+    if (!spriteSymbols.has(id)) {
+      report(
+        `${path}: builds <use href="#${id}">, which is not in the sprite — ` +
+          `it renders as empty space. Add the role to ICON_MAP in ` +
+          `scripts/build-icons.mjs and re-run the icon build.`
       );
     }
   }

@@ -150,6 +150,76 @@ ring. `:has()` moves the ring to the wrapper with no JavaScript.
 
 ---
 
+## Password — `.dds-password`
+
+**For:** any `<input type="password">`. **You do not write this component.**
+
+```html
+<div class="dds-field">
+  <label class="dds-label" for="password">
+    Password <span class="dds-label-note">(required)</span>
+  </label>
+  <input class="dds-input" id="password" name="password" type="password"
+         autocomplete="current-password" required>
+</div>
+```
+
+`components-forms.js` wraps the input in `.dds-password` and appends the reveal
+toggle. The result is the markup you would otherwise have written by hand:
+
+```html
+<span class="dds-password">
+  <input class="dds-input" id="password" type="password" …>
+  <button type="button" class="dds-button dds-button-subtle dds-button-icon
+                               dds-button-sm dds-password-toggle" aria-pressed="false">
+    <span class="dds-sr-only">Show password</span>
+    <svg class="dds-icon dds-password-show" aria-hidden="true"><use href="#dds-icon-eye"/></svg>
+    <svg class="dds-icon dds-password-hide" aria-hidden="true"><use href="#dds-icon-eye-off"/></svg>
+  </button>
+</span>
+```
+
+**Why it is automatic, when nothing else in DDS is.** WCAG 2.2 3.3.8 Accessible
+Authentication (Minimum) forbids a cognitive function test without an
+alternative, and typing a long password blind is that test. A reveal toggle is
+therefore a requirement, not a feature — and a password field without one looks
+completely normal, so an opt-in version would fail silently in exactly the
+products that forgot. `type="password"` is already the unambiguous statement of
+intent that an opt-in attribute would have been. Recorded in `DECISIONS.md`.
+
+**`data-dds-password`** on the input, and it does two jobs:
+
+| Value | Effect |
+| --- | --- |
+| absent | English wording, toggle added |
+| `"de"` | German wording, toggle added |
+| `"off"` | Left alone entirely — no wrapper, no toggle |
+
+**Rules:**
+
+- The accessible name stays **constant** ("Show password") in both states; the
+  state is in `aria-pressed`. A button that renames itself when pressed is
+  announced as a different control each time.
+- Only `type` changes. **`autocomplete` is never rewritten** — that is the usual
+  reason a reveal toggle breaks password managers, and the manager is what makes
+  3.3.8 satisfiable in the first place. Never block paste, for the same reason.
+- The change is announced, because switching a field from masked to visible is a
+  privacy matter a screen-reader user cannot see happening.
+- Without JavaScript: an ordinary masked input that still submits.
+
+**The one shape it refuses.** An input nested inside its own `<label>` gets no
+toggle and a console error instead: a `<label>` may not contain a labelable
+element other than the control it labels, and a `<button>` is one. Use a separate
+`<label for>`, which this system requires anyway.
+
+**Existing markup is respected.** A hand-written toggle — a
+`<button data-dds-password-toggle="<field-id>">` anywhere in the document, or a
+`.dds-password-toggle` beside the field — is wired up rather than duplicated, and
+an input already inside `.dds-password` or `.dds-input-group` is not wrapped
+twice.
+
+---
+
 ## Checkbox and radio — `.dds-choice`
 
 **For:** a boolean, or one of several options.

@@ -10,12 +10,12 @@
 <meta name="description" content="Dessau component reference: every variant and state of button, field, choice, switch, badge, card, notice, dialog, table, tabs and disclosure.">
 <meta name="color-scheme" content="dark light">
 <link rel="icon" href="assets/brand/dessau-icon.svg" type="image/svg+xml">
-<script src="../dds/js/theme-init.js"></script>
+<script src="../dds/js/theme-init.js?v=eb2c6b3a"></script>
 <link rel="preload" href="assets/fonts/Inter-Variable.ttf" as="font"
       type="font/ttf" crossorigin>
-<link rel="stylesheet" href="assets/fonts.css">
-<link rel="stylesheet" href="../dds/dds.css">
-<link rel="stylesheet" href="assets/reference.css">
+<link rel="stylesheet" href="assets/fonts.css?v=395fbad1">
+<link rel="stylesheet" href="../dds/dds.css?v=4b176c10">
+<link rel="stylesheet" href="assets/reference.css?v=42cb2216">
 </head>
 <body>
 <a class="dds-skip-link" href="#main">Skip to main content</a>
@@ -591,6 +591,86 @@
                 </div>
                 <p class="dds-hint" id="f-amount-hint">Currency in euros.</p>
               </div>
+            </div>
+          </div>
+
+          <div class="ref-specimen">
+            <p class="ref-specimen-label">Password — the reveal toggle is not optional</p>
+            <div class="ref-matrix">
+              <div class="dds-field">
+                <label class="dds-label" for="f-password">
+                  Password <span class="dds-label-note">(required)</span>
+                </label>
+                <input class="dds-input" id="f-password" type="password" name="password"
+                       autocomplete="current-password" required
+                       value="correct-horse-battery-staple"
+                       aria-describedby="f-password-hint">
+                <p class="dds-hint" id="f-password-hint">
+                  Written as a bare <span class="dds-code">&lt;input type="password"&gt;</span>.
+                  The wrapper and the button were added by DDS.
+                </p>
+              </div>
+
+              <div class="dds-field">
+                <label class="dds-label" for="f-password-de">Passwort</label>
+                <input class="dds-input" id="f-password-de" type="password" name="password-de"
+                       autocomplete="current-password" data-dds-password="de"
+                       value="richtiges-pferd-batterie-heftklammer"
+                       aria-describedby="f-password-de-hint">
+                <p class="dds-hint" id="f-password-de-hint">
+                  <span class="dds-code">data-dds-password="de"</span> — the button’s
+                  name and the announcement in German.
+                </p>
+              </div>
+
+              <div class="dds-field">
+                <label class="dds-label" for="f-password-off">Recovery key</label>
+                <input class="dds-input" id="f-password-off" type="password" name="recovery"
+                       autocomplete="off" data-dds-password="off"
+                       value="never-to-be-shown"
+                       aria-describedby="f-password-off-hint">
+                <p class="dds-hint" id="f-password-off-hint">
+                  <span class="dds-code">data-dds-password="off"</span> — no wrapper, no
+                  toggle, no way to reveal it. Rare, and it needs a reason.
+                </p>
+              </div>
+
+              <div class="dds-field">
+                <label class="dds-label" for="f-password-disabled">Password</label>
+                <input class="dds-input" id="f-password-disabled" type="password" name="password-disabled"
+                       autocomplete="current-password" value="unchangeable" disabled
+                       aria-describedby="f-password-disabled-hint">
+                <p class="dds-hint" id="f-password-disabled-hint">
+                  A disabled field disables its toggle too — there is nothing to reveal.
+                </p>
+              </div>
+            </div>
+
+            <div class="ref-note">
+              <h3 class="dds-text-sm dds-weight-semibold">Why this one enhancement is not opt-in</h3>
+              <p class="dds-text-sm dds-text-subtle dds-mbs-2xs">
+                Every other behaviour in DDS waits for a
+                <code class="dds-code">data-dds-*</code> attribute. This one does not,
+                because a missing reveal toggle is an accessibility defect rather than a
+                missing feature: WCAG 2.2 3.3.8 Accessible Authentication forbids a
+                cognitive function test without an alternative, and typing a long
+                password blind is exactly that test. Opt-in would make the compliant
+                version the one somebody remembered — and a password field without a
+                toggle looks completely normal, so nothing would ever report it.
+              </p>
+              <p class="dds-text-sm dds-text-subtle dds-mbs-xs">
+                The button keeps <em>one</em> accessible name in both states, with the
+                state in <code class="dds-code">aria-pressed</code>. A button that renames
+                itself when pressed is announced as a different control each time. The
+                icon names the action; the field itself — dots or characters — is the
+                visible state.
+              </p>
+              <p class="dds-text-sm dds-text-subtle dds-mbs-xs">
+                Only <code class="dds-code">type</code> changes.
+                <code class="dds-code">autocomplete</code> is never rewritten and paste is
+                never blocked: breaking the password manager would defeat the criterion
+                the toggle exists to satisfy.
+              </p>
             </div>
           </div>
 
@@ -1628,12 +1708,12 @@
   </footer>
 </div>
 
-<script src="../dds/js/dds.js" defer></script>
-<script src="../dds/js/format.js" defer></script>
-<script src="../dds/js/components.js" defer></script>
-<script src="../dds/js/components-navigation.js" defer></script>
-<script src="../dds/js/components-forms.js" defer></script>
-<script src="assets/reference.js" defer></script>
-<script src="assets/reference-tools.js" defer></script>
+<script src="../dds/js/dds.js?v=88ca7b81" defer></script>
+<script src="../dds/js/format.js?v=8f2e10f1" defer></script>
+<script src="../dds/js/components.js?v=07fa7736" defer></script>
+<script src="../dds/js/components-navigation.js?v=0782ade5" defer></script>
+<script src="../dds/js/components-forms.js?v=6f555727" defer></script>
+<script src="assets/reference.js?v=30a62e51" defer></script>
+<script src="assets/reference-tools.js?v=d85fbb00" defer></script>
 </body>
 </html>

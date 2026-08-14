@@ -193,7 +193,7 @@ announced twice.
 | Paste is never blocked | **3.3.8** |
 | Password managers work; `autocomplete` correct | **3.3.8** |
 | A one-time code in one field with `one-time-code` | **3.3.8** |
-| A password reveal is offered | **3.3.8** |
+| A password reveal is offered — automatic on every `type="password"`, so check it is *there* rather than remembering to add it | **3.3.8** |
 
 ---
 

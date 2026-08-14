@@ -662,6 +662,27 @@
       "accessibility": "Role depends on WHEN it appears: none / role=status / role=alert."
     },
     {
+      "name": "password",
+      "purpose": "A password field and its reveal toggle. Added automatically to every <input type=\"password\">; you do not write this markup.",
+      "notFor": "A field that must never be readable — opt out with data-dds-password=\"off\".",
+      "classes": [
+        ".dds-password",
+        ".dds-password-hide",
+        ".dds-password-show",
+        ".dds-password-toggle"
+      ],
+      "css": "dds/css/components-forms.css",
+      "spec": "## Password — `.dds-password`",
+      "reference": "reference/components.html#field",
+      "js": "dds/js/components-forms.js",
+      "native": "input[type=password]",
+      "hooks": [
+        "data-dds-password",
+        "data-dds-password-toggle"
+      ],
+      "accessibility": "WCAG 2.2 3.3.8 Accessible Authentication: typing a long password blind is a cognitive function test, so the reveal is a requirement and therefore not opt-in — `type=\"password\"` is the opt-in signal (see DECISIONS.md). A real <button type=\"button\"> whose accessible name stays CONSTANT, with the state in aria-pressed; a button that renames itself is announced as a different control each time. Only `type` changes — `autocomplete` is never rewritten and paste is never blocked, because the password manager is what makes 3.3.8 satisfiable. The change is announced via DDS.announce. The caret is restored after the type switch. A disabled field disables its toggle. Without JavaScript: an ordinary masked input that still submits. data-dds-password takes \"off\" (leave the field alone) or a language code (\"de\") for the wording; an authored toggle is wired rather than duplicated, and an input already inside .dds-password or .dds-input-group is not wrapped again."
+    },
+    {
       "name": "pagination",
       "purpose": "Navigation between pages of a list.",
       "notFor": "Steps in a process.",
@@ -1245,13 +1266,12 @@
     },
     {
       "name": "auth",
-      "purpose": "Signing in, and recovering access: sign-in, a one-time code, and a password reset in three steps (request, code, new password).",
+      "purpose": "Signing in, and recovering access: sign-in, a one-time code, and a password reset in three steps (request, code, new password). The reveal toggle is not here — it belongs to the `password` component and is automatic.",
       "notFor": "A general form.",
       "classes": [
         ".dds-auth",
         ".dds-auth-footer",
         ".dds-auth-head",
-        ".dds-password",
         ".dds-otp"
       ],
       "css": "dds/css/patterns-flows.css",
@@ -1259,7 +1279,6 @@
       "reference": "reference/patterns.html#auth",
       "js": "dds/js/patterns/auth.js",
       "hooks": [
-        "data-dds-password-toggle",
         "data-dds-password-confirm",
         "data-dds-password-new",
         "data-dds-password-repeat",

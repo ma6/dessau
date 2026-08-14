@@ -4,13 +4,13 @@
  *   <script src="/dds/js/dds.js" defer></script>
  *   <script src="/dds/js/components-forms.js" defer></script>
  *
- * Contents: number stepper · file upload · character count
+ * Contents: password reveal · number stepper · file upload · character count
  *
  * Everything here degrades to a working native control. Without this file the
  * stepper is a usable `<input type="number">`, the upload is a usable
- * `<input type="file">`, and the character count is simply absent — while
- * `maxlength` still enforces the limit, because the limit was never enforced
- * here in the first place.
+ * `<input type="file">`, the password field is an ordinary masked input, and the
+ * character count is simply absent — while `maxlength` still enforces the limit,
+ * because the limit was never enforced here in the first place.
  */
 (function (global) {
   'use strict';
@@ -20,6 +20,230 @@
     console.error('[DDS] components-forms.js requires dds.js to be loaded first');
     return;
   }
+
+  var SVG_NS = 'http://www.w3.org/2000/svg';
+
+  /** An icon element referencing the inlined sprite. */
+  function spriteIcon(id, className) {
+    var svg = document.createElementNS(SVG_NS, 'svg');
+    svg.setAttribute('class', className ? 'dds-icon ' + className : 'dds-icon');
+    svg.setAttribute('aria-hidden', 'true');
+    svg.setAttribute('focusable', 'false');
+
+    var use = document.createElementNS(SVG_NS, 'use');
+    use.setAttribute('href', '#' + id);
+    svg.appendChild(use);
+
+    return svg;
+  }
+
+  /* =========================================================================
+     Password reveal
+     =========================================================================
+     Markup:
+       <input class="dds-input" type="password" autocomplete="current-password">
+
+     That is the whole contract. Every password field in the document gets the
+     wrapper and the reveal button, without asking for them.
+
+     ---------------------------------------------------------------------------
+     Why this one enhancement is not opt-in
+     ---------------------------------------------------------------------------
+
+     Everything else in DDS waits for a `data-dds-*` attribute. This does not,
+     and the reason is that a missing reveal toggle is an accessibility defect
+     rather than a missing feature: WCAG 2.2 3.3.8 Accessible Authentication
+     (Minimum) forbids a cognitive function test without an alternative, and
+     typing a long password blind is exactly that test. Opt-in would mean the
+     compliant version is the one somebody remembered, and a password field with
+     no toggle looks entirely normal — so nothing would ever report the omission.
+
+     `type="password"` is an unambiguous statement of intent already present in
+     the markup, which is what an opt-in attribute would have been for. See
+     DECISIONS.md.
+
+     Opt out where a field genuinely must stay masked:
+
+       <input type="password" data-dds-password="off">
+
+     The same attribute picks the wording: `data-dds-password="de"`.
+
+     ---------------------------------------------------------------------------
+     The details that matter
+     ---------------------------------------------------------------------------
+
+      - It is a real `<button type="button">` with `aria-pressed`, not a div and
+        not a checkbox. It is one control in two states, so its accessible name
+        must stay CONSTANT — a button whose name changes when pressed is
+        announced as a different control each time. The state lives in
+        `aria-pressed`.
+      - Revealing is announced, because the change is invisible to a
+        screen-reader user and silently switching a field from masked to visible
+        is a privacy matter they should know about.
+      - Only `type` changes. `autocomplete` is never touched: rewriting it is the
+        usual reason a reveal toggle breaks password managers, and keeping the
+        manager working is the very thing 3.3.8 depends on. Paste is never
+        blocked, for the same reason.
+
+     Without this file the field is a normal masked input. Less accessible, still
+     functional, and it still submits.
+     ========================================================================= */
+
+  /**
+   * Wording, per language, mirroring the theme toggle in dds.js.
+   *
+   * `action` is the button's accessible name and stays the same in both states —
+   * the icon and the field itself carry the state. The two announcements are
+   * what a screen-reader user gets instead of seeing the characters appear.
+   */
+  var PASSWORD_LABELS = {
+    en: {
+      action: 'Show password',
+      shown: 'Password is now visible',
+      hidden: 'Password is now hidden',
+    },
+    de: {
+      action: 'Passwort anzeigen',
+      shown: 'Das Passwort ist jetzt sichtbar',
+      hidden: 'Das Passwort ist jetzt verborgen',
+    },
+  };
+
+  function passwordLabels(input) {
+    return PASSWORD_LABELS[input.getAttribute('data-dds-password')] || PASSWORD_LABELS.en;
+  }
+
+  /**
+   * Wire one button to one field.
+   *
+   * Shared by both routes to a toggle: the one this file injects, and one a page
+   * wrote by hand with `data-dds-password-toggle`.
+   */
+  function wireReveal(button, input) {
+    var labels = passwordLabels(input);
+
+    // `type="button"`, or it submits the form instead of revealing anything.
+    if (button.tagName === 'BUTTON' && !button.getAttribute('type')) button.type = 'button';
+
+    button.setAttribute('aria-pressed', input.type === 'text' ? 'true' : 'false');
+
+    button.addEventListener('click', function () {
+      var revealing = input.type === 'password';
+
+      input.type = revealing ? 'text' : 'password';
+      button.setAttribute('aria-pressed', revealing ? 'true' : 'false');
+
+      // Keep the caret where it was. Reassigning `type` moves it to the start in
+      // some engines, which is maddening halfway through a long password.
+      try {
+        var position = input.value.length;
+        input.setSelectionRange(position, position);
+      } catch (error) {
+        // Not all input types support selection ranges; not worth failing over.
+      }
+
+      input.focus();
+
+      DDS.announce(revealing ? labels.shown : labels.hidden);
+    });
+  }
+
+  /** Is there already a toggle in this document pointing at this field? */
+  function hasAuthoredToggle(input) {
+    if (!input.id) return false;
+
+    return Array.prototype.some.call(
+      document.querySelectorAll('[data-dds-password-toggle]'),
+      function (button) {
+        return button.getAttribute('data-dds-password-toggle') === input.id;
+      }
+    );
+  }
+
+  DDS.register(
+    'password',
+    'input[type="password"]:not([data-dds-password="off"])',
+    function (input) {
+      var parent = input.parentElement;
+      if (!parent) return;
+
+      // A page that wrote its own toggle keeps it. Two toggles on one field is
+      // two controls that disagree about the state.
+      if (parent.querySelector('.dds-password-toggle') || hasAuthoredToggle(input)) return;
+
+      /**
+       * Where the button goes.
+       *
+       * A wrapper that already carries the border — because the page wrote
+       * `.dds-password`, or because the field sits in an `.dds-input-group` — is
+       * used as it is. Wrapping a wrapper would draw a second border inside the
+       * first.
+       *
+       * Otherwise the input is moved into a new one. Moving an input preserves
+       * its value, and this runs at DOMContentLoaded, before anything is focused.
+       */
+      var host = parent;
+      if (!parent.matches('.dds-password, .dds-input-group')) {
+        /**
+         * A field nested inside its own `<label>` is the one shape this cannot be
+         * added to. A `<label>` may not contain a labelable element other than the
+         * control it labels, and a `<button>` is labelable — so the toggle would be
+         * invalid markup with undefined activation behaviour, which is worse than
+         * no toggle. Said out loud, because the consequence is a WCAG 2.2 3.3.8
+         * failure and the fix is one Dessau asks for anyway.
+         */
+        if (input.closest('label')) {
+          console.error(
+            '[DDS] no password reveal added: the field is inside its own <label>, ' +
+              'which cannot contain a button. Use a separate <label for>.',
+            input
+          );
+          return;
+        }
+
+        host = document.createElement('span');
+        host.className = 'dds-password';
+        input.replaceWith(host);
+        host.appendChild(input);
+      }
+
+      var button = document.createElement('button');
+      button.type = 'button';
+      button.className =
+        'dds-button dds-button-subtle dds-button-icon dds-button-sm dds-password-toggle';
+
+      // The name is a real element rather than `aria-label`, so it is translated
+      // by the same machinery as the rest of the page.
+      var name = document.createElement('span');
+      name.className = 'dds-sr-only';
+      name.textContent = passwordLabels(input).action;
+      button.appendChild(name);
+
+      button.appendChild(spriteIcon('dds-icon-eye', 'dds-password-show'));
+      button.appendChild(spriteIcon('dds-icon-eye-off', 'dds-password-hide'));
+
+      // A disabled field has nothing to reveal, and an operable control beside a
+      // dead one is a lie about what the form will accept.
+      if (input.disabled) button.disabled = true;
+
+      host.appendChild(button);
+      wireReveal(button, input);
+    }
+  );
+
+  /* A toggle written by hand, pointing at a field by id. Still supported: a
+     product may want the button somewhere this file would not have put it. */
+  DDS.register('password-toggle', '[data-dds-password-toggle]', function (button) {
+    var id = button.getAttribute('data-dds-password-toggle');
+    var input = document.getElementById(id);
+
+    if (!input) {
+      console.error('[DDS] password toggle references unknown field "' + id + '"', button);
+      return;
+    }
+
+    wireReveal(button, input);
+  });
 
   /* =========================================================================
      Number stepper

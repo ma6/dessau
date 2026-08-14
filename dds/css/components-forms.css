@@ -7,10 +7,108 @@
    native one looked wrong.
 
    Section index:
-     Number stepper · Segmented control · File upload · Range · Character count
+     Password · Number stepper · Segmented control · File upload · Range ·
+     Character count
    ============================================================================= */
 
 @layer dds.components {
+
+  /* ==========================================================================
+     Password
+     ==========================================================================
+     A native `<input type="password">` with a reveal toggle beside it.
+
+     The toggle is not a convenience and not a variant to opt into. WCAG 2.2
+     3.3.8 Accessible Authentication (Minimum) forbids a cognitive function test
+     without an alternative, and typing a long password blind — on a phone
+     keyboard, with a tremor, with dyslexia, or simply because the password
+     manager did not fire — is exactly the barrier the criterion is about. Seeing
+     what was typed is the alternative. So `dds/js/components-forms.js` builds
+     this wrapper and this button around every password field on the page, and a
+     product has to write nothing at all.
+
+     What that means for these rules: they must work on markup nobody wrote by
+     hand. The wrapper carries the border so the toggle sits inside the focus
+     ring rather than beside it, and the input gives up its own chrome — the same
+     arrangement as `.dds-input-group`, for the same reason.
+
+     Behaviour: js/components-forms.js */
+  .dds-password {
+    display: flex;
+    align-items: center;
+    gap: var(--dds-space-2xs);
+
+    padding-inline-end: var(--dds-space-3xs);
+    background-color: var(--dds-color-surface-default);
+    border: var(--dds-border-thin) solid var(--dds-color-border-field);
+    border-radius: var(--dds-radius-sm);
+  }
+
+  .dds-password:hover:not(:has(:disabled)) {
+    border-color: var(--dds-color-border-strong);
+  }
+
+  .dds-password:has(:focus-visible) {
+    outline: var(--dds-focus-ring-width) solid var(--dds-color-focus-ring);
+    outline-offset: var(--dds-focus-ring-offset);
+  }
+
+  .dds-password:has(:user-invalid),
+  .dds-password:has([aria-invalid="true"]) {
+    border-color: var(--dds-color-border-error);
+    border-width: var(--dds-border-thick);
+  }
+
+  /* A disabled field greys its own box; the wrapper now IS the box, so it has to
+     carry the same signal — otherwise the border and background say "editable"
+     around a control that is not. */
+  .dds-password:has(> input:disabled) {
+    background-color: var(--dds-color-surface-disabled);
+  }
+
+  .dds-password > input {
+    flex-grow: 1;
+    border: 0;
+    background: none;
+    outline: none;
+    min-inline-size: 0;
+  }
+
+  /* Edge paints its own reveal control inside password fields. Two reveals side
+     by side is two controls for one state, and only one of them announces what it
+     did — so the platform's is removed in favour of the one that does. It is
+     removed ONLY here, inside our wrapper, so a field that opted out
+     (`data-dds-password="off"`) keeps whatever the platform gives it. */
+  .dds-password > input::-ms-reveal {
+    display: none;
+  }
+
+  /* Which icon the reveal toggle shows.
+
+     Driven by `aria-pressed`, not by a class the script also has to set. The
+     state is already in the attribute — it has to be, because that is what gets
+     announced — and a class tracking it in parallel is one more thing that can
+     end up disagreeing with what a screen reader says.
+
+     The icon names the ACTION, matching the button's accessible name: an eye
+     while the password is masked ("Show password"), a struck-through eye while it
+     is revealed ("Hide password"). The visible feedback for the state itself is
+     the field, which is either dots or characters — unmissable, and it is why
+     this button gets away with keeping one name in both states.
+
+     Two selectors, because there are two ways this button reaches the page. The
+     class is on the one DDS injects; the attribute is on one written by hand,
+     pointing at a field by id. They are the same control and they look the
+     same. */
+  .dds-password-toggle .dds-password-show,
+  [data-dds-password-toggle] .dds-password-show { display: inline-block; }
+  .dds-password-toggle .dds-password-hide,
+  [data-dds-password-toggle] .dds-password-hide { display: none; }
+
+  .dds-password-toggle[aria-pressed="true"] .dds-password-show,
+  [data-dds-password-toggle][aria-pressed="true"] .dds-password-show { display: none; }
+  .dds-password-toggle[aria-pressed="true"] .dds-password-hide,
+  [data-dds-password-toggle][aria-pressed="true"] .dds-password-hide { display: inline-block; }
 
   /* ==========================================================================
      Number stepper

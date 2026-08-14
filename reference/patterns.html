@@ -10,12 +10,12 @@
 <meta name="description" content="Dessau pattern reference: address search, autocomplete, accessible form validation, search and results, conditional fields and empty states.">
 <meta name="color-scheme" content="dark light">
 <link rel="icon" href="assets/brand/dessau-icon.svg" type="image/svg+xml">
-<script src="../dds/js/theme-init.js"></script>
+<script src="../dds/js/theme-init.js?v=eb2c6b3a"></script>
 <link rel="preload" href="assets/fonts/Inter-Variable.ttf" as="font"
       type="font/ttf" crossorigin>
-<link rel="stylesheet" href="assets/fonts.css">
-<link rel="stylesheet" href="../dds/dds.css">
-<link rel="stylesheet" href="assets/reference.css">
+<link rel="stylesheet" href="assets/fonts.css?v=395fbad1">
+<link rel="stylesheet" href="../dds/dds.css?v=4b176c10">
+<link rel="stylesheet" href="assets/reference.css?v=42cb2216">
 </head>
 <body>
 <a class="dds-skip-link" href="#main">Skip to main content</a>
@@ -1140,17 +1140,12 @@
               <label class="dds-label" for="a-password">
                 Password <span class="dds-label-note">(required)</span>
               </label>
-              <div class="dds-password">
-                <input class="dds-input" id="a-password" name="password" type="password"
-                       autocomplete="current-password" required
-                       data-dds-label="your password">
-                <button type="button" class="dds-button dds-button-subtle dds-button-icon dds-button-sm"
-                        data-dds-password-toggle="a-password" aria-pressed="false">
-                  <span class="dds-sr-only">Show password</span>
-                  <svg class="dds-icon dds-password-show" aria-hidden="true" focusable="false"><use href="#dds-icon-eye"/></svg>
-                  <svg class="dds-icon dds-password-hide" aria-hidden="true" focusable="false"><use href="#dds-icon-eye-off"/></svg>
-                </button>
-              </div>
+              <!-- No wrapper and no button: the reveal toggle is standard
+                   behaviour on every password field. See the Field section of
+                   the components reference. -->
+              <input class="dds-input" id="a-password" name="password" type="password"
+                     autocomplete="current-password" required
+                     data-dds-label="your password">
             </div>
 
             <label class="dds-choice">
@@ -1170,6 +1165,16 @@
             </div>
           </form>
         </div>
+
+        <p class="ref-note">
+          <svg class="dds-icon" aria-hidden="true"><use href="#dds-icon-info"/></svg>
+          The password field above is written as a bare
+          <code class="dds-code">&lt;input type="password"&gt;</code>. The reveal
+          toggle beside it is standard behaviour on every password field
+          (<a href="components.html#field"><code class="dds-code">.dds-password</code></a>),
+          not something this pattern adds — which is why 3.3.8 cannot be missed by
+          forgetting to ask for it.
+        </p>
 
         <div class="ref-specimen dds-mbs-md">
           <p class="ref-specimen-label">Verification code — one field, not six boxes</p>
@@ -1271,16 +1276,12 @@
               <label class="dds-label" for="r-new">
                 New password <span class="dds-label-note">(required)</span>
               </label>
-              <div class="dds-input-adorned">
-                <input class="dds-input" id="r-new" name="newPassword" type="password"
-                       autocomplete="new-password" required minlength="12"
-                       data-dds-password-new
-                       data-dds-label="a new password"
-                       data-dds-error-tooshort="A password needs at least 12 characters."
-                       aria-describedby="r-new-hint">
-                <button type="button" class="dds-input-action" data-dds-password-toggle="r-new"
-                        aria-pressed="false">Show</button>
-              </div>
+              <input class="dds-input" id="r-new" name="newPassword" type="password"
+                     autocomplete="new-password" required minlength="12"
+                     data-dds-password-new
+                     data-dds-label="a new password"
+                     data-dds-error-tooshort="A password needs at least 12 characters."
+                     aria-describedby="r-new-hint">
               <p class="dds-hint" id="r-new-hint">
                 At least 12 characters. Anything you like — length matters far more
                 than which symbols are in it.
@@ -1380,7 +1381,7 @@
             <h3>Do</h3>
             <ul class="dds-text-sm" style="padding-inline-start: 1.2rem">
               <li>Use <code>autocomplete="username"</code> and <code>current-password</code>.</li>
-              <li>Offer a reveal toggle with <code>aria-pressed</code>.</li>
+              <li>Leave the reveal toggle to <code>.dds-password</code> — it is automatic.</li>
               <li>Put a one-time code in ONE field with <code>one-time-code</code>.</li>
               <li>Give the same response whether or not an account exists.</li>
             </ul>
@@ -1563,21 +1564,21 @@
   </footer>
 </div>
 
-<script src="../dds/js/dds.js" defer></script>
-<script src="../dds/js/format.js" defer></script>
-<script src="../dds/js/components.js" defer></script>
-<script src="../dds/js/components-navigation.js" defer></script>
-<script src="../dds/js/components-forms.js" defer></script>
-<script src="../dds/js/patterns/combobox.js" defer></script>
-<script src="../dds/js/patterns/form-validation.js" defer></script>
-<script src="../dds/js/patterns/conditional-fields.js" defer></script>
-<script src="../dds/js/patterns/wizard.js" defer></script>
-<script src="../dds/js/patterns/derived-output.js" defer></script>
-<script src="../dds/js/patterns/auth.js" defer></script>
-<script src="../dds/js/providers/mock-address-provider.js" defer></script>
-<script src="../dds/js/patterns/address-search.js" defer></script>
-<script src="assets/reference.js" defer></script>
-<script src="assets/reference-tools.js" defer></script>
-<script src="assets/patterns-demo.js" defer></script>
+<script src="../dds/js/dds.js?v=88ca7b81" defer></script>
+<script src="../dds/js/format.js?v=8f2e10f1" defer></script>
+<script src="../dds/js/components.js?v=07fa7736" defer></script>
+<script src="../dds/js/components-navigation.js?v=0782ade5" defer></script>
+<script src="../dds/js/components-forms.js?v=6f555727" defer></script>
+<script src="../dds/js/patterns/combobox.js?v=d16d1ddf" defer></script>
+<script src="../dds/js/patterns/form-validation.js?v=8956eb09" defer></script>
+<script src="../dds/js/patterns/conditional-fields.js?v=a4027025" defer></script>
+<script src="../dds/js/patterns/wizard.js?v=8e1c832f" defer></script>
+<script src="../dds/js/patterns/derived-output.js?v=92f0b336" defer></script>
+<script src="../dds/js/patterns/auth.js?v=1a130f01" defer></script>
+<script src="../dds/js/providers/mock-address-provider.js?v=8e3797e4" defer></script>
+<script src="../dds/js/patterns/address-search.js?v=3544af66" defer></script>
+<script src="assets/reference.js?v=30a62e51" defer></script>
+<script src="assets/reference-tools.js?v=d85fbb00" defer></script>
+<script src="assets/patterns-demo.js?v=601ce590" defer></script>
 </body>
 </html>

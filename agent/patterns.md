@@ -331,7 +331,10 @@ is what produces an error message while someone is still typing.
 
 **For:** signing in, and recovering access.
 
-**Behaviour:** `dds/js/patterns/auth.js` (the password reveal toggle).
+**Behaviour:** `dds/js/patterns/auth.js` (confirming a new password against its
+repeat). The **reveal toggle is not here** — it belongs to the password field, is
+added automatically to every `<input type="password">`, and needs no markup from
+this pattern. See `.dds-password` in [`components.md`](components.md).
 
 **WCAG 2.2 3.3.8 Accessible Authentication (Minimum)** governs this, and it rules
 out a lot of received practice:
@@ -342,16 +345,15 @@ out a lot of received practice:
   code split across separate inputs, no field a manager cannot recognise.
 - **Never block paste.** It breaks every password manager and pushes people toward
   passwords they can type — which are worse.
-- **Offer a password reveal.** Typing a long password blind on a phone keyboard is
-  exactly the barrier the criterion is about. A real `<button>` with
-  `aria-pressed`, whose accessible name stays **constant** — a control whose name
-  changes when pressed is announced as a different control each time.
+- **A password reveal is offered for you.** Typing a long password blind on a
+  phone keyboard is exactly the barrier the criterion is about, so every password
+  field gets a real `<button>` with `aria-pressed` and a **constant** accessible
+  name, whether or not this pattern is on the page. Write the input; write
+  nothing else.
 - **A one-time code goes in ONE field** with `autocomplete="one-time-code"`, so the
   platform can offer it from the message. Six separate boxes look tidy and defeat
   autofill, paste and screen readers at once.
 - **Never reveal whether an account exists.** Same response either way.
-- The reveal toggle changes only `type`. Rewriting `autocomplete` is the usual
-  reason a reveal toggle breaks password managers.
 
 ---
 

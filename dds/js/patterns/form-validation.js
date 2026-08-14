@@ -184,7 +184,26 @@
    * `afterend` puts the message between the radio and the word it labels —
    * "( ) [Enter how we should reply] By email". The message belongs after the whole
    * set of options, where the user reads it once, having seen all the choices.
+   *
+   * And where the control sits inside a wrapper that carries the border — a
+   * password field and its reveal toggle, an input with a unit beside it, a
+   * stepper — "directly after the input" is INSIDE that border, so the message
+   * lands in the middle of the control, laid out as another flex item. The
+   * message goes after the whole visual control instead.
    */
+
+  /**
+   * Wrappers that draw the field's box. The error belongs outside them.
+   *
+   * `.dds-password` is the one that made this necessary: it is generated around
+   * every password field by components-forms.js, so a form can end up with a
+   * wrapper nobody wrote and no obvious reason for the error message to be
+   * sitting inside the input's border.
+   */
+  var FIELD_SHELLS =
+    '.dds-password, .dds-input-group, .dds-confirm-wrap, .dds-select-wrap, ' +
+    '.dds-stepper, .dds-search';
+
   function errorAnchorFor(field) {
     var group = field.closest('.dds-fieldgroup');
 
@@ -197,7 +216,7 @@
       };
     }
 
-    return { node: field, position: 'afterend' };
+    return { node: field.closest(FIELD_SHELLS) || field, position: 'afterend' };
   }
 
   /** Find (or create) the error element belonging to a field. */

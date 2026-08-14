@@ -249,55 +249,10 @@
     gap: var(--dds-space-2xs);
   }
 
-  /* The password field plus its reveal toggle. The wrapper carries the border so
-     the toggle sits inside the focus ring. */
-  .dds-password {
-    display: flex;
-    align-items: center;
-    gap: var(--dds-space-2xs);
-
-    padding-inline-end: var(--dds-space-3xs);
-    background-color: var(--dds-color-surface-default);
-    border: var(--dds-border-thin) solid var(--dds-color-border-field);
-    border-radius: var(--dds-radius-sm);
-  }
-
-  .dds-password:has(:focus-visible) {
-    outline: var(--dds-focus-ring-width) solid var(--dds-color-focus-ring);
-    outline-offset: var(--dds-focus-ring-offset);
-  }
-
-  .dds-password:has(:user-invalid),
-  .dds-password:has([aria-invalid="true"]) {
-    border-color: var(--dds-color-border-error);
-    border-width: var(--dds-border-thick);
-  }
-
-  .dds-password > input {
-    flex-grow: 1;
-    border: 0;
-    background: none;
-    outline: none;
-    min-inline-size: 0;
-  }
-
-  /* Which icon the reveal toggle shows.
-
-     Driven by `aria-pressed`, not by a class the script also has to set. The
-     state is already in the attribute — it has to be, because that is what gets
-     announced — and a class tracking it in parallel is one more thing that can
-     end up disagreeing with what a screen reader says.
-
-     The icon names the ACTION, matching the button's accessible name: an eye
-     while the password is masked ("Show password"), a struck-through eye while it
-     is revealed ("Hide password"). The visible feedback for the state itself is
-     the field, which is either dots or characters — unmissable, and it is why
-     this button gets away with keeping one name in both states. */
-  [data-dds-password-toggle] .dds-password-show { display: inline-block; }
-  [data-dds-password-toggle] .dds-password-hide { display: none; }
-
-  [data-dds-password-toggle][aria-pressed="true"] .dds-password-show { display: none; }
-  [data-dds-password-toggle][aria-pressed="true"] .dds-password-hide { display: inline-block; }
+  /* The password field and its reveal toggle are a COMPONENT, not part of this
+     pattern: see `.dds-password` in components-forms.css. A sign-in page gets the
+     toggle because it has a password field, not because it is a sign-in page —
+     which is why nothing here has to ask for it. */
 
   /* A one-time code. ONE input, not six boxes — see the note above. Monospace
      and letter-spaced so the digits are countable, which is the only legitimate

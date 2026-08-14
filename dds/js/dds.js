@@ -18,6 +18,11 @@
  * elements that opted in via a `data-dds-*` attribute and adds behaviour that
  * the platform does not provide on its own.
  *
+ * There is exactly one exception, and it is documented as one: the password
+ * reveal toggle acts on `<input type="password">` itself, because its absence is
+ * a WCAG 2.2 3.3.8 failure rather than a missing convenience. See DECISIONS.md
+ * 027 — including the three conditions any future exception has to meet.
+ *
  * Two consequences worth being explicit about:
  *
  *  - If this file fails to load, the page still works. A form submits, a

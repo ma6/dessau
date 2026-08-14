@@ -676,3 +676,112 @@ no pull requests. The ticket exists to be read later, not to be managed.
 **Reversal condition.** If the backlog ever outgrows a single reader's attention,
 this becomes a real tracker with real triage — and this entry is superseded rather
 than edited.
+
+---
+
+## 026 — Every asset reference carries the hash of what it points at
+
+**Supersedes** one clause of 023 — "there is no cache-busting query string
+anywhere: there is nothing to bust". The rest of 023 stands, `dist/` is still
+git-ignored, and no build artefact is committed.
+
+**Decision.** `scripts/sync-cache-busting.mjs` appends `?v=<hash>` to every
+stylesheet and script reference in `index.html` and `reference/*.html`, and to
+every `@import` in `dds/dds.css`. The hash is the first eight hex characters of
+sha256 over the file's own content. `npm run check` fails when a stamp is stale.
+
+**Why the old clause was wrong.** It reasoned from the artefact and not from the
+URL. `dist/` genuinely has nothing to bust — nobody links it. But the reference
+links `dds/dds.css`, ten scripts and its own two assets by bare path, on pages a
+returning reader has already cached. Not having a build step does not mean not
+having cacheable URLs; it means the URLs are stable, which is precisely the
+condition under which a browser keeps serving yesterday's copy.
+
+And a stale script is the most expensive kind of wrong, because it does not look
+like caching. It looks like the component you just changed no longer works. The
+first hour goes into code that was already correct.
+
+**Content, not a timestamp.** A version regenerated per run is one line shorter and
+cannot work here: `check:generated` verifies that every generated artefact matches
+what the current sources produce, and a clock-derived value is stale immediately
+after it is written. Hashing the content is what lets `--check` mean anything, and
+it keeps the blast radius honest — editing one pattern script re-versions that one
+file, not all eighteen references.
+
+**The imports are stamped too, and that is the point.** `dds/dds.css` is an entry
+point with eleven `@import`s behind it. Versioning only the `<link>` refetches the
+entry file, which then names the same import URLs it named last time, and the
+browser serves every layer file from cache. It would look busted and be busted for
+almost all of the CSS. So imports are stamped first, bottom-up, and the entry file
+is hashed after that rewrite: the whole chain moves or none of it does.
+
+**Cost.** `dds/dds.css` now carries generated content in a hand-written file, and a
+CSS change produces a slightly larger diff than the CSS change alone.
+`scripts/bundle.mjs` had to learn that `?v=` is part of a URL and not part of a
+path — it asked the filesystem for `primitives.css?v=db001cd4` and got an ENOENT
+that read like a missing file.
+
+**What this does not fix.** The version lives in the HTML, so it only helps once
+the HTML itself is refetched. A host serving these pages with a long max-age hands
+the visitor an old page and, with it, old references. HTML must stay short-lived;
+what this makes safe is caching the assets hard.
+
+**Not stamped.** Fonts, images and `icons.svg`. They are referenced from inside
+stylesheets and from `<use href>`, they change on the order of never, and reaching
+them would mean parsing `url()` for a problem nobody has had.
+
+**Reversal condition.** A real hosting pipeline with content-addressed filenames.
+Then the query string is redundant and this script is deleted rather than kept
+alongside it.
+
+---
+
+## 027 — The password reveal is automatic, not opt-in
+
+**Decision.** `dds/js/components-forms.js` enhances every
+`<input type="password">` in the document: it wraps the field in
+`.dds-password` and appends a reveal toggle, with no attribute asked for and no
+markup written. `data-dds-password="off"` opts a field out; the same attribute
+selects the wording (`"de"`).
+
+**Why this breaks the usual rule, deliberately.** Every other enhancement in DDS
+waits for a `data-dds-*` attribute, and `dds.js` says so in as many words:
+"JavaScript finds elements that opted in via a `data-dds-*` attribute". That rule
+exists so nothing in DDS happens to markup that did not ask for it. It is the
+right default and it is wrong here, for one reason: a missing reveal toggle is not
+a missing feature, it is an accessibility defect. WCAG 2.2 3.3.8 Accessible
+Authentication (Minimum) forbids a cognitive function test without an
+alternative, and typing a long password blind — on a phone, with a tremor, with
+dyslexia, or because the password manager did not fire — is that test.
+
+Opt-in would have meant the compliant version is the one somebody remembered to
+ask for. And the failure is invisible: a password field with no toggle looks
+completely normal, on every device, in every review. Nothing would ever report
+it. The evidence was already in this repository before the change — the reference
+pages spelled the toggle two different ways, one of them
+(`.dds-input-action`) with a class no stylesheet defined, so one of the two demos
+of "how to do this correctly" was rendering an unstyled button.
+
+**`type="password"` is the opt-in signal.** The rule's purpose is that the author
+must have stated the intent in the markup. `type="password"` states it more
+plainly than an attribute could, and it is the only input type where the platform
+deliberately withholds the value from the person typing it.
+
+**Scope, so this does not become a licence.** This is the one enhancement that may
+act on a native type rather than an attribute, and it qualifies because all three
+hold: the absence is a WCAG failure, the type alone carries the full intent, and
+nothing is taken away — the field keeps its value, its `autocomplete`, its
+validation and its behaviour without JavaScript. A future enhancement wanting the
+same exemption has to meet all three.
+
+**Cost.** DDS moves an element in the DOM that a product wrote, which it does
+nowhere else: the input is re-parented into a generated wrapper. That is visible
+to anything holding a reference to `input.parentElement`, and it means the CSS for
+`.dds-password` has to be correct for markup nobody hand-wrote. An input already
+inside `.dds-password` or `.dds-input-group` is left where it is, and an authored
+toggle is wired rather than duplicated.
+
+**Reversal condition.** A platform-native reveal that is reliable across engines
+and not suppressed by `appearance` — Edge's own `::-ms-reveal` was exactly this
+and was neither. Then the injected button is deleted and the native one is left
+alone.
