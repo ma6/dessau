@@ -137,3 +137,67 @@ for (const file of PAGES) {
     await expect(page.locator('.ref-nav a[data-current-section]')).toHaveCount(1);
   });
 }
+
+test('the active first-level entry is distinguishable by more than colour', async ({ page }) => {
+  await page.setViewportSize(WIDE);
+  await page.goto('/reference/content.html');
+
+  const section = page.locator('.ref-nav a[data-current-section]');
+  const sibling = page.locator('.ref-nav a:not([data-current-section])').first();
+
+  /**
+   * The first version of this marker was a colour step plus a weight step, and it was
+   * too quiet to find at a glance — which is the one job it has. Asserting on more than
+   * one channel is what stops it quietly regressing to that: greyscale, a colour vision
+   * difference or forced-colors each remove a different cue, so no single one may carry
+   * the state.
+   */
+  const [current, other] = await Promise.all([
+    section.evaluate((el) => {
+      const s = getComputedStyle(el);
+      return { weight: s.fontWeight, background: s.backgroundColor, shadow: s.boxShadow };
+    }),
+    sibling.evaluate((el) => {
+      const s = getComputedStyle(el);
+      return { weight: s.fontWeight, background: s.backgroundColor, shadow: s.boxShadow };
+    }),
+  ]);
+
+  expect(Number(current.weight), 'no weight difference').toBeGreaterThan(Number(other.weight));
+  expect(current.background, 'no fill difference').not.toBe(other.background);
+  expect(
+    current.shadow,
+    'no connecting bar under the entry that owns the second row'
+  ).not.toBe(other.shadow);
+});
+
+test('the header keeps DOM, visual and tab order in agreement when narrow', async ({ page }) => {
+  await page.setViewportSize(NARROW);
+  await page.goto('/reference/content.html');
+
+  await page.locator('.ref-nav-toggle').click();
+
+  /**
+   * The panel takes a full row of its own at narrow widths, so anything after it in the
+   * DOM is pushed below it while appearing above — and a keyboard user tabs down into
+   * the menu and then back up. The theme toggle is therefore before the navigation.
+   */
+  const order = await page.evaluate(() => {
+    const boxes = [...document.querySelectorAll(
+      '.ref-header-inner > *'
+    )].map((el) => ({
+      tag: el.className || el.tagName,
+      top: Math.round(el.getBoundingClientRect().top),
+    }));
+    return boxes;
+  });
+
+  // Vertical position must never decrease as DOM order advances.
+  for (let i = 1; i < order.length; i += 1) {
+    expect(
+      order[i].top,
+      `"${order[i].tag}" sits above "${order[i - 1].tag}" while coming after it in the ` +
+        `DOM — focus would jump backwards up the page`
+    ).toBeGreaterThanOrEqual(order[i - 1].top);
+  }
+});

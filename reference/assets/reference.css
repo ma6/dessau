@@ -86,8 +86,23 @@
   gap: var(--dds-space-2xs);
 }
 
-.ref-nav-toggle {
+/* The utilities sit together at the end of the first row. The theme toggle comes
+   BEFORE the navigation in the DOM, deliberately: the panel takes a full row of its
+   own at narrow widths, so anything after it in the DOM would be pushed to a third
+   row while appearing above it — a keyboard user would tab down into the menu and
+   then back up. DOM order, visual order and tab order agree everywhere instead.
+
+   The cost is that the theme toggle sits left of the navigation on a wide screen
+   rather than right of it. That is a convention, not a requirement; focus order is
+   the requirement. */
+.ref-theme-toggle,
+.ref-header-inner > .dds-theme-toggle {
   margin-inline-start: auto;
+}
+
+.ref-nav-toggle {
+  /* Already pushed right by the toggle before it; only the gap is needed. */
+  margin-inline-start: var(--dds-space-2xs);
 }
 
 /* Only where the toggle exists to reopen it. */
@@ -163,10 +178,27 @@
 /* --- the group containing the current page -------------------------------- */
 /* `data-current-section`, not `aria-current`: the group is not a page, and the
    second row already carries the real state. This is a visual aid that is
-   deliberately redundant, so nothing depends on it alone. */
+   deliberately redundant, so nothing depends on it alone.
+
+   It reads as a TAB that owns the row beneath it, rather than as a highlighted
+   link. The first version was a colour step plus a weight step — subtle to
+   default, medium to semibold — and it was too quiet to find at a glance, which is
+   the one job it has. Four cues now: fill, weight, full-contrast text and a bar
+   along the edge it shares with the row it introduces. */
 .ref-nav a[data-current-section] {
   color: var(--dds-color-text-default);
   font-weight: var(--dds-font-weight-semibold);
+  background-color: var(--dds-color-surface-selected);
+}
+
+/* The connecting bar, only when there is actually a second row to connect to. A bar
+   pointing at nothing would be decoration claiming to be structure. */
+.ref-nav-panel:has(.ref-nav-secondary) .ref-nav a[data-current-section] {
+  box-shadow: inset 0 -2px 0 0 var(--dds-color-action-primary);
+  /* Square along the shared edge, so the bar reads as a join rather than as a
+     detached underline. */
+  border-end-start-radius: 0;
+  border-end-end-radius: 0;
 }
 
 /* The current page. Colour plus weight plus an underline — three cues, so
@@ -783,14 +815,29 @@
   /* Beats the `hidden` attribute, which the toggle sets and which is meaningless once
      the rows are inline. Without this, resizing a window while collapsed would leave
      the navigation unreachable — the trap the site header component documents. */
+  /* Beats the `hidden` attribute, which the toggle sets and which is meaningless once
+     the rows are inline. Without this, resizing a window while collapsed would leave
+     the navigation unreachable — the trap the site header component documents. */
   .ref-nav-panel,
   .ref-nav-panel[hidden] {
     display: flex;
     flex-basis: auto;
-    flex-direction: row;
-    align-items: center;
-    gap: var(--dds-space-md);
+    /* Stacked, not side by side. Two levels in one row read as one long list again —
+       which is the flattening this restructuring was meant to undo, and it left the
+       active first-level item with nothing to be the parent OF. */
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 0;
     margin-inline-start: auto;
+  }
+
+  /* The second row sits directly under its parent, sharing an edge with it. */
+  .ref-nav-secondary {
+    padding-inline-start: 0;
+    border-inline-start: 0;
+    border-block-start: var(--dds-border-thin) solid var(--dds-color-border-subtle);
+    padding-block-start: var(--dds-space-2xs);
+    margin-block-start: var(--dds-space-2xs);
   }
 
   .ref-layout {
