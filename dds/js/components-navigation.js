@@ -249,6 +249,33 @@
     window.addEventListener('resize', schedule);
 
     /**
+     * Recompute when the DOCUMENT changes size, not only when it is scrolled.
+     *
+     * This is the piece that was missing through three previous attempts, and the
+     * mechanism is worth stating because it is not obvious.
+     *
+     * With `content-visibility: auto`, a section that is off screen is laid out at an
+     * estimated height and only takes its real height when it comes near the viewport.
+     * So scrolling to the end of the page renders the last sections, their real heights
+     * land, and **the page becomes taller after the final scroll event has already been
+     * handled**. Nothing fires again: scroll is done, the size changed instead. The
+     * highlight is left pointing at whatever was correct a moment before the page grew.
+     *
+     * That is a real defect, not a test artefact. Someone who scrolls to the bottom and
+     * stops sees the wrong entry marked and nothing corrects it.
+     *
+     * A `ResizeObserver` on the scrolling content is exactly the right instrument: it
+     * fires when the observed box changes size, which is precisely the event that had
+     * no listener.
+     */
+    if (typeof ResizeObserver !== 'undefined') {
+      var growth = new ResizeObserver(schedule);
+      // The element that actually grows. Falling back to <body> keeps this working in a
+      // page shell that does not use the reference's own wrapper.
+      growth.observe(targets[0].closest('.ref-content, main, body') || document.body);
+    }
+
+    /**
      * Section order is measured once, and has to be re-measured when the layout
      * settles: with `content-visibility: auto` the estimated heights are replaced by
      * real ones as sections approach, which can reorder nothing but does move

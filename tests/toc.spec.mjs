@@ -72,8 +72,17 @@ async function scrollToBottom(page) {
       previous = height;
 
       window.scrollTo({ top: height, behavior: 'instant' });
-      // One frame for layout, one for the observers that layout triggers.
-      await new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+      /**
+       * Three frames, not one. The first lets layout run, the second lets the
+       * observers that layout triggers fire, and the third lets the work those
+       * observers schedule land. Two was enough to settle the height and not enough
+       * for the highlight to have been recomputed from it.
+       */
+      await new Promise((resolve) =>
+        requestAnimationFrame(() =>
+          requestAnimationFrame(() => requestAnimationFrame(resolve))
+        )
+      );
     }
   });
 }
