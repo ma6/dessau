@@ -576,11 +576,20 @@ the mark instead, which follows the site's own theme even when that disagrees wi
 the operating system.
 
 **The wordmark is Inter Black, and that was measured, not chosen.** The mark's
-stroke is 0.29 of its cap height; Inter's weight axis was instanced and the stem
-measured at every stop (0.128 at 400 through 0.271 at 900). 900 is the only weight
+stroke is 0.286 of its cap height; Inter's weight axis was instanced and the stem
+measured at every stop (0.128 at 400 through 0.270 at 900). 900 is the only weight
 that stands beside the mark without looking like an accident. The outlines are
 baked into the file because an SVG used as an image gets no fonts from the
 document.
+
+**Not the display face, and this is the entry that says why.** Setting the logo
+in Space Grotesk is the obvious request — it is what the reference uses for
+headings. Its weight axis ends at 700, which measures 0.189: a third lighter than
+the mark, with an x-height of 0.694 of the cap against Inter's 0.75 on top. Both
+were rendered side by side at header size before deciding. A logo is not a
+heading; two faces doing two jobs is ordinary, while a lockup whose halves
+disagree about weight reads as an accident. Putting the display face in the logo
+would mean redrawing the mark lighter, which is a different mark.
 
 **Cost.** Two literal colours exist in the icon and do not follow a token change,
 and the wordmark's outlines cannot be regenerated without rewriting the variable

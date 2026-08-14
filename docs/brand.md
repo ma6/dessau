@@ -67,12 +67,39 @@ Inter's weight axis was instanced and the D's stem measured at each stop:
 | 500 | 0.153 | | 800 | 0.237 |
 | 600 | 0.179 | | 900 | **0.271** |
 
-So the wordmark is set at 900. The remaining 0.019 leaves the mark reading a
+So the wordmark is set at 900. The remaining 0.016 leaves the mark reading a
 shade heavier than the word, which is the right direction for a logo — the
 initial leads.
 
 Anything lighter puts a display-weight mark next to a text-weight word, which
 does not read as a decision.
+
+Measured with a horizontal cut at half the cap height, taking the first run of
+ink — not by picking a contour out of the outline. Inter builds its D as a
+separate stem rectangle, so counting contours happens to work there and silently
+returns the *counter* for a font that draws the D as one outer shape plus one
+hole. That mistake reads as the stem getting thinner as the weight rises.
+
+### Why not Space Grotesk, the site's display face
+
+The obvious objection is that the reference sets its headings in Space Grotesk,
+so the logo "should" be in the family. It cannot be, and the axis says so:
+
+| | stroke / cap |
+| --- | --- |
+| the mark | 0.286 |
+| Space Grotesk 700, its heaviest | 0.189 |
+| Inter 900 | 0.270 |
+
+Space Grotesk's weight axis ends at 700, a third lighter than the mark. Its
+x-height is also 0.694 of the cap against Inter's 0.75, so the lowercase falls
+smaller as well and widens the gap. Set that way, the mark does not lead the
+word — it looks bolted onto it, and at the 14 px of the header the word goes
+thin while the mark stays blocky.
+
+A logo is not a heading. Two faces doing two jobs is normal; a lockup whose two
+halves disagree about weight is not. The only honest way to put the display face
+in the logo would be to redraw the mark lighter, which is a different mark.
 
 **Spacing.** The wordmark starts at 100.021: the mark's ink width (92.323), plus
 Inter Black's own right side bearing after a D (4.698), plus 3 units of optical
