@@ -774,19 +774,6 @@
                   <p class="dds-numeric">1,209.40<br>888.10<br>17,004.55</p>
                 </div>
                 <div>
-                  <p class="ref-specimen-label">.dds-eyebrow (kicker above a heading)</p>
-                  <p class="dds-eyebrow">Planning application</p>
-                  <p class="dds-text-lg dds-weight-semibold" style="margin-block-start: 0.25rem">
-                    Harbour redevelopment
-                  </p>
-                  <p class="dds-text-2xs dds-text-muted dds-mbs-2xs">
-                    Deliberately NOT uppercased. All-caps costs legibility, defeats
-                    word-shape recognition, and is read letter by letter by some screen
-                    readers when the source text is genuinely capitalised. Weight and
-                    letter-spacing carry the distinction instead.
-                  </p>
-                </div>
-                <div>
                   <p class="ref-specimen-label">.dds-code (monospace)</p>
                   <p class="dds-code">AB-4471-09<br>AB-4l7I-O9</p>
                   <p class="dds-text-2xs dds-text-muted dds-mbs-2xs">
@@ -839,6 +826,37 @@
               <p class="ref-specimen-label">h6 · --dds-font-size-md · wide tracking</p>
               <h6 style="margin: 0">Contact the site office</h6>
             </div>
+          </div>
+        </div>
+
+        <div class="ref-specimen ref-specimen-plain dds-mbs-md">
+          <h3 class="dds-text-sm dds-weight-semibold">Eyebrow — the kicker above a heading</h3>
+          <p class="dds-text-sm dds-text-subtle dds-mbs-2xs dds-measure-default">
+            <code class="dds-code">.dds-eyebrow</code> labels what kind of thing the
+            heading below is. It is a paragraph, never a heading of its own: it belongs
+            to the heading it introduces, and giving it its own level would put a
+            meaningless entry into the document outline.
+          </p>
+
+          <div class="dds-mbs-md" style="padding: var(--dds-space-md); background: var(--dds-color-surface-sunken); border-radius: var(--dds-radius-md)">
+            <p class="dds-eyebrow">Planning application</p>
+            <h4 style="margin-block-start: var(--dds-space-2xs)">Harbour redevelopment, phase two</h4>
+          </div>
+
+          <div class="ref-note">
+            <h3 class="dds-text-sm dds-weight-semibold">Deliberately not uppercased</h3>
+            <p class="dds-text-sm dds-text-subtle dds-mbs-2xs">
+              All-caps is the conventional treatment for a kicker and it is a bad one. It
+              costs legibility, it defeats word-shape recognition — the thing that lets a
+              reader take in a word without spelling it out — and where the source text is
+              genuinely capitalised rather than styled, some screen readers read it letter
+              by letter.
+            </p>
+            <p class="dds-text-sm dds-text-subtle dds-mbs-xs">
+              Weight and letter-spacing carry the distinction instead. If you do want the
+              look, use <code class="dds-code">text-transform</code> so the underlying text
+              stays in sentence case and only the rendering changes.
+            </p>
           </div>
         </div>
 
