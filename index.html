@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<!--
+  Root redirect to the reference.
+
+  Opening the repository root in a browser — or serving it with
+  `python3 -m http.server` — should land on something, not on a directory listing.
+
+  A zero-delay `<meta http-equiv="refresh">` rather than JavaScript, because it works
+  from `file://` with scripting disabled and needs nothing to load first.
+
+  On WCAG 2.2.1 Timing Adjustable: a redirect with **no** delay is explicitly exempt,
+  because it behaves like a server-side redirect. A delayed one is a failure — the user
+  is moved off a page while reading it, with no way to stop it. So the delay here is 0
+  and must stay 0.
+
+  The link below is not decoration. If the refresh is blocked — some kiosk
+  configurations and some privacy extensions do block it — this page has to remain a
+  usable way to get where it was going, rather than a dead end that looks empty.
+-->
+<html lang="en" data-theme="dark" data-dds-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="refresh" content="0; url=reference/index.html">
+<title>Dessau — going to the reference</title>
+<meta name="description" content="Dessau: foundations for digital products. Redirects to the reference.">
+<meta name="color-scheme" content="dark light">
+<meta name="robots" content="noindex">
+<script src="dds/js/theme-init.js"></script>
+<link rel="stylesheet" href="dds/dds.css">
+</head>
+<body>
+  <main class="dds-container dds-center" id="main"
+        style="--dds-container-width: var(--dds-container-sm); min-block-size: 100svh; display: grid; place-content: center; text-align: center">
+    <div class="dds-stack dds-stack-md">
+      <p class="dds-eyebrow">Dessau</p>
+      <h1 class="dds-text-2xl">Foundations for digital products</h1>
+      <p class="dds-text-subtle">
+        Taking you to the reference. If nothing happens,
+        <a href="reference/index.html">open it here</a>.
+      </p>
+    </div>
+  </main>
+</body>
+</html>
