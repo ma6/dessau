@@ -315,6 +315,33 @@ if (!namedBreakpoints.length) {
   }
 }
 
+/* --------------------- 5a. the page shell is separated from the intro */
+
+/**
+ * Every page with a side navigation puts a divider between the introduction and the
+ * two-column layout. It is not decoration: without it the heading of the first
+ * section sits directly against the intro paragraph, and the page reads as one
+ * cramped block.
+ *
+ * That spacing was accidental for a long time — six pages happened to have a divider
+ * and the two that did not looked wrong, which is how it was noticed. Whitespace that
+ * depends on an unrelated element happening to be present is whitespace that will
+ * disappear on the next page someone writes.
+ */
+for (const [path, page] of pages) {
+  if (!page.source.includes('class="ref-layout"')) continue;
+
+  const beforeLayout = page.source.slice(0, page.source.indexOf('class="ref-layout"'));
+
+  // Anything within the last stretch of markup counts as adjacent.
+  if (!/dds-divider[^"]*dds-mbs-2xl/.test(beforeLayout.slice(-400))) {
+    report(
+      `${path}: no divider between the introduction and .ref-layout — the first ` +
+        `section heading sits against the intro text`
+    );
+  }
+}
+
 /* ------------------------ 5b. the root redirect points somewhere real */
 
 /**
