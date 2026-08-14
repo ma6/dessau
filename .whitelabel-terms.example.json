@@ -27,21 +27,68 @@
     "term from the search instead would be weaker: the audit would no longer catch",
     "it appearing as real content."
   ],
-
   "terms": [
-    { "term": "example-predecessor-name" },
-    { "term": "example-organisation" },
-    { "term": "example-domain-word" },
-    { "term": "ExampleAbbrev", "word": true },
-    { "term": "example-internal-host" },
-    { "term": "TICKET-", "raw": "TICKET-\\d" },
-    { "term": "retired-typeface-name" },
-    { "term": "Mustermann" },
-    { "term": "John Doe" },
-    { "term": "Lorem ipsum" },
-    { "term": "example.com" }
+    {
+      "term": "example-predecessor-name"
+    },
+    {
+      "term": "example-organisation"
+    },
+    {
+      "term": "example-domain-word"
+    },
+    {
+      "term": "ExampleAbbrev",
+      "word": true
+    },
+    {
+      "term": "example-internal-host"
+    },
+    {
+      "term": "TICKET-",
+      "raw": "TICKET-\\d"
+    },
+    {
+      "term": "retired-typeface-name"
+    },
+    {
+      "term": "Mustermann"
+    },
+    {
+      "term": "John Doe"
+    },
+    {
+      "term": "Lorem ipsum"
+    },
+    {
+      "term": "example.com"
+    },
+    {
+      "term": "source styleguide",
+      "word": false,
+      "_why": "A reference to what Dessau was built from, without naming it. A hint is still a trace."
+    },
+    {
+      "term": "source material",
+      "word": false,
+      "_why": "Same class of hint."
+    },
+    {
+      "term": "source project",
+      "word": false,
+      "_why": "Same class of hint."
+    },
+    {
+      "raw": "generalis(ing|ed) (an|the) existing",
+      "term": "generalising an existing …",
+      "_why": "Describes the provenance. The result is domain-neutral either way; saying where it came from is not."
+    },
+    {
+      "term": "predecessor",
+      "word": true,
+      "_why": "Same class of hint."
+    }
   ],
-
   "allowed": {
     "agent/ux-writing.md:Mustermann": "A do-not rule about demo data. The cliché has to be named to be prohibited.",
     "agent/ux-writing.md:John Doe": "Same rule, same line.",
