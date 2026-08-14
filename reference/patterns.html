@@ -65,11 +65,6 @@
       <polyline points="112 184 256 328 400 184" style="fill:none;stroke:currentColor;stroke-linecap:round;stroke-linejoin:round;stroke-width:48px"/>
     </symbol>
 
-    <!-- Ionicons: chevron-up-outline -->
-    <symbol id="dds-icon-chevron-up" viewBox="0 0 512 512" fill="currentColor">
-      <polyline points="112 328 256 184 400 328" style="fill:none;stroke:currentColor;stroke-linecap:round;stroke-linejoin:round;stroke-width:48px"/>
-    </symbol>
-
     <!-- Ionicons: chevron-back-outline -->
     <symbol id="dds-icon-chevron-left" viewBox="0 0 512 512" fill="currentColor">
       <polyline points="328 112 184 256 328 400" style="fill:none;stroke:currentColor;stroke-linecap:round;stroke-linejoin:round;stroke-width:48px"/>
@@ -208,10 +203,10 @@
         <a href="navigation.html">Navigation</a>
         <a href="patterns.html" aria-current="page">Patterns</a>
       </nav>
-      <button type="button" class="dds-button dds-button-subtle dds-button-icon"
-              data-dds-theme-toggle aria-pressed="false">
-        <span class="dds-sr-only">Dark theme</span>
-        <svg class="dds-icon" aria-hidden="true"><use href="#dds-icon-moon"/></svg>
+      <button type="button" class="dds-theme-toggle dds-theme-toggle-icon"
+              data-dds-theme-toggle>
+        <svg class="dds-icon dds-theme-toggle-moon" aria-hidden="true"><use href="#dds-icon-moon"/></svg>
+        <svg class="dds-icon dds-theme-toggle-sun" aria-hidden="true"><use href="#dds-icon-sun"/></svg>
       </button>
     </div>
   </header>
@@ -456,6 +451,67 @@
         </div>
 
         <div class="ref-specimen">
+          <p class="ref-specimen-label">Error summary — what a failed submit produces</p>
+
+          <div class="dds-error-summary" tabindex="-1" role="alert" style="max-inline-size: 32rem">
+            <h3 class="dds-error-summary-title">
+              <svg class="dds-icon" aria-hidden="true" focusable="false"><use href="#dds-icon-error"/></svg>
+              There are 3 problems with this form
+            </h3>
+            <ul class="dds-error-summary-list">
+              <li><a href="#v-name">Enter your full name</a></li>
+              <li><a href="#v-email">Enter an email address in the format name@example.org</a></li>
+              <li><a href="#v-reference">Enter the reference code as four characters, a hyphen, then four more</a></li>
+            </ul>
+          </div>
+
+          <div class="ref-note">
+            <h3 class="dds-text-sm dds-weight-semibold">The single highest-value accessibility pattern in a form</h3>
+            <p class="dds-text-sm dds-text-subtle dds-mbs-2xs">
+              Shown here as a static example so it can be read without racing a submit;
+              the form below produces the real one. Without a summary, someone whose
+              submit failed has no idea how many problems there are or where they are —
+              they have to walk the entire form again, and with a screen reader that
+              means listening to every field to find the two that are wrong.
+            </p>
+            <p class="dds-text-sm dds-text-subtle dds-mbs-xs">
+              What it has to get right:
+            </p>
+            <ul class="dds-text-sm dds-text-subtle dds-mbs-2xs" style="padding-inline-start: var(--dds-space-lg)">
+              <li>
+                It appears only <strong>after a submit attempt</strong>, never on page
+                load. A form that greets you with a list of errors before you have typed
+                anything teaches you to ignore the list.
+              </li>
+              <li class="dds-mbs-2xs">
+                <strong>Focus moves to it</strong>, so the user lands on the explanation.
+                Without that, a failed submit silently returns them to the top of the
+                page with no idea anything happened.
+              </li>
+              <li class="dds-mbs-2xs">
+                <code class="dds-code">tabindex="-1"</code> makes that possible without
+                turning the summary into a permanent tab stop.
+              </li>
+              <li class="dds-mbs-2xs">
+                <strong>Every entry is a link to its field.</strong> A list that names
+                problems without offering a way to reach them is a description of the
+                work rather than help with it.
+              </li>
+              <li class="dds-mbs-2xs">
+                The wording <strong>matches the message beside the field</strong>
+                exactly. Two different descriptions of one problem makes the user
+                reconcile them.
+              </li>
+              <li class="dds-mbs-2xs">
+                The count is in the heading — "3 problems", not "Please correct the
+                errors". Knowing how many there are is how someone decides whether to
+                keep going.
+              </li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="ref-specimen dds-mbs-md">
           <p class="ref-specimen-label">Submit with the fields empty, or with an invalid email</p>
 
           <form class="dds-form" data-dds-validate novalidate action="#validation" method="get">
@@ -650,6 +706,82 @@
                 <svg class="dds-icon" aria-hidden="true"><use href="#dds-icon-plus"/></svg>
                 New project
               </button>
+            </div>
+          </div>
+
+          <div class="ref-specimen" data-ref-code>
+            <p class="ref-specimen-label">Upload flow — in progress, done, and rejected</p>
+
+            <div class="dds-uploadflow" style="max-inline-size: 34rem">
+              <p class="dds-results-summary" role="status">
+                2 von 3 Dateien übertragen. Eine Datei wurde abgelehnt.
+              </p>
+
+              <div class="dds-uploadflow-item" data-dds-state="done">
+                <svg class="dds-icon" aria-hidden="true" focusable="false" style="color: var(--dds-color-text-success)"><use href="#dds-icon-check-circle"/></svg>
+                <span>
+                  <span class="dds-weight-medium">bebauungsplan-nord.pdf</span>
+                  <span class="dds-text-sm dds-text-muted">· 4,2 MB</span>
+                </span>
+                <span class="dds-text-sm dds-text-success">Fertig</span>
+              </div>
+
+              <div class="dds-uploadflow-item" data-dds-state="uploading">
+                <span class="dds-progress-ring" style="--dds-progress-ring-value: 46" aria-hidden="true"></span>
+                <span>
+                  <span class="dds-weight-medium">lageplan-2026.dwg</span>
+                  <span class="dds-text-sm dds-text-muted">· 18,7 MB</span>
+                </span>
+                <button type="button" class="dds-button dds-button-subtle dds-button-sm">
+                  Übertragung von lageplan-2026.dwg abbrechen
+                </button>
+                <progress class="dds-progress dds-uploadflow-progress" max="100" value="46">
+                  46&nbsp;%
+                </progress>
+              </div>
+
+              <div class="dds-uploadflow-item" data-dds-state="failed">
+                <svg class="dds-icon" aria-hidden="true" focusable="false" style="color: var(--dds-color-text-error)"><use href="#dds-icon-error"/></svg>
+                <span>
+                  <span class="dds-weight-medium">luftbild-gesamt.tif</span>
+                  <span class="dds-text-sm dds-text-muted">· 42,1 MB</span>
+                </span>
+                <button type="button" class="dds-button dds-button-secondary dds-button-sm">
+                  luftbild-gesamt.tif ersetzen
+                </button>
+                <p class="dds-uploadflow-reason">
+                  42,1 MB — das Maximum sind 10 MB. Speichern Sie das Bild als JPEG
+                  oder laden Sie einen Ausschnitt hoch.
+                </p>
+              </div>
+            </div>
+
+            <div class="ref-note">
+              <h3 class="dds-text-sm dds-weight-semibold">A rejection says why, and what to do</h3>
+              <p class="dds-text-sm dds-text-subtle dds-mbs-2xs">
+                “Upload fehlgeschlagen” tells the user nothing they can act on. The
+                message names the actual number, the actual limit, and a way forward.
+                Someone who has just waited through a 42 MB upload on a phone
+                connection has earned that much.
+              </p>
+              <p class="dds-text-sm dds-text-subtle dds-mbs-xs">
+                One failure never discards the others. The two that worked stay
+                uploaded — a flow that throws away successful work because the last
+                file was too large makes the user redo all of it.
+              </p>
+              <p class="dds-text-sm dds-text-subtle dds-mbs-xs">
+                Every per-file button carries the filename in its accessible name.
+                Three buttons called “Abbrechen” are three indistinguishable controls
+                when read out of context.
+              </p>
+              <p class="dds-text-sm dds-text-subtle dds-mbs-xs">
+                Progress is announced at intervals, not continuously. The
+                <code class="dds-code">&lt;progress&gt;</code> element carries the
+                value for anything that polls it, while the
+                <code class="dds-code">role="status"</code> summary above updates in
+                steps — a live region reading a new percentage every frame is
+                unusable.
+              </p>
             </div>
           </div>
         </div>
@@ -986,6 +1118,186 @@
           </p>
         </div>
 
+        <div class="ref-specimen dds-mbs-md">
+          <p class="ref-specimen-label">Password reset — step 1: ask for the address</p>
+          <form class="dds-auth dds-form" action="#auth" method="post" novalidate data-dds-validate>
+            <div class="dds-auth-head">
+              <h3 class="dds-text-xl">Reset your password</h3>
+              <p class="dds-text-sm dds-text-subtle">
+                We will send a code to your email address.
+              </p>
+            </div>
+
+            <div class="dds-field">
+              <label class="dds-label" for="r-email">
+                Email address <span class="dds-label-note">(required)</span>
+              </label>
+              <input class="dds-input" id="r-email" name="email" type="email"
+                     autocomplete="username email" required
+                     data-dds-label="your email address"
+                     aria-describedby="r-email-hint">
+              <p class="dds-hint" id="r-email-hint">
+                The address you signed up with.
+              </p>
+            </div>
+
+            <div class="dds-form-actions">
+              <button type="submit" class="dds-button dds-button-primary">Send the code</button>
+            </div>
+          </form>
+
+          <div class="ref-note">
+            <h3 class="dds-text-sm dds-weight-semibold">The response is the same either way</h3>
+            <p class="dds-text-sm dds-text-subtle dds-mbs-2xs">
+              "If that address has an account, we have sent a code." Never "no account
+              found". A reset form that distinguishes the two is a free account-
+              enumeration oracle: anyone can test an address list against it and learn
+              who has an account, which for a health service, a legal service or a
+              dating service is a disclosure in itself.
+            </p>
+            <p class="dds-text-sm dds-text-subtle dds-mbs-xs">
+              The same applies to timing — respond in the same time in both cases, or
+              the difference is measurable.
+            </p>
+          </div>
+        </div>
+
+        <div class="ref-specimen dds-mbs-md">
+          <p class="ref-specimen-label">Password reset — step 2: the code, then the new password</p>
+          <form class="dds-auth dds-form" action="#auth" method="post" novalidate
+                data-dds-validate data-dds-password-confirm>
+            <div class="dds-auth-head">
+              <h3 class="dds-text-xl">Choose a new password</h3>
+              <p class="dds-text-sm dds-text-subtle">
+                Enter the code from the email, then your new password.
+              </p>
+            </div>
+
+            <div class="dds-field">
+              <label class="dds-label" for="r-code">
+                Code from the email <span class="dds-label-note">(required)</span>
+              </label>
+              <input class="dds-input dds-otp dds-input-code" id="r-code" name="code"
+                     type="text" inputmode="text" autocomplete="one-time-code"
+                     maxlength="6" pattern="[A-Za-z0-9]{6}" spellcheck="false"
+                     autocapitalize="characters" required
+                     data-dds-label="the code from the email"
+                     data-dds-error-patternmismatch="The code is six letters and numbers, as printed in the email."
+                     aria-describedby="r-code-hint">
+              <p class="dds-hint" id="r-code-hint">
+                Six characters, letters and numbers — for example
+                <span class="dds-code">K4M2QX</span>. It expires in 15 minutes.
+              </p>
+            </div>
+
+            <div class="dds-field">
+              <label class="dds-label" for="r-new">
+                New password <span class="dds-label-note">(required)</span>
+              </label>
+              <div class="dds-input-adorned">
+                <input class="dds-input" id="r-new" name="newPassword" type="password"
+                       autocomplete="new-password" required minlength="12"
+                       data-dds-password-new
+                       data-dds-label="a new password"
+                       data-dds-error-tooshort="A password needs at least 12 characters."
+                       aria-describedby="r-new-hint">
+                <button type="button" class="dds-input-action" data-dds-password-toggle="r-new"
+                        aria-pressed="false">Show</button>
+              </div>
+              <p class="dds-hint" id="r-new-hint">
+                At least 12 characters. Anything you like — length matters far more
+                than which symbols are in it.
+              </p>
+            </div>
+
+            <div class="dds-field">
+              <label class="dds-label" for="r-repeat">
+                Repeat the new password <span class="dds-label-note">(required)</span>
+              </label>
+              <input class="dds-input" id="r-repeat" name="repeatPassword" type="password"
+                     autocomplete="new-password" required
+                     data-dds-password-repeat
+                     data-dds-label="the repeated password"
+                     aria-describedby="r-repeat-status">
+              <p class="dds-hint" id="r-repeat-status" role="status"
+                 data-dds-password-match></p>
+            </div>
+
+            <div class="dds-form-actions">
+              <button type="submit" class="dds-button dds-button-primary">Set the new password</button>
+            </div>
+          </form>
+
+          <div class="ref-note">
+            <h3 class="dds-text-sm dds-weight-semibold">A code, never a clickable link</h3>
+            <p class="dds-text-sm dds-text-subtle dds-mbs-2xs">
+              The email carries a code the user types here — not a link that signs them
+              in. A reset link is a bearer credential sitting in an inbox: it is
+              forwarded, it is scanned and pre-fetched by mail security tooling, which
+              silently consumes single-use tokens, and it appears in referrer headers
+              and browser history. It also lands the user in whichever browser their
+              mail client prefers, which is usually not the one they were using.
+            </p>
+            <p class="dds-text-sm dds-text-subtle dds-mbs-xs">
+              A typed code keeps the session where it started. It is also the more
+              accessible option: it works when the mail client strips links, and it can
+              be read out over the phone to someone who needs help.
+            </p>
+          </div>
+
+          <div class="ref-note">
+            <h3 class="dds-text-sm dds-weight-semibold">Why the code is alphanumeric, and uppercase</h3>
+            <p class="dds-text-sm dds-text-subtle dds-mbs-2xs">
+              <code class="dds-code">[A-Za-z0-9]{6}</code> with
+              <code class="dds-code">autocapitalize="characters"</code>, and accepted in
+              either case. Six digits is 10⁶ combinations; six alphanumerics is about
+              2×10⁹, which is what makes a short code safe to leave valid for fifteen
+              minutes.
+            </p>
+            <p class="dds-text-sm dds-text-subtle dds-mbs-xs">
+              <code class="dds-code">inputmode="text"</code>, not
+              <code class="dds-code">numeric</code> — a numeric keypad cannot type
+              letters, and a code field that will not accept the code in it is a dead
+              end on a phone. <code class="dds-code">.dds-input-code</code> sets a
+              monospace face with ligatures off, so <code class="dds-code">0</code> and
+              <code class="dds-code">O</code>, <code class="dds-code">1</code> and
+              <code class="dds-code">l</code> are distinguishable when transcribing.
+            </p>
+            <p class="dds-text-sm dds-text-subtle dds-mbs-xs">
+              <code class="dds-code">autocomplete="one-time-code"</code> stays on it, so
+              the platform can still offer the code from the message. One field, not six
+              boxes — the same rule as the sign-in code above.
+            </p>
+          </div>
+
+          <div class="ref-note">
+            <h3 class="dds-text-sm dds-weight-semibold">Confirmation, without telling anyone off mid-word</h3>
+            <p class="dds-text-sm dds-text-subtle dds-mbs-2xs">
+              Both password fields carry
+              <code class="dds-code">autocomplete="new-password"</code>. Not
+              <code class="dds-code">off</code>, and not only on the first: that token is
+              how a password manager knows to generate and then to save, and setting it on
+              one field leaves the user retyping 24 random characters into the other.
+            </p>
+            <p class="dds-text-sm dds-text-subtle dds-mbs-xs">
+              The mismatch is reported once the confirmation is at least as long as the
+              first entry, or once the field is left — never on the second keystroke.
+              "Passwords do not match" is true of every confirmation field until the
+              moment it is not, and saying so immediately teaches people to ignore it.
+              The match state uses <code class="dds-code">role="status"</code>, and the
+              text is only rewritten when it changes, so a screen reader does not repeat
+              it on every keypress.
+            </p>
+            <p class="dds-text-sm dds-text-subtle dds-mbs-xs">
+              <code class="dds-code">minlength="12"</code> and nothing else. No character-
+              class rules: they measurably push people towards
+              <code class="dds-code">Password1!</code> and are no longer recommended by
+              NIST or the BSI. Never block paste, or every password manager stops working
+              (WCAG 2.2 3.3.8 Accessible Authentication).
+            </p>
+          </div>
+        </div>
+
         <div class="ref-guidance dds-mbs-md">
           <div class="ref-do">
             <h3>Do</h3>
@@ -1020,68 +1332,70 @@
         </div>
 
         <div class="ref-specimen">
-          <div class="dds-filtering-frame">
-            <div class="dds-filtering-split">
-              <aside class="dds-filtering-aside">
-                <form class="dds-stack dds-stack-md" action="#filtering" method="get">
-                  <fieldset class="dds-fieldgroup">
-                    <legend class="dds-legend">Status</legend>
-                    <div class="dds-fieldgroup-options">
-                      <label class="dds-choice">
-                        <input type="checkbox" name="f-status" value="approved" checked>
-                        <span class="dds-choice-label">Approved</span>
-                      </label>
-                      <label class="dds-choice">
-                        <input type="checkbox" name="f-status" value="review">
-                        <span class="dds-choice-label">Needs review</span>
-                      </label>
-                      <label class="dds-choice">
-                        <input type="checkbox" name="f-status" value="draft">
-                        <span class="dds-choice-label">Draft</span>
-                      </label>
-                    </div>
-                  </fieldset>
-                  <hr class="dds-divider">
-                  <label class="dds-switch">
-                    <input type="checkbox" name="f-archived" role="switch">
-                    <span class="dds-switch-track" aria-hidden="true"></span>
-                    <span>Include archived</span>
-                  </label>
-                  <button type="submit" class="dds-button dds-button-secondary dds-button-sm">
-                    Apply filters
-                  </button>
-                </form>
-              </aside>
-
-              <div class="dds-results">
-                <div class="dds-filterbar-applied">
-                  <span class="dds-text-sm dds-text-muted">Applied:</span>
-                  <span class="dds-chip">
-                    <span class="dds-chip-label">Status:</span> Approved
-                    <button type="button" class="dds-chip-remove">
-                      <span class="dds-sr-only">Remove filter: status approved</span>
-                      <svg class="dds-icon dds-icon-sm" aria-hidden="true"><use href="#dds-icon-close"/></svg>
+          <div class="dds-filtering">
+            <div class="dds-filtering-frame">
+              <div class="dds-filtering-split">
+                <aside class="dds-filtering-aside">
+                  <form class="dds-stack dds-stack-md" action="#filtering" method="get">
+                    <fieldset class="dds-fieldgroup">
+                      <legend class="dds-legend">Status</legend>
+                      <div class="dds-fieldgroup-options">
+                        <label class="dds-choice">
+                          <input type="checkbox" name="f-status" value="approved" checked>
+                          <span class="dds-choice-label">Approved</span>
+                        </label>
+                        <label class="dds-choice">
+                          <input type="checkbox" name="f-status" value="review">
+                          <span class="dds-choice-label">Needs review</span>
+                        </label>
+                        <label class="dds-choice">
+                          <input type="checkbox" name="f-status" value="draft">
+                          <span class="dds-choice-label">Draft</span>
+                        </label>
+                      </div>
+                    </fieldset>
+                    <hr class="dds-divider">
+                    <label class="dds-switch">
+                      <input type="checkbox" name="f-archived" role="switch">
+                      <span class="dds-switch-track" aria-hidden="true"></span>
+                      <span>Include archived</span>
+                    </label>
+                    <button type="submit" class="dds-button dds-button-secondary dds-button-sm">
+                      Apply filters
                     </button>
-                  </span>
-                  <button type="button" class="dds-button dds-button-subtle dds-button-sm">Clear all</button>
+                  </form>
+                </aside>
+
+                <div class="dds-results">
+                  <div class="dds-filterbar-applied">
+                    <span class="dds-text-sm dds-text-muted">Applied:</span>
+                    <span class="dds-chip">
+                      <span class="dds-chip-label">Status:</span> Approved
+                      <button type="button" class="dds-chip-remove">
+                        <span class="dds-sr-only">Remove filter: status approved</span>
+                        <svg class="dds-icon dds-icon-sm" aria-hidden="true"><use href="#dds-icon-close"/></svg>
+                      </button>
+                    </span>
+                    <button type="button" class="dds-button dds-button-subtle dds-button-sm">Clear all</button>
+                  </div>
+
+                  <p class="dds-results-summary" role="status">2 of 18 projects match the current filters.</p>
+
+                  <ul class="dds-results-list">
+                    <li class="dds-card dds-card-compact">
+                      <h3 class="dds-text-md"><a href="#filtering">Harbour redevelopment</a></h3>
+                      <p class="dds-text-sm dds-text-muted dds-mbs-2xs">
+                        Approved · Ilva Bergström · 1.204 Dokumente
+                      </p>
+                    </li>
+                    <li class="dds-card dds-card-compact">
+                      <h3 class="dds-text-md"><a href="#filtering">Kalvebod cycle bridge</a></h3>
+                      <p class="dds-text-sm dds-text-muted dds-mbs-2xs">
+                        Approved · Tomasz Wierzbicki · 471 Dokumente
+                      </p>
+                    </li>
+                  </ul>
                 </div>
-
-                <p class="dds-results-summary" role="status">2 of 18 projects match the current filters.</p>
-
-                <ul class="dds-results-list">
-                  <li class="dds-card dds-card-compact">
-                    <h3 class="dds-text-md"><a href="#filtering">Harbour redevelopment</a></h3>
-                    <p class="dds-text-sm dds-text-muted dds-mbs-2xs">
-                      Approved · Ilva Bergström · 1.204 Dokumente
-                    </p>
-                  </li>
-                  <li class="dds-card dds-card-compact">
-                    <h3 class="dds-text-md"><a href="#filtering">Kalvebod cycle bridge</a></h3>
-                    <p class="dds-text-sm dds-text-muted dds-mbs-2xs">
-                      Approved · Tomasz Wierzbicki · 471 Dokumente
-                    </p>
-                  </li>
-                </ul>
               </div>
             </div>
           </div>

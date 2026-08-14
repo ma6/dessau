@@ -65,11 +65,6 @@
       <polyline points="112 184 256 328 400 184" style="fill:none;stroke:currentColor;stroke-linecap:round;stroke-linejoin:round;stroke-width:48px"/>
     </symbol>
 
-    <!-- Ionicons: chevron-up-outline -->
-    <symbol id="dds-icon-chevron-up" viewBox="0 0 512 512" fill="currentColor">
-      <polyline points="112 328 256 184 400 328" style="fill:none;stroke:currentColor;stroke-linecap:round;stroke-linejoin:round;stroke-width:48px"/>
-    </symbol>
-
     <!-- Ionicons: chevron-back-outline -->
     <symbol id="dds-icon-chevron-left" viewBox="0 0 512 512" fill="currentColor">
       <polyline points="328 112 184 256 328 400" style="fill:none;stroke:currentColor;stroke-linecap:round;stroke-linejoin:round;stroke-width:48px"/>
@@ -208,10 +203,10 @@
         <a href="navigation.html">Navigation</a>
         <a href="patterns.html">Patterns</a>
       </nav>
-      <button type="button" class="dds-button dds-button-subtle dds-button-icon"
-              data-dds-theme-toggle aria-pressed="false">
-        <span class="dds-sr-only">Dark theme</span>
-        <svg class="dds-icon" aria-hidden="true"><use href="#dds-icon-moon"/></svg>
+      <button type="button" class="dds-theme-toggle dds-theme-toggle-icon"
+              data-dds-theme-toggle>
+        <svg class="dds-icon dds-theme-toggle-moon" aria-hidden="true"><use href="#dds-icon-moon"/></svg>
+        <svg class="dds-icon dds-theme-toggle-sun" aria-hidden="true"><use href="#dds-icon-sun"/></svg>
       </button>
     </div>
   </header>
@@ -242,11 +237,14 @@
               <li><a href="#field">Field</a></li>
               <li><a href="#choice">Checkbox, radio and switch</a></li>
               <li><a href="#controls">Stepper, segmented control and upload</a></li>
+              <li><a href="#theme-toggle">Theme toggle</a></li>
               <li><a href="#badge">Badge and card</a></li>
               <li><a href="#notice">Notice</a></li>
               <li><a href="#dialog">Dialog</a></li>
               <li><a href="#table">Table</a></li>
               <li><a href="#tabs">Tabs and disclosure</a></li>
+              <li><a href="#smaller">Date, search, kbd and divider</a></li>
+              <li><a href="#overlays">Tooltip and bottom sheet</a></li>
               <li><a href="#feedback">Feedback and loading</a></li>
             </ul>
             <!-- REF_TOC:END -->
@@ -435,13 +433,16 @@
             <div class="ref-matrix">
               <div class="dds-field">
                 <label class="dds-label" for="f-select">Country</label>
-                <select class="dds-select" id="f-select" name="country" autocomplete="country-name">
-                  <option value="">Choose a country</option>
-                  <option>Belgium</option>
-                  <option>Denmark</option>
-                  <option>Netherlands</option>
-                  <option>Portugal</option>
-                </select>
+                <span class="dds-select-wrap">
+                  <select class="dds-select" id="f-select" name="country" autocomplete="country-name">
+                    <option value="">Choose a country</option>
+                    <option>Belgium</option>
+                    <option>Denmark</option>
+                    <option>Netherlands</option>
+                    <option>Portugal</option>
+                  </select>
+                  <svg class="dds-icon dds-select-arrow" aria-hidden="true" focusable="false"><use href="#dds-icon-chevron-down"/></svg>
+                </span>
                 <p class="dds-hint">A native select: correct on touch, with a keyboard, and in every language.</p>
               </div>
 
@@ -732,6 +733,183 @@
               announced only when it starts to matter, debounced. A live region
               reading a number after every character is unusable.
             </p>
+          </div>
+
+          <div class="ref-specimen" data-ref-code>
+            <p class="ref-specimen-label">Date field and date range</p>
+            <div class="dds-stack dds-stack-md" style="max-inline-size: 30rem">
+              <div class="dds-field">
+                <label class="dds-label" for="bday">Geburtsdatum</label>
+                <input class="dds-input dds-date" id="bday" type="date" name="bday"
+                       autocomplete="bday" aria-describedby="bday-hint">
+                <p class="dds-hint" id="bday-hint">Format TT.MM.JJJJ</p>
+              </div>
+
+              <div class="dds-field">
+                <span class="dds-label" id="period-label">Zeitraum</span>
+                <div class="dds-daterange" role="group" aria-labelledby="period-label"
+                     aria-describedby="period-hint">
+                  <div class="dds-field">
+                    <label class="dds-label dds-text-sm" for="period-from">Von</label>
+                    <input class="dds-input dds-date" id="period-from" type="date"
+                           name="from" autocomplete="off" min="2026-01-01">
+                  </div>
+                  <div class="dds-field">
+                    <label class="dds-label dds-text-sm" for="period-to">Bis</label>
+                    <input class="dds-input dds-date" id="period-to" type="date"
+                           name="to" autocomplete="off" min="2026-01-01">
+                  </div>
+                </div>
+                <p class="dds-hint" id="period-hint">
+                  Beide Felder ausfüllen. Das Enddatum darf nicht vor dem
+                  Startdatum liegen.
+                </p>
+              </div>
+            </div>
+
+            <div class="ref-note">
+              <h3 class="dds-text-sm dds-weight-semibold">The autocomplete rule, which is easy to get backwards</h3>
+              <p class="dds-text-sm dds-text-subtle dds-mbs-2xs">
+                A birthdate takes <code class="dds-code">autocomplete="bday"</code>.
+                WCAG 2.2 1.3.5 expects it, and it is the field where autofill helps
+                most — someone who struggles to type a date gets it filled in.
+              </p>
+              <p class="dds-text-sm dds-text-subtle dds-mbs-xs">
+                A future date takes <code class="dds-code">autocomplete="off"</code>,
+                because there is nothing stored to fill it with. Copying that onto a
+                birthdate field is the common mistake, and it silently removes the
+                help from the one place it mattered — which is why both cases are
+                shown here rather than just one.
+              </p>
+            </div>
+
+            <div class="ref-note">
+              <h3 class="dds-text-sm dds-weight-semibold">Why the native picker stays</h3>
+              <p class="dds-text-sm dds-text-subtle dds-mbs-2xs">
+                The platform control knows the locale's date order, the first day of
+                the week, the calendar system and the device's own conventions. On a
+                phone it is a purpose-built control that a scripted one cannot match.
+              </p>
+              <p class="dds-text-sm dds-text-subtle dds-mbs-xs">
+                A JavaScript date picker has to rebuild all of that, usually gets the
+                keyboard wrong, and is the single most common source of "I cannot
+                enter my date of birth". The visible format still differs by locale
+                and platform, so the expected format always goes in a hint — it
+                cannot be inferred from the control.
+              </p>
+              <p class="dds-text-sm dds-text-subtle dds-mbs-xs">
+                <code class="dds-code">color-scheme</code> is bound to the theme, so
+                the picker's own chrome follows light and dark with no styling at
+                all. Switch the theme and open the picker to see it.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ====================================================== theme toggle -->
+      <section class="ref-section" id="theme-toggle">
+        <div class="ref-section-head">
+          <h2>Theme toggle</h2>
+          <p class="dds-text-subtle dds-measure-default dds-mbs-xs">
+            Deliberately styled as a text link rather than a button: it sits in a
+            header or footer utility row, where a filled control would out-shout
+            the navigation beside it. The theme is a preference, not an action the
+            page wants you to take.
+          </p>
+        </div>
+
+        <div class="dds-stack dds-stack-lg">
+          <div class="ref-specimen" data-ref-code>
+            <div class="dds-cluster dds-cluster-lg">
+              <div>
+                <p class="ref-specimen-label">With label — preferred</p>
+                <button type="button" class="dds-theme-toggle" data-dds-theme-toggle>
+                  <svg class="dds-icon dds-theme-toggle-moon" aria-hidden="true"><use href="#dds-icon-moon"/></svg>
+                  <svg class="dds-icon dds-theme-toggle-sun" aria-hidden="true"><use href="#dds-icon-sun"/></svg>
+                  <span class="dds-theme-toggle-label">Dark</span>
+                </button>
+              </div>
+
+              <div>
+                <p class="ref-specimen-label">Icon only — compact</p>
+                <button type="button" class="dds-theme-toggle dds-theme-toggle-icon"
+                        data-dds-theme-toggle>
+                  <svg class="dds-icon dds-theme-toggle-moon" aria-hidden="true"><use href="#dds-icon-moon"/></svg>
+                  <svg class="dds-icon dds-theme-toggle-sun" aria-hidden="true"><use href="#dds-icon-sun"/></svg>
+                </button>
+              </div>
+
+              <div>
+                <p class="ref-specimen-label">German wording</p>
+                <button type="button" class="dds-theme-toggle" data-dds-theme-toggle="de">
+                  <svg class="dds-icon dds-theme-toggle-moon" aria-hidden="true"><use href="#dds-icon-moon"/></svg>
+                  <svg class="dds-icon dds-theme-toggle-sun" aria-hidden="true"><use href="#dds-icon-sun"/></svg>
+                  <span class="dds-theme-toggle-label">Dunkel</span>
+                </button>
+              </div>
+            </div>
+
+            <p class="ref-note">
+              <svg class="dds-icon" aria-hidden="true"><use href="#dds-icon-info"/></svg>
+              Press any of them — including the one in the page header. <strong>All
+              toggles in a document share one mechanism and stay in sync</strong>,
+              because they all reflect one piece of state. Both icons are in the
+              markup and CSS chooses which shows, so there is no flash of the wrong
+              icon before the script runs.
+            </p>
+          </div>
+
+          <div class="ref-specimen">
+            <p class="ref-specimen-label">Why there is no <code class="dds-code">aria-pressed</code></p>
+            <div class="dds-prose dds-text-sm">
+              <p>
+                The visible label says where pressing takes you — “Dark” while light
+                is active. The accessible name must therefore say the same thing
+                (WCAG 2.5.3 Label in Name), which makes this an <strong>action
+                button</strong>, not a toggle button.
+              </p>
+              <p>There are two valid patterns, and they must not be mixed:</p>
+              <ul>
+                <li><strong>Action button</strong> — the name changes, no
+                  <code class="dds-code">aria-pressed</code>. This one.</li>
+                <li><strong>Toggle button</strong> — the name stays constant,
+                  <code class="dds-code">aria-pressed</code> carries the state.</li>
+              </ul>
+              <p>
+                Combining them announces “switch to dark theme, not pressed”, which
+                double-encodes the state and leaves the listener unsure whether the
+                control describes the current mode or the next one.
+              </p>
+              <p>
+                Pressing announces the <em>result</em> — “Light — light theme on” —
+                not the next action. The label has just changed to describe what
+                pressing again would do, which is not what the user needs to hear.
+              </p>
+            </div>
+          </div>
+
+          <div class="ref-guidance">
+            <div class="ref-do">
+              <h3>Do</h3>
+              <ul class="dds-text-sm" style="padding-inline-start: 1.2rem">
+                <li>Use a real <code>&lt;button&gt;</code>, however link-like it looks.</li>
+                <li>Prefer the labelled variant — sun and moon alone are ambiguous about which is the current state.</li>
+                <li>Give the icon-only variant an accessible name; the script sets one.</li>
+                <li>Keep the toggle reachable on <strong>every</strong> page — it is the only way out of a default someone cannot read comfortably.</li>
+                <li>Persist the choice, and let it outrank the system preference.</li>
+              </ul>
+            </div>
+            <div class="ref-dont">
+              <h3>Don’t</h3>
+              <ul class="dds-text-sm" style="padding-inline-start: 1.2rem">
+                <li>Use an <code>&lt;a&gt;</code> — it does not navigate, is announced as a link, and does nothing on Space.</li>
+                <li>Set both a changing name and <code>aria-pressed</code>.</li>
+                <li>Carry the meaning in icon colour alone — the shape and the label do it.</li>
+                <li>Swap the icon in JavaScript; CSS already knows the theme.</li>
+                <li>Hide it away in a settings page.</li>
+              </ul>
+            </div>
           </div>
         </div>
       </section>
@@ -1055,6 +1233,192 @@
         </div>
       </section>
 
+      <!-- ============================================ date, search, kbd, divider -->
+      <section class="ref-section" id="smaller">
+        <div class="ref-section-head">
+          <h2>Date, search, kbd and divider</h2>
+          <p class="dds-text-subtle dds-measure-default dds-mbs-xs">
+            Small components, each with one thing that is easy to get wrong.
+          </p>
+        </div>
+
+        <div class="dds-stack dds-stack-lg">
+          <div class="ref-specimen" data-ref-code>
+            <p class="ref-specimen-label">Date field — the native picker</p>
+            <div class="ref-matrix">
+              <div class="dds-field">
+                <label class="dds-label" for="d-bday">
+                  Geburtsdatum <span class="dds-label-note">(erforderlich)</span>
+                </label>
+                <input class="dds-input" id="d-bday" name="bday" type="date"
+                       autocomplete="bday" required aria-describedby="d-bday-hint">
+                <p class="dds-hint" id="d-bday-hint">Format: TT.MM.JJJJ</p>
+              </div>
+
+              <div class="dds-field">
+                <label class="dds-label" for="d-start">Beginn</label>
+                <input class="dds-input" id="d-start" name="start" type="date"
+                       autocomplete="off" min="2026-01-01" aria-describedby="d-start-hint">
+                <p class="dds-hint" id="d-start-hint">Frühestens heute. Format: TT.MM.JJJJ</p>
+              </div>
+            </div>
+            <div class="dds-field dds-mbs-md" style="max-inline-size: 26rem">
+              <span class="dds-label" id="d-range-label">Zeitraum</span>
+              <div class="dds-daterange" role="group" aria-labelledby="d-range-label">
+                <div class="dds-field">
+                  <label class="dds-label dds-text-sm" for="d-from">Von</label>
+                  <input class="dds-input" id="d-from" name="from" type="date">
+                </div>
+                <div class="dds-field">
+                  <label class="dds-label dds-text-sm" for="d-to">Bis</label>
+                  <input class="dds-input" id="d-to" name="to" type="date">
+                </div>
+              </div>
+            </div>
+            <p class="ref-note">
+              <svg class="dds-icon" aria-hidden="true"><use href="#dds-icon-warning"/></svg>
+              <strong>The <code class="dds-code">autocomplete</code> rule is easy to
+              get backwards.</strong> A date of birth takes
+              <code class="dds-code">bday</code> — WCAG 1.3.5 expects it, and it is
+              the field where autofill helps most. Only a <em>future</em> date takes
+              <code class="dds-code">off</code>, because there is nothing to fill.
+              Showing just the second case teaches people to copy <code
+              class="dds-code">off</code> onto a birthdate.
+            </p>
+          </div>
+
+          <div class="ref-specimen" data-ref-code>
+            <p class="ref-specimen-label">Search field — one unit, real submit</p>
+            <form class="dds-search" role="search" action="#smaller" method="get"
+                  style="max-inline-size: 26rem">
+              <svg class="dds-icon" aria-hidden="true"><use href="#dds-icon-search"/></svg>
+              <input id="s-q" name="q" type="search" aria-label="Projekte durchsuchen"
+                     placeholder="Projekt oder Person">
+              <button type="submit" class="dds-button dds-button-primary">Suchen</button>
+            </form>
+            <p class="ref-note">
+              <svg class="dds-icon" aria-hidden="true"><use href="#dds-icon-info"/></svg>
+              <code class="dds-code">role="search"</code> makes it findable as a
+              landmark, and <code class="dds-code">type="search"</code> gets the
+              platform's clear control, query history and the “Search” return key on
+              iOS. The button has a <strong>name</strong> — a magnifier alone is
+              announced as “button”.
+            </p>
+          </div>
+
+          <div class="ref-specimen" data-ref-code>
+            <p class="ref-specimen-label">Keyboard keys</p>
+            <p class="dds-text-sm">
+              Press <kbd class="dds-kbd">Esc</kbd> to close, or
+              <kbd class="dds-kbd">Ctrl</kbd> + <kbd class="dds-kbd">K</kbd> to
+              search. On a Mac, <kbd class="dds-kbd">⌘</kbd> +
+              <kbd class="dds-kbd">K</kbd>.
+            </p>
+          </div>
+
+          <div class="ref-specimen" data-ref-code>
+            <p class="ref-specimen-label">Divider</p>
+            <p class="dds-text-sm">Content above the rule.</p>
+            <hr class="dds-divider dds-mbs-md dds-mbe-md">
+            <p class="dds-text-sm">Content below it.</p>
+            <p class="ref-note">
+              <svg class="dds-icon" aria-hidden="true"><use href="#dds-icon-info"/></svg>
+              A real <code class="dds-code">&lt;hr&gt;</code>, so it is a thematic
+              break in the document rather than a styled empty div. Use it between
+              groups that layout does not already separate — a rule that merely
+              repeats existing spacing is noise.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================================================= tooltip and sheet -->
+      <section class="ref-section" id="overlays">
+        <div class="ref-section-head">
+          <h2>Tooltip and bottom sheet</h2>
+        </div>
+
+        <div class="dds-stack dds-stack-lg">
+          <div class="ref-specimen" data-ref-code>
+            <p class="ref-specimen-label">Tooltip — supplementary only</p>
+            <p class="dds-cluster dds-cluster-sm">
+              <button type="button" class="dds-button dds-button-secondary"
+                      popovertarget="tip-retention">
+                Aufbewahrungsdauer
+                <svg class="dds-icon" aria-hidden="true"><use href="#dds-icon-info"/></svg>
+              </button>
+              <span class="dds-tooltip" id="tip-retention" popover>
+                Dokumente bleiben zehn Jahre gespeichert und werden danach
+                automatisch gelöscht.
+              </span>
+            </p>
+            <p class="ref-note">
+              <svg class="dds-icon" aria-hidden="true"><use href="#dds-icon-warning"/></svg>
+              <strong>Never the only place information lives.</strong> A tooltip is
+              unavailable on touch, easy to miss, and it disappears — anything
+              essential belongs in a hint below the field. Built on
+              <code class="dds-code">popover</code>, which supplies the dismiss
+              behaviour WCAG 2.2 1.4.13 requires and renders in the top layer.
+            </p>
+          </div>
+
+          <div class="ref-specimen" data-ref-code>
+            <p class="ref-specimen-label">Bottom sheet — the same dialog, anchored low</p>
+            <button type="button" class="dds-button dds-button-secondary"
+                    data-dds-dialog-open="demo-sheet">
+              Open bottom sheet
+            </button>
+
+            <dialog class="dds-dialog dds-dialog-sheet" id="demo-sheet"
+                    aria-labelledby="demo-sheet-title">
+              <div class="dds-dialog-header">
+                <h2 class="dds-dialog-title" id="demo-sheet-title">Sortieren nach</h2>
+                <button type="button" class="dds-button dds-button-subtle dds-button-icon"
+                        data-dds-dialog-close>
+                  <span class="dds-sr-only">Schließen</span>
+                  <svg class="dds-icon" aria-hidden="true"><use href="#dds-icon-close"/></svg>
+                </button>
+              </div>
+              <div class="dds-dialog-body">
+                <fieldset class="dds-fieldgroup">
+                  <legend class="dds-sr-only">Sortierung</legend>
+                  <div class="dds-fieldgroup-options">
+                    <label class="dds-choice">
+                      <input type="radio" name="sheet-sort" value="recent" checked>
+                      <span class="dds-choice-label">Zuletzt geändert</span>
+                    </label>
+                    <label class="dds-choice">
+                      <input type="radio" name="sheet-sort" value="name">
+                      <span class="dds-choice-label">Name</span>
+                    </label>
+                    <label class="dds-choice">
+                      <input type="radio" name="sheet-sort" value="size">
+                      <span class="dds-choice-label">Anzahl Dokumente</span>
+                    </label>
+                  </div>
+                </fieldset>
+              </div>
+              <div class="dds-dialog-footer">
+                <button type="button" class="dds-button dds-button-primary" data-dds-dialog-close>
+                  Übernehmen
+                </button>
+              </div>
+            </dialog>
+
+            <p class="ref-note">
+              <svg class="dds-icon" aria-hidden="true"><use href="#dds-icon-info"/></svg>
+              <strong>Narrow the window below 30rem to see it.</strong> Above that it
+              is an ordinary centred dialog; below, it anchors to the bottom edge with
+              square lower corners. Not a second component —
+              <code class="dds-code">.dds-dialog-sheet</code> is a viewport-dependent
+              variant, because “reachable by a thumb” genuinely is a viewport
+              property. It is one of the few places a media query is correct.
+            </p>
+          </div>
+        </div>
+      </section>
+
+
       <!-- ================================================= feedback & icons -->
       <section class="ref-section" id="feedback">
         <div class="ref-section-head">
@@ -1104,40 +1468,6 @@
             </div>
           </div>
 
-          <div class="ref-specimen">
-            <p class="ref-specimen-label">Icon set</p>
-            <div class="dds-cluster dds-cluster-md" style="font-size: 1.5rem">
-              <svg class="dds-icon" aria-hidden="true"><use href="#dds-icon-check"/></svg>
-              <svg class="dds-icon" aria-hidden="true"><use href="#dds-icon-check-circle"/></svg>
-              <svg class="dds-icon" aria-hidden="true"><use href="#dds-icon-warning"/></svg>
-              <svg class="dds-icon" aria-hidden="true"><use href="#dds-icon-error"/></svg>
-              <svg class="dds-icon" aria-hidden="true"><use href="#dds-icon-info"/></svg>
-              <svg class="dds-icon" aria-hidden="true"><use href="#dds-icon-close"/></svg>
-              <svg class="dds-icon" aria-hidden="true"><use href="#dds-icon-search"/></svg>
-              <svg class="dds-icon" aria-hidden="true"><use href="#dds-icon-plus"/></svg>
-              <svg class="dds-icon" aria-hidden="true"><use href="#dds-icon-minus"/></svg>
-              <svg class="dds-icon" aria-hidden="true"><use href="#dds-icon-edit"/></svg>
-              <svg class="dds-icon" aria-hidden="true"><use href="#dds-icon-trash"/></svg>
-              <svg class="dds-icon" aria-hidden="true"><use href="#dds-icon-menu"/></svg>
-              <svg class="dds-icon" aria-hidden="true"><use href="#dds-icon-chevron-down"/></svg>
-              <svg class="dds-icon" aria-hidden="true"><use href="#dds-icon-chevron-up"/></svg>
-              <svg class="dds-icon" aria-hidden="true"><use href="#dds-icon-chevron-left"/></svg>
-              <svg class="dds-icon" aria-hidden="true"><use href="#dds-icon-chevron-right"/></svg>
-              <svg class="dds-icon" aria-hidden="true"><use href="#dds-icon-arrow-left"/></svg>
-              <svg class="dds-icon" aria-hidden="true"><use href="#dds-icon-arrow-right"/></svg>
-              <svg class="dds-icon" aria-hidden="true"><use href="#dds-icon-external"/></svg>
-              <svg class="dds-icon" aria-hidden="true"><use href="#dds-icon-location"/></svg>
-              <svg class="dds-icon" aria-hidden="true"><use href="#dds-icon-document"/></svg>
-              <svg class="dds-icon" aria-hidden="true"><use href="#dds-icon-inbox"/></svg>
-              <svg class="dds-icon" aria-hidden="true"><use href="#dds-icon-sun"/></svg>
-              <svg class="dds-icon" aria-hidden="true"><use href="#dds-icon-moon"/></svg>
-            </div>
-            <p class="dds-text-sm dds-text-muted dds-mbs-sm dds-measure-default">
-              Stroke weight lives in CSS, not in the SVG, so an icon matches the
-              text beside it and the whole set can be re-weighted in one place.
-              Colour comes from <code class="dds-code">currentColor</code>.
-            </p>
-          </div>
         </div>
       </section>
 

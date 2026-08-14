@@ -245,6 +245,128 @@
   min-inline-size: 11rem;
 }
 
+/* -------------------------------------------------------------------- layers */
+/* The cascade-layer stack, weakest at the top. Each step is inset a little further
+   so the order reads as a progression rather than as a plain list. */
+.ref-layer {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--dds-space-xs);
+
+  padding: var(--dds-space-2xs) var(--dds-space-sm);
+  border-inline-start: var(--dds-border-thick) solid var(--dds-color-border-subtle);
+  background-color: var(--dds-color-surface-sunken);
+  border-radius: var(--dds-radius-sm);
+}
+
+.ref-layer code {
+  font-family: var(--dds-font-mono);
+  font-size: var(--dds-font-size-xs);
+  color: var(--dds-color-text-default);
+}
+
+/* The product's own layer. Marked with weight and a border as well as colour, so
+   "this is the one that wins" survives greyscale. */
+.ref-layer-yours {
+  border-inline-start-color: var(--dds-color-action-primary);
+  background-color: var(--dds-color-surface-selected);
+}
+
+/* --------------------------------------------------------------------- icons */
+/* One cell per symbol in the sprite, each with its role name. The name matters as
+   much as the glyph: the role is what markup refers to, and which Ionicon backs it
+   is an implementation detail that may change. */
+.ref-icons {
+  display: grid;
+  gap: var(--dds-space-sm);
+  grid-template-columns: repeat(auto-fill, minmax(min(9rem, 100%), 1fr));
+}
+
+.ref-icon {
+  display: flex;
+  align-items: center;
+  gap: var(--dds-space-xs);
+
+  padding: var(--dds-space-xs) var(--dds-space-sm);
+  background-color: var(--dds-color-surface-sunken);
+  border-radius: var(--dds-radius-sm);
+
+  /* The glyph is drawn larger than body text so the shape can be judged. */
+  font-size: var(--dds-font-size-lg);
+  color: var(--dds-color-text-default);
+}
+
+.ref-icon-name {
+  font-family: var(--dds-font-mono);
+  font-size: var(--dds-font-size-2xs);
+  color: var(--dds-color-text-subtle);
+  /* A long role name must not push the glyph out of the cell. */
+  min-inline-size: 0;
+  overflow-wrap: anywhere;
+}
+
+/* -------------------------------------------------------------- breakpoints */
+/* Live: which named breakpoint the current window width has reached. Resizing the
+   window is the demonstration, so the state has to be visible at a glance. */
+.ref-breakpoint-readout {
+  padding: var(--dds-space-xs) var(--dds-space-sm);
+  margin-block-end: var(--dds-space-sm);
+
+  font-family: var(--dds-font-mono);
+  font-variant-numeric: tabular-nums;
+  color: var(--dds-color-text-default);
+
+  background-color: var(--dds-color-surface-sunken);
+  border-radius: var(--dds-radius-sm);
+}
+
+.ref-breakpoint-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--dds-space-3xs);
+}
+
+.ref-breakpoint {
+  display: flex;
+  align-items: baseline;
+  gap: var(--dds-space-sm);
+  flex-wrap: wrap;
+
+  padding: var(--dds-space-2xs) var(--dds-space-xs);
+  border-inline-start: var(--dds-border-thick) solid var(--dds-color-border-subtle);
+  border-radius: var(--dds-radius-sm);
+}
+
+/* The active one gains a border weight as well as a colour — the state is not
+   carried by hue alone. */
+.ref-breakpoint[data-active] {
+  border-inline-start-color: var(--dds-color-action-primary);
+  background-color: var(--dds-color-surface-selected);
+}
+
+.ref-breakpoint-name {
+  font-family: var(--dds-font-mono);
+  font-size: var(--dds-font-size-2xs);
+  color: var(--dds-color-text-default);
+  min-inline-size: 14rem;
+}
+
+.ref-breakpoint-value {
+  color: var(--dds-color-text-subtle);
+  font-size: var(--dds-font-size-xs);
+}
+
+.ref-breakpoint-state {
+  margin-inline-start: auto;
+  color: var(--dds-color-text-muted);
+}
+
+.ref-breakpoint[data-active] .ref-breakpoint-state {
+  color: var(--dds-color-text-link);
+  font-weight: var(--dds-font-weight-semibold);
+}
+
 /* --------------------------------------------------------------------- code */
 .ref-code {
   margin: 0;
@@ -496,10 +618,22 @@
    is what makes its absence visible.
    ============================================================================= */
 
+/* A note is a BLOCK, and that is a bug fix rather than a preference.
+   ----------------------------------------------------------------------------
+   It used to be `display: flex` with a `gap`, to sit the icon beside the text.
+   Flex makes every child a flex item — including each inline element and each run
+   of text between them. A sentence containing four `<code>` spans became eleven
+   flex items with a gap between all of them: four boxed numbers strewn across two
+   ragged columns, with the sentence broken around them.
+
+   It looked like a font or wrapping problem, which is why it survived a long time.
+   The cause is that flex does not lay out text; it lays out boxes.
+
+   So the note is block, text flows the way text does, and the icon is taken out of
+   flow entirely — it cannot make items out of anything if it is not in the flow. */
 .ref-note {
-  display: flex;
-  gap: var(--dds-space-xs);
-  align-items: flex-start;
+  display: block;
+  position: relative;
 
   margin-block-start: var(--dds-space-sm);
   padding: var(--dds-space-xs) var(--dds-space-sm);
@@ -512,8 +646,17 @@
   border-radius: var(--dds-radius-sm);
 }
 
+/* Room for the icon, but only where there is one — most notes lead with a heading
+   instead, and an empty indent on those reads as a mistake. */
+.ref-note:has(> .dds-icon) {
+  padding-inline-start: calc(var(--dds-space-sm) + 1.6em);
+}
+
 .ref-note > .dds-icon {
-  margin-block-start: 0.15em;
+  position: absolute;
+  inset-inline-start: var(--dds-space-sm);
+  /* Optically aligned to the first line's cap height rather than its box. */
+  inset-block-start: calc(var(--dds-space-xs) + 0.2em);
   color: var(--dds-color-text-muted);
 }
 

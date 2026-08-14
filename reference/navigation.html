@@ -65,11 +65,6 @@
       <polyline points="112 184 256 328 400 184" style="fill:none;stroke:currentColor;stroke-linecap:round;stroke-linejoin:round;stroke-width:48px"/>
     </symbol>
 
-    <!-- Ionicons: chevron-up-outline -->
-    <symbol id="dds-icon-chevron-up" viewBox="0 0 512 512" fill="currentColor">
-      <polyline points="112 328 256 184 400 328" style="fill:none;stroke:currentColor;stroke-linecap:round;stroke-linejoin:round;stroke-width:48px"/>
-    </symbol>
-
     <!-- Ionicons: chevron-back-outline -->
     <symbol id="dds-icon-chevron-left" viewBox="0 0 512 512" fill="currentColor">
       <polyline points="328 112 184 256 328 400" style="fill:none;stroke:currentColor;stroke-linecap:round;stroke-linejoin:round;stroke-width:48px"/>
@@ -208,10 +203,10 @@
         <a href="navigation.html" aria-current="page">Navigation</a>
         <a href="patterns.html">Patterns</a>
       </nav>
-      <button type="button" class="dds-button dds-button-subtle dds-button-icon"
-              data-dds-theme-toggle aria-pressed="false">
-        <span class="dds-sr-only">Dark theme</span>
-        <svg class="dds-icon" aria-hidden="true"><use href="#dds-icon-moon"/></svg>
+      <button type="button" class="dds-theme-toggle dds-theme-toggle-icon"
+              data-dds-theme-toggle>
+        <svg class="dds-icon dds-theme-toggle-moon" aria-hidden="true"><use href="#dds-icon-moon"/></svg>
+        <svg class="dds-icon dds-theme-toggle-sun" aria-hidden="true"><use href="#dds-icon-sun"/></svg>
       </button>
     </div>
   </header>
@@ -259,6 +254,8 @@
               <li><a href="#steps">Step progress</a></li>
               <li><a href="#toolbar">Toolbar, filter bar and action bar</a></li>
               <li><a href="#toc">Table of contents</a></li>
+              <li><a href="#contentnav">Content and app navigation</a></li>
+              <li><a href="#topbar">App topbar and alert banner</a></li>
               <li><a href="#sitefooter">Site footer</a></li>
             </ul>
             <!-- REF_TOC:END -->
@@ -438,18 +435,26 @@
           <div class="dds-steps-frame" style="padding: var(--dds-space-md)">
             <ol class="dds-steps">
               <li class="dds-step" data-dds-step="done">
+                <span class="dds-step-marker">
+                  <svg class="dds-icon" aria-hidden="true" focusable="false"><use href="#dds-icon-check"/></svg>
+                </span>
                 Your details
                 <span class="dds-step-status" data-dds-step-status>Completed</span>
               </li>
               <li class="dds-step" data-dds-step="done">
+                <span class="dds-step-marker">
+                  <svg class="dds-icon" aria-hidden="true" focusable="false"><use href="#dds-icon-check"/></svg>
+                </span>
                 Address
                 <span class="dds-step-status" data-dds-step-status>Completed</span>
               </li>
               <li class="dds-step" data-dds-step="current" aria-current="step">
+                <span class="dds-step-marker"></span>
                 Documents
                 <span class="dds-step-status" data-dds-step-status>Current step</span>
               </li>
               <li class="dds-step" data-dds-step="todo">
+                <span class="dds-step-marker"></span>
                 Review and submit
                 <span class="dds-step-status" data-dds-step-status>Not started</span>
               </li>
@@ -541,21 +546,27 @@
                 </div>
                 <div class="dds-field">
                   <label class="dds-label" for="nav-filter-status">Status</label>
-                  <select class="dds-select" id="nav-filter-status" name="status">
-                    <option value="">Any status</option>
-                    <option>Approved</option>
-                    <option>Needs review</option>
-                    <option>Draft</option>
-                  </select>
+                  <span class="dds-select-wrap">
+                    <select class="dds-select" id="nav-filter-status" name="status">
+                      <option value="">Any status</option>
+                      <option>Approved</option>
+                      <option>Needs review</option>
+                      <option>Draft</option>
+                    </select>
+                    <svg class="dds-icon dds-select-arrow" aria-hidden="true" focusable="false"><use href="#dds-icon-chevron-down"/></svg>
+                  </span>
                 </div>
                 <div class="dds-field">
                   <label class="dds-label" for="nav-filter-owner">Owner</label>
-                  <select class="dds-select" id="nav-filter-owner" name="owner">
-                    <option value="">Anyone</option>
-                    <option>Ilva Bergström</option>
-                    <option>Tomasz Wierzbicki</option>
-                    <option>Nadja Öztürk</option>
-                  </select>
+                  <span class="dds-select-wrap">
+                    <select class="dds-select" id="nav-filter-owner" name="owner">
+                      <option value="">Anyone</option>
+                      <option>Ilva Bergström</option>
+                      <option>Tomasz Wierzbicki</option>
+                      <option>Nadja Öztürk</option>
+                    </select>
+                    <svg class="dds-icon dds-select-arrow" aria-hidden="true" focusable="false"><use href="#dds-icon-chevron-down"/></svg>
+                  </span>
                 </div>
               </div>
 
@@ -643,6 +654,331 @@
               </p>
             </div>
           </div>
+        </div>
+      </section>
+
+      <!-- =============================================== content navigation -->
+      <section class="ref-section" id="contentnav">
+        <div class="ref-section-head">
+          <h2>Content and app navigation</h2>
+          <p class="dds-text-subtle dds-measure-default dds-mbs-xs">
+            Four navigation components, four different jobs. Content navigation
+            moves you between the pages of one body of content; app navigation moves
+            you between areas of a signed-in application; the site header moves you
+            between top-level sections; the table of contents moves you within a
+            single page.
+          </p>
+        </div>
+
+        <div data-ref-bp>
+          <div class="dds-contentnav-frame" style="padding: var(--dds-space-md)">
+            <div class="dds-contentnav-layout" data-dds-contentnav>
+              <button class="dds-contentnav-toggle dds-button dds-button-secondary"
+                      type="button" data-dds-contentnav-toggle
+                      aria-expanded="false" aria-controls="demo-contentnav">
+                <svg class="dds-icon" aria-hidden="true" focusable="false"><use href="#dds-icon-menu"/></svg>
+                In this guide
+              </button>
+
+              <div class="dds-contentnav-scrim" data-dds-contentnav-scrim></div>
+
+              <nav class="dds-contentnav" id="demo-contentnav" aria-labelledby="demo-contentnav-title">
+                <p class="dds-contentnav-title" id="demo-contentnav-title">In this guide</p>
+
+                <button class="dds-contentnav-close dds-button dds-button-quiet dds-button-sm"
+                        type="button" data-dds-contentnav-close>
+                  <svg class="dds-icon" aria-hidden="true" focusable="false"><use href="#dds-icon-close"/></svg>
+                  Close
+                </button>
+
+                <div class="dds-contentnav-group">
+                  <p class="dds-contentnav-group-title">Before you start</p>
+                  <ul>
+                    <li><a href="#contentnav">What you will need</a></li>
+                    <li><a href="#contentnav" aria-current="page">Deadlines and dates</a></li>
+                    <li><a href="#contentnav">Who to contact</a></li>
+                  </ul>
+                </div>
+
+                <div class="dds-contentnav-group">
+                  <p class="dds-contentnav-group-title">Applying</p>
+                  <ul>
+                    <li><a href="#contentnav">Filling in the form</a></li>
+                    <li><a href="#contentnav">Documents to attach</a></li>
+                    <li><a href="#contentnav">Paying the fee</a></li>
+                  </ul>
+                </div>
+
+                <div class="dds-contentnav-group">
+                  <p class="dds-contentnav-group-title">After you apply</p>
+                  <ul>
+                    <li><a href="#contentnav">How long it takes</a></li>
+                    <li><a href="#contentnav">Appealing a decision</a></li>
+                  </ul>
+                </div>
+              </nav>
+
+              <div data-dds-contentnav-content>
+                <div class="dds-prose">
+                  <h3>Deadlines and dates</h3>
+                  <p>
+                    Applications open on 1 September and close at 23:59 on
+                    31 October. Anything submitted after that waits for the
+                    following round.
+                  </p>
+                  <p>
+                    Narrow the width switcher above to below 64rem: the column
+                    becomes a panel and the button appears. Open it, then press
+                    Escape — focus goes back to the button, not to the top of the
+                    page.
+                  </p>
+                  <p>
+                    While the panel is open, try tabbing. This text is
+                    <code class="dds-code">inert</code>, so it is out of the tab
+                    order and out of the accessibility tree — not merely covered.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="ref-note dds-mbs-md">
+          <h3 class="dds-text-sm dds-weight-semibold">Why this is not a &lt;dialog&gt;</h3>
+          <p class="dds-text-sm dds-text-subtle dds-mbs-2xs">
+            A modal panel is the right behaviour at narrow widths, and
+            <code class="dds-code">showModal()</code> would normally be how to get
+            it. It cannot be used here: the same element has to be a static column
+            above the threshold, and the browser closes a dialog with
+            <code class="dds-code">dialog:not([open]) { display: none }</code>.
+            Overriding that is precisely the bug
+            <code class="dds-code">scripts/check-css.mjs</code> now guards against.
+          </p>
+          <p class="dds-text-sm dds-text-subtle dds-mbs-xs">
+            The alternative — a dialog for narrow and a separate column for wide —
+            means two copies of the same navigation, which drift apart and are both
+            announced by a screen reader. So it stays one
+            <code class="dds-code">&lt;nav&gt;</code>, and the part that actually
+            mattered comes from the platform anyway:
+            <code class="dds-code">inert</code> on the content.
+          </p>
+          <p class="dds-text-sm dds-text-subtle dds-mbs-xs">
+            <code class="dds-code">inert</code> is what a focus trap was always
+            approximating. A hand-written trap cycles Tab inside the panel while a
+            screen reader walks straight into the content behind it, reading a page
+            the user cannot see. It also has to track the first and last focusable
+            element, which is wrong the moment something inside the panel expands.
+          </p>
+        </div>
+
+        <h3 class="dds-text-sm dds-weight-semibold dds-mbs-xl">App navigation</h3>
+        <p class="dds-text-sm dds-text-subtle dds-measure-default dds-mbs-2xs">
+          Flat, for a signed-in application. No groups and no off-canvas mechanic —
+          if it needs grouping it has outgrown this and wants a content navigation;
+          if it needs to collapse, the app is a site and wants a header.
+        </p>
+
+        <div class="ref-specimen dds-mbs-sm">
+          <div class="dds-sidebar" style="--dds-sidebar-width: 14rem">
+            <div class="dds-sidebar-aside">
+              <nav class="dds-appnav" aria-label="Account areas">
+                <div class="dds-appnav-section">
+                  <ul>
+                    <li>
+                      <a href="#contentnav" aria-current="page">
+                        <svg class="dds-icon" aria-hidden="true" focusable="false"><use href="#dds-icon-inbox"/></svg>
+                        Overview
+                      </a>
+                    </li>
+                    <li>
+                      <a href="#contentnav">
+                        <svg class="dds-icon" aria-hidden="true" focusable="false"><use href="#dds-icon-document"/></svg>
+                        Documents
+                        <span class="dds-appnav-meta dds-badge">12</span>
+                      </a>
+                    </li>
+                    <li>
+                      <a href="#contentnav">
+                        <svg class="dds-icon" aria-hidden="true" focusable="false"><use href="#dds-icon-edit"/></svg>
+                        Drafts
+                        <span class="dds-appnav-meta dds-text-muted dds-text-xs">3</span>
+                      </a>
+                    </li>
+                  </ul>
+                </div>
+
+                <div class="dds-appnav-section">
+                  <span class="dds-appnav-section-title" id="appnav-settings">Settings</span>
+                  <ul aria-labelledby="appnav-settings">
+                    <li>
+                      <a href="#contentnav">
+                        <svg class="dds-icon" aria-hidden="true" focusable="false"><use href="#dds-icon-location"/></svg>
+                        Addresses
+                      </a>
+                    </li>
+                    <li>
+                      <a href="#contentnav">
+                        <svg class="dds-icon" aria-hidden="true" focusable="false"><use href="#dds-icon-trash"/></svg>
+                        Close account
+                      </a>
+                    </li>
+                  </ul>
+                </div>
+              </nav>
+            </div>
+            <div class="dds-sidebar-main">
+              <p class="dds-text-sm dds-text-subtle">
+                The current area carries <code class="dds-code">aria-current="page"</code>,
+                and shows it three ways: a fill, a heavier weight and a coloured
+                label. A fill alone disappears in forced-colors mode and in
+                greyscale.
+              </p>
+              <p class="dds-text-sm dds-text-subtle dds-mbs-sm">
+                Icons are <code class="dds-code">aria-hidden</code> — the label
+                carries the meaning. An icon-only app navigation forces every user
+                to learn a private symbol vocabulary, and gives a screen-reader user
+                nothing at all.
+              </p>
+              <p class="dds-text-sm dds-text-subtle dds-mbs-sm">
+                The column itself is <code class="dds-code">.dds-sidebar</code> from
+                the layout primitives, not part of this component. The navigation is
+                only the navigation, so it can also sit inside a topbar layout or a
+                panel.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================================================ topbar -->
+      <section class="ref-section" id="topbar">
+        <div class="ref-section-head">
+          <h2>App topbar and alert banner</h2>
+          <p class="dds-text-subtle dds-measure-default dds-mbs-xs">
+            Application chrome, as opposed to site chrome. A site header is for
+            getting between pages; a topbar names what you are looking at, holds the
+            actions that apply to it, and stays put while the content scrolls.
+          </p>
+        </div>
+
+        <div data-ref-bp>
+          <div class="dds-topbar-frame" style="position: static">
+            <div class="dds-topbar">
+              <button class="dds-button dds-button-quiet dds-button-icon" type="button"
+                      aria-label="Open navigation">
+                <svg class="dds-icon" aria-hidden="true" focusable="false"><use href="#dds-icon-menu"/></svg>
+              </button>
+              <div class="dds-topbar-context">
+                <h3 class="dds-topbar-title">Harbour redevelopment — phase two</h3>
+                <p class="dds-topbar-meta">Draft · edited 14 minutes ago by Ilva Bergström</p>
+              </div>
+              <div class="dds-topbar-actions">
+                <button class="dds-button dds-button-quiet" type="button">Discard</button>
+                <button class="dds-button dds-button-secondary" type="button">Save draft</button>
+                <button class="dds-button dds-button-primary" type="button">Publish</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="ref-note dds-mbs-md">
+          <h3 class="dds-text-sm dds-weight-semibold">The title is a heading</h3>
+          <p class="dds-text-sm dds-text-subtle dds-mbs-2xs">
+            <code class="dds-code">.dds-topbar-title</code> goes on a real heading
+            element, so the object's name is in the document outline. A styled
+            <code class="dds-code">div</code> looks identical and leaves a
+            screen-reader user with no way to find out what they are editing.
+          </p>
+          <p class="dds-text-sm dds-text-subtle dds-mbs-xs">
+            It truncates with an ellipsis rather than wrapping, so a long name cannot
+            push the actions off the screen. Truncation is only safe because the full
+            name is also the page heading below — a topbar is the summary, never the
+            only place the name appears.
+          </p>
+          <p class="dds-text-sm dds-text-subtle dds-mbs-xs">
+            The frame is <code class="dds-code">position: sticky</code> in the
+            component; it is overridden to <code class="dds-code">static</code> here
+            so it stays inside this example instead of following you down the page.
+          </p>
+        </div>
+
+        <h3 class="dds-text-sm dds-weight-semibold dds-mbs-xl">Alert banner</h3>
+        <p class="dds-text-sm dds-text-subtle dds-measure-default dds-mbs-2xs">
+          Page-level, edge to edge, and only ever one at a time. Two stacked banners
+          means neither gets read. Distinct from a notice, which attaches to the one
+          section it concerns.
+        </p>
+
+        <div class="ref-specimen dds-mbs-sm" style="padding: 0; overflow: hidden">
+          <div class="dds-banner dds-banner-info">
+            <svg class="dds-icon" aria-hidden="true" focusable="false"><use href="#dds-icon-info"/></svg>
+            <div class="dds-banner-body">
+              <p class="dds-banner-title">Planned maintenance on Sunday</p>
+              <p>
+                The service will be unavailable between 02:00 and 05:00 CET.
+                <a href="#topbar">What this affects</a>
+              </p>
+            </div>
+            <button class="dds-banner-dismiss dds-button dds-button-quiet dds-button-icon"
+                    type="button" aria-label="Dismiss this message">
+              <svg class="dds-icon" aria-hidden="true" focusable="false"><use href="#dds-icon-close"/></svg>
+            </button>
+          </div>
+
+          <div class="dds-banner dds-banner-warning">
+            <svg class="dds-icon" aria-hidden="true" focusable="false"><use href="#dds-icon-warning"/></svg>
+            <div class="dds-banner-body">
+              <p class="dds-banner-title">Your signing certificate expires in 9 days</p>
+              <p>Renew it before 23 August to keep publishing.</p>
+            </div>
+          </div>
+
+          <div class="dds-banner dds-banner-error">
+            <svg class="dds-icon" aria-hidden="true" focusable="false"><use href="#dds-icon-error"/></svg>
+            <div class="dds-banner-body">
+              <p class="dds-banner-title">Uploads are failing</p>
+              <p>We know about it and are working on it. Nothing already saved is affected.</p>
+            </div>
+          </div>
+
+          <div class="dds-banner dds-banner-success">
+            <svg class="dds-icon" aria-hidden="true" focusable="false"><use href="#dds-icon-check-circle"/></svg>
+            <div class="dds-banner-body">
+              <p class="dds-banner-title">Service restored</p>
+              <p>Uploads have been working normally since 11:20.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="ref-note dds-mbs-md">
+          <h3 class="dds-text-sm dds-weight-semibold">Which role, and when none</h3>
+          <p class="dds-text-sm dds-text-subtle dds-mbs-2xs">
+            All four are shown stacked here so they can be compared. That is the one
+            situation in which stacking them is right.
+          </p>
+          <ul class="dds-text-sm dds-text-subtle dds-mbs-xs" style="padding-inline-start: var(--dds-space-lg)">
+            <li>
+              <strong>Already there when the page loaded</strong> — no role at all.
+              A live region present at load gets announced before the page itself,
+              so the first thing a screen-reader user hears is the banner, out of
+              any context.
+            </li>
+            <li class="dds-mbs-2xs">
+              <strong>Appeared just now, informational</strong> —
+              <code class="dds-code">role="status"</code>. Announced politely, after
+              whatever is being read finishes.
+            </li>
+            <li class="dds-mbs-2xs">
+              <strong>Appeared just now and blocks what the user was doing</strong> —
+              <code class="dds-code">role="alert"</code>. This interrupts, so it has
+              to be worth interrupting for.
+            </li>
+          </ul>
+          <p class="dds-text-sm dds-text-subtle dds-mbs-xs">
+            The dismiss button needs a label that says what it dismisses. "Dismiss"
+            alone, in a list of links and buttons read out of context, gives no clue
+            which of several things it closes.
+          </p>
         </div>
       </section>
 

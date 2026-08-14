@@ -65,11 +65,6 @@
       <polyline points="112 184 256 328 400 184" style="fill:none;stroke:currentColor;stroke-linecap:round;stroke-linejoin:round;stroke-width:48px"/>
     </symbol>
 
-    <!-- Ionicons: chevron-up-outline -->
-    <symbol id="dds-icon-chevron-up" viewBox="0 0 512 512" fill="currentColor">
-      <polyline points="112 328 256 184 400 328" style="fill:none;stroke:currentColor;stroke-linecap:round;stroke-linejoin:round;stroke-width:48px"/>
-    </symbol>
-
     <!-- Ionicons: chevron-back-outline -->
     <symbol id="dds-icon-chevron-left" viewBox="0 0 512 512" fill="currentColor">
       <polyline points="328 112 184 256 328 400" style="fill:none;stroke:currentColor;stroke-linecap:round;stroke-linejoin:round;stroke-width:48px"/>
@@ -208,10 +203,10 @@
         <a href="navigation.html">Navigation</a>
         <a href="patterns.html">Patterns</a>
       </nav>
-      <button type="button" class="dds-button dds-button-subtle dds-button-icon"
-              data-dds-theme-toggle aria-pressed="false">
-        <span class="dds-sr-only">Dark theme</span>
-        <svg class="dds-icon" aria-hidden="true"><use href="#dds-icon-moon"/></svg>
+      <button type="button" class="dds-theme-toggle dds-theme-toggle-icon"
+              data-dds-theme-toggle>
+        <svg class="dds-icon dds-theme-toggle-moon" aria-hidden="true"><use href="#dds-icon-moon"/></svg>
+        <svg class="dds-icon dds-theme-toggle-sun" aria-hidden="true"><use href="#dds-icon-sun"/></svg>
       </button>
     </div>
   </header>
@@ -494,6 +489,52 @@
               person’s name in its accessible name.
             </p>
           </div>
+
+          <div class="ref-specimen" data-ref-code>
+            <p class="ref-specimen-label">Specifications</p>
+            <dl class="dds-specs" style="max-inline-size: 34rem">
+              <div>
+                <dt>Bauzeit</dt>
+                <dd>1925–1926</dd>
+              </div>
+              <div>
+                <dt>Architekt</dt>
+                <dd>Walter Gropius</dd>
+              </div>
+              <div>
+                <dt>Bruttogeschossfläche</dt>
+                <dd class="dds-numeric">2.610 m²</dd>
+              </div>
+              <div>
+                <dt>Geschosse</dt>
+                <dd class="dds-numeric">3 bis 5</dd>
+              </div>
+              <div>
+                <dt>Konstruktion</dt>
+                <dd>Stahlbetonskelett mit Vorhangfassade</dd>
+              </div>
+              <div>
+                <dt>Denkmalstatus</dt>
+                <dd>UNESCO-Welterbe seit 1996</dd>
+              </div>
+            </dl>
+
+            <div class="ref-note">
+              <h3 class="dds-text-sm dds-weight-semibold">Specifications or a key-value list?</h3>
+              <p class="dds-text-sm dds-text-subtle dds-mbs-2xs">
+                Both are a <code class="dds-code">&lt;dl&gt;</code>. The difference is
+                what the reader is doing. A key-value list is for a handful of pairs
+                being <em>read</em> — a summary, a review step before submitting.
+                This is for a longer, homogeneous list someone is <em>looking a value
+                up in</em>, which is why every row is separated and the label is tied
+                to its value with a leader.
+              </p>
+              <p class="dds-text-sm dds-text-subtle dds-mbs-xs">
+                The leader is generated content, so it is not in the accessibility
+                tree. A row of literal dots would be read out, one per dot.
+              </p>
+            </div>
+          </div>
         </div>
       </section>
 
@@ -631,6 +672,62 @@
               comparing categories, bars are read more accurately — angle is much
               harder to judge than length.
             </p>
+          </div>
+
+          <div class="ref-specimen" data-ref-code>
+            <p class="ref-specimen-label">Progress ring</p>
+
+            <div class="dds-cluster" style="gap: var(--dds-space-lg); align-items: center">
+              <span class="dds-progress-ring dds-progress-ring-lg" style="--dds-progress-ring-value: 72" aria-hidden="true">
+                <span class="dds-progress-ring-value">72&nbsp;%</span>
+              </span>
+              <span class="dds-progress-ring" style="--dds-progress-ring-value: 40" aria-hidden="true"></span>
+              <span class="dds-progress-ring" style="--dds-progress-ring-value: 100" aria-hidden="true"></span>
+              <span class="dds-progress-ring" style="--dds-progress-ring-value: 8" aria-hidden="true"></span>
+            </div>
+
+            <p class="dds-text-sm dds-text-subtle dds-mbs-md">
+              In place, beside the thing it is about — which is the only reason to
+              choose a ring over a bar:
+            </p>
+
+            <ul class="dds-datalist dds-mbs-sm" style="max-inline-size: 30rem">
+              <li>
+                <span class="dds-progress-ring" style="--dds-progress-ring-value: 100" aria-hidden="true"></span>
+                <span class="dds-datalist-body">
+                  <span class="dds-datalist-title">bebauungsplan-nord.pdf</span>
+                  <span class="dds-datalist-meta">4,2 MB · fertig</span>
+                </span>
+              </li>
+              <li>
+                <span class="dds-progress-ring" style="--dds-progress-ring-value: 46" aria-hidden="true"></span>
+                <span class="dds-datalist-body">
+                  <span class="dds-datalist-title">lageplan-2026.dwg</span>
+                  <span class="dds-datalist-meta">
+                    <progress class="dds-progress" max="100" value="46">46&nbsp;%</progress>
+                    46&nbsp;% von 18,7 MB
+                  </span>
+                </span>
+              </li>
+            </ul>
+
+            <div class="ref-note">
+              <h3 class="dds-text-sm dds-weight-semibold">The circle communicates nothing on its own</h3>
+              <p class="dds-text-sm dds-text-subtle dds-mbs-2xs">
+                The ring is <code class="dds-code">aria-hidden</code>, exactly like the
+                charts. A screen reader gets nothing from an angle, so the value has
+                to exist as text or on a real
+                <code class="dds-code">&lt;progress&gt;</code> — as in the second row
+                above. A ring with no textual value is a decoration that looks like
+                information.
+              </p>
+              <p class="dds-text-sm dds-text-subtle dds-mbs-xs">
+                Use a bar wherever one fits. This exists for the case where it does
+                not: a table cell, a dense dashboard, beside a filename. It is drawn
+                with a conic gradient and a radial mask, so it sits on any surface
+                without needing an opaque inner circle matched to the background.
+              </p>
+            </div>
           </div>
         </div>
       </section>
@@ -967,6 +1064,50 @@
               aloud tells nobody anything — the name belongs in real text beside
               the avatar or in a visually hidden span.
             </p>
+          </div>
+
+          <div class="ref-specimen" data-ref-code>
+            <p class="ref-specimen-label">Byline — compact, for the top of an article</p>
+            <p class="dds-byline">
+              <span class="dds-avatar dds-avatar-sm" aria-hidden="true">IB</span>
+              <span class="dds-byline-name">Ilva Bergström</span>
+              <span class="dds-byline-meta">
+                <time datetime="2026-08-11">11. August 2026</time> · 7 Minuten Lesezeit
+              </span>
+            </p>
+
+            <p class="ref-specimen-label dds-mbs-lg">Byline — boxed, for the end of one</p>
+            <div class="dds-byline-box">
+              <span class="dds-avatar dds-avatar-lg" aria-hidden="true">IB</span>
+              <div class="dds-byline-body">
+                <p class="dds-byline-name">Ilva Bergström</p>
+                <p class="dds-byline-meta">Redaktion Stadtentwicklung</p>
+                <p class="dds-mbs-2xs">
+                  Schreibt seit 2019 über Bauvorhaben, Verkehr und darüber, was
+                  Planung für die Menschen bedeutet, die dort schon wohnen.
+                </p>
+                <p class="dds-mbs-xs">
+                  <a href="#media">E-Mail an Ilva Bergström</a>
+                </p>
+              </div>
+            </div>
+
+            <div class="ref-note">
+              <h3 class="dds-text-sm dds-weight-semibold">“Email” is not a link name</h3>
+              <p class="dds-text-sm dds-text-subtle dds-mbs-2xs">
+                A screen-reader user can list every link on a page and hear them out
+                of context. In that list, “Email” appears with no indication of
+                whose — and on an article with three contributors, three identical
+                entries. The name goes in the link text: “E-Mail an Ilva
+                Bergström”.
+              </p>
+              <p class="dds-text-sm dds-text-subtle dds-mbs-xs">
+                The date is a <code class="dds-code">&lt;time&gt;</code> with a machine
+                -readable <code class="dds-code">datetime</code>. The visible form is
+                written for the reader's locale; the attribute is what a machine reads,
+                and the two do not have to look alike.
+              </p>
+            </div>
           </div>
         </div>
       </section>

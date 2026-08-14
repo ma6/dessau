@@ -69,11 +69,6 @@
       <polyline points="112 184 256 328 400 184" style="fill:none;stroke:currentColor;stroke-linecap:round;stroke-linejoin:round;stroke-width:48px"/>
     </symbol>
 
-    <!-- Ionicons: chevron-up-outline -->
-    <symbol id="dds-icon-chevron-up" viewBox="0 0 512 512" fill="currentColor">
-      <polyline points="112 328 256 184 400 328" style="fill:none;stroke:currentColor;stroke-linecap:round;stroke-linejoin:round;stroke-width:48px"/>
-    </symbol>
-
     <!-- Ionicons: chevron-back-outline -->
     <symbol id="dds-icon-chevron-left" viewBox="0 0 512 512" fill="currentColor">
       <polyline points="328 112 184 256 328 400" style="fill:none;stroke:currentColor;stroke-linecap:round;stroke-linejoin:round;stroke-width:48px"/>
@@ -215,12 +210,10 @@
         <a href="patterns.html">Patterns</a>
       </nav>
 
-      <button type="button" class="dds-button dds-button-subtle dds-button-icon"
-              data-dds-theme-toggle aria-pressed="false">
-        <!-- The label is constant. A control whose accessible name changes when
-             pressed is announced as a different control each time. -->
-        <span class="dds-sr-only">Dark theme</span>
-        <svg class="dds-icon" aria-hidden="true"><use href="#dds-icon-moon"/></svg>
+      <button type="button" class="dds-theme-toggle dds-theme-toggle-icon"
+              data-dds-theme-toggle>
+        <svg class="dds-icon dds-theme-toggle-moon" aria-hidden="true"><use href="#dds-icon-moon"/></svg>
+        <svg class="dds-icon dds-theme-toggle-sun" aria-hidden="true"><use href="#dds-icon-sun"/></svg>
       </button>
     </div>
   </header>
