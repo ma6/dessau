@@ -971,7 +971,7 @@
       ],
       "spec": "## Theme toggle — `.dds-theme-toggle`",
       "reference": "reference/components.html#controls",
-      "accessibility": "An action button: the label and accessible name describe the NEXT state, so there is NO aria-pressed. Combining a changing name with aria-pressed double-encodes the state. Both icons are in the markup; CSS chooses."
+      "accessibility": "An action button: the label and accessible name describe the NEXT state, so there is NO aria-pressed. Combining a changing name with aria-pressed double-encodes the state. Both icons are in the markup; CSS chooses. Wording — label, accessible name and announcement alike — follows the nearest [lang]; data-dds-theme-toggle takes no value, and one left over from when it named a language is warned about and ignored."
     },
     {
       "name": "toast",

@@ -48,12 +48,11 @@
   var FALLBACK_THEME = 'dark';
 
   /**
-   * Toggle wording, per language.
+   * Toggle wording, per language, chosen by `DDS.utils.language(button)`.
    *
-   * `data-dds-theme-toggle="de"` picks a set; the default is English. Two strings
-   * per theme: `short` is the visible label, `action` is the accessible name, and
-   * `action` begins with `short` so the name contains the visible label
-   * (WCAG 2.5.3 Label in Name).
+   * Two strings per theme: `short` is the visible label, `action` is the
+   * accessible name, and `action` begins with `short` so the name contains the
+   * visible label (WCAG 2.5.3 Label in Name).
    *
    * Kept here rather than in the markup so that every toggle in a document stays
    * consistent without the page having to repeat the strings — and so switching
@@ -61,14 +60,42 @@
    */
   var THEME_LABELS = {
     en: {
-      dark: { short: 'Dark', action: 'Dark theme — switch on' },
-      light: { short: 'Light', action: 'Light theme — switch on' },
+      dark: {
+        short: 'Dark',
+        action: 'Dark theme — switch on',
+        applied: 'Dark — dark theme on',
+      },
+      light: {
+        short: 'Light',
+        action: 'Light theme — switch on',
+        applied: 'Light — light theme on',
+      },
     },
     de: {
-      dark: { short: 'Dunkel', action: 'Dunkel — dunkles Design einschalten' },
-      light: { short: 'Hell', action: 'Hell — helles Design einschalten' },
+      dark: {
+        short: 'Dunkel',
+        action: 'Dunkel — dunkles Design einschalten',
+        applied: 'Dunkel — dunkles Design ist eingeschaltet',
+      },
+      light: {
+        short: 'Hell',
+        action: 'Hell — helles Design einschalten',
+        applied: 'Hell — helles Design ist eingeschaltet',
+      },
     },
   };
+
+  /**
+   * The wording for one toggle, in the language of the place it sits.
+   *
+   * `applied` is the third string and it exists because the announcement used to
+   * be assembled here as `labels[…].short + ' — dark theme on'` — a German label
+   * followed by an English sentence, spoken as one message. Wording that varies
+   * by language cannot be half in a table and half in the code.
+   */
+  function themeLabelsFor(button) {
+    return THEME_LABELS[language(button)] || THEME_LABELS.en;
+  }
   var ENHANCED_FLAG = 'ddsEnhanced';
 
   /* =========================================================================
@@ -260,8 +287,7 @@
     var next = theme === 'dark' ? 'light' : 'dark';
 
     document.querySelectorAll('[data-dds-theme-toggle]').forEach(function (button) {
-      var labels = THEME_LABELS[button.getAttribute('data-dds-theme-toggle') || 'en'] ||
-        THEME_LABELS.en;
+      var labels = themeLabelsFor(button);
 
       var label = button.querySelector('.dds-theme-toggle-label');
       if (label) label.textContent = labels[next].short;
@@ -346,6 +372,18 @@
     // `type="button"`, or a toggle inside a form submits it.
     if (button.tagName === 'BUTTON' && !button.getAttribute('type')) button.type = 'button';
 
+    /* The attribute's value used to name a language: `data-dds-theme-toggle="de"`.
+       It no longer does — `lang` does — and a value left behind is now a silent
+       no-op on markup whose author believes it is doing something. Said once, per
+       toggle, at setup rather than on every repaint. */
+    if (button.getAttribute('data-dds-theme-toggle')) {
+      console.warn(
+        '[DDS] data-dds-theme-toggle no longer takes a value; the wording follows ' +
+          'the nearest `lang`. Remove the value, and set `lang` if it is missing.',
+        button
+      );
+    }
+
     button.addEventListener('click', function () {
       theme.toggle();
 
@@ -353,10 +391,7 @@
          changed to say what pressing again would do, which is not what the user
          needs to hear — they need confirmation of what just happened. The change
          is obvious to a sighted user and invisible otherwise. */
-      var applied = currentTheme();
-      var labels = THEME_LABELS[button.getAttribute('data-dds-theme-toggle') || 'en'] ||
-        THEME_LABELS.en;
-      announce(labels[applied].short + ' — ' + (applied === 'dark' ? 'dark theme on' : 'light theme on'));
+      announce(themeLabelsFor(button)[currentTheme()].applied);
     });
   });
 
@@ -387,6 +422,37 @@
         fn.apply(context, args);
       }, wait);
     };
+  }
+
+  /**
+   * Which language an element's text is in.
+   *
+   * There is exactly one answer to this in a document and it is already written
+   * down: `lang`. It is not optional markup — a screen reader picks its voice and
+   * pronunciation rules from it (WCAG 3.1.1) — so any page correct enough to be
+   * worth localising has already said it. A `data-dds-*` attribute repeating the
+   * answer would only add a second place for it to be wrong, and the failure is
+   * silent in the worst way: a German accessible name read aloud by an English
+   * voice.
+   *
+   * `closest` rather than `documentElement`, because a part of a page may be in
+   * another language and must say so (WCAG 3.1.2 Language of Parts). A control
+   * inside that part is spoken in that language, which is the same rule that
+   * makes the text beside it pronounceable — not a special case.
+   *
+   * The region subtag is dropped: `de-AT` and `de-CH` are `de` for wording. An
+   * unrecognised language is the caller's problem to fall back on, and every
+   * caller in DDS falls back to English rather than to nothing, because a control
+   * named in the wrong language still beats one with no name at all.
+   *
+   * @param {Element} element
+   * @returns {string} A primary language subtag, lowercased. `''` if nothing said.
+   */
+  function language(element) {
+    var scope = element && element.closest ? element.closest('[lang]') : null;
+    var declared = scope ? scope.getAttribute('lang') : '';
+
+    return (declared || '').toLowerCase().split('-')[0];
   }
 
   /** Does the user want motion? Read at call time, not cached — it can change. */
@@ -438,6 +504,7 @@
       prefersReducedMotion: prefersReducedMotion,
       escapeHtml: escapeHtml,
       uniqueId: uniqueId,
+      language: language,
     },
   };
 

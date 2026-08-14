@@ -185,6 +185,28 @@ Anything asynchronous and re-triggerable uses `AbortController`. Without it a sl
 earlier response lands after a fast later one and overwrites it — a bug that only
 appears on a slow connection.
 
+### Wording follows `lang`
+
+Any string a script puts on the page — an accessible name, an announcement — takes
+its language from `DDS.utils.language(element)`, which reads the nearest `[lang]`.
+
+**Never a `data-dds-*` attribute naming a language.** The document already states
+it, and `lang` is not optional markup: a screen reader picks its voice and
+pronunciation rules from it (WCAG 3.1.1). A second place to say it is a second
+place for it to be wrong, and the failure is silent in the worst way — a German
+accessible name spoken by an English voice. Both the theme toggle and the password
+reveal used to take a language code in their own attribute; neither does now.
+
+`closest`, not `documentElement`: a part of a page may be in another language and
+has to say so anyway (WCAG 3.1.2 Language of Parts), so a control inside that part
+is spoken in that language. Region subtags are dropped — `de-AT` is `de`. An
+unrecognised language falls back to English, because a control named in the wrong
+language still beats one with no name.
+
+A table of strings per language lives beside the behaviour that uses them, and
+**every** string in it varies together. A label from the table joined to a
+sentence written in the code is how one announcement ends up half-translated.
+
 ---
 
 ## HTML

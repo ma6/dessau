@@ -787,3 +787,43 @@ toggle is wired rather than duplicated.
 and not suppressed by `appearance` — Edge's own `::-ms-reveal` was exactly this
 and was neither. Then the injected button is deleted and the native one is left
 alone.
+
+---
+
+## 028 — Wording follows `lang`, and nothing else
+
+**Decision.** Every string DDS writes into a page — an accessible name, a live
+announcement — takes its language from `DDS.utils.language(element)`, which reads
+the nearest ancestor `[lang]`. No `data-dds-*` attribute names a language. The
+theme toggle's `data-dds-theme-toggle="de"` is gone; a leftover value logs a
+warning and is ignored.
+
+**Why.** `lang` is not decoration. It is what tells a screen reader which voice
+and which pronunciation rules to use (WCAG 3.1.1), so any page worth localising
+has already stated its language — and an attribute repeating it is not a
+convenience, it is a second source of truth. The two can disagree, and the
+disagreement is invisible in a way that matters: the button is *named* in German
+and *spoken* by an English voice. Nothing on screen looks wrong. Only someone
+listening finds out.
+
+**`closest`, not `documentElement`.** A part of a page in another language has to
+say so regardless (WCAG 3.1.2 Language of Parts) — that is what makes the text
+pronounceable. Reading the same attribute means a control inside that part is
+spoken in that part's language for free, and it is one mechanism rather than a
+general rule plus an exception.
+
+**What this exposed.** The theme toggle's announcement was assembled as
+`labels[theme].short + ' — dark theme on'`: the label came from the table, the
+sentence after it was written in English in the code. On a German page it
+announced "Dunkel — dark theme on". Wording that varies by language cannot be
+half in a table and half in the source, so the announcement became a third string
+in the table.
+
+**Cost.** A product that set `data-dds-theme-toggle="de"` on a page with no `lang`
+now gets English. That page had a WCAG 3.1.1 failure the attribute was quietly
+compensating for, and it is better found than papered over — hence the warning
+rather than a silent change.
+
+**Reversal condition.** A case where the language of a control genuinely differs
+from the language of its surroundings and cannot be expressed with `lang`. None
+is known; `lang` on the control itself covers the ones that have come up.

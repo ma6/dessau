@@ -112,27 +112,15 @@
   };
 
   /**
-   * Which language this text is in, taken from the document rather than asked for.
+   * The wording for one field, in the language of the place it sits.
    *
-   * `<html lang>` is not optional — it is what tells a screen reader which voice
-   * and pronunciation rules to use (WCAG 3.1.1), so on any page that is correct
-   * to begin with, the answer is already there. An attribute repeating it would
-   * be a second source that can disagree with the first, and the disagreement is
-   * silent: the label would be announced in German by a voice reading English.
-   *
-   * `closest('[lang]')` rather than `documentElement.lang`, so a German field in
-   * an English page is handled — which is the same mechanism (WCAG 3.1.2 Language
-   * of Parts) that makes its label pronounceable, not a special case for this.
-   *
-   * The region subtag is dropped: `de-AT` and `de-CH` are German here. An unknown
-   * language falls back to English rather than to nothing, because a button with
-   * no name is worse than a button named in the wrong language.
+   * `DDS.utils.language` is the single answer to "which language is this?" in the
+   * system, and it reads `lang` — see the note there for why nothing in DDS asks
+   * for the language a second time. English when the language is unrecognised: a
+   * button named in the wrong language still beats one with no name.
    */
   function passwordLabels(element) {
-    var scope = element.closest('[lang]');
-    var lang = (scope ? scope.getAttribute('lang') : '') || '';
-
-    return PASSWORD_LABELS[lang.toLowerCase().split('-')[0]] || PASSWORD_LABELS.en;
+    return PASSWORD_LABELS[DDS.utils.language(element)] || PASSWORD_LABELS.en;
   }
 
   /**

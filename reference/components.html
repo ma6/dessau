@@ -882,12 +882,12 @@
               <div class="dds-upload-zone">
                 <svg class="dds-icon" aria-hidden="true"><use href="#dds-icon-upload"/></svg>
                 <label>
-                  <span class="dds-button dds-button-secondary">Dateien auswählen</span>
+                  <span class="dds-button dds-button-secondary" lang="de">Dateien auswählen</span>
                   <input class="dds-sr-only" id="upload" name="documents" type="file" multiple
                          accept=".pdf,.jpg,.jpeg,.png,application/pdf,image/jpeg,image/png"
                          aria-describedby="upload-hint">
                 </label>
-                <p class="dds-hint" id="upload-hint">
+                <p class="dds-hint" id="upload-hint" lang="de">
                   PDF, JPG oder PNG, je bis 10 MB. Dateien können auch hierher gezogen werden.
                 </p>
               </div>
@@ -940,7 +940,7 @@
 
           <div class="ref-specimen" data-ref-code>
             <p class="ref-specimen-label">Date field and date range</p>
-            <div class="dds-stack dds-stack-md" style="max-inline-size: 30rem">
+            <div class="dds-stack dds-stack-md" style="max-inline-size: 30rem" lang="de">
               <div class="dds-field">
                 <label class="dds-label" for="bday">Geburtsdatum</label>
                 <input class="dds-input dds-date" id="bday" type="date" name="bday"
@@ -1044,12 +1044,14 @@
               </div>
 
               <div>
-                <p class="ref-specimen-label">German wording</p>
-                <button type="button" class="dds-theme-toggle" data-dds-theme-toggle="de">
-                  <svg class="dds-icon dds-theme-toggle-moon" aria-hidden="true"><use href="#dds-icon-moon"/></svg>
-                  <svg class="dds-icon dds-theme-toggle-sun" aria-hidden="true"><use href="#dds-icon-sun"/></svg>
-                  <span class="dds-theme-toggle-label">Dunkel</span>
-                </button>
+                <p class="ref-specimen-label">German wording — from <code class="dds-code">lang</code>, not an attribute</p>
+                <div lang="de">
+                  <button type="button" class="dds-theme-toggle" data-dds-theme-toggle>
+                    <svg class="dds-icon dds-theme-toggle-moon" aria-hidden="true"><use href="#dds-icon-moon"/></svg>
+                    <svg class="dds-icon dds-theme-toggle-sun" aria-hidden="true"><use href="#dds-icon-sun"/></svg>
+                    <span class="dds-theme-toggle-label">Dunkel</span>
+                  </button>
+                </div>
               </div>
             </div>
 
@@ -1471,7 +1473,7 @@
         <div class="dds-stack dds-stack-lg">
           <div class="ref-specimen" data-ref-code>
             <p class="ref-specimen-label">Date field — the native picker</p>
-            <div class="ref-matrix">
+            <div class="ref-matrix" lang="de">
               <div class="dds-field">
                 <label class="dds-label" for="d-bday">
                   Geburtsdatum <span class="dds-label-note">(erforderlich)</span>
@@ -1488,7 +1490,7 @@
                 <p class="dds-hint" id="d-start-hint">Frühestens heute. Format: TT.MM.JJJJ</p>
               </div>
             </div>
-            <div class="dds-field dds-mbs-md" style="max-inline-size: 26rem">
+            <div class="dds-field dds-mbs-md" style="max-inline-size: 26rem" lang="de">
               <span class="dds-label" id="d-range-label">Zeitraum</span>
               <div class="dds-daterange" role="group" aria-labelledby="d-range-label">
                 <div class="dds-field">
@@ -1567,7 +1569,7 @@
         <div class="dds-stack dds-stack-lg">
           <div class="ref-specimen" data-ref-code>
             <p class="ref-specimen-label">Tooltip — supplementary only</p>
-            <p class="dds-cluster dds-cluster-sm">
+            <p class="dds-cluster dds-cluster-sm" lang="de">
               <button type="button" class="dds-button dds-button-secondary"
                       popovertarget="tip-retention">
                 Aufbewahrungsdauer
@@ -1596,7 +1598,7 @@
             </button>
 
             <dialog class="dds-dialog dds-dialog-sheet" id="demo-sheet"
-                    aria-labelledby="demo-sheet-title">
+                    aria-labelledby="demo-sheet-title" lang="de">
               <div class="dds-dialog-header">
                 <h2 class="dds-dialog-title" id="demo-sheet-title">Sortieren nach</h2>
                 <button type="button" class="dds-button dds-button-subtle dds-button-icon"
@@ -1709,11 +1711,11 @@
   </footer>
 </div>
 
-<script src="../dds/js/dds.js?v=88ca7b81" defer></script>
+<script src="../dds/js/dds.js?v=0a50c647" defer></script>
 <script src="../dds/js/format.js?v=8f2e10f1" defer></script>
 <script src="../dds/js/components.js?v=07fa7736" defer></script>
 <script src="../dds/js/components-navigation.js?v=0782ade5" defer></script>
-<script src="../dds/js/components-forms.js?v=ca2b38de" defer></script>
+<script src="../dds/js/components-forms.js?v=03180cbd" defer></script>
 <script src="assets/reference.js?v=30a62e51" defer></script>
 <script src="assets/reference-tools.js?v=d85fbb00" defer></script>
 </body>

@@ -190,13 +190,9 @@ intent that an opt-in attribute would have been. Recorded in `DECISIONS.md`.
 **`data-dds-password="off"`** on the input is the only knob: the field is left
 alone entirely — no wrapper, no toggle. It is rare and it needs a reason.
 
-**The wording comes from `lang`,** not from an attribute. `<html lang>` already
-states the language, and a screen reader depends on it for pronunciation (WCAG
-3.1.1); asking a second time only creates a second answer that can disagree with
-the first. The nearest ancestor `[lang]` wins, so a German field inside an English
-page is spoken in German — the same `lang="de"` that makes its label
-pronounceable (WCAG 3.1.2). Region subtags are ignored; an unknown language falls
-back to English rather than to a nameless button. `en` and `de` today.
+**The wording comes from `lang`,** not from an attribute — the system-wide rule,
+with its reasoning, is [Wording follows `lang`](conventions.md#wording-follows-lang).
+`en` and `de` today.
 
 **Rules:**
 
@@ -608,7 +604,10 @@ Prefer the labelled one. Sun and moon are conventional but not universal, and
 "which one is the current state and which the next?" is genuinely ambiguous without
 words.
 
-**German wording:** `data-dds-theme-toggle="de"`.
+**German wording:** set `lang` — see
+[Wording follows `lang`](conventions.md#wording-follows-lang).
+`data-dds-theme-toggle` takes no value; one left over from before logs a warning
+and is ignored.
 
 ### Styled as a text link, still a button
 
