@@ -119,20 +119,29 @@ test('the marker is "location", not "page"', async ({ page }) => {
   await expect(current).toHaveAttribute('aria-current', 'location');
 });
 
-test('the sentinel adds no height to the page', async ({ page }) => {
+test('the highlight always names exactly one section', async ({ page }) => {
   await page.goto('/reference/patterns.html');
 
-  const grew = await page.evaluate(() => {
-    const sentinel = document.querySelector('[data-dds-toc-sentinel]');
-    if (!sentinel) return null;
-    const before = document.documentElement.scrollHeight;
-    sentinel.remove();
-    return before - document.documentElement.scrollHeight;
-  });
+  const toc = page.locator('[data-dds-toc]').first();
 
-  expect(grew, 'no sentinel was inserted').not.toBeNull();
-  expect(
-    grew,
-    'the sentinel adds scroll height, so the page can be scrolled past its content'
-  ).toBe(0);
+  /**
+   * At every scroll position, including the very top and the very bottom. "Exactly
+   * one" is the property the geometric approach buys and the band did not: a band can
+   * be empty, and an empty answer leaves the previous mark in place — which is how the
+   * last entry became permanently unreachable.
+   */
+  const positions = [0, 0.25, 0.5, 0.75, 1];
+
+  for (const fraction of positions) {
+    await page.evaluate((f) => {
+      const max = document.documentElement.scrollHeight - window.innerHeight;
+      window.scrollTo({ top: Math.round(max * f), behavior: 'instant' });
+    }, fraction);
+
+    await expect(
+      toc.locator('[aria-current]'),
+      `at ${fraction * 100}% down the page, the highlight names ` +
+        `something other than exactly one section`
+    ).toHaveCount(1);
+  }
 });

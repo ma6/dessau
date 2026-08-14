@@ -177,11 +177,19 @@ test('the address search fills every field from one selection', async ({ page })
   await expect(option).toBeVisible();
   await option.click();
 
-  // The point of the pattern: one selection, every field populated.
+  /**
+   * The point of the pattern: one selection, every field populated.
+   *
+   * Scoped to `[data-dds-address-search]`, not to a `<form>`. The pattern deliberately
+   * does not require one — it is a set of fields that a product drops into whatever
+   * form it already has — and an earlier version of this test assumed the demo wrapped
+   * them in one. It reported "no address fields found" while the pattern worked
+   * perfectly, which is a test failing about its own assumption.
+   */
   const filled = await page.evaluate(() => {
-    const form = document.querySelector('[data-dds-address-combobox]')?.closest('form');
-    if (!form) return null;
-    return [...form.querySelectorAll('input')]
+    const region = document.querySelector('[data-dds-address-search]');
+    if (!region) return null;
+    return [...region.querySelectorAll('input')]
       .filter((i) => i.type !== 'search' && !i.closest('[data-dds-address-combobox]'))
       .map((i) => ({ name: i.name, value: i.value }));
   });

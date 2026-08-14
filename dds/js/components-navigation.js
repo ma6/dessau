@@ -114,9 +114,15 @@
          </ul>
        </nav>
 
-     Highlights the section currently being read, using an IntersectionObserver
-     rather than a scroll listener: the observer reports only when a threshold is
-     actually crossed, instead of running a callback on every scroll frame.
+     Highlights the section currently being read: the last one whose top is above a
+     reading line a quarter of the way down the viewport, recomputed on scroll and
+     throttled to one frame.
+
+     An `IntersectionObserver` band was tried first and is the wrong tool here, for a
+     reason that is easy to miss — it answers "what is inside this band", and at the
+     bottom of a page nothing is, because there is no scroll left to bring the last
+     section into it. No answer means the previous mark stays, so the final entry can
+     never activate. See the note on `update()` below.
 
      The marker is `aria-current="location"`, not `"page"`. The user has not
      navigated anywhere — the reading position moved. `"page"` would tell a
@@ -129,8 +135,6 @@
   DDS.register('toc', '[data-dds-toc]', function (toc) {
     var links = Array.prototype.slice.call(toc.querySelectorAll('a[href^="#"]'));
     if (!links.length) return;
-
-    if (typeof IntersectionObserver === 'undefined') return;
 
     // Map each target id back to its link.
     var byId = new Map();
@@ -152,108 +156,78 @@
       });
     }
 
-    var visible = new Set();
-    /** True once the end of the document is on screen. See `endObserver` below. */
-    var atEnd = false;
-    var lastLink = links[links.length - 1];
-
-    function update() {
-      /**
-       * The end of the page wins outright.
-       *
-       * No `rootMargin` can make a short final section active. The reading band sits
-       * near the top of the viewport, and at the bottom of the page there is nothing
-       * left to scroll — so a short last section stays below the band forever while
-       * the section above it keeps the marker. The result is a table of contents with
-       * one entry that can never be reached, which was exactly the symptom.
-       *
-       * Once the end of the document is visible, the last section is the last thing
-       * on screen regardless of geometry, so the answer is known without measuring.
-       */
-      if (atEnd) {
-        mark(lastLink);
-        return;
-      }
-
-      if (!visible.size) return;
-
-      // Several sections can be in the band at once; the topmost is being read.
-      var topmost = Array.from(visible).sort(function (a, b) {
-        return a.getBoundingClientRect().top - b.getBoundingClientRect().top;
-      })[0];
-
-      mark(byId.get(topmost));
-    }
-
-    var observer = new IntersectionObserver(
-      function (entries) {
-        entries.forEach(function (entry) {
-          if (entry.isIntersecting) visible.add(entry.target);
-          else visible.delete(entry.target);
-        });
-
-        update();
-      },
-      {
-        /* A band near the top of the viewport rather than the whole viewport: with
-           the full viewport, every section in view intersects at once and the marker
-           jumps around. The band answers "what is being read", not "what is on
-           screen". */
-        rootMargin: '-10% 0px -70% 0px',
-        threshold: 0,
-      }
-    );
-
-    byId.forEach(function (link, target) {
-      observer.observe(target);
+    /**
+     * Which section is being read, answered geometrically.
+     * ------------------------------------------------------------------------
+     * The section whose top is the last one above a reading line a quarter of the way
+     * down the viewport. That always produces exactly one answer, which is the whole
+     * point.
+     *
+     * This replaced a pure `IntersectionObserver` band, and the reason is worth
+     * keeping. A band from 10% to 30% of the viewport reports what is inside it — and
+     * at the bottom of a page nothing is, because there is no scrolling left to bring
+     * the last section up into it. With no answer, the previous mark stayed, so the
+     * final entry in the list could never become active. On a page whose last section
+     * is short, that is an entry nobody can ever reach, in a component whose entire
+     * job is to say where you are.
+     *
+     * Two attempts to rescue the band failed in an instructive way: a sentinel at the
+     * end of the document, then a tolerance on it. Both worked on some pages and not
+     * others, because `content-visibility: auto` on the sections means off-screen ones
+     * are laid out at an estimated height and grow as they approach — so the page gets
+     * taller while you scroll towards its end, and "the end" is not where it was a
+     * moment ago. Tuning geometry against a moving target produced a component that
+     * behaved differently per page while being identical.
+     *
+     * Measuring instead of listening for crossings costs one `getBoundingClientRect`
+     * per section per frame, throttled to one frame. For a few dozen sections that is
+     * nothing, and it is always right.
+     */
+    var targets = Array.from(byId.keys()).sort(function (a, b) {
+      return a.getBoundingClientRect().top - b.getBoundingClientRect().top;
     });
 
-    /**
-     * A zero-height sentinel after the last section, watched by its own observer.
-     *
-     * A scroll listener would answer the same question and run on every frame to do
-     * it. An observer on a sentinel costs nothing while the user is anywhere else in
-     * the document, and reports exactly once when the end comes into view.
-     */
-    var lastTarget = Array.from(byId.keys()).sort(function (a, b) {
-      return a.getBoundingClientRect().top - b.getBoundingClientRect().top;
-    }).pop();
+    function update() {
+      var line = window.innerHeight * 0.25;
+      var current = null;
 
-    if (lastTarget && lastTarget.parentNode) {
-      var sentinel = document.createElement('div');
-      sentinel.setAttribute('aria-hidden', 'true');
-      sentinel.setAttribute('data-dds-toc-sentinel', '');
-      sentinel.style.blockSize = '1px';
-      // Never adds height of its own to the page.
-      sentinel.style.marginBlockStart = '-1px';
-      lastTarget.parentNode.insertBefore(sentinel, lastTarget.nextSibling);
+      for (var i = 0; i < targets.length; i += 1) {
+        if (targets[i].getBoundingClientRect().top <= line) current = targets[i];
+      }
 
-      var endObserver = new IntersectionObserver(
-        function (entries) {
-          atEnd = entries[entries.length - 1].isIntersecting;
-          update();
-        },
-        {
-          /**
-           * Fire slightly BEFORE the sentinel is on screen. A positive bottom margin
-           * expands the root downwards, so "the end" counts as reached once it is
-           * within a fifth of a viewport.
-           *
-           * That tolerance is not cosmetic. On a page using
-           * `content-visibility: auto`, off-screen sections are laid out at an
-           * estimated height and grow to their real height as they approach — so the
-           * page gets taller while you scroll towards its end, and a jump to the
-           * bottom lands short by an amount that differs per page. Requiring the
-           * sentinel to be exactly in view made the last entry activate on some pages
-           * and not others, with the component behaving identically on all of them.
-           */
-          rootMargin: '0px 0px 20% 0px',
-          threshold: 0,
-        }
-      );
-
-      endObserver.observe(sentinel);
+      /* Above the first section — still in the page's introduction. The first entry is
+         marked rather than none, because an empty state here reads as the highlight
+         being broken. */
+      mark(byId.get(current || targets[0]));
     }
+
+    var pending = null;
+    function schedule() {
+      if (pending) return;
+      pending = requestAnimationFrame(function () {
+        pending = null;
+        update();
+      });
+    }
+
+    /* `passive`, so the listener can never delay a scroll. */
+    window.addEventListener('scroll', schedule, { passive: true });
+    window.addEventListener('resize', schedule);
+
+    /**
+     * Section order is measured once, and has to be re-measured when the layout
+     * settles: with `content-visibility: auto` the estimated heights are replaced by
+     * real ones as sections approach, which can reorder nothing but does move
+     * everything. Re-sorting on resize is cheap and keeps the order honest if a
+     * section is inserted later.
+     */
+    window.addEventListener('resize', function () {
+      targets.sort(function (a, b) {
+        return a.getBoundingClientRect().top - b.getBoundingClientRect().top;
+      });
+    });
+
+    update();
   });
 
   /* =========================================================================
