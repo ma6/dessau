@@ -198,12 +198,13 @@
   <header class="ref-header">
     <div class="dds-container ref-header-inner" style="--dds-container-width: var(--dds-container-xl)">
       <a class="ref-brand" href="index.html">
-        <!-- Decorative: the link already says "Dessau" in text, so the mark adds
-             nothing to the accessible name. It is a masked span rather than an
-             <img> because the brand takes the colour of the text — see
-             reference.css and docs/brand.md. -->
-        <span class="ref-brand-mark" aria-hidden="true"></span>
-        Dessau
+        <!-- The logo is a masked span rather than an <img>, because the brand
+             takes the colour of the text and an <img> cannot. The word stays in
+             the DOM beside it: it carries the accessible name, and it is what is
+             shown if the browser has no mask support. See reference.css and
+             docs/brand.md. -->
+        <span class="ref-brand-logo" aria-hidden="true"></span>
+        <span class="ref-brand-name">Dessau</span>
         <span class="ref-brand-sub">Foundations for digital products</span>
       </a>
 

@@ -553,12 +553,20 @@ a foundation (021); a logo is the opposite of one.
 no field, no second palette. The mark and the logo are pure `currentColor`.
 
 That has a consequence which is easy to get wrong, so it is written down here as
-well as in `docs/brand.md`: **the mark can never be an `<img>`.** An SVG loaded as
+well as in `docs/brand.md`: **the brand can never be an `<img>`.** An SVG loaded as
 an image is its own document with nothing to inherit from, so `currentColor` there
 resolves to black — in both themes, with no error. The reference header therefore
-uses the file as a CSS **mask** over `background-color: currentColor`, inside an
-`@supports` so that a browser without mask support renders no box rather than a
-solid rectangle. Inlining the SVG is the other correct option.
+uses the file as a CSS **mask** over `background-color: currentColor`. Inlining the
+SVG is the other correct option.
+
+**The header carries the whole logo, and the word stays in the DOM.** The mark
+beside "Dessau" set in the display face is the same word twice, in two different
+drawings. So the header masks `dessau-logo.svg` and hides the text — but the hiding
+rule sits inside the *same* `@supports (mask-image: …)` as the mask. With mask
+support: logo drawn, word hidden the way `dds-sr-only` hides things, accessible
+name unchanged. Without it: no logo, and the word is simply visible, which is what
+the header was before. `class="dds-sr-only"` in the markup would have hidden the
+word unconditionally and left a brandless header wherever the mask is unsupported.
 
 **The favicon is the one exception, and it is not a loophole.** A tab strip has no
 text to inherit from, so `dessau-icon.svg` states `#201e1a` and `#f4f2ee` and

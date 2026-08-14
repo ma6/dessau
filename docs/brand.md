@@ -67,8 +67,9 @@ Inter's weight axis was instanced and the D's stem measured at each stop:
 | 500 | 0.153 | | 800 | 0.237 |
 | 600 | 0.179 | | 900 | **0.271** |
 
-900. The remaining 0.019 leaves the mark reading a shade heavier than the word,
-which is the right direction for a logo — the initial leads.
+So the wordmark is set at 900. The remaining 0.019 leaves the mark reading a
+shade heavier than the word, which is the right direction for a logo — the
+initial leads.
 
 Anything lighter puts a display-weight mark next to a text-weight word, which
 does not read as a decision.
@@ -105,13 +106,13 @@ So the mark is **never** an `<img>`. Two ways to place it:
 
 ```css
 /* A mask. The file supplies the shape, the page supplies the colour. */
-.brand-mark {
+.brand-logo {
   display: inline-block;
-  block-size: 1.15em;
-  aspect-ratio: 92.323 / 100;
+  block-size: 0.8em;
+  aspect-ratio: 509.42 / 101.34;   /* or 92.323 / 100 for the mark */
 
   background-color: currentColor;
-  mask-image: url("brand/dessau-mark.svg");
+  mask-image: url("brand/dessau-logo.svg");
   mask-size: contain;
   mask-repeat: no-repeat;
 }
@@ -119,16 +120,45 @@ So the mark is **never** an `<img>`. Two ways to place it:
 
 or inline the SVG into the markup, where `fill="currentColor"` works normally.
 
-The reference header uses the mask, wrapped in `@supports (mask-image: …)` so a
-browser without mask support gets no box rather than a solid rectangle of
-`currentColor` where the mark should be.
+### In the reference header
+
+The header carries the **whole logo**, not the mark beside the word set in the
+display face — the same word twice, in two different drawings, is a lockup
+nobody chose.
+
+```html
+<a class="ref-brand" href="index.html">
+  <span class="ref-brand-logo" aria-hidden="true"></span>
+  <span class="ref-brand-name">Dessau</span>
+  <span class="ref-brand-sub">Foundations for digital products</span>
+</a>
+```
+
+Both the mask and the rule that hides `.ref-brand-name` live inside the same
+`@supports (mask-image: …)`. That is deliberate and it is the whole fallback:
+
+- **with** mask support — the logo is drawn, the word is hidden the way
+  `dds-sr-only` hides things, and the accessible name is unchanged;
+- **without** it — no logo is drawn, and the word is simply visible, which is
+  what the header looked like before there was a logo.
+
+Hiding the word with `class="dds-sr-only"` in the markup instead would hide it
+unconditionally, and a browser without mask support would render a header with
+no brand in it at all.
+
+Sizing is in `em` so the logo tracks the sub-line beside it as the fluid type
+scale changes. At `0.8em` of box height the wordmark's cap lands just above
+Space Grotesk's `0.70em` cap — the right direction, since Inter Black reads
+heavier than the bold it replaces and needs less size to carry the same weight.
+No `align-self` is needed: a flex item with no line boxes takes its baseline
+from its bottom edge, which is where this logo's baseline already is.
 
 ### The one exception
 
 `dessau-icon.svg` carries two literal values, because a favicon has no text
 beside it and no document to inherit from:
 
-```
+```text
 light scheme   #201e1a   stone-950 ink
 dark scheme    #f4f2ee   stone-100 paper
 ```
