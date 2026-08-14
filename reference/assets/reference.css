@@ -67,11 +67,40 @@
   letter-spacing: var(--dds-letter-spacing-normal);
 }
 
+/* --------------------------------------------------------------- navigation */
+/* Two levels, and a disclosure below the shell's threshold.
+   ----------------------------------------------------------------------------
+   A media query rather than a container query, and that is correct here: this is
+   the page shell, so the viewport IS what it depends on. Inside a component the
+   opposite is true — see agent/responsive.md.
+
+   The panel is NOT `hidden` in the markup. It is hidden by CSS only at the widths
+   where the toggle is actually displayed, which means the failure direction is
+   right: with no JavaScript, or before enhancement runs, the navigation is
+   present rather than behind a button that does nothing. */
+.ref-nav-panel {
+  /* Its own row, so the two levels never compete with the brand for space. */
+  flex-basis: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: var(--dds-space-2xs);
+}
+
+.ref-nav-toggle {
+  margin-inline-start: auto;
+}
+
+/* Only where the toggle exists to reopen it. */
+@media (max-width: 63.999rem) {
+  .ref-nav-panel[hidden] {
+    display: none;
+  }
+}
+
 .ref-nav {
   display: flex;
   flex-wrap: wrap;
   gap: var(--dds-space-2xs);
-  margin-inline-start: auto;
 }
 
 .ref-nav a {
@@ -91,6 +120,53 @@
   background-color: var(--dds-color-surface-hover);
   color: var(--dds-color-text-default);
   text-decoration: none;
+}
+
+/* --- the second level ---------------------------------------------------- */
+/* The pages of the current group. Set apart from the first level by size and by a
+   leading rule, not by indentation — indentation disappears the moment the row
+   wraps, which on a narrow screen is immediately. */
+.ref-nav-secondary {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--dds-space-3xs);
+
+  padding-inline-start: var(--dds-space-sm);
+  border-inline-start: var(--dds-border-thick) solid var(--dds-color-border-subtle);
+}
+
+.ref-nav-secondary a {
+  padding: var(--dds-space-3xs) var(--dds-space-xs);
+  min-block-size: 2rem;
+  display: inline-flex;
+  align-items: center;
+
+  font-size: var(--dds-font-size-xs);
+  color: var(--dds-color-text-muted);
+  text-decoration: none;
+  border-radius: var(--dds-radius-sm);
+}
+
+.ref-nav-secondary a:hover {
+  background-color: var(--dds-color-surface-hover);
+  color: var(--dds-color-text-default);
+  text-decoration: none;
+}
+
+.ref-nav-secondary a[aria-current="page"] {
+  color: var(--dds-color-text-link);
+  font-weight: var(--dds-font-weight-semibold);
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+}
+
+/* --- the group containing the current page -------------------------------- */
+/* `data-current-section`, not `aria-current`: the group is not a page, and the
+   second row already carries the real state. This is a visual aid that is
+   deliberately redundant, so nothing depends on it alone. */
+.ref-nav a[data-current-section] {
+  color: var(--dds-color-text-default);
+  font-weight: var(--dds-font-weight-semibold);
 }
 
 /* The current page. Colour plus weight plus an underline — three cues, so
@@ -696,7 +772,27 @@
 /* Two columns once there is genuinely room. A media query is correct here,
    unlike inside a component: this is the page shell, so the viewport IS what it
    depends on. */
+/* Wide enough for the header to hold both rows without a disclosure. Chosen to match
+   the shell's own two-column threshold, so the header and the content change shape at
+   the same moment rather than one at a time. */
 @media (min-width: 64rem) {
+  .ref-nav-toggle {
+    display: none;
+  }
+
+  /* Beats the `hidden` attribute, which the toggle sets and which is meaningless once
+     the rows are inline. Without this, resizing a window while collapsed would leave
+     the navigation unreachable — the trap the site header component documents. */
+  .ref-nav-panel,
+  .ref-nav-panel[hidden] {
+    display: flex;
+    flex-basis: auto;
+    flex-direction: row;
+    align-items: center;
+    gap: var(--dds-space-md);
+    margin-inline-start: auto;
+  }
+
   .ref-layout {
     grid-template-columns: 15rem minmax(0, 1fr);
     gap: var(--dds-space-2xl);
