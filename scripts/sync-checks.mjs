@@ -59,6 +59,47 @@ const ordered = [...aggregate.matchAll(/npm run (check:[\w:-]+)/g)].map((m) => m
 const rows = [];
 const problems = [];
 
+/**
+ * Read a block tag out of a header comment — continuation lines included.
+ *
+ * The first version of this was `/^\s*\*\s*@catches\s+(.+)$/m`, and `.` does not
+ * cross a newline. Every `@catches` in this repository is one sentence wrapped at
+ * the same 88 columns as the code around it, so six of the eight rows on the
+ * architecture page ended mid-clause: "a page referring to an icon the sprite"
+ * never says what the failure is, and the table is what "is this covered?" gets
+ * answered from.
+ *
+ * The wrapping was never the mistake. A description runs until the comment says it
+ * is over — a blank line, the next `@tag`, or the end of the block — which is how
+ * every one of them is already written, so no script had to be reformatted to be
+ * read correctly.
+ */
+function blockTag(source, tag) {
+  const lines = source.split('\n');
+  const opens = new RegExp(`^\\s*\\*\\s*@${tag}\\b\\s*`);
+
+  const start = lines.findIndex((line) => opens.test(line));
+  if (start === -1) return null;
+
+  const parts = [lines[start].replace(opens, '')];
+
+  for (const line of lines.slice(start + 1)) {
+    // The end of the comment block. Checked before the comment-line test, because
+    // `*/` satisfies that one too.
+    if (/^\s*\*\//.test(line)) break;
+    if (!/^\s*\*/.test(line)) break;
+
+    const text = line.replace(/^\s*\*\s?/, '').trim();
+
+    // A blank comment line ends the paragraph; another tag starts its own.
+    if (!text || /^@\w+/.test(text)) break;
+
+    parts.push(text);
+  }
+
+  return parts.join(' ').replace(/\s+/g, ' ').trim() || null;
+}
+
 for (const name of ordered) {
   const command = pkg.scripts[name];
 
@@ -82,7 +123,7 @@ for (const name of ordered) {
      * something inferred from prose: a script whose author never said what it catches
      * has not finished explaining itself, and a guess here would read as fact.
      */
-    const catches = source.match(/^\s*\*\s*@catches\s+(.+)$/m);
+    const catches = blockTag(source, 'catches');
 
     if (!catches) {
       problems.push(
@@ -95,7 +136,7 @@ for (const name of ordered) {
     rows.push({
       script: file,
       npm: name,
-      catches: catches[1].trim(),
+      catches,
       // Whether the step is a verify-only run of a generator.
       generated: /--check/.test(command),
     });
@@ -113,6 +154,20 @@ if (problems.length) {
 
 const escape = (text) =>
   String(text).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+
+/**
+ * A `@catches` tag is written for someone reading the source, in the same light
+ * Markdown as the prose around it. Put through untouched, the cell shows literal
+ * backticks and a literal `**` in a table that has no other markup in it — the
+ * sentence would be complete and still not read as one.
+ *
+ * Escaping runs first, so a `<use>` named in a description stays text and the two
+ * elements produced here are the only markup in the cell.
+ */
+const inline = (text) =>
+  escape(text)
+    .replace(/`([^`]+)`/g, '<code class="dds-code">$1</code>')
+    .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
 
 const table = `${START}
           <div class="dds-scroll">
@@ -137,7 +192,7 @@ ${rows
                       ? '<br><span class="dds-text-2xs dds-text-muted">verify only · regenerate to fix</span>'
                       : ''
                   }</th>
-                  <td>${escape(row.catches)}</td>
+                  <td>${inline(row.catches)}</td>
                 </tr>`
   )
   .join('\n')}

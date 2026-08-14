@@ -74,7 +74,8 @@
  * from inside stylesheets and from `<use href>`, they change on the order of never,
  * and stamping them would mean parsing `url()` for a problem nobody has had.
  *
- * @catches A stylesheet or script served from a stale browser cache, which presents as a component defect rather than as a caching problem.
+ * @catches A stylesheet or script served from a stale browser cache, which
+ *   presents as a component defect rather than as a caching problem.
  *
  * Zero dependencies, Node stdlib only.
  */
