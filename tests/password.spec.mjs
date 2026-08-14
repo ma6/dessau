@@ -95,6 +95,22 @@ test('data-dds-password="off" is left alone entirely', async ({ page }) => {
   await expect(page.locator('.dds-password', { has: optedOut })).toHaveCount(0);
 });
 
+test('the toggle speaks the language of the field, not of the script', async ({ page }) => {
+  await page.goto(COMPONENTS);
+
+  const english = page.locator('.dds-password', { has: page.locator('#f-password') });
+  const german = page.locator('.dds-password', { has: page.locator('#f-password-de') });
+
+  await expect(english.locator('.dds-password-toggle')).toHaveText(/Show password/);
+
+  /**
+   * The page is `lang="en"`; the field is inside `lang="de"`. Nothing in the
+   * markup asks for German wording — asking would mean two places stating the
+   * language, and the one that is wrong would be the silent one.
+   */
+  await expect(german.locator('.dds-password-toggle')).toHaveText(/Passwort anzeigen/);
+});
+
 test('a disabled password field has a disabled toggle', async ({ page }) => {
   await page.goto(COMPONENTS);
 

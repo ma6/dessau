@@ -187,13 +187,16 @@ completely normal, so an opt-in version would fail silently in exactly the
 products that forgot. `type="password"` is already the unambiguous statement of
 intent that an opt-in attribute would have been. Recorded in `DECISIONS.md`.
 
-**`data-dds-password`** on the input, and it does two jobs:
+**`data-dds-password="off"`** on the input is the only knob: the field is left
+alone entirely — no wrapper, no toggle. It is rare and it needs a reason.
 
-| Value | Effect |
-| --- | --- |
-| absent | English wording, toggle added |
-| `"de"` | German wording, toggle added |
-| `"off"` | Left alone entirely — no wrapper, no toggle |
+**The wording comes from `lang`,** not from an attribute. `<html lang>` already
+states the language, and a screen reader depends on it for pronunciation (WCAG
+3.1.1); asking a second time only creates a second answer that can disagree with
+the first. The nearest ancestor `[lang]` wins, so a German field inside an English
+page is spoken in German — the same `lang="de"` that makes its label
+pronounceable (WCAG 3.1.2). Region subtags are ignored; an unknown language falls
+back to English rather than to a nameless button. `en` and `de` today.
 
 **Rules:**
 

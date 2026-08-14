@@ -741,8 +741,10 @@ alongside it.
 **Decision.** `dds/js/components-forms.js` enhances every
 `<input type="password">` in the document: it wraps the field in
 `.dds-password` and appends a reveal toggle, with no attribute asked for and no
-markup written. `data-dds-password="off"` opts a field out; the same attribute
-selects the wording (`"de"`).
+markup written. `data-dds-password="off"` opts a field out, and that is the
+attribute's only job: the wording is read from the nearest `[lang]`, because
+`<html lang>` already states the language and a second place to say it is a
+second place for it to be wrong.
 
 **Why this breaks the usual rule, deliberately.** Every other enhancement in DDS
 waits for a `data-dds-*` attribute, and `dds.js` says so in as many words:
