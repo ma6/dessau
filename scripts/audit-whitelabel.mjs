@@ -9,8 +9,12 @@
  * placeholder data.
  *
  * Scope is every file that can enter the history — contents, filenames, directory
- * names, comments, metadata, URLs, SVG contents, demo data. Anything git ignores is
- * out of scope, because it cannot be committed.
+ * names, comments, metadata, URLs, SVG contents, demo data — AND every commit
+ * message. Anything git ignores is out of scope, because it cannot be committed.
+ *
+ * The commit messages matter as much as the files. A message is the one place a name
+ * can sit permanently with nothing scanning it, and rewriting one costs almost
+ * nothing before a first push and a great deal afterwards.
  *
  * -----------------------------------------------------------------------------
  * The term list lives OUTSIDE the repository
@@ -33,11 +37,17 @@
  */
 
 import { readFile } from 'node:fs/promises';
+import { execFile } from 'node:child_process';
+import { promisify } from 'node:util';
 import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 const CONFIG_PATH = join(ROOT, '.whitelabel-terms.json');
+
+/** Shared by both git calls. Module scope, because it was once local to one of them
+    and the other silently caught the resulting ReferenceError. */
+const run = promisify(execFile);
 
 /* ------------------------------------------------------------------- config */
 
@@ -85,10 +95,6 @@ if (!TERMS.length) {
  * script hung. Listing is the right operation anyway: one call, no stdin.
  */
 async function committableFiles() {
-  const { execFile } = await import('node:child_process');
-  const { promisify } = await import('node:util');
-  const run = promisify(execFile);
-
   const { stdout } = await run(
     'git',
     ['-C', ROOT, 'ls-files', '--cached', '--others', '--exclude-standard'],
@@ -175,6 +181,86 @@ for (const relativePath of files) {
   }
 }
 
+/* --- commit messages ------------------------------------------------------- */
+
+/**
+ * The history is part of the repository, and a commit message is the one place a
+ * name can sit forever with nothing scanning it.
+ *
+ * This is not hypothetical: after every file was clean, two commit messages still
+ * referred to the material Dessau was generalised from — one of them in the subject
+ * line of the initial commit, which is the single most visible string in the whole
+ * project. The file audit passed the entire time, because a commit message is not a
+ * file.
+ *
+ * Rewriting a message means rewriting history, which is cheap before a first push
+ * and expensive afterwards. So it is checked from the start.
+ */
+async function commitMessages() {
+  try {
+    const { stdout } = await run(
+      'git',
+      ['-C', ROOT, 'log', '--format=%H%x1f%B%x1e', '--all'],
+      { maxBuffer: 32 * 1024 * 1024 }
+    );
+
+    return stdout
+      .split('\x1e')
+      .map((record) => record.trim())
+      .filter(Boolean)
+      .map((record) => {
+        const [hash, body] = record.split('\x1f');
+        return { hash: hash.trim().slice(0, 9), body: body || '' };
+      });
+  } catch (error) {
+    /**
+     * A repository with no commits yet is legitimately empty. Anything else is a
+     * broken audit pretending to be a clean one.
+     *
+     * The first version of this was a bare `catch { return [] }`, which swallowed a
+     * ReferenceError and reported "0 commit messages scanned" as a pass. That is the
+     * exact failure this whole script exists to prevent — a check that cannot fail.
+     */
+    if (/does not have any commits yet|unknown revision/i.test(error.message)) {
+      return [];
+    }
+
+    console.error('\nCannot run: reading the commit history failed.\n');
+    console.error('  ' + error.message);
+    console.error('\nThe history is in scope, so an audit that cannot read it has not');
+    console.error('checked what it claims to check.\n');
+    process.exit(1);
+  }
+}
+
+const commits = await commitMessages();
+
+for (const commit of commits) {
+  const lines = commit.body.split('\n');
+
+  for (const entry of TERMS) {
+    const pattern = matcher(entry);
+
+    lines.forEach((line, index) => {
+      if (!pattern.test(line)) return;
+
+      // The same allowlist mechanism, keyed by commit rather than by file.
+      const key = 'commit:' + entry.term;
+      if (ALLOWED.has(key)) {
+        allowed.push({ file: `commit ${commit.hash}`, line: index + 1, term: entry.term });
+        return;
+      }
+
+      findings.push({
+        file: `commit ${commit.hash} (message)`,
+        line: index + 1,
+        term: entry.term,
+        text: line.trim().slice(0, 120),
+      });
+    });
+  }
+}
+
 /* --- report ---------------------------------------------------------------- */
 
 if (findings.length) {
@@ -207,7 +293,8 @@ if (allowed.length) {
 }
 
 console.log(
-  `\n${files.length} files scanned, ${TERMS.length} terms searched ` +
+  `\n${files.length} files and ${commits.length} commit messages scanned, ` +
+    `${TERMS.length} terms searched ` +
     `(case-insensitive; git-ignored files are out of scope).\n` +
     (findings.length === 0
       ? `CLEAN — 0 unjustified hits, ${allowed.length} justified.`

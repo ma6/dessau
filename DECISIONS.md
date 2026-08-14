@@ -483,3 +483,43 @@ replaced was measured by eye at one size and sat visibly high everywhere else.
 **Same reasoning, elsewhere.** `.dds-choice > input` centres on its label's first line
 the same way. Sizing a native checkbox is not an option, so the box moves rather than
 the control.
+
+---
+
+## 023 — What Dessau deliberately does not include
+
+**Decision.** The following are out of scope, and the entry exists so "why is there
+no X?" has an answer other than "we forgot".
+
+**A pricing or plan-comparison card.** A side-by-side comparison of product tiers
+cannot be generalised without becoming a different component: the fields, the
+emphasis and the rules are all specific to what is being sold. The generic parts
+exist separately — `.dds-choice-card` for choosing an option, `.dds-specs` for
+comparing features, `.dds-table` for comparing down a column.
+
+**Any format-specific identifier lookup** — a bank code, a VAT number, a national
+ID number. The validation rules are domain knowledge and the checksum belongs
+on a server. What is reusable is the *shape*: a read-only value resolved from
+validated input, over a replaceable resolver. That is the derived-output pattern.
+
+**Brand assets** — a logo, a mark, a favicon. Dessau is a foundation, not a brand.
+
+**A level-3 voice guide.** Writing has three levels (`agent/ux-writing.md`); level 3
+is the product's own voice and belongs to the product. It is an explicit slot in
+`agent/consumer-AGENTS.template.md`, deliberately empty here.
+
+**Committed build artefacts.** `scripts/bundle.mjs` generates into git-ignored
+`dist/`. A committed minified file is a second copy of the truth that eventually
+becomes a wrong copy, and nothing in the reference depends on one — which is also
+why there is no cache-busting query string anywhere: there is nothing to bust.
+
+**Organisational process.** No reviewer counts, approval gates, ticket workflows,
+prescribed status transitions, team roles or escalation paths. None of it belongs in
+a foundation, and a foundation that carries it makes every consumer inherit someone
+else's org chart.
+
+Dessau states what it does **not** require, explicitly, so an agent does not invent
+it. That means a handful of process terms appear in `AGENTS.md`,
+`agent/principles.md` and `README.md` — always as prohibitions. The whitelabel audit
+lists each as a justified exception rather than dropping the term from its search, so
+the same word appearing as real content would still fail the gate.
