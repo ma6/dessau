@@ -11,8 +11,8 @@ All three live in [`reference/assets/brand/`](../reference/assets/brand/).
 
 | File | What it is | viewBox |
 | --- | --- | --- |
-| `dessau-mark.svg` | the D on its own | `0 0 92.323 100` |
-| `dessau-logo.svg` | the mark as the initial, with "essau" in Inter Black | `0 0 509.42 101.34` |
+| `dessau-mark.svg` | the D on its own | `0 0 91.8 100` |
+| `dessau-logo.svg` | the mark as the initial, with "essau" in Inter Black | `0 0 508.89 101.34` |
 | `dessau-icon.svg` | the mark on a square canvas, for the favicon | `0 0 128 128` |
 
 They sit under `reference/`, not under `dds/`, and that placement is the
@@ -43,11 +43,19 @@ proportions can be read straight off the path:
 
 | | units | of the cap |
 | --- | --- | --- |
-| ink width | 92.323 | 0.923 |
+| ink width | 91.8 | 0.918 |
 | stem | 28.68 | 0.287 |
 | seam between stem and bowl | 6.08 | 0.061 |
 | bar, top and bottom of the bowl | 28.97 | 0.290 |
 | notch | 90.9 × 42.6, open to the left | — |
+
+The ink width is measured from the **flattened curves**. A box taken from the
+path's points instead gives 92.323, because the bowl's Bézier handles reach 0.523
+past the curve they steer — half a percent of empty space that would otherwise be
+welded into every use of the file, shrinking the mark inside any `mask-size:
+contain` box and pushing the wordmark 0.523 too far right. The other three edges
+need no such care: they are the straight bars and the flat side of the stem,
+where the points sit on the curve.
 
 Two artefacts of the original drawing are **preserved rather than tidied**: the
 stem is 99.942 tall against the bowl's 100, and the outer corners carry a curve
@@ -101,7 +109,7 @@ A logo is not a heading. Two faces doing two jobs is normal; a lockup whose two
 halves disagree about weight is not. The only honest way to put the display face
 in the logo would be to redraw the mark lighter, which is a different mark.
 
-**Spacing.** The wordmark starts at 100.021: the mark's ink width (92.323), plus
+**Spacing.** The wordmark starts at 99.498: the mark's ink width (91.8), plus
 Inter Black's own right side bearing after a D (4.698), plus 3 units of optical
 correction, because this D is wider and heavier than the one Inter fits for. No
 tracking inside the word — that letterfit is the typeface's.
@@ -136,7 +144,7 @@ So the mark is **never** an `<img>`. Two ways to place it:
 .brand-logo {
   display: inline-block;
   block-size: 0.8em;
-  aspect-ratio: 509.42 / 101.34;   /* or 92.323 / 100 for the mark */
+  aspect-ratio: 508.89 / 101.34;   /* or 91.8 / 100 for the mark */
 
   background-color: currentColor;
   mask-image: url("brand/dessau-logo.svg");

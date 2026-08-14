@@ -25,11 +25,17 @@
   can be read straight off the path:
 
       cap height          100
-      ink width            92.323      0.923 of the cap
+      ink width            91.8        0.918 of the cap
       stem                 28.68 wide
       seam                  6.08       between stem and bowl
       bar                  28.97       top and bottom of the bowl
       notch                90.9 wide by 42.6 deep, open to the left
+
+  The width is measured from the FLATTENED curves. A box taken from the path's
+  points instead is 92.323, because the bowl's Bezier handles reach 0.523 past
+  the curve they steer; that half a percent of empty space would then be welded
+  into every use of the file. The other three edges need no such care, being the
+  straight bars and the flat side of the stem, where the points sit on the curve.
 
   A stroke of 0.29 against the cap makes this heavier than Inter Black, which
   is 0.271. That is the number the wordmark in dessau-logo.svg is fitted to.
@@ -51,7 +57,7 @@
   Two paths, both solid. The notch is part of the bowl's outline rather than a
   counter, so there is no hole and no fill-rule to get wrong.
 -->
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 92.323 100" fill="currentColor"
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 91.8 100" fill="currentColor"
      role="img" aria-labelledby="dessau-mark-title">
   <title id="dessau-mark-title">Dessau</title>
   <path d="M0.203 0.203C0.087 0.29 0 22.798 0 50.174L0 99.942L28.679 99.942L28.679 0L14.542 0C6.75 0 0.29 0.087 0.203 0.203Z"/>
