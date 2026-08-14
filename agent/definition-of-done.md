@@ -175,6 +175,7 @@ node scripts/check-agent-index.mjs
 node scripts/sync-icons.mjs --check
 node scripts/sync-reference-toc.mjs --check
 node scripts/build-foundations.mjs --check
+node scripts/sync-cache-busting.mjs --check
 ```
 
 An automated pass is a floor, not a result. It cannot tell you whether an

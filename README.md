@@ -356,7 +356,7 @@ Full text with reasoning: [`agent/principles.md`](agent/principles.md).
 
 ## Verify
 
-Six scripts, all Node standard library only. Each catches a class of failure that
+Seven scripts, all Node standard library only. Each catches a class of failure that
 produces no error anywhere — no console message, no broken layout, no failing test.
 
 ```bash
@@ -366,6 +366,7 @@ node scripts/check-agent-index.mjs       # agent context still matches the imple
 node scripts/sync-icons.mjs --check      # inline icon sprites are current
 node scripts/sync-reference-toc.mjs --check
 node scripts/build-foundations.mjs --check
+node scripts/sync-cache-busting.mjs --check   # asset versions match the assets
 ```
 
 Maintainer-only, run when the thing they generate changes:
@@ -375,8 +376,16 @@ node scripts/build-icons.mjs         # rebuild the sprite from Ionicons (needs n
 node scripts/build-foundations.mjs   # regenerate dds/foundations.json
 node scripts/sync-icons.mjs          # re-inline the sprite into every page
 node scripts/sync-reference-toc.mjs  # rebuild each page's side navigation
+node scripts/sync-cache-busting.mjs  # re-stamp ?v= on every stylesheet and script
 node scripts/bundle.mjs              # optional: dist/dds.css and dds.min.css
 ```
+
+The `?v=<hash>` on every `<link>` and `<script>` is generated, never typed. It is
+the content hash of the file being referenced, so a change to a stylesheet reaches
+a reader who already has the old one — including the eleven layer files behind
+`dds/dds.css`, whose `@import`s are stamped for the same reason. It only works if
+the HTML itself is served with a short cache lifetime; the assets are what this
+makes safe to cache hard. Reasoning: [`DECISIONS.md`](DECISIONS.md) 026.
 
 An automated pass is a floor, not a result. No script can tell you whether an
 announcement is useful, whether focus order matches how the page reads, or whether

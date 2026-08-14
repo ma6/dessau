@@ -15,8 +15,8 @@
     "check:index": "node scripts/check-agent-index.mjs",
     "check:reference": "node scripts/check-reference.mjs",
     "check:whitelabel": "node scripts/audit-whitelabel.mjs",
-    "check:generated": "node scripts/build-foundations.mjs --check && node scripts/sync-breakpoints.mjs --check && node scripts/sync-checks.mjs --check && node scripts/sync-reference-nav.mjs --check && node scripts/sync-reference-toc.mjs --check && node scripts/sync-icons.mjs --check",
-    "build": "node scripts/build-foundations.mjs && node scripts/sync-icons.mjs && node scripts/sync-breakpoints.mjs && node scripts/sync-reference-nav.mjs && node scripts/sync-reference-toc.mjs && node scripts/sync-checks.mjs && node scripts/bundle.mjs",
+    "check:generated": "node scripts/build-foundations.mjs --check && node scripts/sync-breakpoints.mjs --check && node scripts/sync-checks.mjs --check && node scripts/sync-reference-nav.mjs --check && node scripts/sync-reference-toc.mjs --check && node scripts/sync-icons.mjs --check && node scripts/sync-cache-busting.mjs --check",
+    "build": "node scripts/build-foundations.mjs && node scripts/sync-icons.mjs && node scripts/sync-breakpoints.mjs && node scripts/sync-reference-nav.mjs && node scripts/sync-reference-toc.mjs && node scripts/sync-checks.mjs && node scripts/sync-cache-busting.mjs && node scripts/bundle.mjs",
     "test": "playwright test"
   },
   "devDependencies": {

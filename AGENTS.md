@@ -160,7 +160,7 @@ dessau/
 
 ## 5. Verify before claiming done
 
-Run all four. They are fast, dependency-free, and each catches a class of
+Run all of them. They are fast, dependency-free, and each catches a class of
 failure that is otherwise silent:
 
 ```bash
@@ -168,7 +168,12 @@ node scripts/check-contrast.mjs   # every colour pair vs WCAG 2.2 AA, both theme
 node scripts/check-css.mjs        # undefined properties, primitive leaks, dead queries
 node scripts/sync-icons.mjs       # re-inline the icon sprite into every page
 node scripts/sync-icons.mjs --check   # verify the inline copies are current
+node scripts/sync-cache-busting.mjs   # re-stamp ?v= after any CSS or JS change
 ```
+
+The last one is not optional after touching a stylesheet or a script: the `?v=`
+each page carries is that file's content hash, and leaving it stale is how a reader
+keeps being served the version you just replaced.
 
 Then walk [`agent/definition-of-done.md`](agent/definition-of-done.md).
 

@@ -83,10 +83,17 @@ async function inlineImports(file, seen = new Set()) {
     cursor = match.index + match[0].length;
 
     const [, href, layerName] = match;
-    const importedPath = join(base, href);
+
+    // `scripts/sync-cache-busting.mjs` appends `?v=<hash>` to every import, so the
+    // browser cannot serve a layer file from cache after it changes. That query is
+    // part of the URL, not part of the path: keeping it here asks the filesystem
+    // for `primitives.css?v=db001cd4` and gets an ENOENT that looks like a missing
+    // file rather than like a URL that was never meant to be one.
+    const path = href.split(/[?#]/)[0];
+    const importedPath = join(base, path);
     const imported = await inlineImports(importedPath, new Set(seen));
 
-    output += `\n/* ---- inlined: ${href} ---- */\n`;
+    output += `\n/* ---- inlined: ${path} ---- */\n`;
     output += layerName ? `@layer ${layerName} {\n${imported}\n}\n` : imported;
   }
 

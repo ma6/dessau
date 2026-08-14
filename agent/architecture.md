@@ -251,7 +251,7 @@ A provider must:
 
 ## Verification is part of the architecture
 
-Four classes of failure in this system are **silent** — no console error, no
+Several classes of failure in this system are **silent** — no console error, no
 broken layout, no failing test, just a piece of design quietly absent. They are
 caught by script, not by review:
 
@@ -263,6 +263,7 @@ caught by script, not by review:
 | `sync-icons.mjs --check` | A stale inline icon sprite, or a reference to a missing icon |
 | `sync-reference-toc.mjs --check` | A stale side navigation |
 | `build-foundations.mjs --check` | A stale machine-readable export |
+| `sync-cache-busting.mjs --check` | A `?v=` that no longer matches the file it versions, so a browser keeps serving the old one |
 
 All zero-dependency, Node stdlib only. Run them before claiming anything is done.
 
