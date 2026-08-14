@@ -365,3 +365,29 @@ and pulled from there.
 **Do:** when generation surfaces a gap, fix the gap rather than the generator. Seven
 of nine thresholds turned out to have no stated reason at all. A threshold nobody can
 justify is a number nobody can safely change.
+
+---
+
+## A commit subject starting with `#` is deleted, not committed
+
+Putting the ticket first — `#42 feat(patterns): …` — reads well and is what most
+issue conventions look like. To Git that line is a comment. `--cleanup=strip`,
+which is the default whenever a message passes through an editor, removes every
+line beginning with `#`, and the subject is a line beginning with `#`.
+
+```bash
+printf '#42 feat: subject\n\nbody\n' | git stripspace --strip-comments
+# body
+```
+
+The commit still succeeds. Its subject is now the first line of the body, or the
+message is empty and the commit is aborted with a message about an empty message
+rather than about a comment.
+
+`-m` and `-F` use `--cleanup=whitespace`, which keeps comments, so this survives
+every scripted commit and fails only when a human edits one — the case that is
+never tested.
+
+**Do:** `[#42] feat(patterns): …`. The bracket puts a non-comment character first,
+the ticket still leads the subject, and the conventional type and scope stay where
+every parser expects them.

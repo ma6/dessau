@@ -150,6 +150,17 @@ unusable by the next person or agent.
       correctly.
 - [ ] Any deliberate divergence from guidance recorded in `DECISIONS.md`.
 
+## 14. The ticket
+
+- [ ] The requirement was filed as a `story` issue before the work started —
+      [`recipes/new-requirement.md`](recipes/new-requirement.md).
+- [ ] Every commit subject opens with `[#n]`; the last one adds `Closes #n`.
+- [ ] Every acceptance criterion ticked, or the issue left open with a comment
+      saying which one is unmet and why.
+
+A ticket closed with an unmet criterion claims something that is not true, which
+is worse than having filed no ticket at all.
+
 ---
 
 ## The scripted gate

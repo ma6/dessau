@@ -76,13 +76,27 @@ light-mode value is usually the one that was reasoned about.
 Committing is pre-authorised in this repository: commit after each completed step
 without asking. `git push` is not — ask first.
 
+Every commit subject starts with the ticket, in brackets:
+
+```text
+[#42] fix(combobox): the active option is announced, not just outlined
+```
+
+Bare `#42` at the start of a line is a Git comment and gets deleted whole.
+
 Every commit message ends with:
 
-```
+```text
+Closes #42        ← only the commit that finishes the ticket
+
 AI-assisted change (Claude Code)
 
 Co-Authored-By: Claude <noreply@anthropic.com>
 ```
+
+The ticket comes first, before the work does: a new requirement is filed as a
+GitHub Issue with the `story` label, then implemented. See
+[`agent/recipes/new-requirement.md`](agent/recipes/new-requirement.md).
 
 ### `src/` is off limits
 
@@ -95,8 +109,9 @@ stage it, never write into it.
 ## The short version
 
 1. Read [`AGENTS.md`](AGENTS.md).
-2. Check [`agent/index.json`](agent/index.json) before building anything new.
-3. Use the `modern-web-guidance` skill while working.
-4. Run the three verification scripts.
-5. Walk [`agent/definition-of-done.md`](agent/definition-of-done.md).
-6. Commit small, record the reasoning.
+2. File the requirement as a ticket before building it.
+3. Check [`agent/index.json`](agent/index.json) before building anything new.
+4. Use the `modern-web-guidance` skill while working.
+5. Run the three verification scripts.
+6. Walk [`agent/definition-of-done.md`](agent/definition-of-done.md).
+7. Commit small, reference the ticket, record the reasoning.

@@ -598,3 +598,53 @@ search finds them.
 
 **Reversal condition.** If the reference site is ever moved out of this repository,
 the brand goes with it and this entry goes back to reading like 023.
+
+---
+
+## 025 — Requirements are tickets, and the tickets live in GitHub
+
+**Decision.** Every requirement the maintainer states is filed as a GitHub Issue
+before the work starts, written as a user story — role, capability, benefit,
+context, acceptance criteria — and labelled `story`. Every commit answering it
+opens its subject with `[#n]`, and the commit satisfying the last criterion adds a
+`Closes #n` trailer. The procedure is `agent/recipes/new-requirement.md`.
+
+**At the front of the subject, in brackets.** A trailer at the bottom is invisible
+in `git log --oneline`, `git blame` and every GitHub list view, which is where the
+history is actually read; the ticket has to be in the forty characters that get
+shown. Brackets rather than a bare `#n` because a subject beginning with `#` is a
+comment line to Git, and `--cleanup=strip` — the default whenever a message passes
+through an editor — removes it entirely. The failure is silent and takes the whole
+subject with it.
+
+**Why.** A commit message in this repository already explains what changed and why
+it was built that way, at length. What it cannot explain is what was *asked for*.
+Those are different records: one is the answer, the other is the question, and the
+question is the one that decays. Reading a diff six months later tells you what
+somebody decided; only the ticket tells you what somebody wanted, in their own
+words, before an implementation existed to describe it in. Without it the original
+request is recoverable only by inferring it backwards from its own solution —
+which is exactly the reasoning that gets a change reverted as pointless.
+
+`story` separates the two directions work arrives from. Issues 1–12 are follow-ups
+an agent noticed and set aside; a requirement stated by the maintainer is a
+different kind of object and reads differently, so the label is what keeps the
+backlog from flattening into one undifferentiated list.
+
+**In GitHub, not in the repository.** A backlog checked into the tree goes stale
+the moment the work is done, and `ISSUES-TO-CREATE.md` — git-ignored, written when
+`gh` was unavailable — exists as the proof. Issues also cross-link to commits by
+number in both directions, which a Markdown file cannot do. The repository holds
+what is true about Dessau now; the issue tracker holds what was asked and what is
+outstanding.
+
+**Cost.** A minute before each requirement, and one more place to look. Offline
+work cannot file the ticket at the moment the requirement is stated — file it when
+the network returns, before the work is claimed done, not after.
+
+**Not** a process. One maintainer, no milestones, no estimates, no status columns,
+no pull requests. The ticket exists to be read later, not to be managed.
+
+**Reversal condition.** If the backlog ever outgrows a single reader's attention,
+this becomes a real tracker with real triage — and this entry is superseded rather
+than edited.

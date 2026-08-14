@@ -189,11 +189,28 @@ faithful over HTTP.
 - **One maintainer.** No pull request is required, no peer approval, no
   four-eyes rule, no release gate, no simulated team roles. Do not invent
   process. Direct commits on `main` are fine.
+- **Every requirement becomes a ticket first.** When the maintainer asks for
+  something new, file it as a GitHub Issue written as a user story — role,
+  capability, benefit, acceptance criteria — **before** starting the work, with
+  the `story` label. Then reference it in every commit that answers it. A commit
+  says what changed; only the ticket says what was asked for. Procedure and
+  format: [`agent/recipes/new-requirement.md`](agent/recipes/new-requirement.md).
+  Not for typos, corrections in flight, or follow-up questions about work just
+  done.
 - **Small, coherent commits.** One purpose each; leave Dessau working; include
-  the documentation the change needs. Conventional style:
-  `feat(patterns):`, `fix(combobox):`, `docs(a11y):`, `refactor(css):`.
+  the documentation the change needs. **The ticket comes first in the subject**,
+  then the conventional type and scope:
+  ```
+  [#42] feat(patterns): the summary moves focus, the fields do not
+  ```
+  In brackets, not bare. A subject beginning with `#` is a comment to Git, and
+  `--cleanup=strip` — the default whenever the message passes through an editor —
+  deletes the whole line without a word. Verify with
+  `printf '#42 x\n\nbody\n' | git stripspace --strip-comments`.
 - **End every commit message with:**
   ```
+  Closes #42        ← only on the commit that finishes the ticket
+
   AI-assisted change (Claude Code)
 
   Co-Authored-By: Claude <noreply@anthropic.com>
@@ -202,7 +219,8 @@ faithful over HTTP.
   specification lags behind its code is a component nobody can trust.
 - **Record reasoning, not just outcomes.** `DECISIONS.md` for architecture,
   `LESSONS_LEARNED.md` for experience. Both explain *why*.
-- **File a GitHub Issue** for worthwhile work outside the current task. Capture
+- **File a GitHub Issue** for worthwhile work outside the current task — without
+  the `story` label, which is reserved for what the maintainer asked for. Capture
   the problem, the intended outcome, relevant context, and acceptance criteria
   where useful. Do not expand the current task because a good idea appeared, and
   do not turn every thought into an issue.
