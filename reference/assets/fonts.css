@@ -1,0 +1,115 @@
+/* =============================================================================
+   Reference site — self-hosted fonts
+   =============================================================================
+
+   This file is NOT part of DDS.
+
+   DDS ships no font binaries: its typography tokens name a family and fall
+   through to the platform UI font, so a product carries no font weight and no
+   licence obligation it did not ask for. See docs/typography.md.
+
+   The reference site is a product that consumes Dessau, and it wants the full
+   typographic identity — so it does what Dessau recommends a product does, and
+   serves as the worked example of that recipe.
+
+   -----------------------------------------------------------------------------
+   The recipe, as actually applied here
+   -----------------------------------------------------------------------------
+
+   1. VARIABLE fonts. One file per family covers every weight, so three files
+      replace what would otherwise be nine or more.
+
+   2. SELF-HOSTED, never a third-party CDN. A CDN reference leaks every reader's
+      IP address to another party and puts a third-party connection on the
+      critical path. Same-origin removes both.
+
+   3. `font-display: swap`. Text renders immediately in the fallback and swaps
+      when the font arrives. Never `block`: invisible text is worse than briefly
+      different text.
+
+   4. The fallback stack is KEPT. The `--dds-font-*` tokens already list it and
+      are not reduced to a single family here — a failed font request must
+      degrade, not blank the page.
+
+   5. `unicode-range` limited to Latin and Latin Extended-A/-B. That covers every
+      Latin-script language in Europe. The browser downloads a face only if the
+      page actually uses characters in the declared range.
+
+   6. The OFL notice travels with the files (`OFL-*.txt` in this directory). The
+      licence requires it, and "we linked to it" is not the same thing.
+
+   -----------------------------------------------------------------------------
+   Honest note about the format
+   -----------------------------------------------------------------------------
+
+   These are TTF, not WOFF2, because that is what Google Fonts publishes in its
+   source repository and converting requires tooling Dessau deliberately does not
+   depend on. WOFF2 would be roughly 60% smaller and is what a production product
+   should ship — see docs/typography.md. For a documentation site behind a normal
+   HTTP server with compression, TTF is acceptable; for a customer-facing product
+   it is not, and pretending otherwise would make this a bad example.
+   ============================================================================= */
+
+/* The Latin coverage this project needs: Basic Latin, Latin-1 Supplement,
+   Latin Extended-A and -B, general punctuation and currency symbols. Written out
+   per face rather than shared, because `unicode-range` cannot be a variable. */
+
+/* --------------------------------------------------------------- body / UI */
+@font-face {
+  font-family: "Inter";
+  src: url("fonts/Inter-Variable.ttf") format("truetype-variations");
+  /* The whole axis, because it is one variable file. */
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+  unicode-range: U+0000-00FF, U+0100-024F, U+2000-206F, U+20A0-20BF, U+2122, U+2212;
+}
+
+/* ------------------------------------------------------------------ display */
+@font-face {
+  font-family: "Space Grotesk";
+  src: url("fonts/SpaceGrotesk-Variable.ttf") format("truetype-variations");
+  font-weight: 300 700;
+  font-style: normal;
+  font-display: swap;
+  unicode-range: U+0000-00FF, U+0100-024F, U+2000-206F, U+20A0-20BF, U+2122, U+2212;
+}
+
+/* --------------------------------------------------------------- monospace */
+@font-face {
+  font-family: "JetBrains Mono";
+  src: url("fonts/JetBrainsMono-Variable.ttf") format("truetype-variations");
+  font-weight: 100 800;
+  font-style: normal;
+  font-display: swap;
+  unicode-range: U+0000-00FF, U+0100-024F, U+2000-206F, U+20A0-20BF, U+2122, U+2212;
+}
+
+/* -----------------------------------------------------------------------------
+   Metric-matched fallback
+   -----------------------------------------------------------------------------
+
+   Reduces the layout shift when the real face swaps in, by adjusting the
+   fallback's metrics to match Inter's. Without it, a page of text visibly
+   reflows on font load — which is a Cumulative Layout Shift problem and, more
+   simply, annoying to read.
+
+   Only done for the body face: it renders first and everywhere, so it is the one
+   whose shift is actually noticeable.
+   ----------------------------------------------------------------------------- */
+@font-face {
+  font-family: "Inter Fallback";
+  src: local("Helvetica Neue"), local("Arial"), local("Liberation Sans");
+  /* Inter runs optically smaller than Helvetica at the same size. */
+  size-adjust: 107%;
+  ascent-override: 90%;
+  descent-override: 22%;
+  line-gap-override: 0%;
+}
+
+/* Slot the metric-matched fallback in directly after the real face. The rest of
+   the stack stays exactly as the tokens define it. */
+:root {
+  --dds-font-body: Inter, "Inter Fallback", system-ui, -apple-system, "Segoe UI",
+    Roboto, "Helvetica Neue", sans-serif;
+}

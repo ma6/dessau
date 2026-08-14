@@ -1,0 +1,361 @@
+/**
+ * DDS — component behaviour.
+ *
+ *   <script src="/dds/js/dds.js" defer></script>
+ *   <script src="/dds/js/components.js" defer></script>
+ *
+ * Load after dds.js. Optional: a product that builds its own behaviour can skip
+ * this file entirely and keep the same markup and CSS.
+ *
+ * Everything here is behaviour the platform does NOT already provide. Anything
+ * the platform does provide is left alone, which is why there is no accordion
+ * (`<details name>`), no disclosure toggle (`<details>`), no focus trap
+ * (`showModal()`), and no validation engine (constraint validation API).
+ *
+ * Contents: dialog opener · tabs · toast · copy-to-clipboard
+ */
+(function (global) {
+  'use strict';
+
+  var DDS = global.DDS;
+  if (!DDS) {
+    console.error('[DDS] components.js requires dds.js to be loaded first');
+    return;
+  }
+
+  /* =========================================================================
+     Dialog opener
+     =========================================================================
+     Markup:
+       <button data-dds-dialog-open="my-dialog">Open</button>
+       <dialog id="my-dialog" class="dds-dialog" aria-labelledby="my-dialog-title">
+         ...
+         <button data-dds-dialog-close>Cancel</button>
+       </dialog>
+
+     `showModal()` is what does the real work: it moves focus into the dialog,
+     makes everything behind it inert, closes on Escape, renders in the top layer
+     so no `overflow: hidden` ancestor can clip it, and returns focus to the
+     opener on close. None of that is reimplemented here.
+
+     What is added: scroll locking (the page behind a modal should not scroll)
+     and the declarative open/close attributes.
+     ========================================================================= */
+
+  var SCROLL_LOCK_CLASS = 'dds-scroll-locked';
+  var openDialogCount = 0;
+
+  function lockScroll() {
+    openDialogCount += 1;
+    document.documentElement.classList.add(SCROLL_LOCK_CLASS);
+  }
+
+  function unlockScroll() {
+    openDialogCount = Math.max(0, openDialogCount - 1);
+    // Only release when the last dialog closes — a dialog opened from a dialog
+    // would otherwise unlock the page while one is still open.
+    if (openDialogCount === 0) {
+      document.documentElement.classList.remove(SCROLL_LOCK_CLASS);
+    }
+  }
+
+  DDS.register('dialog-open', '[data-dds-dialog-open]', function (trigger) {
+    trigger.addEventListener('click', function () {
+      var id = trigger.getAttribute('data-dds-dialog-open');
+      var dialog = document.getElementById(id);
+
+      if (!dialog) {
+        console.error('[DDS] no dialog found with id "' + id + '"');
+        return;
+      }
+      if (typeof dialog.showModal !== 'function') {
+        console.error('[DDS] element is not a <dialog>', dialog);
+        return;
+      }
+
+      lockScroll();
+      dialog.showModal();
+    });
+  });
+
+  DDS.register('dialog', 'dialog.dds-dialog', function (dialog) {
+    // Release the lock however the dialog closed: a close button, Escape, a
+    // form submit, or `close()` from application code.
+    dialog.addEventListener('close', unlockScroll);
+
+    // Clicking the backdrop closes. The backdrop is not a separate element, so
+    // the test is whether the click landed on the dialog box itself rather than
+    // on any of its children — which only happens outside the visible panel.
+    dialog.addEventListener('click', function (event) {
+      if (event.target === dialog) dialog.close('dismiss');
+    });
+
+    dialog.querySelectorAll('[data-dds-dialog-close]').forEach(function (button) {
+      button.addEventListener('click', function () {
+        dialog.close(button.getAttribute('data-dds-dialog-close') || 'close');
+      });
+    });
+  });
+
+  /* =========================================================================
+     Tabs
+     =========================================================================
+     Markup:
+       <div class="dds-tabs" data-dds-tabs>
+         <div class="dds-tablist" role="tablist" aria-label="Sections">
+           <button class="dds-tab" role="tab" id="t1" aria-controls="p1">One</button>
+           <button class="dds-tab" role="tab" id="t2" aria-controls="p2">Two</button>
+         </div>
+         <div id="p1" role="tabpanel" aria-labelledby="t1" tabindex="0">…</div>
+         <div id="p2" role="tabpanel" aria-labelledby="t2" tabindex="0" hidden>…</div>
+       </div>
+
+     Implements the ARIA tabs pattern:
+      - A roving tabindex: the tablist is ONE tab stop, not one per tab. Tab
+        enters the list and Tab again leaves it for the panel; arrow keys move
+        between tabs. A list of nine tabs must not cost nine presses to pass.
+      - Home/End jump to the ends.
+      - Selection follows focus, which is correct when switching is cheap and
+        reversible.
+
+     `aria-selected` and `hidden` are the state — read from and written to the
+     DOM, so the visual state and the announced state cannot drift apart.
+     ========================================================================= */
+
+  DDS.register('tabs', '[data-dds-tabs]', function (root) {
+    var tabs = Array.prototype.slice.call(root.querySelectorAll('[role="tab"]'));
+    if (!tabs.length) return;
+
+    function panelFor(tab) {
+      var id = tab.getAttribute('aria-controls');
+      return id ? document.getElementById(id) : null;
+    }
+
+    function select(tab, moveFocus) {
+      tabs.forEach(function (candidate) {
+        var isSelected = candidate === tab;
+        candidate.setAttribute('aria-selected', isSelected ? 'true' : 'false');
+        // Only the selected tab is reachable with Tab.
+        candidate.tabIndex = isSelected ? 0 : -1;
+
+        var panel = panelFor(candidate);
+        if (panel) panel.hidden = !isSelected;
+      });
+
+      if (moveFocus) tab.focus();
+    }
+
+    // Establish the initial state from the markup rather than assuming the
+    // first tab: a server may have rendered a different one as selected.
+    var initial = tabs.filter(function (tab) {
+      return tab.getAttribute('aria-selected') === 'true';
+    })[0] || tabs[0];
+    select(initial, false);
+
+    tabs.forEach(function (tab, index) {
+      tab.addEventListener('click', function () {
+        select(tab, false);
+      });
+
+      tab.addEventListener('keydown', function (event) {
+        var target = null;
+
+        switch (event.key) {
+          // Wrap around at both ends: reaching the last tab and pressing Right
+          // should not simply stop.
+          case 'ArrowRight':
+            target = tabs[(index + 1) % tabs.length];
+            break;
+          case 'ArrowLeft':
+            target = tabs[(index - 1 + tabs.length) % tabs.length];
+            break;
+          case 'Home':
+            target = tabs[0];
+            break;
+          case 'End':
+            target = tabs[tabs.length - 1];
+            break;
+          default:
+            return;
+        }
+
+        // Only prevent default once a key is actually handled, so an unrelated
+        // shortcut still reaches the browser.
+        event.preventDefault();
+        select(target, true);
+      });
+    });
+  });
+
+  /* =========================================================================
+     Toast
+     =========================================================================
+       DDS.toast('Draft saved');
+       DDS.toast('Could not save', { kind: 'error', duration: 8000 });
+
+     A toast is for confirming something that already happened. It must never
+     be the only place important information lives, and it must never contain
+     the only route to an action: it disappears on a timer, which excludes
+     anyone reading slowly, magnifying the screen, or away from the keyboard.
+
+     The region is `role="status"` (polite), so a toast never interrupts. The
+     timer pauses on hover and on focus, because a message that vanishes while
+     being read or while its close button has focus is a trap.
+     ========================================================================= */
+
+  var TOAST_ICONS = {
+    success: 'dds-icon-check-circle',
+    warning: 'dds-icon-warning',
+    error: 'dds-icon-error',
+    info: 'dds-icon-info',
+  };
+
+  // A visible word per kind, so the meaning does not depend on the icon shape
+  // or the fill colour.
+  var TOAST_PREFIX = {
+    success: 'Success',
+    warning: 'Warning',
+    error: 'Error',
+    info: 'Information',
+  };
+
+  var toastRegion = null;
+
+  function getToastRegion() {
+    if (toastRegion && document.body.contains(toastRegion)) return toastRegion;
+
+    toastRegion = document.createElement('div');
+    toastRegion.className = 'dds-toast-region';
+    toastRegion.setAttribute('role', 'status');
+    toastRegion.setAttribute('aria-live', 'polite');
+    // Read only what was added, not the whole stack again.
+    toastRegion.setAttribute('aria-atomic', 'false');
+    document.body.appendChild(toastRegion);
+
+    return toastRegion;
+  }
+
+  /**
+   * Show a toast.
+   *
+   * @param {string} message
+   * @param {{ kind?: 'success'|'warning'|'error'|'info', duration?: number }} [options]
+   * @returns {HTMLElement} the toast, so a caller can dismiss it early.
+   */
+  function toast(message, options) {
+    var opts = options || {};
+    var kind = TOAST_ICONS[opts.kind] ? opts.kind : 'info';
+    var duration = typeof opts.duration === 'number' ? opts.duration : 5000;
+
+    var element = document.createElement('div');
+    element.className = 'dds-toast dds-toast-' + kind;
+
+    var icon = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+    icon.setAttribute('class', 'dds-icon');
+    icon.setAttribute('aria-hidden', 'true');
+    var use = document.createElementNS('http://www.w3.org/2000/svg', 'use');
+    use.setAttribute('href', '#' + TOAST_ICONS[kind]);
+    icon.appendChild(use);
+    element.appendChild(icon);
+
+    // The kind, in words, for anyone who does not see the colour or the icon.
+    var prefix = document.createElement('span');
+    prefix.className = 'dds-sr-only';
+    prefix.textContent = TOAST_PREFIX[kind] + ': ';
+    element.appendChild(prefix);
+
+    var text = document.createElement('span');
+    // textContent, not innerHTML: a toast frequently carries a value that came
+    // from outside the application.
+    text.textContent = message;
+    element.appendChild(text);
+
+    var close = document.createElement('button');
+    close.type = 'button';
+    close.className = 'dds-toast-close';
+    close.setAttribute('aria-label', 'Dismiss message');
+    var closeIcon = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+    closeIcon.setAttribute('class', 'dds-icon');
+    closeIcon.setAttribute('aria-hidden', 'true');
+    var closeUse = document.createElementNS('http://www.w3.org/2000/svg', 'use');
+    closeUse.setAttribute('href', '#dds-icon-close');
+    closeIcon.appendChild(closeUse);
+    close.appendChild(closeIcon);
+    element.appendChild(close);
+
+    getToastRegion().appendChild(element);
+
+    var timer = null;
+
+    function dismiss() {
+      clearTimeout(timer);
+      element.remove();
+    }
+
+    function startTimer() {
+      // `duration: 0` means "stay until dismissed" — the right choice for
+      // anything the user genuinely needs to read.
+      if (duration > 0) timer = setTimeout(dismiss, duration);
+    }
+
+    function pauseTimer() {
+      clearTimeout(timer);
+    }
+
+    startTimer();
+
+    element.addEventListener('mouseenter', pauseTimer);
+    element.addEventListener('mouseleave', startTimer);
+    // focusin/focusout rather than focus: the close button inside is what
+    // receives focus, and focus does not bubble.
+    element.addEventListener('focusin', pauseTimer);
+    element.addEventListener('focusout', startTimer);
+    close.addEventListener('click', dismiss);
+
+    return element;
+  }
+
+  DDS.toast = toast;
+
+  /* =========================================================================
+     Copy to clipboard
+     =========================================================================
+     Markup:
+       <button data-dds-copy="#reference-value">Copy</button>
+
+     Small, but it is the kind of thing every product rebuilds badly. The part
+     usually missed: confirming that it worked. A button that silently succeeds
+     leaves the user unsure whether to press it again.
+     ========================================================================= */
+
+  DDS.register('copy', '[data-dds-copy]', function (button) {
+    // No async clipboard API means no reliable copy. Rather than a button that
+    // does nothing, remove it and let the user select the text themselves.
+    if (!navigator.clipboard) {
+      button.hidden = true;
+      return;
+    }
+
+    button.addEventListener('click', function () {
+      var selector = button.getAttribute('data-dds-copy');
+      var source = document.querySelector(selector);
+      if (!source) return;
+
+      var value = 'value' in source ? source.value : source.textContent;
+
+      navigator.clipboard.writeText(String(value).trim()).then(
+        function () {
+          DDS.announce('Copied to clipboard');
+          toast('Copied to clipboard', { kind: 'success', duration: 2500 });
+        },
+        function () {
+          // Denied permission, or a non-secure context.
+          DDS.announce('Could not copy. Select the text and copy it manually.', {
+            assertive: true,
+          });
+          toast('Could not copy automatically', { kind: 'error' });
+        }
+      );
+    });
+  });
+})(typeof window !== 'undefined' ? window : globalThis);

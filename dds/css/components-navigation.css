@@ -1,0 +1,888 @@
+/* =============================================================================
+   DDS — Navigation components
+   =============================================================================
+
+   Site chrome and wayfinding. Domain-neutral: nothing here assumes a particular
+   kind of product, industry or content.
+
+   Every component in this file is responsive by CONTAINER QUERY, not by media
+   query. The reason is not fashion — a header inside a 480px-wide preview stage,
+   a dialog or an embedded panel has to lay itself out for the space it was
+   actually given, not for the browser window. A media query would make it read
+   the window and get it wrong everywhere except the page it was written on.
+
+   Note the recurring `-frame` wrapper. A container query cannot style the element
+   that establishes the container, only its descendants. So the outer element
+   carries `container-type`/`container-name` and does nothing else; an inner
+   element carries the grid or flex layout and is what the query targets. Skip the
+   frame and the query silently matches nothing — the component just stays in its
+   narrow form at every width.
+
+   Section index:
+     Site header · Site footer · Breadcrumb · Pagination · Step progress ·
+     Sticky action bar · Table of contents · Menu · Filter bar · Toolbar
+   ============================================================================= */
+
+@layer dds.components {
+
+  /* ==========================================================================
+     Site header
+     ==========================================================================
+     A `<header>` containing the product name and the primary `<nav>`.
+
+     Below the threshold the navigation collapses behind a disclosure button.
+     Above it, the links are visible. Both states are the same markup and the
+     same DOM order — the mobile menu is not a second copy of the navigation,
+     because two copies drift and a screen reader announces both.
+
+     The current page carries `aria-current="page"`. That is not decoration: it
+     is the only way a screen-reader user knows where they are, and it is why the
+     active state must also be more than a colour.
+
+     Behaviour: js/components-navigation.js */
+  .dds-siteheader-frame {
+    container-type: inline-size;
+    container-name: dds-siteheader;
+
+    background-color: var(--dds-color-surface-default);
+    border-block-end: var(--dds-border-thin) solid var(--dds-color-border-subtle);
+  }
+
+  .dds-siteheader {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--dds-space-sm);
+    padding-block: var(--dds-space-sm);
+  }
+
+  .dds-siteheader-brand {
+    display: flex;
+    align-items: center;
+    gap: var(--dds-space-xs);
+
+    font-family: var(--dds-font-display);
+    font-size: var(--dds-font-size-lg);
+    font-weight: var(--dds-font-weight-bold);
+    color: var(--dds-color-text-default);
+    text-decoration: none;
+    /* The brand link is not body text, so it is exempt from the always-underline
+       rule: it is unmistakably a link by position and treatment. */
+    letter-spacing: var(--dds-letter-spacing-tight);
+  }
+
+  .dds-siteheader-brand:hover {
+    color: var(--dds-color-text-default);
+    text-decoration: none;
+  }
+
+  /* The disclosure button. Hidden above the threshold via the container query
+     below — not the other way round, so the navigation is reachable when CSS
+     fails to load. */
+  .dds-siteheader-toggle {
+    margin-inline-start: auto;
+  }
+
+  .dds-siteheader-actions {
+    display: flex;
+    align-items: center;
+    gap: var(--dds-space-2xs);
+  }
+
+  /* --- the navigation ---------------------------------------------------- */
+  .dds-primary-nav {
+    /* Below the threshold: full width on its own row, collapsed unless open. */
+    flex-basis: 100%;
+  }
+
+  .dds-primary-nav[hidden] {
+    display: none;
+  }
+
+  .dds-primary-nav ul {
+    display: flex;
+    flex-direction: column;
+    gap: var(--dds-space-3xs);
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .dds-primary-nav a {
+    display: flex;
+    align-items: center;
+    padding: var(--dds-space-xs) var(--dds-space-sm);
+    min-block-size: 2.75rem;
+
+    font-weight: var(--dds-font-weight-medium);
+    color: var(--dds-color-text-subtle);
+    text-decoration: none;
+    border-radius: var(--dds-radius-sm);
+  }
+
+  .dds-primary-nav a:hover {
+    background-color: var(--dds-color-surface-hover);
+    color: var(--dds-color-text-default);
+    text-decoration: none;
+  }
+
+  /* Current page: colour, weight AND a marker rule. Three cues. */
+  .dds-primary-nav a[aria-current="page"] {
+    color: var(--dds-color-text-link);
+    background-color: var(--dds-color-surface-selected);
+    font-weight: var(--dds-font-weight-semibold);
+  }
+
+  @container dds-siteheader (inline-size >= 48rem) {
+    /* Wide enough: navigation inline, disclosure button gone. */
+    .dds-siteheader-toggle {
+      display: none;
+    }
+
+    .dds-primary-nav {
+      flex-basis: auto;
+      margin-inline-start: auto;
+    }
+
+    /* Always visible above the threshold, whatever the disclosure state was.
+       Without this the menu would stay collapsed after a resize. */
+    .dds-primary-nav[hidden] {
+      display: block;
+    }
+
+    .dds-primary-nav ul {
+      flex-direction: row;
+      align-items: center;
+      gap: var(--dds-space-2xs);
+    }
+
+    .dds-primary-nav a[aria-current="page"] {
+      background-color: transparent;
+      /* An underline replaces the fill, so the marker survives the row layout. */
+      box-shadow: inset 0 -2px 0 0 var(--dds-color-action-primary);
+      border-radius: 0;
+    }
+
+    .dds-siteheader-actions {
+      order: 3;
+    }
+  }
+
+  /* ==========================================================================
+     Site footer
+     ==========================================================================
+     A `<footer>` with grouped links and a closing line.
+
+     Each group is a `<nav>` with its own accessible name, or a plain list under
+     a heading. A single undifferentiated list of thirty links is technically
+     valid and practically unusable with a screen reader. */
+  .dds-sitefooter-frame {
+    container-type: inline-size;
+    container-name: dds-sitefooter;
+
+    background-color: var(--dds-color-surface-sunken);
+    border-block-start: var(--dds-border-thin) solid var(--dds-color-border-subtle);
+    padding-block: var(--dds-space-xl);
+  }
+
+  .dds-sitefooter {
+    display: flex;
+    flex-direction: column;
+    gap: var(--dds-space-xl);
+  }
+
+  .dds-sitefooter-groups {
+    display: grid;
+    gap: var(--dds-space-lg);
+  }
+
+  @container dds-sitefooter (inline-size >= 40rem) {
+    .dds-sitefooter-groups {
+      grid-template-columns: repeat(auto-fit, minmax(min(11rem, 100%), 1fr));
+    }
+  }
+
+  .dds-sitefooter-group h2,
+  .dds-sitefooter-group h3 {
+    font-family: var(--dds-font-body);
+    font-size: var(--dds-font-size-sm);
+    font-weight: var(--dds-font-weight-semibold);
+    color: var(--dds-color-text-default);
+    margin-block-end: var(--dds-space-xs);
+  }
+
+  .dds-sitefooter-group ul {
+    display: flex;
+    flex-direction: column;
+    gap: var(--dds-space-2xs);
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .dds-sitefooter-group a {
+    font-size: var(--dds-font-size-sm);
+    color: var(--dds-color-text-subtle);
+  }
+
+  .dds-sitefooter-base {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--dds-space-sm) var(--dds-space-md);
+
+    padding-block-start: var(--dds-space-md);
+    border-block-start: var(--dds-border-thin) solid var(--dds-color-border-subtle);
+
+    font-size: var(--dds-font-size-sm);
+    color: var(--dds-color-text-muted);
+  }
+
+  /* ==========================================================================
+     Breadcrumb
+     ==========================================================================
+     Where the current page sits in the hierarchy.
+
+     An ordered list inside a named `<nav>`, because the sequence is the meaning.
+     The separator is a CSS pseudo-element and therefore not in the accessibility
+     tree — a literal "/" between links would be read out between every item.
+
+     The last entry is the current page: not a link, and marked
+     `aria-current="page"`. Linking a page to itself is a dead control. */
+  .dds-breadcrumb ol {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--dds-space-2xs);
+
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    font-size: var(--dds-font-size-sm);
+  }
+
+  .dds-breadcrumb li {
+    display: flex;
+    align-items: center;
+    gap: var(--dds-space-2xs);
+  }
+
+  /* Decorative separator, invisible to assistive technology by virtue of being
+     generated content. */
+  .dds-breadcrumb li + li::before {
+    content: "";
+    inline-size: 0.4em;
+    block-size: 0.4em;
+    border-block-start: var(--dds-border-thin) solid var(--dds-color-border-default);
+    border-inline-end: var(--dds-border-thin) solid var(--dds-color-border-default);
+    rotate: 45deg;
+    /* Logical: the chevron points the reading direction, so it flips in RTL. */
+    color: var(--dds-color-text-muted);
+  }
+
+  .dds-breadcrumb [aria-current="page"] {
+    color: var(--dds-color-text-muted);
+    font-weight: var(--dds-font-weight-medium);
+  }
+
+  /* ==========================================================================
+     Pagination
+     ==========================================================================
+     Navigation between pages of a list.
+
+     Real links with real hrefs, so a page is bookmarkable, shareable and
+     openable in a new tab. Buttons that fetch a page over script give all of
+     that up.
+
+     The container is a named `<nav>`; the current page carries
+     `aria-current="page"`; each link's accessible name says what it goes to
+     ("Page 3", not "3"). */
+  .dds-pagination {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--dds-space-2xs);
+  }
+
+  .dds-pagination ul {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--dds-space-3xs);
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .dds-pagination-link {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    min-inline-size: 2.5rem;
+    min-block-size: 2.5rem;
+    padding-inline: var(--dds-space-2xs);
+
+    font-size: var(--dds-font-size-sm);
+    font-variant-numeric: tabular-nums;
+    color: var(--dds-color-text-subtle);
+    text-decoration: none;
+
+    border: var(--dds-border-thin) solid transparent;
+    border-radius: var(--dds-radius-sm);
+  }
+
+  .dds-pagination-link:hover {
+    background-color: var(--dds-color-surface-hover);
+    color: var(--dds-color-text-default);
+    text-decoration: none;
+  }
+
+  .dds-pagination-link[aria-current="page"] {
+    background-color: var(--dds-color-surface-selected);
+    border-color: var(--dds-color-action-primary);
+    color: var(--dds-color-text-link);
+    font-weight: var(--dds-font-weight-semibold);
+  }
+
+  /* A gap in the sequence. Presentational, and must not be a tab stop. */
+  .dds-pagination-gap {
+    padding-inline: var(--dds-space-2xs);
+    color: var(--dds-color-text-muted);
+  }
+
+  /* ==========================================================================
+     Step progress
+     ==========================================================================
+     Position within a multi-step process.
+
+     An ordered list, because the sequence is the point. Each step states its
+     status in TEXT, not only through colour or a tick: "Step 2 of 4, current".
+     A ring of coloured dots communicates nothing without sight.
+
+     `aria-current="step"` marks the active one. Completed steps may be links if
+     the user is allowed back; upcoming ones never are. */
+  .dds-steps-frame {
+    container-type: inline-size;
+    container-name: dds-steps;
+  }
+
+  .dds-steps {
+    display: flex;
+    flex-direction: column;
+    gap: var(--dds-space-xs);
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    counter-reset: dds-step;
+  }
+
+  .dds-step {
+    display: flex;
+    align-items: center;
+    gap: var(--dds-space-sm);
+    counter-increment: dds-step;
+    font-size: var(--dds-font-size-sm);
+  }
+
+  /* The number marker. Generated content, so the visible number cannot drift
+     from the list position. */
+  .dds-step::before {
+    content: counter(dds-step);
+
+    display: grid;
+    place-items: center;
+    flex-shrink: 0;
+
+    inline-size: 1.75rem;
+    block-size: 1.75rem;
+
+    font-variant-numeric: tabular-nums;
+    font-weight: var(--dds-font-weight-semibold);
+    color: var(--dds-color-text-muted);
+
+    background-color: var(--dds-color-surface-sunken);
+    border: var(--dds-border-thin) solid var(--dds-color-border-default);
+    border-radius: var(--dds-radius-circle);
+  }
+
+  .dds-step[data-dds-step="done"]::before {
+    /* A tick replaces the number. Colour AND glyph change, and the status is
+       also stated in the step's text. */
+    content: "\2713";
+    color: var(--dds-color-on-success-solid);
+    background-color: var(--dds-color-success-solid);
+    border-color: var(--dds-color-success-solid);
+  }
+
+  .dds-step[aria-current="step"]::before {
+    color: var(--dds-color-action-on-primary);
+    background-color: var(--dds-color-action-primary);
+    border-color: var(--dds-color-action-primary);
+  }
+
+  .dds-step[aria-current="step"] {
+    font-weight: var(--dds-font-weight-semibold);
+    color: var(--dds-color-text-default);
+  }
+
+  .dds-step-status {
+    color: var(--dds-color-text-muted);
+    font-weight: var(--dds-font-weight-regular);
+  }
+
+  @container dds-steps (inline-size >= 34rem) {
+    .dds-steps {
+      flex-direction: row;
+      align-items: flex-start;
+      gap: var(--dds-space-md);
+    }
+
+    .dds-step {
+      flex: 1;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: var(--dds-space-2xs);
+    }
+  }
+
+  /* ==========================================================================
+     Sticky action bar
+     ==========================================================================
+     Keeps the primary action reachable at the end of a long form.
+
+     Two things it must get right:
+
+       - `env(safe-area-inset-bottom)`, or on a phone the button sits under the
+         home indicator and cannot be tapped.
+       - It must not obscure a focused field. `scroll-padding-block-end` on the
+         scroll container reserves the space, which is what stops the bar
+         covering whatever the keyboard just scrolled into view (WCAG 2.2 2.4.11
+         Focus Not Obscured). */
+  .dds-actionbar {
+    position: sticky;
+    inset-block-end: 0;
+    z-index: var(--dds-z-raised);
+
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--dds-space-xs);
+    justify-content: flex-end;
+
+    padding: var(--dds-space-sm) var(--dds-space-md);
+    padding-block-end: max(var(--dds-space-sm), env(safe-area-inset-bottom));
+
+    background-color: color-mix(in srgb, var(--dds-color-surface-default) 92%, transparent);
+    backdrop-filter: blur(8px);
+    border-block-start: var(--dds-border-thin) solid var(--dds-color-border-subtle);
+  }
+
+  /* Applied to the scrolling ancestor of a form that ends in an action bar. */
+  .dds-actionbar-host {
+    scroll-padding-block-end: 6rem;
+  }
+
+  .dds-actionbar-info {
+    margin-inline-end: auto;
+    font-size: var(--dds-font-size-sm);
+    color: var(--dds-color-text-muted);
+  }
+
+  /* ==========================================================================
+     Table of contents
+     ==========================================================================
+     In-page anchor navigation for a long document.
+
+     Sticky beside the content when there is room. `scroll-margin-block-start` on
+     the headings (base.css) keeps a target from landing underneath a sticky
+     header.
+
+     The active entry is set from an IntersectionObserver, and it is
+     `aria-current="location"` — "location" rather than "page", because the user
+     has not navigated anywhere; the reading position moved.
+
+     Behaviour: js/components-navigation.js */
+  .dds-toc {
+    font-size: var(--dds-font-size-sm);
+  }
+
+  .dds-toc-title {
+    font-weight: var(--dds-font-weight-semibold);
+    color: var(--dds-color-text-default);
+    margin-block-end: var(--dds-space-xs);
+  }
+
+  .dds-toc ul {
+    display: flex;
+    flex-direction: column;
+    gap: var(--dds-space-3xs);
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    /* A rail the active marker sits on. */
+    border-inline-start: var(--dds-border-thin) solid var(--dds-color-border-subtle);
+  }
+
+  .dds-toc a {
+    display: block;
+    padding: var(--dds-space-3xs) var(--dds-space-sm);
+    /* Pull onto the rail so the active marker replaces that segment of it. */
+    margin-inline-start: -1px;
+    border-inline-start: var(--dds-border-thick) solid transparent;
+
+    color: var(--dds-color-text-subtle);
+    text-decoration: none;
+  }
+
+  .dds-toc a:hover {
+    color: var(--dds-color-text-default);
+    text-decoration: underline;
+  }
+
+  .dds-toc a[aria-current="location"] {
+    color: var(--dds-color-text-link);
+    border-inline-start-color: var(--dds-color-action-primary);
+    font-weight: var(--dds-font-weight-semibold);
+  }
+
+  /* Nested levels indent, mirroring the heading hierarchy. */
+  .dds-toc ul ul a {
+    padding-inline-start: var(--dds-space-lg);
+  }
+
+  .dds-toc-sticky {
+    position: sticky;
+    inset-block-start: var(--dds-space-md);
+    max-block-size: calc(100svh - var(--dds-space-2xl));
+    overflow-y: auto;
+  }
+
+  /* ==========================================================================
+     Menu
+     ==========================================================================
+     A list of actions revealed from a button — a row's overflow menu, a user
+     menu.
+
+     Built on the `popover` attribute with `popovertarget`, which gives light
+     dismiss (click outside), Escape, top-layer rendering and focus return for
+     free. Before `popover` this needed a click-outside listener, a keydown
+     handler, a focus-restore reference and a z-index fight.
+
+     It is a menu of ACTIONS, so the items are `<button>` or `<a>` in a list —
+     not `role="menu"`/`role="menuitem"`, which switches assistive technology
+     into application mode and changes what keys do. That role is for a desktop
+     application menu bar, not a dropdown of links, and using it here makes the
+     control less familiar rather than more. */
+  .dds-menu {
+    position: absolute;
+    inline-size: max-content;
+    min-inline-size: 12rem;
+    max-inline-size: 20rem;
+    margin: 0;
+    padding: var(--dds-space-3xs);
+
+    background-color: var(--dds-color-surface-raised);
+    border: var(--dds-border-thin) solid var(--dds-color-border-default);
+    border-radius: var(--dds-radius-md);
+    box-shadow: var(--dds-elevation-lg);
+  }
+
+  /* Anchor to the invoker. A popover opened via `popovertarget` gets its invoker
+     as an implicit anchor, so no anchor name is needed — which matters, because
+     naming would mean a unique name per menu instance. */
+  @supports (anchor-name: --dds-probe) {
+    .dds-menu {
+      inset-block-start: anchor(bottom);
+      inset-inline-end: anchor(right);
+      margin-block-start: var(--dds-space-3xs);
+      position-try-fallbacks: flip-block, flip-inline;
+    }
+  }
+
+  .dds-menu ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .dds-menu-item {
+    display: flex;
+    align-items: center;
+    gap: var(--dds-space-xs);
+    inline-size: 100%;
+
+    padding: var(--dds-space-xs) var(--dds-space-sm);
+    min-block-size: 2.5rem;
+
+    font-family: inherit;
+    font-size: var(--dds-font-size-sm);
+    text-align: start;
+    color: var(--dds-color-text-default);
+    text-decoration: none;
+
+    background: none;
+    border: 0;
+    border-radius: var(--dds-radius-sm);
+    cursor: pointer;
+  }
+
+  .dds-menu-item:hover {
+    background-color: var(--dds-color-surface-hover);
+    color: var(--dds-color-text-default);
+    text-decoration: none;
+  }
+
+  .dds-menu-item-danger {
+    color: var(--dds-color-text-error);
+  }
+
+  .dds-menu-item-danger:hover {
+    background-color: var(--dds-color-surface-error);
+    color: var(--dds-color-text-error);
+  }
+
+  .dds-menu-separator {
+    block-size: 0;
+    margin-block: var(--dds-space-3xs);
+    border: 0;
+    border-block-start: var(--dds-border-thin) solid var(--dds-color-border-subtle);
+  }
+
+  .dds-menu-label {
+    padding: var(--dds-space-2xs) var(--dds-space-sm);
+    font-size: var(--dds-font-size-xs);
+    color: var(--dds-color-text-muted);
+  }
+
+  /* ==========================================================================
+     Filter bar
+     ==========================================================================
+     Controls that narrow a list, plus the chips showing what is currently
+     applied.
+
+     The applied filters must be visible as removable chips. A user who cannot
+     see which filters are active cannot understand why the list is short — and
+     "no results" with three invisible filters applied is the most common
+     dead end in a filtered interface. */
+  .dds-filterbar {
+    display: flex;
+    flex-direction: column;
+    gap: var(--dds-space-sm);
+
+    padding: var(--dds-space-md);
+    background-color: var(--dds-color-surface-sunken);
+    border: var(--dds-border-thin) solid var(--dds-color-border-subtle);
+    border-radius: var(--dds-radius-md);
+  }
+
+  .dds-filterbar-controls {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    gap: var(--dds-space-sm);
+  }
+
+  .dds-filterbar-controls > * {
+    /* Each control takes a share but never shrinks below usability. */
+    flex: 1 1 12rem;
+  }
+
+  .dds-filterbar-applied {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--dds-space-2xs);
+  }
+
+  /* ==========================================================================
+     Toolbar
+     ==========================================================================
+     A grouped row of controls above a list or an editor.
+
+     `role="toolbar"` with arrow-key navigation is appropriate only when the
+     controls are numerous enough that individual tab stops become tedious. For
+     three buttons, leave them as three tab stops — a roving tabindex on a small
+     toolbar makes it less predictable, not more. */
+  .dds-toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--dds-space-xs);
+
+    padding: var(--dds-space-2xs);
+    background-color: var(--dds-color-surface-default);
+    border: var(--dds-border-thin) solid var(--dds-color-border-subtle);
+    border-radius: var(--dds-radius-md);
+  }
+
+  .dds-toolbar-group {
+    display: flex;
+    align-items: center;
+    gap: var(--dds-space-3xs);
+  }
+
+  .dds-toolbar-group + .dds-toolbar-group {
+    padding-inline-start: var(--dds-space-xs);
+    border-inline-start: var(--dds-border-thin) solid var(--dds-color-border-subtle);
+  }
+
+  .dds-toolbar-spacer {
+    margin-inline-start: auto;
+  }
+}
+
+@layer dds.components {
+
+  /* ==========================================================================
+     App topbar
+     ==========================================================================
+     Application chrome: a persistent bar carrying the current context and the
+     controls that apply to it.
+
+     Distinct from the site header, and the distinction is real. A site header is
+     for wayfinding between pages — brand, primary navigation, a search. A topbar
+     is for a workspace: it names what you are looking at, holds the actions that
+     apply to it, and stays put while the content below scrolls. Using one where
+     the other belongs produces either a marketing site that feels like an admin
+     tool or an admin tool where the user cannot tell what they are editing.
+
+     `<header>` with a name, sticky, and it carries the current object's title as
+     a real heading so the document outline reflects where the user is. */
+  .dds-topbar-frame {
+    container-type: inline-size;
+    container-name: dds-topbar;
+
+    position: sticky;
+    inset-block-start: 0;
+    z-index: var(--dds-z-raised);
+
+    background-color: var(--dds-color-surface-default);
+    border-block-end: var(--dds-border-thin) solid var(--dds-color-border-subtle);
+  }
+
+  .dds-topbar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--dds-space-sm);
+    padding: var(--dds-space-sm) var(--dds-space-md);
+  }
+
+  /* The context: what the user is looking at. A heading, not a styled div — it is
+     the most important orientation on the screen. */
+  .dds-topbar-context {
+    display: flex;
+    flex-direction: column;
+    min-inline-size: 0;
+    /* Take the space so the actions sit at the far edge. */
+    flex-grow: 1;
+  }
+
+  .dds-topbar-title {
+    margin: 0;
+    font-family: var(--dds-font-body);
+    font-size: var(--dds-font-size-lg);
+    font-weight: var(--dds-font-weight-semibold);
+    /* A long object name truncates rather than pushing the actions off screen —
+       the full name is in the page heading below. */
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .dds-topbar-meta {
+    font-size: var(--dds-font-size-sm);
+    color: var(--dds-color-text-muted);
+  }
+
+  .dds-topbar-actions {
+    display: flex;
+    align-items: center;
+    gap: var(--dds-space-2xs);
+    flex-shrink: 0;
+  }
+
+  @container dds-topbar (inline-size < 34rem) {
+    /* Narrow: the actions move to their own row rather than being crushed
+       alongside a truncated title. */
+    .dds-topbar-actions {
+      flex-basis: 100%;
+      justify-content: flex-end;
+    }
+  }
+
+  /* ==========================================================================
+     Alert banner
+     ==========================================================================
+     A page-level or application-level message spanning the full width: planned
+     downtime, a degraded service, an expiring credential.
+
+     Distinct from a notice, and worth keeping distinct. A notice is attached to
+     the section it concerns; a banner concerns the whole page and sits above the
+     content, edge to edge. Styling a notice to be full-width instead produces a
+     message that looks page-level and is announced as belonging to a section.
+
+     It is only ever ONE at a time. Two stacked banners means neither is read.
+
+     `role="status"` when informational; `role="alert"` only when it appeared just
+     now AND blocks what the user was doing. A banner present at page load takes no
+     role at all — otherwise a screen reader announces it before the page. */
+  .dds-banner {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--dds-space-sm);
+
+    padding: var(--dds-space-sm) var(--dds-space-md);
+    /* No radius and no side borders: it spans the viewport, so a rounded corner
+       would look like a mistake. */
+    border-block-end: var(--dds-border-thin) solid var(--dds-color-border-default);
+
+    background-color: var(--dds-color-surface-sunken);
+    font-size: var(--dds-font-size-sm);
+  }
+
+  .dds-banner-body {
+    flex-grow: 1;
+    min-inline-size: 0;
+    /* Keep the text readable rather than stretched across a very wide screen. */
+    max-inline-size: var(--dds-measure-wide);
+  }
+
+  .dds-banner-title {
+    font-weight: var(--dds-font-weight-semibold);
+  }
+
+  /* The dismiss control, where the banner is genuinely dismissible. Anything the
+     user must act on is not dismissible — and anything dismissible must stay
+     dismissed, which is a product decision about where that is remembered. */
+  .dds-banner-dismiss {
+    flex-shrink: 0;
+    margin-inline-start: auto;
+  }
+
+  .dds-banner-info {
+    background-color: var(--dds-color-surface-info);
+    border-block-end-color: var(--dds-color-border-info);
+  }
+  .dds-banner-info > .dds-icon { color: var(--dds-color-text-info); }
+
+  .dds-banner-warning {
+    background-color: var(--dds-color-surface-warning);
+    border-block-end-color: var(--dds-color-border-warning);
+  }
+  .dds-banner-warning > .dds-icon { color: var(--dds-color-text-warning); }
+
+  .dds-banner-error {
+    background-color: var(--dds-color-surface-error);
+    border-block-end-color: var(--dds-color-border-error);
+  }
+  .dds-banner-error > .dds-icon { color: var(--dds-color-text-error); }
+
+  .dds-banner-success {
+    background-color: var(--dds-color-surface-success);
+    border-block-end-color: var(--dds-color-border-success);
+  }
+  .dds-banner-success > .dds-icon { color: var(--dds-color-text-success); }
+}

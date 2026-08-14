@@ -1,0 +1,359 @@
+/* =============================================================================
+   DDS — Base
+   =============================================================================
+
+   A small reset plus sensible defaults for plain HTML elements.
+
+   The goal is that semantic markup with no classes at all already looks and
+   behaves correctly. A heading is a heading, a list is a list, a form control
+   is operable and visibly focusable. Classes then add specific components on
+   top of a floor that is already sound — they are not what makes the page work.
+
+   Everything here is inside `@layer dds.base`, so a product's own stylesheet
+   overrides it without needing higher specificity or `!important`.
+   ============================================================================= */
+
+@layer dds.base {
+  /* --------------------------------------------------------------- box model */
+  *,
+  *::before,
+  *::after {
+    box-sizing: border-box;
+  }
+
+  /* Remove the default margin only. Padding is left alone: zeroing padding on
+     everything means re-adding it for lists, fieldsets and dialogs anyway. */
+  :where(body, h1, h2, h3, h4, h5, h6, p, figure, blockquote, dl, dd, ol, ul) {
+    margin: 0;
+  }
+
+  /* ------------------------------------------------------------------- root */
+  html {
+    /* No font-size override. Scaling the root away from the browser default
+       breaks the reader's own font-size setting, which is the single most
+       used accessibility feature on the web. The type scale is in rem so it
+       follows whatever the reader has chosen. */
+    -webkit-text-size-adjust: 100%;
+
+    /* Keep the scrollbar's space reserved so a page that grows past one
+       viewport does not shift horizontally when the scrollbar appears. */
+    scrollbar-gutter: stable;
+
+    /* Anchor navigation and in-page links land below any sticky header, and
+       stop exactly on the target rather than a pixel above it. */
+    scroll-padding-block-start: var(--dds-space-2xl);
+  }
+
+  /* Smooth scrolling is opt-in per user preference rather than a default that
+     then has to be undone — see the reduced-motion block at the end. */
+  @media (prefers-reduced-motion: no-preference) {
+    html:focus-within {
+      scroll-behavior: smooth;
+    }
+  }
+
+  body {
+    background-color: var(--dds-color-surface-page);
+    color: var(--dds-color-text-default);
+    font-family: var(--dds-font-body);
+    font-size: var(--dds-font-size-md);
+    line-height: var(--dds-line-height-normal);
+
+    /* Tabular figures off by default, but proportional-width digits with
+       consistent forms. `cv05`/`ss03` are Inter-specific niceties that are
+       simply ignored by any other family — a slashed zero and a straight-legged
+       lowercase L, both of which matter when a reader has to copy a reference
+       number or an IBAN out of the interface. */
+    font-feature-settings: "cv05", "ss03";
+
+    /* Grayscale antialiasing on macOS: the default subpixel rendering makes
+       light-on-dark text look heavier than dark-on-light at the same weight. */
+    -webkit-font-smoothing: antialiased;
+
+    min-height: 100svh;
+  }
+
+  /* ------------------------------------------------------------- typography */
+  :where(h1, h2, h3, h4, h5, h6) {
+    font-family: var(--dds-font-display);
+    font-weight: var(--dds-font-weight-semibold);
+    line-height: var(--dds-line-height-snug);
+
+    /* Avoid a heading whose last line is a single orphaned word. Ignored where
+       unsupported, and capped by the browser at a few lines so it stays cheap. */
+    text-wrap: balance;
+  }
+
+  h1 {
+    font-size: var(--dds-font-size-4xl);
+    line-height: var(--dds-line-height-tight);
+    letter-spacing: var(--dds-letter-spacing-tight);
+  }
+  h2 { font-size: var(--dds-font-size-3xl); }
+  h3 { font-size: var(--dds-font-size-2xl); }
+  h4 { font-size: var(--dds-font-size-xl); }
+  h5 { font-size: var(--dds-font-size-lg); }
+  h6 {
+    font-size: var(--dds-font-size-md);
+    letter-spacing: var(--dds-letter-spacing-wide);
+  }
+
+  p {
+    /* Improve rag and avoid short last lines. Progressive: unsupported
+       browsers just get normal wrapping. */
+    text-wrap: pretty;
+  }
+
+  /* Long words (URLs, identifiers, compound nouns) must not force the page to
+     scroll sideways — that breaks WCAG 1.4.10 Reflow at 320px. */
+  :where(p, li, dd, dt, h1, h2, h3, h4, h5, h6, caption, figcaption, label) {
+    overflow-wrap: break-word;
+  }
+
+  small {
+    font-size: var(--dds-font-size-sm);
+  }
+
+  :where(code, kbd, samp, pre) {
+    font-family: var(--dds-font-mono);
+    /* Monospace faces run optically large next to the body face. */
+    font-size: 0.9375em;
+  }
+
+  pre {
+    overflow-x: auto;
+    /* A scrollable region must be reachable by keyboard, so anything that can
+       overflow gets a tab stop. Products should also give it an accessible
+       name; see the table component for the same treatment. */
+    padding: var(--dds-space-md);
+    background-color: var(--dds-color-surface-sunken);
+    border-radius: var(--dds-radius-md);
+  }
+
+  /* ------------------------------------------------------------------ links */
+  a {
+    color: var(--dds-color-text-link);
+    /* Always underlined. Colour alone is not a sufficient distinction from
+       surrounding text (WCAG 1.4.1), and an underline is the one convention
+       every reader already knows. */
+    text-decoration: underline;
+
+    /* Push the underline clear of descenders so it stays legible instead of
+       cutting through g, j, p, q and y. */
+    text-underline-offset: 0.15em;
+    text-decoration-thickness: max(1px, 0.06em);
+  }
+
+  a:hover {
+    color: var(--dds-color-text-link-hover);
+    text-decoration-thickness: max(2px, 0.12em);
+  }
+
+  a:visited {
+    color: var(--dds-color-text-link-visited);
+  }
+
+  /* --------------------------------------------------------------- media */
+  :where(img, picture, video, canvas, svg, iframe) {
+    display: block;
+    max-inline-size: 100%;
+  }
+
+  :where(img, video) {
+    /* Preserve intrinsic proportions when only one dimension is constrained. */
+    block-size: auto;
+  }
+
+  /* ------------------------------------------------------------------ lists */
+  /* Lists used for navigation and layout lose their markers via a class; a
+     plain content list keeps them. Marker colour is dimmed so the text, not
+     the bullet, carries the emphasis. */
+  :where(ul, ol)::marker {
+    color: var(--dds-color-text-muted);
+  }
+
+  /* ------------------------------------------------------------- form controls */
+  /* Form elements do not inherit font by default — this is the single most
+     common cause of a control that looks foreign inside its own interface. */
+  :where(button, input, select, textarea, optgroup) {
+    font: inherit;
+    letter-spacing: inherit;
+    color: inherit;
+  }
+
+  textarea {
+    /* Vertical only: horizontal resize lets a user drag a control outside its
+       container and break the layout. */
+    resize: vertical;
+    /* Never smaller than a usefully readable amount of text. */
+    min-block-size: 4lh;
+  }
+
+  /* Tint native controls (checkbox, radio, range, progress) with the action
+     colour instead of rebuilding them. A native control brings correct
+     keyboard behaviour, platform conventions, forced-colors support and
+     assistive-technology support for free. */
+  :where(input, select, textarea, progress) {
+    accent-color: var(--dds-color-action-primary);
+  }
+
+  /* Do not shrink the tap target of native checkboxes and radios. */
+  :where(input[type="checkbox"], input[type="radio"]) {
+    inline-size: 1.125rem;
+    block-size: 1.125rem;
+  }
+
+  :where(button, [role="button"], label, summary) {
+    cursor: pointer;
+  }
+
+  /* WCAG 2.2 2.5.8 Target Size (Minimum) requires 24x24 CSS px for pointer
+     targets. Applied here as a floor for every interactive element so a
+     component has to opt out deliberately rather than accidentally fall below
+     it. Inline links in a sentence are exempt by the success criterion. */
+  :where(button, [role="button"], input[type="checkbox"], input[type="radio"], summary) {
+    min-inline-size: 24px;
+    min-block-size: 24px;
+  }
+
+  fieldset {
+    margin: 0;
+    padding: 0;
+    border: 0;
+  }
+
+  legend {
+    padding: 0;
+  }
+
+  /* -------------------------------------------------------------- tables */
+  table {
+    border-collapse: collapse;
+    /* Percentage widths in a table need a resolved basis. */
+    inline-size: 100%;
+  }
+
+  :where(th, td) {
+    text-align: start; /* logical: flips correctly in right-to-left */
+  }
+
+  caption {
+    text-align: start;
+  }
+
+  /* -------------------------------------------------------------- details */
+  summary {
+    /* Keep the native disclosure triangle but allow the row to be laid out. */
+    display: list-item;
+  }
+
+  /* ------------------------------------------------------------------ focus */
+  /* One focus treatment for the entire system.
+
+     `:focus-visible` rather than `:focus`, so a mouse click on a button does
+     not leave a ring behind, while keyboard and assistive-technology focus is
+     always indicated.
+
+     `outline` rather than `box-shadow`: outline follows the element's shape,
+     never affects layout, and — critically — is preserved in forced-colors
+     mode, where box-shadow is discarded. */
+  :focus-visible {
+    outline: var(--dds-focus-ring-width) solid var(--dds-color-focus-ring);
+    outline-offset: var(--dds-focus-ring-offset);
+    /* The offset gap shows the page through it, which keeps the ring readable
+       against both the element's own fill and the surface behind it. */
+  }
+
+  /* Remove the ring only where a visible replacement is guaranteed. Nothing in
+     DDS does this today; the hook exists so a component can opt out explicitly
+     and reviewably rather than by adding `outline: none` inline. */
+  :where([data-dds-focus="custom"]):focus-visible {
+    outline: none;
+  }
+
+  /* A focused element must not be completely hidden behind sticky furniture
+     (WCAG 2.2 2.4.11 Focus Not Obscured). `scroll-margin` on every focusable
+     element keeps it clear of a sticky header when focus arrives by keyboard. */
+  :where(a, button, input, select, textarea, summary, [tabindex]) {
+    scroll-margin-block: var(--dds-space-2xl);
+  }
+
+  /* ----------------------------------------------------------- scroll lock */
+  /* Applied to the root element by JavaScript while a modal dialog or a
+     full-screen viewer is open (`dds/js/components.js`).
+
+     It is genuinely needed: `showModal()` makes the rest of the document inert,
+     but inert does not stop scrolling, and background scroll behind a modal is
+     allowed by some engines. Without this, a dialog opens and the page slides
+     around behind it.
+
+     `overflow: hidden` on the root rather than on `<body>`, and no compensating
+     padding: `scrollbar-gutter: stable` above already reserves the scrollbar's
+     space permanently, so removing the scrollbar cannot shift the layout. That is
+     what the gutter is for, and it is why the usual
+     `padding-right: <scrollbar-width>` hack is not here. */
+  .dds-scroll-locked {
+    overflow: hidden;
+  }
+
+  /* --------------------------------------------------------------- selection */
+  ::selection {
+    background-color: var(--dds-color-selection-bg);
+    color: var(--dds-color-selection-text);
+  }
+
+  /* ----------------------------------------------------------- placeholders */
+  ::placeholder {
+    color: var(--dds-color-text-muted);
+    /* Firefox dims placeholders further by default. */
+    opacity: 1;
+  }
+
+  /* --------------------------------------------------------------- disabled */
+  :where(button, input, select, textarea):disabled {
+    cursor: not-allowed;
+    color: var(--dds-color-text-disabled);
+    background-color: var(--dds-color-surface-disabled);
+  }
+
+  /* --------------------------------------------------------- reduced motion */
+  /* A global switch rather than a per-component opt-out.
+
+     `prefers-reduced-motion: reduce` is set by people who get motion sickness
+     or migraines from movement. A component that forgets to honour it can
+     genuinely hurt someone, so the safe default is that nothing animates
+     unless the whole system is allowed to.
+
+     Durations collapse to ~0 instead of `animation: none` so that JS which
+     waits for `transitionend`/`animationend` still fires and does not leave an
+     element stuck mid-state. */
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+
+  /* --------------------------------------------------------- forced colours */
+  /* Windows High Contrast and similar modes replace the palette with the
+     user's own. Colour-based affordances disappear there, so anything that
+     communicated state through colour has to restate it with a system colour
+     keyword or a border. Individual components add their own rules; this is
+     the shared floor. */
+  @media (forced-colors: active) {
+    :focus-visible {
+      /* `Highlight` is the user's chosen focus colour. */
+      outline-color: Highlight;
+    }
+
+    /* Backgrounds are stripped in forced-colors, so a fill-only boundary would
+       vanish. Give anything that relied on a fill an explicit edge. */
+    :where(button, input, select, textarea) {
+      border: var(--dds-border-thin) solid ButtonBorder;
+    }
+  }
+}

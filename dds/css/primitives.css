@@ -1,0 +1,265 @@
+/* =============================================================================
+   DDS — Primitive tokens
+   =============================================================================
+
+   Raw, literal values. No intent, no meaning, no theme awareness.
+
+   Components MUST NOT use these directly. They exist so the semantic layer
+   (tokens.semantic.css) has a small, consistent vocabulary to point at, and so
+   a value is written down exactly once.
+
+   Ramps are perceptually spaced: each step is a deliberate, usable stop, not a
+   mechanical interpolation. Step numbers follow the familiar 50…950 convention
+   so "which end is dark" needs no lookup.
+
+   Naming: --dds-<family>-<step>
+   ============================================================================= */
+
+:root {
+  /* ---------------------------------------------------------------------------
+     Neutral — "stone". A warm-tinted grey.
+
+     Warm rather than blue-grey on purpose: long-form reading and dense forms
+     sit on these surfaces all day, and a slight warmth reads as paper rather
+     than as screen. It also keeps the neutral clearly distinct from the cool
+     action colour, so a grey surface never looks like a faded blue one.
+     --------------------------------------------------------------------------- */
+  --dds-stone-0:   #ffffff;
+  --dds-stone-50:  #fbfaf8;
+  --dds-stone-100: #f4f2ee;
+  --dds-stone-200: #e8e5df;
+  --dds-stone-300: #d5d1c9;
+  --dds-stone-400: #b1aba1;
+  --dds-stone-500: #8a8377;
+  --dds-stone-600: #6a645a;
+  --dds-stone-700: #514c44;
+  --dds-stone-800: #3a3630;
+  --dds-stone-850: #2b2823;
+  --dds-stone-900: #201e1a;
+  --dds-stone-950: #151310;
+
+  /* ---------------------------------------------------------------------------
+     Action — "indigo". The single interactive hue.
+
+     One hue carries every interactive affordance (buttons, links, selected
+     state, focus). Reduction is the point: if everything actionable shares one
+     colour, colour alone starts to mean "you can act on this", which makes the
+     interface learnable. Deliberately a blue-violet rather than a cyan-blue so
+     it cannot be confused with the informational status hue below.
+     --------------------------------------------------------------------------- */
+  --dds-indigo-50:  #f2f3fd;
+  --dds-indigo-100: #e4e7fb;
+  --dds-indigo-200: #ccd2f7;
+  --dds-indigo-300: #a8b1ef;
+  --dds-indigo-400: #7f89e3;
+  --dds-indigo-500: #5c63d2;
+  --dds-indigo-600: #4649b8;
+  --dds-indigo-700: #3a3a95;
+  --dds-indigo-800: #303077;
+  --dds-indigo-900: #2a2b5e;
+  --dds-indigo-950: #1a1a3a;
+
+  /* ---------------------------------------------------------------------------
+     Accent — "clay". Decorative only, never status, never action.
+
+     A muted terracotta. Present so that illustration, charts and editorial
+     emphasis have somewhere to go that is not the action colour and not a
+     status colour. Earthy rather than a saturated primary: the Bauhaus
+     influence here is material honesty, not red/yellow/blue geometry.
+     --------------------------------------------------------------------------- */
+  --dds-clay-50:  #fdf5f1;
+  --dds-clay-100: #fae8de;
+  --dds-clay-200: #f2cfba;
+  --dds-clay-300: #e5ab8a;
+  --dds-clay-400: #d3835d;
+  --dds-clay-500: #b9613b;
+  --dds-clay-600: #9a4b2c;
+  --dds-clay-700: #7b3b24;
+  --dds-clay-800: #5e2e1d;
+  --dds-clay-900: #482417;
+
+  /* ---------------------------------------------------------------------------
+     Status hues. Four, each unmistakably its own hue at every step, because
+     status must survive being read by someone who sees hue differently — the
+     colour is a reinforcement, the text and icon carry the meaning.
+     --------------------------------------------------------------------------- */
+
+  /* Success — green */
+  --dds-green-50:  #eefaf3;
+  --dds-green-100: #d2f3e0;
+  --dds-green-200: #a6e5c2;
+  --dds-green-300: #6bcf9d;
+  --dds-green-400: #38b177;
+  --dds-green-500: #1d8f5c;
+  --dds-green-600: #16724a;
+  --dds-green-700: #135a3c;
+  --dds-green-800: #10462f;
+  --dds-green-900: #0c3423;
+
+  /* Warning — amber. Kept olive-leaning rather than orange so it cannot be
+     mistaken for the clay accent or for the error red. */
+  --dds-amber-50:  #fdf8e7;
+  --dds-amber-100: #f9edc0;
+  --dds-amber-200: #f1d883;
+  --dds-amber-300: #e2be47;
+  --dds-amber-400: #c8a01c;
+  --dds-amber-500: #a48214;
+  --dds-amber-600: #836811;
+  --dds-amber-700: #67520f;
+  --dds-amber-800: #4f3f0d;
+  --dds-amber-900: #3c300a;
+
+  /* Error — red */
+  --dds-red-50:  #fdf3f2;
+  --dds-red-100: #fbe3e1;
+  --dds-red-200: #f6c7c3;
+  --dds-red-300: #eda29c;
+  --dds-red-400: #de766e;
+  --dds-red-500: #c94a43;
+  --dds-red-600: #ad3630;
+  --dds-red-700: #8b2b26;
+  --dds-red-800: #6d221f;
+  --dds-red-900: #531c1a;
+
+  /* Information — cyan. A different hue from the action indigo on purpose:
+     "this is information" must never look like "this is a button". */
+  --dds-cyan-50:  #eef7fd;
+  --dds-cyan-100: #d9edfa;
+  --dds-cyan-200: #b3daf4;
+  --dds-cyan-300: #7cbfea;
+  --dds-cyan-400: #43a0da;
+  --dds-cyan-500: #1c81c2;
+  --dds-cyan-600: #14669e;
+  --dds-cyan-700: #125280;
+  --dds-cyan-800: #114265;
+  --dds-cyan-900: #0e344e;
+
+  /* ---------------------------------------------------------------------------
+     Space — 4px base, geometric-ish ramp.
+
+     Deliberately thin. Every step earns its place, and there are no in-between
+     values: a layout that needs 14px is a layout that has not decided yet.
+     An undefined custom property invalidates the whole declaration silently,
+     so `scripts/check-css.mjs` guards against reaching for a step that does
+     not exist.
+     --------------------------------------------------------------------------- */
+  --dds-space-3xs: 0.125rem; /*  2px — hairline nudges, icon optical alignment */
+  --dds-space-2xs: 0.25rem;  /*  4px — base unit */
+  --dds-space-xs:  0.5rem;   /*  8px — inside small controls */
+  --dds-space-sm:  0.75rem;  /* 12px — label to control */
+  --dds-space-md:  1rem;     /* 16px — default gap */
+  --dds-space-lg:  1.5rem;   /* 24px — between groups */
+  --dds-space-xl:  2rem;     /* 32px — between blocks */
+  --dds-space-2xl: 3rem;     /* 48px — between sections */
+  --dds-space-3xl: 4.5rem;   /* 72px — between major regions */
+
+  /* ---------------------------------------------------------------------------
+     Radius. Two functional stops plus a pill and a circle. `sm` is for things
+     that sit inside other things (inputs, buttons); `md` for containers.
+     --------------------------------------------------------------------------- */
+  --dds-radius-none: 0;
+  --dds-radius-sm:   0.25rem;  /*  4px */
+  --dds-radius-md:   0.5rem;   /*  8px */
+  --dds-radius-lg:   0.875rem; /* 14px */
+  --dds-radius-pill: 999rem;
+  --dds-radius-circle: 50%;
+
+  /* ---------------------------------------------------------------------------
+     Border widths. `--dds-border-thick` exists so emphasis never depends on
+     colour alone (a selected card gains weight, not just hue).
+     --------------------------------------------------------------------------- */
+  --dds-border-thin: 1px;
+  --dds-border-thick: 2px;
+
+  /* ---------------------------------------------------------------------------
+     Type scale. Fluid between a small-viewport and a large-viewport size using
+     clamp(), so there is no breakpoint at which text jumps. The rem-based
+     bounds mean a user's browser font-size setting still scales everything.
+
+     The ratio is ~1.2 at the small end and ~1.25 at the large end: modest, so
+     a long document does not turn into a poster.
+     --------------------------------------------------------------------------- */
+  --dds-font-size-2xs: 0.75rem;                            /* 12px — never body copy */
+  --dds-font-size-xs:  0.8125rem;                          /* 13px */
+  --dds-font-size-sm:  0.875rem;                           /* 14px */
+  --dds-font-size-md:  1rem;                               /* 16px — body default */
+  --dds-font-size-lg:  clamp(1.0625rem, 1rem + 0.3vw, 1.125rem);
+  --dds-font-size-xl:  clamp(1.1875rem, 1.1rem + 0.5vw, 1.375rem);
+  --dds-font-size-2xl: clamp(1.375rem, 1.25rem + 0.8vw, 1.75rem);
+  --dds-font-size-3xl: clamp(1.625rem, 1.4rem + 1.3vw, 2.25rem);
+  --dds-font-size-4xl: clamp(2rem, 1.6rem + 2vw, 3rem);
+
+  --dds-line-height-tight: 1.15;  /* display sizes */
+  --dds-line-height-snug: 1.3;    /* headings, single-line UI */
+  --dds-line-height-normal: 1.55; /* body copy */
+  --dds-line-height-loose: 1.7;   /* long-form reading */
+
+  --dds-font-weight-regular: 400;
+  --dds-font-weight-medium: 500;
+  --dds-font-weight-semibold: 600;
+  --dds-font-weight-bold: 700;
+
+  --dds-letter-spacing-tight: -0.02em; /* large display only */
+  --dds-letter-spacing-normal: 0;
+  --dds-letter-spacing-wide: 0.02em;   /* small caps-ish UI labels */
+
+  /* ---------------------------------------------------------------------------
+     Measure — line length, in characters, because readability is a function of
+     characters per line, not pixels.
+     --------------------------------------------------------------------------- */
+  --dds-measure-narrow: 45ch;
+  --dds-measure-default: 68ch;
+  --dds-measure-wide: 88ch;
+
+  /* ---------------------------------------------------------------------------
+     Container widths. For page and form shells, not for prose line length.
+     --------------------------------------------------------------------------- */
+  --dds-container-xs: 24rem;  /* 384px */
+  --dds-container-sm: 32rem;  /* 512px */
+  --dds-container-md: 45rem;  /* 720px */
+  --dds-container-lg: 60rem;  /* 960px */
+  --dds-container-xl: 75rem;  /* 1200px */
+
+  /* ---------------------------------------------------------------------------
+     Elevation. Two-part shadows (a tight contact shadow plus a soft ambient
+     one) because a single blur reads as a glow rather than as height.
+     Dark mode overrides these in the semantic layer — the same shadow that
+     reads as height on white reads as dirt on near-black.
+     --------------------------------------------------------------------------- */
+  --dds-shadow-none: none;
+  --dds-shadow-sm: 0 1px 2px rgb(21 19 16 / 0.06), 0 1px 1px rgb(21 19 16 / 0.04);
+  --dds-shadow-md: 0 4px 8px -2px rgb(21 19 16 / 0.08), 0 2px 3px -1px rgb(21 19 16 / 0.05);
+  --dds-shadow-lg: 0 12px 20px -6px rgb(21 19 16 / 0.12), 0 4px 8px -3px rgb(21 19 16 / 0.06);
+
+  /* Dark-mode equivalents, kept here so both variants of a value live together. */
+  --dds-shadow-sm-dark: 0 1px 2px rgb(0 0 0 / 0.4);
+  --dds-shadow-md-dark: 0 4px 8px -2px rgb(0 0 0 / 0.5), 0 2px 3px -1px rgb(0 0 0 / 0.4);
+  --dds-shadow-lg-dark: 0 14px 24px -8px rgb(0 0 0 / 0.6), 0 4px 8px -3px rgb(0 0 0 / 0.45);
+
+  /* ---------------------------------------------------------------------------
+     Motion. Short durations only. Motion here reports a state change or shows
+     where something came from; it is never the point of interest.
+     All of it is neutralised globally under prefers-reduced-motion (base.css).
+     --------------------------------------------------------------------------- */
+  --dds-duration-instant: 80ms;  /* hover, focus, colour swaps */
+  --dds-duration-fast: 140ms;    /* small reveals, toggles */
+  --dds-duration-base: 220ms;    /* dialogs, panels */
+  --dds-duration-slow: 320ms;    /* full-surface transitions only */
+
+  --dds-ease-standard: cubic-bezier(0.2, 0, 0, 1);   /* decelerating: arrivals */
+  --dds-ease-exit: cubic-bezier(0.4, 0, 1, 1);       /* accelerating: departures */
+  --dds-ease-emphasis: cubic-bezier(0.3, 0, 0, 1.1); /* a slight overshoot */
+
+  /* ---------------------------------------------------------------------------
+     Z-index. A closed scale. Ad-hoc values are how stacking bugs are born, so
+     anything that stacks picks a name from this list or does not stack.
+     --------------------------------------------------------------------------- */
+  --dds-z-base: 0;
+  --dds-z-raised: 10;    /* sticky headers, sticky table heads */
+  --dds-z-dropdown: 20;  /* listbox, menu, popover */
+  --dds-z-scrim: 50;     /* overlay behind a panel */
+  --dds-z-panel: 60;     /* off-canvas / drawer */
+  --dds-z-dialog: 70;    /* modal content */
+  --dds-z-toast: 80;     /* status messages, above a dialog */
+  --dds-z-tooltip: 90;   /* always outermost */
+}

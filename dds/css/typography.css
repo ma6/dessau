@@ -1,0 +1,172 @@
+/* =============================================================================
+   DDS — Typography
+   =============================================================================
+
+   Type utilities on top of the element defaults in base.css.
+
+   Two things live here that are easy to get wrong and expensive to fix later:
+
+   1. `.dds-prose` — the reading measure. Long-form text is capped at ~68
+      characters per line because line length, not font size, is what governs
+      reading comfort. Anything wider and the eye loses its place returning to
+      the next line.
+
+   2. `.dds-numeric` — tabular figures. Any column of numbers that a reader
+      compares vertically (amounts, quantities, dates, reference numbers) needs
+      equal-width digits, or the columns will not align and comparison becomes
+      manual work.
+   ============================================================================= */
+
+@layer dds.typography {
+  /* ------------------------------------------------------------ type ramp */
+  /* Size utilities. Named for the step, not for a use case, so `text-sm` does
+     not silently become "the caption size" and then resist being reused. */
+  .dds-text-2xs { font-size: var(--dds-font-size-2xs); }
+  .dds-text-xs  { font-size: var(--dds-font-size-xs); }
+  .dds-text-sm  { font-size: var(--dds-font-size-sm); }
+  .dds-text-md  { font-size: var(--dds-font-size-md); }
+  .dds-text-lg  { font-size: var(--dds-font-size-lg); }
+  .dds-text-xl  { font-size: var(--dds-font-size-xl); }
+  .dds-text-2xl { font-size: var(--dds-font-size-2xl); }
+  .dds-text-3xl { font-size: var(--dds-font-size-3xl); }
+  .dds-text-4xl { font-size: var(--dds-font-size-4xl); }
+
+  .dds-weight-regular  { font-weight: var(--dds-font-weight-regular); }
+  .dds-weight-medium   { font-weight: var(--dds-font-weight-medium); }
+  .dds-weight-semibold { font-weight: var(--dds-font-weight-semibold); }
+  .dds-weight-bold     { font-weight: var(--dds-font-weight-bold); }
+
+  .dds-font-display { font-family: var(--dds-font-display); }
+  .dds-font-body    { font-family: var(--dds-font-body); }
+  .dds-font-mono    { font-family: var(--dds-font-mono); }
+
+  /* ---------------------------------------------------------- text colour */
+  .dds-text-default { color: var(--dds-color-text-default); }
+  .dds-text-subtle  { color: var(--dds-color-text-subtle); }
+  .dds-text-muted   { color: var(--dds-color-text-muted); }
+  .dds-text-inverse { color: var(--dds-color-text-inverse); }
+
+  /* Status text colours. Each is paired with an icon or a word in every
+     component that uses it — never the colour alone (WCAG 1.4.1). */
+  .dds-text-success { color: var(--dds-color-text-success); }
+  .dds-text-warning { color: var(--dds-color-text-warning); }
+  .dds-text-error   { color: var(--dds-color-text-error); }
+  .dds-text-info    { color: var(--dds-color-text-info); }
+
+  /* ------------------------------------------------------- display heading */
+  /* An oversized heading for page and section openers. Separate from `h1` so
+     that visual scale and heading level stay independent: the document
+     outline is decided by structure, not by how large something should look. */
+  .dds-display {
+    font-family: var(--dds-font-display);
+    font-size: var(--dds-font-size-4xl);
+    font-weight: var(--dds-font-weight-bold);
+    line-height: var(--dds-line-height-tight);
+    letter-spacing: var(--dds-letter-spacing-tight);
+    text-wrap: balance;
+  }
+
+  /* An eyebrow / kicker above a heading. Not uppercased: all-caps costs
+     legibility, defeats word-shape recognition and is read letter-by-letter by
+     some screen readers when the source text is genuinely capitalised. */
+  .dds-eyebrow {
+    font-family: var(--dds-font-body);
+    font-size: var(--dds-font-size-sm);
+    font-weight: var(--dds-font-weight-semibold);
+    letter-spacing: var(--dds-letter-spacing-wide);
+    color: var(--dds-color-text-muted);
+  }
+
+  /* ---------------------------------------------------------------- prose */
+  /* Long-form content. Applies vertical rhythm to whatever HTML it contains,
+     so a block of authored or CMS markup needs no per-element classes.
+
+     The measure is set on the container, and `--dds-prose-measure` lets a
+     single instance widen without inventing a variant class. */
+  .dds-prose {
+    --dds-prose-measure: var(--dds-measure-default);
+
+    max-inline-size: var(--dds-prose-measure);
+    line-height: var(--dds-line-height-loose);
+  }
+
+  /* Owl selector: space between siblings, never before the first or after the
+     last. That means no margin to collapse or strip at the edges of the block,
+     which is what makes this composable inside cards, dialogs and grids. */
+  .dds-prose > * + * {
+    margin-block-start: var(--dds-space-md);
+  }
+
+  /* Headings need more space above than below, so they group with the text
+     they introduce rather than floating between two paragraphs. */
+  .dds-prose > :is(h2, h3, h4, h5, h6) {
+    margin-block-start: var(--dds-space-xl);
+  }
+
+  .dds-prose > :is(h2, h3, h4, h5, h6) + * {
+    margin-block-start: var(--dds-space-sm);
+  }
+
+  .dds-prose :is(ul, ol) {
+    /* Logical padding so markers sit correctly in right-to-left text. */
+    padding-inline-start: var(--dds-space-lg);
+  }
+
+  .dds-prose :is(ul, ol) > li + li {
+    margin-block-start: var(--dds-space-2xs);
+  }
+
+  .dds-prose blockquote {
+    padding-inline-start: var(--dds-space-md);
+    border-inline-start: var(--dds-border-thick) solid var(--dds-color-border-default);
+    color: var(--dds-color-text-subtle);
+  }
+
+  /* A wider variant for prose that sits next to scannable material. */
+  .dds-prose-wide { --dds-prose-measure: var(--dds-measure-wide); }
+  .dds-prose-narrow { --dds-prose-measure: var(--dds-measure-narrow); }
+
+  /* -------------------------------------------------------------- numerals */
+  /* Equal-width digits, for any number a reader compares against another
+     number. Also disables the ligature-style grouping some faces apply to
+     digit runs, which would corrupt a reference number visually. */
+  .dds-numeric {
+    font-variant-numeric: tabular-nums;
+    font-feature-settings: "tnum", "cv05";
+  }
+
+  /* A value the reader may need to transcribe or verify character by character:
+     a reference code, an account identifier, a checksum. Monospace makes
+     transposition and repeated characters visible. */
+  .dds-code {
+    font-family: var(--dds-font-mono);
+    font-variant-ligatures: none;
+  }
+
+  /* ----------------------------------------------------------- truncation */
+  /* Single-line truncation. Use sparingly: hidden text is unreadable text, so
+     the full value belongs in the accessible name or a `title` where the
+     truncated form is not sufficient. */
+  .dds-truncate {
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
+
+  /* Multi-line clamp. `-webkit-` prefixed properties are the interoperable
+     spelling for line-clamp across all current engines. */
+  .dds-clamp-lines {
+    --dds-clamp-lines: 2;
+
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: var(--dds-clamp-lines);
+    overflow: hidden;
+  }
+
+  /* ------------------------------------------------------- non-breaking */
+  /* Keeps a multi-part value from splitting across lines mid-value: an amount
+     and its unit, a date, a phone number. Reading "1 234,56" broken across two
+     lines forces the reader to reassemble it. */
+  .dds-nowrap { white-space: nowrap; }
+}

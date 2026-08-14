@@ -1,0 +1,66 @@
+# ---------------------------------------------------------------------------
+# Local source and reference material — never part of Dessau's Git history.
+# ---------------------------------------------------------------------------
+/src/
+
+# ---------------------------------------------------------------------------
+# Local bootstrap instructions (contain source-project context by nature).
+# ---------------------------------------------------------------------------
+/DESSAU_BOOTSTRAP.md
+/MINI_PROMPT*.txt
+
+# ---------------------------------------------------------------------------
+# OS and editor noise
+# ---------------------------------------------------------------------------
+.DS_Store
+._*
+.Spotlight-V100
+.Trashes
+Thumbs.db
+desktop.ini
+*.swp
+*.swo
+*~
+.idea/
+.vscode/*
+!.vscode/extensions.json
+
+# ---------------------------------------------------------------------------
+# Tooling output
+# ---------------------------------------------------------------------------
+node_modules/
+dist/
+build/
+coverage/
+.cache/
+*.log
+npm-debug.log*
+.env
+.env.*
+!.env.example
+.claude/settings.local.json
+
+# Scratch directory used by scripts/build-icons.mjs when fetching upstream SVGs.
+/.tmp-ionicons/
+
+# ---------------------------------------------------------------------------
+# The modern-web-guidance skill
+# ---------------------------------------------------------------------------
+# `skills-lock.json` IS committed: it declares the source and a content hash, so
+# the skill can be restored and verified. The materialised copy under `.agents/`
+# is not — vendoring ~140 files of third-party guidance into the history is a
+# different thing from declaring a dependency on it.
+#
+# The skill is mandatory (agent/modern-web-guidance.md). Restore it before
+# working here.
+# ---------------------------------------------------------------------------
+/.agents/
+
+# ---------------------------------------------------------------------------
+# Undecided working file, deliberately left out of the initial commit
+# ---------------------------------------------------------------------------
+# Dessau currently states that it has no brand assets — a foundation is not a
+# brand (docs/inherited.md). A logo draft contradicts that, so it is not
+# committed without a decision either way. Delete this line to include it.
+# ---------------------------------------------------------------------------
+/logo-entwurf.png

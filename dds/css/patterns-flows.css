@@ -1,0 +1,404 @@
+/* =============================================================================
+   DDS — Flow patterns
+   =============================================================================
+
+   Patterns that span more than one screen or more than one moment: a process
+   split across steps, a value derived from another, a summary before commitment,
+   a sign-in.
+
+   These are where a design system earns its keep. Each one has a version that
+   looks finished and is quietly broken — a wizard that loses your answers on
+   back, a derived field the user cannot correct, a review step that hides what
+   it is about to do, a sign-in that blocks the password manager. The rules
+   below are the difference.
+
+   Section index:
+     Wizard · Derived output · Review · Authentication · Filtering · Upload flow
+   ============================================================================= */
+
+@layer dds.patterns {
+
+  /* ==========================================================================
+     Wizard
+     ==========================================================================
+     A process split into ordered steps, one visible at a time.
+
+     Only worth doing when the task genuinely has a sequence, or is too long for
+     one screen. A four-step wizard around six fields is six fields plus three
+     extra decisions.
+
+     The rules:
+
+       - Every step is a real form that submits. Server-rendered, one URL per
+         step, is the reference model: it survives a reload, a shared link, a
+         back button and a dead JavaScript bundle. The client-side version here
+         is an enhancement over that, not a replacement for it.
+       - Back never loses input. This is the rule that gets broken. If going back
+         discards what was typed, the user learns never to go back, and stops
+         checking their own answers.
+       - Position is stated in text — "Step 2 of 4" — not only drawn as dots.
+       - On advancing, focus moves to the new step's heading, and the change is
+             announced. Otherwise focus stays on a button that no longer exists and
+         a screen-reader user has no idea anything happened.
+       - Required fields in a hidden step never block submission of a visible
+         one.
+       - A summary step precedes anything irreversible.
+
+     Behaviour: js/patterns/wizard.js */
+  .dds-wizard {
+    display: flex;
+    flex-direction: column;
+    gap: var(--dds-space-xl);
+  }
+
+  .dds-wizard-step[hidden] {
+    display: none;
+  }
+
+  .dds-wizard-step {
+    display: flex;
+    flex-direction: column;
+    gap: var(--dds-space-lg);
+  }
+
+  /* The step heading receives focus on advance, so it needs a ring. It is
+     `tabindex="-1"`: focusable programmatically, never a permanent tab stop. */
+  .dds-wizard-heading:focus-visible {
+    outline: var(--dds-focus-ring-width) solid var(--dds-color-focus-ring);
+    outline-offset: var(--dds-focus-ring-offset);
+  }
+
+  .dds-wizard-position {
+    font-size: var(--dds-font-size-sm);
+    font-weight: var(--dds-font-weight-medium);
+    color: var(--dds-color-text-muted);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .dds-wizard-actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--dds-space-xs);
+    padding-block-start: var(--dds-space-md);
+    border-block-start: var(--dds-border-thin) solid var(--dds-color-border-subtle);
+  }
+
+  /* Back on the leading side, forward on the trailing side — matching reading
+     direction, so it flips correctly in a right-to-left locale. */
+  .dds-wizard-back {
+    margin-inline-end: auto;
+  }
+
+  /* ==========================================================================
+     Derived output
+     ==========================================================================
+     A read-only value worked out from something the user entered: a bank name
+     from an account identifier, a region from a postcode, a total from a
+     quantity and a price.
+
+     The generalised form of a pattern that is usually built badly. The mistakes:
+
+       - Rendering the derived value as an editable input. It is output, not
+         input. An editable field invites the user to change it, and then either
+         their edit is silently discarded or two sources of truth are submitted.
+         Use a `<dl>`, or a genuinely read-only element.
+       - Not announcing it. The value appears while focus is elsewhere, so
+         nobody using a screen reader learns it exists. The output region is
+         `aria-live="polite"`.
+       - Treating "not yet derivable" as an error. A half-typed identifier is not
+         wrong, it is incomplete. Validate on blur, not on keystroke.
+       - Resolving from a table shipped to the browser. Reference data belongs on
+         the server; the client sends the input and receives the answer.
+
+     Behaviour: js/patterns/derived-output.js */
+  .dds-derived {
+    display: flex;
+    flex-direction: column;
+    gap: var(--dds-space-sm);
+  }
+
+  /* The output. A description list, because that is what a labelled derived
+     value is — and it makes the association available to assistive technology
+     rather than merely visual. */
+  .dds-derived-output {
+    display: grid;
+    grid-template-columns: minmax(6rem, max-content) 1fr;
+    gap: var(--dds-space-2xs) var(--dds-space-md);
+    align-items: baseline;
+
+    margin: 0;
+    padding: var(--dds-space-sm) var(--dds-space-md);
+
+    background-color: var(--dds-color-surface-sunken);
+    border-radius: var(--dds-radius-sm);
+    /* A leading edge in the action colour: this content was produced by the
+       system, not typed by the user. */
+    border-inline-start: var(--dds-border-thick) solid var(--dds-color-border-default);
+  }
+
+  .dds-derived-output[hidden] {
+    display: none;
+  }
+
+  .dds-derived-output > dt {
+    font-size: var(--dds-font-size-sm);
+    color: var(--dds-color-text-muted);
+  }
+
+  .dds-derived-output > dd {
+    margin: 0;
+    font-weight: var(--dds-font-weight-medium);
+  }
+
+  /* Confirmed valid. A tick beside the field, in addition to the output
+     appearing — so the confirmation is not carried by colour alone. */
+  .dds-derived-check {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--dds-space-3xs);
+    font-size: var(--dds-font-size-sm);
+    color: var(--dds-color-text-success);
+    font-weight: var(--dds-font-weight-medium);
+  }
+
+  .dds-derived-check[hidden] {
+    display: none;
+  }
+
+  /* ==========================================================================
+     Review
+     ==========================================================================
+     The last screen before something happens: everything the user entered, a
+     way back to each part, and one clear action.
+
+     What it must do:
+
+       - Show every value that will be submitted. A review that summarises
+         selectively is worse than none, because it implies completeness.
+       - Give each group its own "Change" link, going back to that step with the
+         data intact — and naming what it changes, so a list of eight links is
+         not eight controls all called "Change".
+       - Name the consequence on the button. "Submit application", not "Confirm".
+       - Say plainly whether it can be undone. */
+  .dds-review {
+    display: flex;
+    flex-direction: column;
+    gap: var(--dds-space-lg);
+  }
+
+  .dds-review-group {
+    padding: var(--dds-space-md);
+    background-color: var(--dds-color-surface-default);
+    border: var(--dds-border-thin) solid var(--dds-color-border-subtle);
+    border-radius: var(--dds-radius-md);
+  }
+
+  .dds-review-group-head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: var(--dds-space-xs);
+    margin-block-end: var(--dds-space-sm);
+  }
+
+  .dds-review-group-title {
+    margin: 0;
+    font-size: var(--dds-font-size-lg);
+  }
+
+  /* ==========================================================================
+     Authentication
+     ==========================================================================
+     Sign in, and recover access.
+
+     WCAG 2.2 3.3.8 Accessible Authentication (Minimum) is the governing
+     requirement, and it rules out a lot of received practice:
+
+       - No cognitive function test unless an alternative exists. Remembering a
+         password counts as one, so the page MUST support a password manager.
+         That means correct `autocomplete` tokens, no paste blocking, no
+         splitting a code across separate inputs, and no field the manager
+         cannot recognise.
+       - Never block paste. Blocking paste breaks every password manager and
+         pushes people towards passwords they can type — which are worse.
+       - Offer a way to reveal the password. Typing a long password blind, on a
+             phone keyboard, is exactly the barrier the criterion is about. The
+         toggle is a real button with `aria-pressed`.
+       - `autocomplete="one-time-code"` on a verification code, in ONE field, so
+         the platform can offer it from the message. Six separate boxes look
+         tidy and defeat autofill, paste and screen readers at once.
+       - Say which credential failed only as far as security allows, and never
+         reveal whether an account exists.
+
+     A recovery flow states plainly what it will send and where, and gives the
+     same response whether or not the address is registered. */
+  .dds-auth {
+    display: flex;
+    flex-direction: column;
+    gap: var(--dds-space-lg);
+    /* Sign-in is one column, read top to bottom, on every screen size. */
+    max-inline-size: var(--dds-container-xs);
+    margin-inline: auto;
+  }
+
+  .dds-auth-head {
+    display: flex;
+    flex-direction: column;
+    gap: var(--dds-space-2xs);
+  }
+
+  /* The password field plus its reveal toggle. The wrapper carries the border so
+     the toggle sits inside the focus ring. */
+  .dds-password {
+    display: flex;
+    align-items: center;
+    gap: var(--dds-space-2xs);
+
+    padding-inline-end: var(--dds-space-3xs);
+    background-color: var(--dds-color-surface-default);
+    border: var(--dds-border-thin) solid var(--dds-color-border-field);
+    border-radius: var(--dds-radius-sm);
+  }
+
+  .dds-password:has(:focus-visible) {
+    outline: var(--dds-focus-ring-width) solid var(--dds-color-focus-ring);
+    outline-offset: var(--dds-focus-ring-offset);
+  }
+
+  .dds-password:has(:user-invalid),
+  .dds-password:has([aria-invalid="true"]) {
+    border-color: var(--dds-color-border-error);
+    border-width: var(--dds-border-thick);
+  }
+
+  .dds-password > input {
+    flex-grow: 1;
+    border: 0;
+    background: none;
+    outline: none;
+    min-inline-size: 0;
+  }
+
+  /* A one-time code. ONE input, not six boxes — see the note above. Monospace
+     and letter-spaced so the digits are countable, which is the only legitimate
+     reason the six-box version looks appealing. */
+  .dds-otp {
+    font-family: var(--dds-font-mono);
+    font-size: var(--dds-font-size-xl);
+    letter-spacing: 0.35em;
+    text-align: center;
+    /* Trailing letter-spacing shifts the visual centre; compensate. */
+    text-indent: 0.35em;
+  }
+
+  .dds-auth-footer {
+    display: flex;
+    flex-direction: column;
+    gap: var(--dds-space-xs);
+    padding-block-start: var(--dds-space-md);
+    border-block-start: var(--dds-border-thin) solid var(--dds-color-border-subtle);
+    font-size: var(--dds-font-size-sm);
+  }
+
+  /* ==========================================================================
+     Filtering
+     ==========================================================================
+     Narrowing a list, and being able to tell what has been narrowed.
+
+     Composes the filter bar and chip components with the results and empty
+     states from patterns.css. The pattern's own contribution is the rules:
+
+       - Applied filters are always visible as removable chips. A short list
+         with three invisible filters applied is the most common dead end in a
+         filtered interface — the user concludes the data is missing.
+       - The result count is announced when it changes, politely and debounced.
+       - "No results" names the active filters and offers to clear them. An empty
+         state that does not is a dead end.
+       - Filter state lives in the URL, so a filtered view can be shared,
+         bookmarked and returned to with the back button.
+       - Filters apply on change, or behind an explicit Apply button — never
+         ambiguously both. */
+  .dds-filtering {
+    display: flex;
+    flex-direction: column;
+    gap: var(--dds-space-lg);
+  }
+
+  /* A sidebar layout on wide screens, stacked on narrow. Container-based, so it
+     works inside a panel and not only on a full page. */
+  .dds-filtering-frame {
+    container-type: inline-size;
+    container-name: dds-filtering;
+  }
+
+  .dds-filtering-split {
+    display: grid;
+    gap: var(--dds-space-lg);
+  }
+
+  @container dds-filtering (inline-size >= 52rem) {
+    .dds-filtering-split {
+      grid-template-columns: 16rem 1fr;
+      align-items: start;
+    }
+
+    .dds-filtering-aside {
+      position: sticky;
+      inset-block-start: var(--dds-space-md);
+    }
+  }
+
+  /* ==========================================================================
+     Upload flow
+     ==========================================================================
+     Choosing files, seeing them checked, and recovering from a rejection.
+
+     The upload component handles selection and listing. The flow adds what
+     happens next:
+
+       - Per-file progress, and a real way to cancel one in flight.
+       - A rejection says WHY and WHAT to do: "18 MB — the limit is 10 MB. Try a
+         smaller file or split it." Not "Upload failed".
+       - One failure does not discard the others.
+       - Progress is announced at intervals, not continuously. A live region
+         updated per percent is unusable. */
+  .dds-uploadflow {
+    display: flex;
+    flex-direction: column;
+    gap: var(--dds-space-md);
+  }
+
+  .dds-uploadflow-item {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    align-items: center;
+    gap: var(--dds-space-xs) var(--dds-space-sm);
+
+    padding: var(--dds-space-sm);
+    background-color: var(--dds-color-surface-default);
+    border: var(--dds-border-thin) solid var(--dds-color-border-subtle);
+    border-radius: var(--dds-radius-sm);
+  }
+
+  /* The progress bar spans the full width on its own row, below the filename. */
+  .dds-uploadflow-progress {
+    grid-column: 1 / -1;
+  }
+
+  .dds-uploadflow-item[data-dds-state="failed"] {
+    border-color: var(--dds-color-border-error);
+    background-color: var(--dds-color-surface-error);
+  }
+
+  .dds-uploadflow-item[data-dds-state="done"] {
+    border-color: var(--dds-color-border-success);
+  }
+
+  .dds-uploadflow-reason {
+    grid-column: 1 / -1;
+    font-size: var(--dds-font-size-sm);
+    color: var(--dds-color-text-error);
+  }
+}

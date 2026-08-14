@@ -1,0 +1,115 @@
+/* =============================================================================
+   DDS — Utilities
+   =============================================================================
+
+   Single-purpose helpers, last in the layer order so they win inside DDS.
+
+   Deliberately a short list. A utility for every property turns markup into a
+   second, worse stylesheet and makes a change impossible to make in one place.
+   These exist because they are genuinely composition-level concerns that would
+   otherwise force a one-off class:
+
+     - spacing overrides at the point of composition,
+     - visibility that must be correct for assistive technology,
+     - surface and text colour when arranging existing components.
+
+   Anything more specific than this belongs in a component or a pattern.
+   ============================================================================= */
+
+@layer dds.utilities {
+  /* --------------------------------------------------------------- spacing */
+  /* Margin only in the block direction, and only between things. Inline
+     margins and padding belong to the component, not to a utility — that is
+     what keeps a component reusable in a context it has not seen. */
+  .dds-mbs-0   { margin-block-start: 0; }
+  .dds-mbs-2xs { margin-block-start: var(--dds-space-2xs); }
+  .dds-mbs-xs  { margin-block-start: var(--dds-space-xs); }
+  .dds-mbs-sm  { margin-block-start: var(--dds-space-sm); }
+  .dds-mbs-md  { margin-block-start: var(--dds-space-md); }
+  .dds-mbs-lg  { margin-block-start: var(--dds-space-lg); }
+  .dds-mbs-xl  { margin-block-start: var(--dds-space-xl); }
+  .dds-mbs-2xl { margin-block-start: var(--dds-space-2xl); }
+
+  .dds-mbe-0   { margin-block-end: 0; }
+  .dds-mbe-2xs { margin-block-end: var(--dds-space-2xs); }
+  .dds-mbe-xs  { margin-block-end: var(--dds-space-xs); }
+  .dds-mbe-sm  { margin-block-end: var(--dds-space-sm); }
+  .dds-mbe-md  { margin-block-end: var(--dds-space-md); }
+  .dds-mbe-lg  { margin-block-end: var(--dds-space-lg); }
+  .dds-mbe-xl  { margin-block-end: var(--dds-space-xl); }
+  .dds-mbe-2xl { margin-block-end: var(--dds-space-2xl); }
+
+  /* ------------------------------------------------------------ visibility */
+  /* Hidden from everyone, including assistive technology. Prefer the `hidden`
+     attribute in markup — it puts the state in the DOM where JS can read it. */
+  .dds-hidden { display: none !important; }
+
+  /* Present for assistive technology only. The `:not(:focus-within)` guard
+     means a focusable element inside it becomes visible when focused, which is
+     how a skip link works. */
+  .dds-sr-only:not(:focus-within) {
+    position: absolute;
+    inline-size: 1px;
+    block-size: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+    border: 0;
+  }
+
+  /* Visible, but removed from the accessibility tree. For decoration whose
+     meaning is already carried by adjacent text. Pair with `aria-hidden="true"`
+     in the markup — this class does not set it. */
+  .dds-decorative {
+    /* Prevents text selection of purely ornamental characters. */
+    user-select: none;
+  }
+
+  /* ---------------------------------------------------------------- surface */
+  .dds-surface-default { background-color: var(--dds-color-surface-default); }
+  .dds-surface-raised  { background-color: var(--dds-color-surface-raised); }
+  .dds-surface-sunken  { background-color: var(--dds-color-surface-sunken); }
+  .dds-surface-page    { background-color: var(--dds-color-surface-page); }
+
+  /* Applies the surface colour AND a matching text colour together. Setting a
+     background without its paired foreground is how contrast failures get
+     introduced by composition. */
+  .dds-surface-inverse {
+    background-color: var(--dds-color-text-default);
+    color: var(--dds-color-text-inverse);
+  }
+
+  /* -------------------------------------------------------------- elevation */
+  .dds-elevation-none { box-shadow: none; }
+  .dds-elevation-sm   { box-shadow: var(--dds-elevation-sm); }
+  .dds-elevation-md   { box-shadow: var(--dds-elevation-md); }
+  .dds-elevation-lg   { box-shadow: var(--dds-elevation-lg); }
+
+  /* ----------------------------------------------------------------- radius */
+  .dds-radius-none { border-radius: 0; }
+  .dds-radius-sm   { border-radius: var(--dds-radius-sm); }
+  .dds-radius-md   { border-radius: var(--dds-radius-md); }
+  .dds-radius-lg   { border-radius: var(--dds-radius-lg); }
+  .dds-radius-pill { border-radius: var(--dds-radius-pill); }
+
+  /* ------------------------------------------------------------------ width */
+  .dds-w-full { inline-size: 100%; }
+
+  /* Constrain to a reading measure without the rest of `.dds-prose`. */
+  .dds-measure-narrow  { max-inline-size: var(--dds-measure-narrow); }
+  .dds-measure-default { max-inline-size: var(--dds-measure-default); }
+  .dds-measure-wide    { max-inline-size: var(--dds-measure-wide); }
+
+  /* ------------------------------------------------------------------ text */
+  .dds-text-start  { text-align: start; }
+  .dds-text-center { text-align: center; }
+  .dds-text-end    { text-align: end; }
+
+  /* -------------------------------------------------------------- print */
+  /* Hide interface furniture that means nothing on paper. */
+  @media print {
+    .dds-no-print { display: none !important; }
+  }
+}

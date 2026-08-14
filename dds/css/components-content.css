@@ -1,0 +1,1231 @@
+/* =============================================================================
+   DDS — Content components
+   =============================================================================
+
+   Blocks for editorial and data-presentation content, as opposed to controls.
+
+   Section index:
+     Teaser · Facts · Call to action · Download · Key-value list · Data list ·
+     Chip · Quote · Figure · Chart (bar) · Chart (donut) · Lightbox ·
+     Consent embed ·
+     Media player · Gallery · Avatar
+   ============================================================================= */
+
+@layer dds.components {
+
+  /* ==========================================================================
+     Teaser
+     ==========================================================================
+     A card that promotes something elsewhere: an image, a heading, a short
+     summary, one link.
+
+     The link wraps the heading text, not the card. The card grows the hit area
+     via `.dds-card-link` (components.css), so the accessible name stays the
+     heading rather than becoming the entire card body read aloud. */
+  .dds-teaser {
+    display: flex;
+    flex-direction: column;
+    /* Contain the image's corners. */
+    overflow: hidden;
+    padding: 0;
+  }
+
+  .dds-teaser-media {
+    /* A fixed ratio, so a grid of teasers has aligned headings regardless of the
+       source images' proportions. */
+    aspect-ratio: 16 / 9;
+    background-color: var(--dds-color-surface-sunken);
+  }
+
+  .dds-teaser-media > img {
+    inline-size: 100%;
+    block-size: 100%;
+    /* Fill the ratio box without distortion. */
+    object-fit: cover;
+  }
+
+  .dds-teaser-body {
+    display: flex;
+    flex-direction: column;
+    gap: var(--dds-space-2xs);
+    padding: var(--dds-space-md);
+    /* Grow so the footer aligns across a row of teasers. */
+    flex-grow: 1;
+  }
+
+  .dds-teaser-meta {
+    font-size: var(--dds-font-size-xs);
+    color: var(--dds-color-text-muted);
+  }
+
+  .dds-teaser-footer {
+    /* Pushed to the bottom, so a row of teasers has its links on one line. */
+    margin-block-start: auto;
+    padding-block-start: var(--dds-space-xs);
+  }
+
+  /* ==========================================================================
+     Facts
+     ==========================================================================
+     A small set of headline figures.
+
+     Marked up as a description list: each figure is a value for a labelled
+     term, which is exactly what `<dl>` means. A grid of divs would leave the
+     number and its meaning unassociated for a screen reader — "1,204" followed
+     by "Documents" as two unrelated strings.
+
+     The number is visually larger than its label but comes SECOND in the DOM of
+     each pair, because `<dt>` must precede `<dd>`. Visual order is restored
+     with flex-direction, which is safe here: the pairing is what carries the
+     meaning, not the sequence. */
+  .dds-facts {
+    display: grid;
+    gap: var(--dds-space-md);
+    grid-template-columns: repeat(auto-fit, minmax(min(10rem, 100%), 1fr));
+    margin: 0;
+  }
+
+  .dds-fact {
+    display: flex;
+    /* Value above label visually; `<dt>` still first in the DOM. */
+    flex-direction: column-reverse;
+    gap: var(--dds-space-3xs);
+
+    padding: var(--dds-space-md);
+    background-color: var(--dds-color-surface-sunken);
+    border-radius: var(--dds-radius-md);
+  }
+
+  .dds-fact-value {
+    margin: 0;
+    font-family: var(--dds-font-display);
+    font-size: var(--dds-font-size-3xl);
+    font-weight: var(--dds-font-weight-bold);
+    line-height: var(--dds-line-height-tight);
+    /* Tabular, so a row of figures aligns. */
+    font-variant-numeric: tabular-nums;
+    color: var(--dds-color-text-default);
+  }
+
+  .dds-fact-label {
+    font-size: var(--dds-font-size-sm);
+    color: var(--dds-color-text-muted);
+  }
+
+  /* ==========================================================================
+     Call to action
+     ==========================================================================
+     A prominent block inviting one specific next step.
+
+     One action. A call-to-action block with three buttons is a menu, and a menu
+     does not need this much emphasis. */
+  .dds-cta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--dds-space-md);
+    justify-content: space-between;
+
+    padding: var(--dds-space-lg);
+    background-color: var(--dds-color-surface-selected);
+    border: var(--dds-border-thin) solid var(--dds-color-border-default);
+    border-radius: var(--dds-radius-lg);
+  }
+
+  .dds-cta-body {
+    display: flex;
+    flex-direction: column;
+    gap: var(--dds-space-2xs);
+    /* Keep the text readable rather than stretched across a wide block. */
+    max-inline-size: var(--dds-measure-narrow);
+  }
+
+  .dds-cta-title {
+    margin: 0;
+    font-size: var(--dds-font-size-xl);
+  }
+
+  /* ==========================================================================
+     Download
+     ==========================================================================
+     A link to a file.
+
+     The format and size belong in the visible text, not in a `title` or only in
+     an icon. Someone on a metered connection needs to know that a link is a
+     14 MB PDF before they tap it, and someone using a screen reader needs it in
+     the accessible name rather than as a visual afterthought. */
+  .dds-download {
+    display: flex;
+    align-items: center;
+    gap: var(--dds-space-sm);
+
+    padding: var(--dds-space-sm) var(--dds-space-md);
+    background-color: var(--dds-color-surface-default);
+    border: var(--dds-border-thin) solid var(--dds-color-border-subtle);
+    border-radius: var(--dds-radius-md);
+
+    text-decoration: none;
+    color: var(--dds-color-text-default);
+  }
+
+  .dds-download:hover {
+    background-color: var(--dds-color-surface-hover);
+    border-color: var(--dds-color-border-default);
+    color: var(--dds-color-text-default);
+    text-decoration: none;
+  }
+
+  .dds-download > .dds-icon {
+    font-size: 1.5em;
+    color: var(--dds-color-text-link);
+  }
+
+  .dds-download-body {
+    display: flex;
+    flex-direction: column;
+    min-inline-size: 0;
+  }
+
+  .dds-download-name {
+    font-weight: var(--dds-font-weight-medium);
+    /* Underlined, because it is the link text. */
+    text-decoration: underline;
+    text-underline-offset: 0.15em;
+  }
+
+  .dds-download-meta {
+    font-size: var(--dds-font-size-sm);
+    color: var(--dds-color-text-muted);
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* ==========================================================================
+     Key-value list
+     ==========================================================================
+     Paired labels and values — a summary, a detail panel, a review step.
+
+     A real `<dl>`, so each value is programmatically associated with its label.
+     Two columns once there is room; stacked when there is not, because a
+     cramped two-column key-value list is harder to read than a stacked one. */
+  .dds-keyvalue {
+    display: grid;
+    gap: var(--dds-space-2xs) var(--dds-space-md);
+    margin: 0;
+  }
+
+  .dds-keyvalue > dt {
+    font-size: var(--dds-font-size-sm);
+    color: var(--dds-color-text-muted);
+  }
+
+  .dds-keyvalue > dd {
+    margin: 0;
+    color: var(--dds-color-text-default);
+  }
+
+  /* Two columns: label and value side by side. Grid rather than float, so a
+     multi-line value keeps its label aligned to the top. */
+  .dds-keyvalue-columns {
+    grid-template-columns: minmax(8rem, max-content) 1fr;
+    align-items: baseline;
+  }
+
+  /* A divider between rows, for a long list where the eye needs help pairing. */
+  .dds-keyvalue-divided > dd {
+    padding-block-end: var(--dds-space-xs);
+    border-block-end: var(--dds-border-thin) solid var(--dds-color-border-subtle);
+  }
+
+  .dds-keyvalue-divided > dt {
+    padding-block-end: var(--dds-space-xs);
+    border-block-end: var(--dds-border-thin) solid var(--dds-color-border-subtle);
+  }
+
+  /* ==========================================================================
+     Data list
+     ==========================================================================
+     A list of records, each with a primary line, supporting detail and
+     optionally an action. The row-based alternative to a table, for when there
+     are only two or three fields per record and no column comparison.
+
+     Use a table instead as soon as the user compares values down a column: rows
+     of prose cannot be scanned that way. */
+  .dds-datalist {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    border: var(--dds-border-thin) solid var(--dds-color-border-subtle);
+    border-radius: var(--dds-radius-md);
+    overflow: hidden;
+  }
+
+  .dds-datalist > li {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--dds-space-sm);
+
+    padding: var(--dds-space-sm) var(--dds-space-md);
+    background-color: var(--dds-color-surface-default);
+  }
+
+  .dds-datalist > li + li {
+    border-block-start: var(--dds-border-thin) solid var(--dds-color-border-subtle);
+  }
+
+  .dds-datalist-body {
+    flex-grow: 1;
+    min-inline-size: 0;
+  }
+
+  .dds-datalist-title {
+    font-weight: var(--dds-font-weight-medium);
+  }
+
+  .dds-datalist-meta {
+    font-size: var(--dds-font-size-sm);
+    color: var(--dds-color-text-muted);
+  }
+
+  .dds-datalist-actions {
+    margin-inline-start: auto;
+  }
+
+  /* ==========================================================================
+     Chip
+     ==========================================================================
+     A removable token representing an applied filter or a selected value.
+
+     Distinct from a badge: a badge is read, a chip is operated. A chip that
+     removes a filter must contain a real `<button>` naming what it removes —
+     "Remove filter: approved", not just an ×. Six chips whose buttons are all
+     called "Remove" are six identical controls to a screen-reader user. */
+  .dds-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--dds-space-3xs);
+
+    padding-inline-start: var(--dds-space-xs);
+    /* Less end padding: the remove button supplies its own. */
+    padding-inline-end: var(--dds-space-3xs);
+    padding-block: var(--dds-space-3xs);
+    min-block-size: 2rem;
+
+    font-size: var(--dds-font-size-sm);
+    color: var(--dds-color-text-default);
+
+    background-color: var(--dds-color-surface-sunken);
+    border: var(--dds-border-thin) solid var(--dds-color-border-default);
+    border-radius: var(--dds-radius-pill);
+  }
+
+  /* A chip with no remove button (a plain token) gets symmetric padding. */
+  .dds-chip:not(:has(.dds-chip-remove)) {
+    padding-inline-end: var(--dds-space-xs);
+  }
+
+  .dds-chip-label {
+    color: var(--dds-color-text-muted);
+  }
+
+  .dds-chip-remove {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    /* 24px, the WCAG 2.2 minimum, inside a compact chip. */
+    inline-size: 1.5rem;
+    block-size: 1.5rem;
+
+    color: var(--dds-color-text-muted);
+    background: none;
+    border: 0;
+    border-radius: var(--dds-radius-circle);
+    cursor: pointer;
+  }
+
+  .dds-chip-remove:hover {
+    background-color: var(--dds-color-surface-active);
+    color: var(--dds-color-text-default);
+  }
+
+  /* A selectable chip built on a checkbox — a filter toggle. */
+  .dds-chip-toggle {
+    position: relative;
+    cursor: pointer;
+  }
+
+  .dds-chip-toggle > input {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    margin: 0;
+    cursor: pointer;
+  }
+
+  .dds-chip-toggle:has(> input:checked) {
+    background-color: var(--dds-color-surface-selected);
+    border-color: var(--dds-color-action-primary);
+    /* Weight as well as colour, so selection is not colour-only. */
+    border-width: var(--dds-border-thick);
+    font-weight: var(--dds-font-weight-medium);
+    padding-block: calc(var(--dds-space-3xs) - 1px);
+  }
+
+  .dds-chip-toggle:has(> input:focus-visible) {
+    outline: var(--dds-focus-ring-width) solid var(--dds-color-focus-ring);
+    outline-offset: var(--dds-focus-ring-offset);
+  }
+
+  /* ==========================================================================
+     Quote
+     ==========================================================================
+     A pulled-out quotation, at display scale.
+
+     A real `<blockquote>` with a `<figcaption>` for the attribution, wrapped in
+     a `<figure>`. That structure matters: the attribution is not part of the
+     quotation, so it must not sit inside the `<blockquote>` — which is what
+     `cite` inside a blockquote wrongly implies. `<figure>` is the element that
+     legitimately groups content with its caption.
+
+     No decorative quotation-mark glyph. If one is wanted, it belongs in a
+     `::before` so it stays out of the accessibility tree — a literal " typed
+     into the markup is read aloud, and a screen reader already announces a
+     blockquote as a quotation.
+
+     The measure is narrower than body copy: a large type size at full reading
+     width produces very few words per line and a distractingly ragged edge. */
+  .dds-quote {
+    display: flex;
+    flex-direction: column;
+    gap: var(--dds-space-sm);
+    margin: 0;
+    /* Narrower than `--dds-measure-default` because the type is larger. */
+    max-inline-size: 34ch;
+  }
+
+  .dds-quote > blockquote {
+    margin: 0;
+    padding: 0;
+    /* No border here: the quote carries its emphasis through scale, unlike the
+       inline blockquote in `.dds-prose`, which uses a rule. */
+    border: 0;
+
+    font-family: var(--dds-font-display);
+    font-size: var(--dds-font-size-3xl);
+    font-weight: var(--dds-font-weight-medium);
+    line-height: var(--dds-line-height-snug);
+    letter-spacing: var(--dds-letter-spacing-tight);
+    color: var(--dds-color-text-default);
+    text-wrap: balance;
+  }
+
+  .dds-quote > figcaption {
+    font-size: var(--dds-font-size-sm);
+    color: var(--dds-color-text-muted);
+  }
+
+  /* An accent rule on the leading edge, for a quote set into a page of text. */
+  .dds-quote-accented {
+    padding-inline-start: var(--dds-space-lg);
+    border-inline-start: var(--dds-border-thick) solid var(--dds-color-accent);
+    max-inline-size: 38ch;
+  }
+
+  /* Centred, for a quote used as a section opener. */
+  .dds-quote-centered {
+    align-items: center;
+    text-align: center;
+    max-inline-size: 40ch;
+    margin-inline: auto;
+  }
+
+  /* ==========================================================================
+     Figure
+     ==========================================================================
+     An image with a caption.
+
+     `alt` and `<figcaption>` do different jobs and are not interchangeable:
+     `alt` replaces the image for someone who cannot see it, the caption is
+     supplementary information everyone gets. Repeating one as the other means a
+     screen reader announces the same sentence twice. A purely decorative image
+     takes `alt=""` and keeps its caption. */
+  .dds-figure {
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--dds-space-xs);
+  }
+
+  .dds-figure > img {
+    inline-size: 100%;
+    block-size: auto;
+    border-radius: var(--dds-radius-md);
+    background-color: var(--dds-color-surface-sunken);
+  }
+
+  .dds-figure > figcaption {
+    font-size: var(--dds-font-size-sm);
+    color: var(--dds-color-text-muted);
+  }
+
+  /* Text and media side by side. The frame layer exists so the container query
+     has something to query: a container query cannot style the element that
+     establishes the container, only its descendants. */
+  .dds-textmedia-frame {
+    container-type: inline-size;
+    container-name: dds-textmedia;
+  }
+
+  .dds-textmedia {
+    display: grid;
+    gap: var(--dds-space-lg);
+  }
+
+  @container dds-textmedia (inline-size > 40rem) {
+    .dds-textmedia {
+      grid-template-columns: 1fr 1fr;
+      align-items: center;
+    }
+
+    /* Media on the trailing side. Bound INSIDE the query on purpose: applied
+       unconditionally, `order` would also reverse the stacked order below the
+       breakpoint, putting the caption before what it captions and breaking
+       WCAG 1.3.2 Meaningful Sequence. */
+    .dds-textmedia-media-end .dds-textmedia-media {
+      order: 2;
+    }
+  }
+
+  /* ==========================================================================
+     Chart — bar
+     ==========================================================================
+     A CSS-only bar chart.
+
+     A chart is a picture of data, and a picture is not accessible. The rule
+     here is absolute: every chart is accompanied by the same data as a real
+     table. The table may be visually hidden (`.dds-sr-only`), but it must exist
+     — it is the only representation that can be read, navigated cell by cell,
+     copied, and translated.
+
+     The bars themselves are `aria-hidden`. Do not attempt to make an SVG chart
+     "accessible" with ARIA labels on each segment; a table already solves it. */
+  .dds-chart {
+    display: flex;
+    flex-direction: column;
+    gap: var(--dds-space-sm);
+  }
+
+  .dds-chart-bars {
+    display: grid;
+    gap: var(--dds-space-xs);
+  }
+
+  .dds-chart-row {
+    display: grid;
+    grid-template-columns: minmax(6rem, max-content) 1fr max-content;
+    align-items: center;
+    gap: var(--dds-space-sm);
+    font-size: var(--dds-font-size-sm);
+  }
+
+  .dds-chart-label {
+    color: var(--dds-color-text-subtle);
+  }
+
+  .dds-chart-track {
+    block-size: var(--dds-space-md);
+    background-color: var(--dds-color-surface-sunken);
+    border-radius: var(--dds-radius-sm);
+    overflow: hidden;
+  }
+
+  /* `--dds-chart-value` is a percentage set inline per bar. Inline is correct
+     here: it is data, not styling, and it is the one case where a value cannot
+     come from a token. */
+  .dds-chart-bar {
+    inline-size: var(--dds-chart-value, 0%);
+    block-size: 100%;
+    background-color: var(--dds-color-accent);
+    border-radius: var(--dds-radius-sm);
+  }
+
+  .dds-chart-value {
+    font-variant-numeric: tabular-nums;
+    color: var(--dds-color-text-default);
+    font-weight: var(--dds-font-weight-medium);
+  }
+
+  /* ==========================================================================
+     Chart — donut
+     ==========================================================================
+     A single proportion, drawn with a conic gradient. Same rule as the bar
+     chart: the figure is decorative, the table is the data.
+
+     A donut is only worth using for one value against a whole. For comparing
+     several categories, bars are read more accurately — angle is much harder to
+     judge than length. */
+  .dds-donut {
+    --dds-donut-value: 0;
+    --dds-donut-size: 8rem;
+    --dds-donut-thickness: 1.25rem;
+
+    inline-size: var(--dds-donut-size);
+    block-size: var(--dds-donut-size);
+    border-radius: var(--dds-radius-circle);
+
+    /* The filled arc, then the remaining track. */
+    background: conic-gradient(
+      var(--dds-color-accent) calc(var(--dds-donut-value) * 1%),
+      var(--dds-color-surface-sunken) 0
+    );
+
+    /* Punch out the middle. `mask` avoids needing an opaque inner circle, which
+       would have to match whatever surface the donut happens to sit on. */
+    mask: radial-gradient(
+      farthest-side,
+      transparent calc(50% - var(--dds-donut-thickness)),
+      black calc(50% - var(--dds-donut-thickness) + 1px)
+    );
+
+    display: grid;
+    place-items: center;
+  }
+
+  .dds-donut-wrap {
+    display: grid;
+    place-items: center;
+    position: relative;
+  }
+
+  .dds-donut-caption {
+    position: absolute;
+    font-family: var(--dds-font-display);
+    font-size: var(--dds-font-size-xl);
+    font-weight: var(--dds-font-weight-bold);
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* ==========================================================================
+     Lightbox trigger
+     ==========================================================================
+     The `<a>` that wraps a thumbnail. It supplies only a positioning context
+     (for the magnifier badge), the cursor, and the hover zoom — every existing
+     image and figure style keeps applying through it, because those match by
+     descendant selector.
+
+     Everything here is scoped to `[data-dds-lightbox-ready]`, which the script
+     sets once it has attached. That is deliberate progressive enhancement: with
+     no JavaScript there is no viewer, so a magnifier badge and a `zoom-in`
+     cursor would be promising something that will not happen. The link still
+     opens the full-size image in a new tab.
+
+     `overflow: hidden` sits on the ANCHOR — which wraps only the `<img>` — and
+     not on a surrounding `<figure>`. On the figure it would clip the
+     `<figcaption>` too and square off the image edge where it meets the caption.
+     Here the visible frame stays the same size while the image zooms inside it. */
+  .dds-lightbox-trigger {
+    position: relative;
+    display: block;
+    overflow: hidden;
+    border-radius: var(--dds-radius-md);
+  }
+
+  .dds-lightbox-trigger[data-dds-lightbox-ready] {
+    cursor: zoom-in;
+  }
+
+  .dds-lightbox-trigger[data-dds-lightbox-ready] img {
+    transition: scale var(--dds-duration-base) var(--dds-ease-standard);
+  }
+
+  .dds-lightbox-trigger[data-dds-lightbox-ready]:hover img,
+  .dds-lightbox-trigger[data-dds-lightbox-ready]:focus-visible img {
+    scale: 1.05;
+  }
+
+  /* Under reduced motion, do not scale AT ALL — not merely scale instantly.
+     The global rule in base.css collapses transition durations, which would leave
+     the image jumping to 105% with no transition. That is still movement, and
+     movement is the thing being avoided. The magnifier badge and the cursor
+     already say the image is enlargeable. */
+  @media (prefers-reduced-motion: reduce) {
+    .dds-lightbox-trigger[data-dds-lightbox-ready]:hover img,
+    .dds-lightbox-trigger[data-dds-lightbox-ready]:focus-visible img {
+      scale: 1;
+    }
+  }
+
+  /* The magnifier badge. `pointer-events: none` so it never intercepts the click
+     meant for the link underneath, and `aria-hidden` in the markup because the
+     link already says what it does. */
+  .dds-lightbox-zoom {
+    position: absolute;
+    inset-block-end: var(--dds-space-xs);
+    inset-inline-end: var(--dds-space-xs);
+
+    display: grid;
+    place-items: center;
+    inline-size: 2rem;
+    block-size: 2rem;
+
+    color: var(--dds-color-on-overlay);
+    background-color: var(--dds-color-overlay-control);
+    border-radius: var(--dds-radius-circle);
+    pointer-events: none;
+  }
+
+  .dds-lightbox-zoom .dds-icon {
+    font-size: 1rem;
+  }
+
+  /* ==========================================================================
+     Lightbox
+     ==========================================================================
+     An enlarged view of an image, in a shared native `<dialog>`.
+
+     The trigger is a real `<a href>` pointing at the full-size file, wrapping
+     the thumbnail. Without JavaScript the link simply opens the image — which is
+     a perfectly good outcome and means the enlargement never depends on script.
+
+     Behaviour: js/components-content.js */
+  .dds-lightbox {
+    /* Fill the viewport; the dialog is the whole surface. */
+    inline-size: 100vw;
+    max-inline-size: 100vw;
+    block-size: 100svh;
+    max-block-size: 100svh;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    background-color: transparent;
+
+    display: grid;
+    grid-template-rows: 1fr auto;
+    place-items: center;
+  }
+
+  .dds-lightbox::backdrop {
+    background-color: var(--dds-color-overlay-strong);
+  }
+
+  /* A theme-independent white focus ring inside the viewer. The global focus
+     colour is dark for the light theme and would be barely visible against the
+     fixed dark backdrop here. */
+  .dds-lightbox :focus-visible {
+    outline-color: var(--dds-color-on-overlay);
+  }
+
+  .dds-lightbox-figure {
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--dds-space-sm);
+    padding: var(--dds-space-lg);
+    min-block-size: 0;
+  }
+
+  /* The wrapper shrinks to the image, which is what lets the navigation zones
+     cover half the IMAGE rather than half the viewport — clicking beside a
+     portrait image should dismiss the viewer, not page through it.
+
+     `line-height: 0` removes the inline descender gap under the image, so the
+     wrapper is exactly the image's size and the zones align with its edges. */
+  .dds-lightbox-imgwrap {
+    position: relative;
+    display: inline-flex;
+    line-height: 0;
+    min-block-size: 0;
+  }
+
+  /* The limits are in viewport units, ON THE IMAGE, not percentages relative to
+     the wrapper. The wrapper is `inline-flex` and shrinks to its content, so a
+     percentage here would be circular — wrapper width depends on the image,
+     image width depends on the wrapper — and collapses the image to zero in some
+     engines. */
+  .dds-lightbox-image {
+    display: block;
+    max-inline-size: calc(100vw - 2rem);
+    max-block-size: calc(100svh - 9rem);
+    /* Never upscale a small image to fill the viewport. */
+    inline-size: auto;
+    block-size: auto;
+    object-fit: contain;
+    border-radius: var(--dds-radius-md);
+  }
+
+  .dds-lightbox-caption {
+    padding: var(--dds-space-sm) var(--dds-space-lg);
+    color: var(--dds-color-on-overlay-muted);
+    font-size: var(--dds-font-size-sm);
+    text-align: center;
+    max-inline-size: var(--dds-measure-default);
+  }
+
+  .dds-lightbox-close,
+  .dds-lightbox-nav {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    inline-size: 2.75rem;
+    block-size: 2.75rem;
+
+    color: var(--dds-color-on-overlay);
+    background-color: var(--dds-color-overlay-control);
+    border: var(--dds-border-thin) solid var(--dds-color-overlay-control-border);
+    border-radius: var(--dds-radius-circle);
+    cursor: pointer;
+  }
+
+  .dds-lightbox-close {
+    position: absolute;
+    inset-block-start: var(--dds-space-md);
+    inset-inline-end: var(--dds-space-md);
+    /* Above the navigation zones, or the trailing zone swallows the close click. */
+    z-index: 2;
+  }
+
+  .dds-lightbox-close:hover,
+  .dds-lightbox-nav:hover {
+    background-color: var(--dds-color-overlay-control-hover);
+  }
+
+  /* A large invisible click zone covering the leading or trailing half, with the
+     visible button centred in it.
+
+     On touch, a 44px button in the corner of a full-screen image is a small
+     target for a thumb already holding the device. On a pointer, "click the left
+     side to go back" is what every other image viewer has taught people.
+
+     The zone is a plain <div>: not focusable, no accessible name. The button
+     inside it is the control, so a keyboard user gets one stop per direction
+     rather than two overlapping ones. */
+  /* Each zone is half the image's width, so the whole left or right half is
+     clickable rather than only the small arrow. The visible button inside is
+     `pointer-events: none`, which is what makes the entire half respond to the
+     mouse — keyboard focus and Enter on the button still work independently,
+     because those do not go through hit testing. */
+  .dds-lightbox-zone {
+    position: absolute;
+    inset-block: 0;
+    inline-size: 50%;
+
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    /* No background: the zone must not dim the image it sits over. */
+  }
+
+  .dds-lightbox-zone-start {
+    inset-inline-start: 0;
+    justify-content: flex-start;
+  }
+
+  .dds-lightbox-zone-end {
+    inset-inline-end: 0;
+    justify-content: flex-end;
+  }
+
+  .dds-lightbox-zone[hidden] { display: none; }
+
+  .dds-lightbox-zone .dds-lightbox-nav {
+    pointer-events: none;
+    margin-inline: var(--dds-space-sm);
+  }
+
+  /* Dim the arrows until the pointer is over their half, so they do not compete
+     with the image. On touch there is no hover, so they stay fully visible. */
+  @media (hover: hover) {
+    .dds-lightbox-zone .dds-lightbox-nav {
+      opacity: 0.6;
+      transition: opacity var(--dds-duration-fast) var(--dds-ease-standard);
+    }
+
+    .dds-lightbox-zone:hover .dds-lightbox-nav,
+    .dds-lightbox-zone:focus-within .dds-lightbox-nav {
+      opacity: 1;
+    }
+  }
+
+  /* ==========================================================================
+     Consent embed
+     ==========================================================================
+     A placeholder that loads a third-party embed only after an explicit click.
+
+     Why this is a component rather than just dropping in an `<iframe>`: a
+     third-party frame contacts that provider — and can set cookies and collect
+     an IP address — the moment the page loads, before the visitor has agreed to
+     anything. Deferring the load until a deliberate action means no request
+     leaves the page unasked.
+
+     The consent is per embed and is not remembered. Remembering it is a
+     product-level decision that needs a real consent record, not a component
+     side effect.
+
+     There is always a plain link to the content on the provider's own site, so
+     the material is reachable without JavaScript and without accepting the
+     embed at all.
+
+     Behaviour: js/components-content.js */
+  .dds-embed {
+    /* A ratio box, so the placeholder and the loaded frame are the same size
+       and the page does not shift when the embed appears. 16:9 is the default,
+       because video and maps are the common cases. */
+    aspect-ratio: 16 / 9;
+    display: grid;
+    place-items: center;
+
+    padding: var(--dds-space-lg);
+    text-align: center;
+
+    background-color: var(--dds-color-surface-sunken);
+    border: var(--dds-border-thin) solid var(--dds-color-border-default);
+    border-radius: var(--dds-radius-md);
+    overflow: hidden;
+  }
+
+  .dds-embed-body {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--dds-space-sm);
+    max-inline-size: var(--dds-measure-narrow);
+  }
+
+  .dds-embed-body > .dds-icon {
+    font-size: 2rem;
+    color: var(--dds-color-text-muted);
+  }
+
+  /* A portrait embed — a social post rather than a video or a map.
+
+     FIXED HEIGHT, not an aspect ratio, and that distinction is load-bearing.
+     A social provider's own /embed frame renders at a fixed intrinsic height
+     (header, image, action bar, caption). Constrained into an aspect-ratio box
+     it overflows and the provider's iframe grows its OWN browser scrollbar
+     inside our frame — a scrollbar we cannot style, cannot remove, and which
+     makes the embed look broken. A fixed height that comfortably fits the
+     provider's content avoids it entirely.
+
+     The height is therefore a value tuned to the provider, not to a design
+     scale, which is why it is a literal here. `max-inline-size` keeps a portrait
+     post from stretching absurdly wide on a desktop. */
+  .dds-embed-portrait {
+    aspect-ratio: auto;
+    block-size: 48.75rem; /* 780px — fits a typical post without an inner scrollbar */
+    max-inline-size: 25rem; /* 400px — a post is not a wide medium */
+    margin-inline: auto;
+  }
+
+  /* Once loaded, the frame fills the ratio box. */
+  .dds-embed > iframe {
+    inline-size: 100%;
+    block-size: 100%;
+    border: 0;
+  }
+
+  .dds-embed:has(> iframe) {
+    padding: 0;
+    background-color: var(--dds-color-overlay-strong);
+  }
+
+  /* ==========================================================================
+     Media player
+     ==========================================================================
+     Native `<video>` and `<audio>` with `controls`.
+
+     The native controls are keyboard operable, work with a screen reader,
+     support picture-in-picture and AirPlay, and honour the platform's own
+     accessibility settings. A custom player has to rebuild all of that and
+     essentially never does.
+
+     Captions are not optional for video with speech (WCAG 1.2.2). A
+     `<track kind="captions">` is the requirement; auto-generated captions
+     reviewed by a person are acceptable, unreviewed ones are not. */
+  .dds-media {
+    inline-size: 100%;
+    border-radius: var(--dds-radius-md);
+    background-color: var(--dds-color-surface-sunken);
+  }
+
+  video.dds-media {
+    aspect-ratio: 16 / 9;
+    block-size: auto;
+  }
+
+  audio.dds-media {
+    /* Audio controls have their own intrinsic height; a radius alone is enough. */
+    inline-size: 100%;
+  }
+
+  /* ==========================================================================
+     Gallery
+     ==========================================================================
+     A grid of thumbnails, each a lightbox trigger. */
+  .dds-gallery {
+    display: grid;
+    gap: var(--dds-space-xs);
+    grid-template-columns: repeat(auto-fill, minmax(min(9rem, 100%), 1fr));
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  /* The tile's own radius is smaller than the trigger default, so it is set here
+     rather than generically on `.dds-lightbox-trigger` — which would collide with
+     every other context the trigger appears in. */
+  .dds-gallery a {
+    display: block;
+    aspect-ratio: 1;
+    border-radius: var(--dds-radius-sm);
+    overflow: hidden;
+    background-color: var(--dds-color-surface-sunken);
+  }
+
+  /* No hover zoom here. Every gallery tile is an ordinary lightbox trigger, and
+     the zoom, the cursor and the magnifier badge all live on
+     `.dds-lightbox-trigger` — one implementation, shared by the single image, the
+     text-media block and the gallery alike. A local copy here would be a second
+     version of the same effect, drifting from the first at slightly different
+     scale and duration. */
+  .dds-gallery img {
+    inline-size: 100%;
+    block-size: 100%;
+    object-fit: cover;
+  }
+
+  /* ==========================================================================
+     Avatar
+     ==========================================================================
+     A person or entity, as an image or as initials.
+
+     Initials are `aria-hidden` and the name is supplied as text — either
+     visibly beside the avatar or visually hidden. "IB" read aloud tells nobody
+     anything, and initials are ambiguous by nature. */
+  .dds-avatar {
+    --dds-avatar-size: 2.5rem;
+
+    display: inline-grid;
+    place-items: center;
+
+    inline-size: var(--dds-avatar-size);
+    block-size: var(--dds-avatar-size);
+    flex-shrink: 0;
+
+    font-size: calc(var(--dds-avatar-size) * 0.4);
+    font-weight: var(--dds-font-weight-semibold);
+    /* Not the action colour: an avatar is not interactive. */
+    color: var(--dds-color-accent);
+    background-color: var(--dds-color-accent-subtle);
+
+    border-radius: var(--dds-radius-circle);
+    overflow: hidden;
+    user-select: none;
+  }
+
+  .dds-avatar > img {
+    inline-size: 100%;
+    block-size: 100%;
+    object-fit: cover;
+  }
+
+  .dds-avatar-sm { --dds-avatar-size: 1.75rem; }
+  .dds-avatar-lg { --dds-avatar-size: 4rem; }
+
+  /* Overlapping avatars for a group. The count that follows must be real text. */
+  .dds-avatar-group {
+    display: flex;
+    align-items: center;
+  }
+
+  .dds-avatar-group > .dds-avatar + .dds-avatar {
+    /* Overlap, with a ring in the surface colour to separate them. */
+    margin-inline-start: calc(var(--dds-avatar-size, 2.5rem) * -0.3);
+    box-shadow: 0 0 0 2px var(--dds-color-surface-default);
+  }
+}
+
+@layer dds.components {
+
+  /* ==========================================================================
+     Specs list
+     ==========================================================================
+     A list of properties and their values — dimensions, materials, technical
+     characteristics.
+
+     A `<dl>`, like the key-value list, but arranged for scanning a longer set:
+     each row is a full-width pair with a leader line, so the eye can travel from
+     a label on one side to its value on the other without losing the row.
+
+     Use the key-value list for a handful of pairs in a summary; use this for a
+     longer, homogeneous list where the reader is looking one value up. */
+  .dds-specs {
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .dds-specs > div {
+    display: flex;
+    align-items: baseline;
+    gap: var(--dds-space-xs);
+    padding-block: var(--dds-space-xs);
+  }
+
+  .dds-specs > div + div {
+    border-block-start: var(--dds-border-thin) solid var(--dds-color-border-subtle);
+  }
+
+  .dds-specs dt {
+    color: var(--dds-color-text-muted);
+    /* Keep the label from being squeezed by a long value. */
+    flex-shrink: 0;
+  }
+
+  /* A dotted leader between label and value. Generated content, so it is not in
+     the accessibility tree — a row of literal dots would be read aloud. */
+  .dds-specs dt::after {
+    content: "";
+    display: inline-block;
+    inline-size: 100%;
+    /* A hairline of repeating dots, drawn rather than typed. */
+    border-block-end: var(--dds-border-thin) dotted var(--dds-color-border-default);
+    margin-inline-start: var(--dds-space-2xs);
+    /* Sit on the baseline rather than the text bottom. */
+    translate: 0 -0.25em;
+  }
+
+  .dds-specs dt {
+    display: flex;
+    align-items: baseline;
+    flex-grow: 1;
+    min-inline-size: 0;
+  }
+
+  .dds-specs dd {
+    margin: 0;
+    text-align: end;
+    font-weight: var(--dds-font-weight-medium);
+    flex-shrink: 0;
+  }
+
+  /* ==========================================================================
+     Byline
+     ==========================================================================
+     Who wrote or owns something, and how to reach them.
+
+     Two shapes: a compact inline form for the top of an article, and a fuller
+     boxed form for the end of one.
+
+     The avatar is decorative (`aria-hidden`); the name is real text. A contact
+     link says what it is for — "Email Ilva Bergström", not "Email" — because a
+     screen-reader user listing the links on a page otherwise hears "Email" with
+     no idea whose. */
+  .dds-byline {
+    display: flex;
+    align-items: center;
+    gap: var(--dds-space-xs);
+    font-size: var(--dds-font-size-sm);
+    color: var(--dds-color-text-subtle);
+  }
+
+  .dds-byline-name {
+    font-weight: var(--dds-font-weight-medium);
+    color: var(--dds-color-text-default);
+  }
+
+  .dds-byline-meta {
+    color: var(--dds-color-text-muted);
+  }
+
+  /* The fuller form: a bordered box with room for a role and contact details. */
+  .dds-byline-box {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    gap: var(--dds-space-md);
+
+    padding: var(--dds-space-md);
+    background-color: var(--dds-color-surface-sunken);
+    border: var(--dds-border-thin) solid var(--dds-color-border-subtle);
+    border-radius: var(--dds-radius-md);
+    font-size: var(--dds-font-size-sm);
+  }
+
+  .dds-byline-box .dds-byline-body {
+    display: flex;
+    flex-direction: column;
+    gap: var(--dds-space-3xs);
+    /* Keep the bio at a readable measure inside a wide box. */
+    max-inline-size: var(--dds-measure-narrow);
+    min-inline-size: 0;
+    flex-grow: 1;
+  }
+
+  /* ==========================================================================
+     Progress ring
+     ==========================================================================
+     Determinate progress as a circle, for a compact context where a bar does not
+     fit — inside a table row, beside a filename, in a dense dashboard.
+
+     Drawn with a conic gradient, exactly like the donut chart, because it is the
+     same shape doing a different job. A bar is clearer for anything wide enough
+     to hold one; this exists for when there is not room.
+
+     The figure is `aria-hidden`. The value belongs on a real `<progress>` or in
+     text beside it, because a circle communicates nothing to a screen reader —
+     the same rule as the chart components. */
+  .dds-progress-ring {
+    --dds-progress-ring-value: 0;
+    --dds-progress-ring-size: 2.5rem;
+    --dds-progress-ring-thickness: 0.3125rem;
+
+    position: relative;
+    display: inline-grid;
+    place-items: center;
+
+    inline-size: var(--dds-progress-ring-size);
+    block-size: var(--dds-progress-ring-size);
+    flex-shrink: 0;
+  }
+
+  .dds-progress-ring::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: var(--dds-radius-circle);
+
+    background: conic-gradient(
+      var(--dds-color-action-primary) calc(var(--dds-progress-ring-value) * 1%),
+      var(--dds-color-surface-active) 0
+    );
+
+    /* Punch out the middle, so the ring sits on whatever surface it is placed on
+       without needing an opaque inner circle to match it. */
+    mask: radial-gradient(
+      farthest-side,
+      transparent calc(50% - var(--dds-progress-ring-thickness)),
+      black calc(50% - var(--dds-progress-ring-thickness) + 1px)
+    );
+  }
+
+  /* The value in the middle. Tabular, so it does not shift as digits change. */
+  .dds-progress-ring-value {
+    position: relative;
+    font-size: var(--dds-font-size-2xs);
+    font-weight: var(--dds-font-weight-semibold);
+    font-variant-numeric: tabular-nums;
+    color: var(--dds-color-text-default);
+  }
+
+  .dds-progress-ring-lg {
+    --dds-progress-ring-size: 5rem;
+    --dds-progress-ring-thickness: 0.5rem;
+  }
+
+  .dds-progress-ring-lg .dds-progress-ring-value {
+    font-size: var(--dds-font-size-md);
+  }
+}

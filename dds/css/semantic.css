@@ -1,0 +1,271 @@
+/* =============================================================================
+   DDS — Semantic tokens
+   =============================================================================
+
+   Intent, not value. `--dds-color-text-error` says what the colour is *for*;
+   `--dds-red-600` only says what it *is*.
+
+   Components consume THIS layer. That is the whole contract:
+     - a component never needs to know a hex value,
+     - light and dark are one lookup apart,
+     - and re-theming means editing this file, not every component.
+
+   Light values live in `:root`. Dark mode overrides only what actually changes
+   in `[data-theme="dark"]`; anything not listed there inherits from `:root` on
+   purpose (spacing, radius, type — none of it is theme-dependent).
+
+   `color-scheme` is bound to the theme so native controls (date pickers,
+   scrollbars, the search field's clear button, form autofill) follow along
+   without any extra styling.
+
+   Verified by: node scripts/check-contrast.mjs
+   ============================================================================= */
+
+:root {
+  color-scheme: light;
+
+  /* ---------------------------------------------------------------- surfaces */
+  /* page      — the backdrop everything sits on
+     default   — the normal content plane (cards, panels, table rows)
+     raised    — floats above `default` (dialogs, popovers, listboxes)
+     sunken    — recedes below `default` (wells, code blocks, inset areas)
+
+     In light mode `default` and `raised` are both white and separation comes
+     from shadow. In dark mode shadow barely reads, so they differ in value
+     instead — same three-plane model, different mechanism per theme. */
+  --dds-color-surface-page: var(--dds-stone-50);
+  --dds-color-surface-default: var(--dds-stone-0);
+  --dds-color-surface-raised: var(--dds-stone-0);
+  --dds-color-surface-sunken: var(--dds-stone-100);
+
+  /* Interaction washes for rows, list options and ghost buttons. Low-contrast
+     by design — they signal "under the pointer", not "important". */
+  --dds-color-surface-hover: var(--dds-stone-100);
+  --dds-color-surface-active: var(--dds-stone-200);
+  --dds-color-surface-selected: var(--dds-indigo-50);
+  --dds-color-surface-disabled: var(--dds-stone-100);
+
+  /* Status tints. Backgrounds for notices and banners — never text colours. */
+  --dds-color-surface-success: var(--dds-green-50);
+  --dds-color-surface-warning: var(--dds-amber-50);
+  --dds-color-surface-error: var(--dds-red-50);
+  --dds-color-surface-info: var(--dds-cyan-50);
+
+  /* -------------------------------------------------------------------- text */
+  --dds-color-text-default: var(--dds-stone-900);
+  --dds-color-text-subtle: var(--dds-stone-700);
+  --dds-color-text-muted: var(--dds-stone-600);
+  --dds-color-text-inverse: var(--dds-stone-50);
+  /* Disabled text is exempt from the contrast minimum per WCAG 1.4.3, but it
+     still has to be legible enough to read what is unavailable. */
+  --dds-color-text-disabled: var(--dds-stone-500);
+
+  --dds-color-text-link: var(--dds-indigo-700);
+  --dds-color-text-link-hover: var(--dds-indigo-800);
+  --dds-color-text-link-visited: var(--dds-indigo-900);
+
+  --dds-color-text-success: var(--dds-green-700);
+  --dds-color-text-warning: var(--dds-amber-700);
+  --dds-color-text-error: var(--dds-red-700);
+  --dds-color-text-info: var(--dds-cyan-700);
+
+  /* ------------------------------------------------------------------ action */
+  /* One interactive hue, three emphasis levels:
+       primary   — filled. One per view; the thing you most likely want.
+       secondary — outlined. Equal-weight alternatives.
+       subtle    — text only. Tertiary and in-table actions.
+     Emphasis is carried by fill and border, not by hue, so the interface stays
+     readable when hue perception differs. */
+  --dds-color-action-primary: var(--dds-indigo-600);
+  --dds-color-action-primary-hover: var(--dds-indigo-700);
+  --dds-color-action-primary-active: var(--dds-indigo-800);
+  --dds-color-action-on-primary: var(--dds-stone-0);
+
+  --dds-color-action-secondary: var(--dds-indigo-700);
+  --dds-color-action-secondary-hover: var(--dds-indigo-50);
+  --dds-color-action-secondary-active: var(--dds-indigo-100);
+
+  /* Destructive actions borrow the error hue. This is the one sanctioned
+     overlap between action and status, because "delete" genuinely is both. */
+  --dds-color-action-danger: var(--dds-red-700);
+  --dds-color-action-danger-hover: var(--dds-red-800);
+  --dds-color-action-danger-active: var(--dds-red-900);
+  --dds-color-action-on-danger: var(--dds-stone-0);
+
+  --dds-color-action-disabled: var(--dds-stone-200);
+
+  /* ---------------------------------------------------------------- borders */
+  /* Four weights, and only the first is allowed to be faint:
+       subtle  — decorative dividers between related rows. Below 3:1 on
+                 purpose: it separates content that layout already separates,
+                 so it carries no information by itself.
+       default — a real component boundary. Must clear 3:1 (WCAG 1.4.11).
+       strong  — emphasis and selected state.
+       field   — form control edges. Stronger than `default` so an input reads
+                 as an input rather than as a panel. */
+  --dds-color-border-subtle: var(--dds-stone-200);
+  --dds-color-border-default: var(--dds-stone-500);
+  --dds-color-border-strong: var(--dds-stone-700);
+  --dds-color-border-field: var(--dds-stone-600);
+
+  --dds-color-border-success: var(--dds-green-600);
+  --dds-color-border-warning: var(--dds-amber-600);
+  --dds-color-border-error: var(--dds-red-600);
+  --dds-color-border-info: var(--dds-cyan-600);
+
+  /* ------------------------------------------------------------------ focus */
+  /* A single focus treatment across the whole system. Two rings, actually: the
+     coloured ring plus an offset gap in the surface colour, so the indicator
+     stays visible against both light and dark backgrounds and against the
+     component's own fill. */
+  --dds-color-focus-ring: var(--dds-indigo-700);
+  --dds-focus-ring-width: 2px;
+  --dds-focus-ring-offset: 2px;
+
+  /* --------------------------------------------------------- solid statuses */
+  /* Saturated fills for toasts and badges. Intentionally IDENTICAL in light
+     and dark: a fill that shifts per theme needs its paired text colour to
+     shift too, and that pairing is exactly where contrast regressions hide.
+     One fixed pair per status is one thing to verify instead of two. */
+  --dds-color-success-solid: var(--dds-green-700);
+  --dds-color-warning-solid: var(--dds-amber-800);
+  --dds-color-error-solid: var(--dds-red-700);
+  --dds-color-info-solid: var(--dds-cyan-700);
+  --dds-color-on-success-solid: var(--dds-stone-0);
+  --dds-color-on-warning-solid: var(--dds-stone-0);
+  --dds-color-on-error-solid: var(--dds-stone-0);
+  --dds-color-on-info-solid: var(--dds-stone-0);
+
+  /* ----------------------------------------------------------------- accent */
+  /* Decorative only. Never a status, never an action, never a text colour on a
+     light surface. Charts, illustration, editorial emphasis. */
+  --dds-color-accent: var(--dds-clay-600);
+  --dds-color-accent-subtle: var(--dds-clay-100);
+
+  /* -------------------------------------------------------------- selection */
+  /* Fixed across themes for the same reason as the solid statuses. */
+  --dds-color-selection-bg: var(--dds-indigo-700);
+  --dds-color-selection-text: var(--dds-stone-0);
+
+  /* --------------------------------------------------------------- overlay */
+  /* A scrim laid over arbitrary page content: a dialog backdrop, a lightbox.
+
+     Translucent black, and IDENTICAL in both themes. This is not an oversight —
+     an overlay darkens whatever is behind it rather than tinting it, so one
+     value is correct for both. A theme-dependent overlay would have to pair with
+     a theme-dependent foreground, and the foreground here sits on top of
+     unknown content, not on a known surface.
+
+     Because the effective background depends on the content behind it, these
+     pairs are not machine-checkable by `scripts/check-contrast.mjs`. The
+     mitigation is the strong variant: at 85% black, near-white text clears AA
+     against any underlying content. Anything placed on an overlay uses
+     `--dds-color-on-overlay`, never a text token, which would invert in dark
+     mode and become invisible. */
+  --dds-color-overlay: rgb(0 0 0 / 0.5);
+  --dds-color-overlay-strong: rgb(0 0 0 / 0.85);
+  --dds-color-on-overlay: var(--dds-stone-0);
+  --dds-color-on-overlay-muted: var(--dds-stone-200);
+
+  /* Controls sitting directly on an overlay — a lightbox close button. They
+     need their own fill and edge, because there is no surface beneath them. */
+  --dds-color-overlay-control: rgb(0 0 0 / 0.5);
+  --dds-color-overlay-control-hover: rgb(0 0 0 / 0.75);
+  --dds-color-overlay-control-border: rgb(255 255 255 / 0.35);
+
+  /* -------------------------------------------------------------- elevation */
+  --dds-elevation-sm: var(--dds-shadow-sm);
+  --dds-elevation-md: var(--dds-shadow-md);
+  --dds-elevation-lg: var(--dds-shadow-lg);
+
+  /* ------------------------------------------------------------- typography */
+  /* See docs/typography.md for the evaluation behind these choices.
+     Dessau ships no font binaries: the first family is used when the reader
+     already has it, otherwise the stack falls through to the platform UI font,
+     which is a good typeface on every current platform. `system-ui` before the
+     named fallbacks is deliberate. */
+  --dds-font-display: "Space Grotesk", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --dds-font-body: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
+  --dds-font-mono: "JetBrains Mono", ui-monospace, "SF Mono", "Cascadia Mono", "Roboto Mono", Menlo, Consolas, monospace;
+}
+
+[data-theme="dark"] {
+  color-scheme: dark;
+
+  /* Surfaces climb in value as they rise, which is how depth reads on a dark
+     background. Never pure black: #000 with light text causes halation, and
+     it leaves no room for a "sunken" plane below the default one. */
+  --dds-color-surface-page: var(--dds-stone-950);
+  --dds-color-surface-default: var(--dds-stone-900);
+  --dds-color-surface-raised: var(--dds-stone-850);
+  --dds-color-surface-sunken: var(--dds-stone-950);
+
+  --dds-color-surface-hover: var(--dds-stone-800);
+  --dds-color-surface-active: var(--dds-stone-700);
+  --dds-color-surface-selected: var(--dds-indigo-950);
+  --dds-color-surface-disabled: var(--dds-stone-850);
+
+  /* Status tints as dark, desaturated grounds rather than the light-mode
+     pastels, which would glare. */
+  --dds-color-surface-success: #0d2c20;
+  --dds-color-surface-warning: #2e2609;
+  --dds-color-surface-error: #331a19;
+  --dds-color-surface-info: #0d2939;
+
+  --dds-color-text-default: var(--dds-stone-100);
+  --dds-color-text-subtle: var(--dds-stone-300);
+  --dds-color-text-muted: var(--dds-stone-400);
+  --dds-color-text-inverse: var(--dds-stone-900);
+  --dds-color-text-disabled: var(--dds-stone-500);
+
+  --dds-color-text-link: var(--dds-indigo-300);
+  --dds-color-text-link-hover: var(--dds-indigo-200);
+  /* Visited is desaturated rather than only lighter or darker, so all three
+     link states stay distinguishable from each other in dark mode. */
+  --dds-color-text-link-visited: #b9b4d8;
+
+  --dds-color-text-success: var(--dds-green-300);
+  --dds-color-text-warning: var(--dds-amber-300);
+  --dds-color-text-error: var(--dds-red-300);
+  --dds-color-text-info: var(--dds-cyan-300);
+
+  /* The filled button lightens so it separates from the dark page; its label
+     therefore flips to dark. Keeping a white label on a dark-mode indigo fill
+     is the classic dark-mode contrast failure. */
+  --dds-color-action-primary: var(--dds-indigo-300);
+  --dds-color-action-primary-hover: var(--dds-indigo-200);
+  --dds-color-action-primary-active: var(--dds-indigo-100);
+  --dds-color-action-on-primary: var(--dds-indigo-950);
+
+  --dds-color-action-secondary: var(--dds-indigo-300);
+  --dds-color-action-secondary-hover: #22224a;
+  --dds-color-action-secondary-active: #2c2c5c;
+
+  --dds-color-action-danger: var(--dds-red-300);
+  --dds-color-action-danger-hover: var(--dds-red-200);
+  --dds-color-action-danger-active: var(--dds-red-100);
+  --dds-color-action-on-danger: var(--dds-red-900);
+
+  --dds-color-action-disabled: var(--dds-stone-800);
+
+  /* `default` keeps the same primitive in both themes: stone-500 is the one
+     step that clears 3:1 against the light surfaces and the dark ones. */
+  --dds-color-border-subtle: var(--dds-stone-800);
+  --dds-color-border-default: var(--dds-stone-500);
+  --dds-color-border-strong: var(--dds-stone-300);
+  --dds-color-border-field: var(--dds-stone-400);
+
+  --dds-color-border-success: var(--dds-green-400);
+  --dds-color-border-warning: var(--dds-amber-400);
+  --dds-color-border-error: var(--dds-red-400);
+  --dds-color-border-info: var(--dds-cyan-400);
+
+  --dds-color-focus-ring: var(--dds-indigo-300);
+
+  --dds-color-accent: var(--dds-clay-300);
+  --dds-color-accent-subtle: #3a2318;
+
+  --dds-elevation-sm: var(--dds-shadow-sm-dark);
+  --dds-elevation-md: var(--dds-shadow-md-dark);
+  --dds-elevation-lg: var(--dds-shadow-lg-dark);
+}

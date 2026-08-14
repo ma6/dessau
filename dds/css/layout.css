@@ -1,0 +1,264 @@
+/* =============================================================================
+   DDS — Layout primitives
+   =============================================================================
+
+   Six composable primitives that between them cover almost every layout a
+   product needs. Each does exactly one thing and has no opinion about what it
+   contains.
+
+     .dds-container  centre a page-width column
+     .dds-stack      vertical rhythm between children
+     .dds-cluster    horizontal group that wraps
+     .dds-grid       equal-width columns that reflow by available space
+     .dds-sidebar    a fixed-ish side column plus a flexible main column
+     .dds-split      push two groups to opposite ends of a line
+
+   Why primitives instead of per-page layout CSS: a product that composes four
+   of these needs no new CSS to build a page, so page layout stops being a
+   place where bugs accumulate.
+
+   All of them use logical properties (`inline`/`block`, `start`/`end`) rather
+   than physical ones (`left`/`right`), so a right-to-left locale needs no
+   separate stylesheet.
+
+   None of them uses a media query. They respond to the space they are actually
+   given — via `flex-wrap`, `auto-fit` or a container query — which means they
+   behave correctly inside a narrow column, not just at a narrow viewport.
+   That is the difference between a layout that survives reuse and one that
+   only works on the page it was written for.
+   ============================================================================= */
+
+@layer dds.layout {
+  /* -------------------------------------------------------------- container */
+  /* A centred column with gutters that never collapse to zero.
+
+     `--dds-container-width` is the knob: set it per instance rather than
+     creating `.dds-container-sm`, `-md`, `-lg` variants. */
+  .dds-container {
+    --dds-container-width: var(--dds-container-lg);
+    --dds-container-gutter: var(--dds-space-md);
+
+    inline-size: 100%;
+    max-inline-size: var(--dds-container-width);
+    margin-inline: auto;
+    padding-inline: var(--dds-container-gutter);
+  }
+
+  /* ------------------------------------------------------------------ stack */
+  /* Vertical rhythm via the owl selector. Space goes *between* children only,
+     so the block has no outer margin to fight with when nested.
+
+     Set `--dds-stack-space` on the element to change the gap; nested stacks
+     each keep their own value because the property is read, not inherited
+     through the selector. */
+  .dds-stack {
+    --dds-stack-space: var(--dds-space-md);
+
+    display: flow-root; /* contains child margins without a clearfix hack */
+  }
+
+  .dds-stack > * + * {
+    margin-block-start: var(--dds-stack-space);
+  }
+
+  /* A stack that pushes its last child to the bottom — for cards in a row that
+     must have their footers aligned regardless of body length. */
+  .dds-stack-fill {
+    display: flex;
+    flex-direction: column;
+    gap: var(--dds-stack-space, var(--dds-space-md));
+    block-size: 100%;
+  }
+
+  .dds-stack-fill > .dds-stack-push {
+    margin-block-start: auto;
+  }
+
+  .dds-stack-2xs { --dds-stack-space: var(--dds-space-2xs); }
+  .dds-stack-xs  { --dds-stack-space: var(--dds-space-xs); }
+  .dds-stack-sm  { --dds-stack-space: var(--dds-space-sm); }
+  .dds-stack-md  { --dds-stack-space: var(--dds-space-md); }
+  .dds-stack-lg  { --dds-stack-space: var(--dds-space-lg); }
+  .dds-stack-xl  { --dds-stack-space: var(--dds-space-xl); }
+  .dds-stack-2xl { --dds-stack-space: var(--dds-space-2xl); }
+
+  /* ---------------------------------------------------------------- cluster */
+  /* A horizontal group that wraps onto more lines when it runs out of room:
+     button rows, tag lists, filter chips, inline metadata.
+
+     `flex-wrap` means no breakpoint is involved — it wraps exactly when it
+     needs to, at any container width. */
+  .dds-cluster {
+    --dds-cluster-space: var(--dds-space-xs);
+
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--dds-cluster-space);
+    align-items: center;
+  }
+
+  .dds-cluster-baseline { align-items: baseline; }
+  .dds-cluster-start { align-items: flex-start; }
+  .dds-cluster-end { justify-content: flex-end; }
+  .dds-cluster-center { justify-content: center; }
+
+  .dds-cluster-2xs { --dds-cluster-space: var(--dds-space-2xs); }
+  .dds-cluster-sm  { --dds-cluster-space: var(--dds-space-sm); }
+  .dds-cluster-md  { --dds-cluster-space: var(--dds-space-md); }
+  .dds-cluster-lg  { --dds-cluster-space: var(--dds-space-lg); }
+
+  /* ------------------------------------------------------------------- grid */
+  /* Equal-width columns that decide their own count from the space available.
+
+     `auto-fit` + `minmax(min(<ideal>, 100%), 1fr)` is the whole trick:
+       - columns are at least `--dds-grid-min` wide,
+       - the count drops as the container narrows, with no media query,
+       - and the inner `min(…, 100%)` stops a single item from overflowing a
+         container narrower than the minimum, which is the classic failure of
+         this pattern at 320px. */
+  .dds-grid {
+    --dds-grid-min: 16rem;
+    --dds-grid-space: var(--dds-space-md);
+
+    display: grid;
+    gap: var(--dds-grid-space);
+    grid-template-columns: repeat(auto-fit, minmax(min(var(--dds-grid-min), 100%), 1fr));
+  }
+
+  /* A grid whose items should not stretch to the tallest row. */
+  .dds-grid-top { align-items: start; }
+
+  /* ---------------------------------------------------------------- sidebar */
+  /* A side column at its natural or given width plus a main column that takes
+     the rest, collapsing to one column when the main column would get too
+     narrow to be useful.
+
+     Implemented with flex-basis maths rather than a breakpoint: the wrap
+     happens when `--dds-sidebar-content-min` can no longer be satisfied, which
+     is the actual condition we care about. */
+  .dds-sidebar {
+    --dds-sidebar-width: 16rem;
+    --dds-sidebar-content-min: 55%;
+    --dds-sidebar-space: var(--dds-space-lg);
+
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--dds-sidebar-space);
+  }
+
+  .dds-sidebar > .dds-sidebar-aside {
+    flex-grow: 1;
+    flex-basis: var(--dds-sidebar-width);
+  }
+
+  .dds-sidebar > .dds-sidebar-main {
+    flex-grow: 999; /* absorb all leftover space so the aside stays near its width */
+    flex-basis: 0;
+    min-inline-size: var(--dds-sidebar-content-min);
+  }
+
+  /* ------------------------------------------------------------------ split */
+  /* Two groups pushed to opposite ends of one line — a toolbar, a card footer,
+     a page header with a title and an action. Wraps rather than crushing. */
+  .dds-split {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--dds-space-sm) var(--dds-space-md);
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .dds-split-baseline { align-items: baseline; }
+
+  /* ------------------------------------------------------------------ centre */
+  /* Horizontally centre a block whose width comes from its own content, and
+     optionally centre it in the viewport vertically too. */
+  .dds-center {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .dds-center-screen {
+    display: grid;
+    place-items: center;
+    min-block-size: 100svh;
+  }
+
+  /* ---------------------------------------------------- scrollable region */
+  /* Wraps content that is legitimately wider than its container (wide tables,
+     diagrams, code).
+
+     `tabindex="0"` in the markup is not optional: an `overflow: auto` region is
+     not keyboard-scrollable without a tab stop, which strands anyone without a
+     mouse or trackpad. The markup also needs `role="region"` and an accessible
+     name so the stop announces what it is — see the table component. */
+  .dds-scroll-x {
+    overflow-x: auto;
+    /* Reserve room for the scrollbar so content does not shift when it
+       appears, and keep momentum scrolling on touch. */
+    overscroll-behavior-x: contain;
+  }
+
+  .dds-scroll-x:focus-visible {
+    outline: var(--dds-focus-ring-width) solid var(--dds-color-focus-ring);
+    outline-offset: calc(var(--dds-focus-ring-offset) * -1);
+  }
+
+  /* ------------------------------------------------------------ visually hidden */
+  /* Available to assistive technology, invisible on screen.
+
+     `clip-path` plus a 1px box rather than `display: none` (which removes it
+     from the accessibility tree entirely) or a negative text-indent (which
+     misbehaves in right-to-left). `white-space: nowrap` stops the 1px box from
+     wrapping the text into an enormous vertical strip that can still be
+     reached by a screen reader's touch exploration. */
+  .dds-visually-hidden:not(:focus-within) {
+    position: absolute;
+    inline-size: 1px;
+    block-size: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+    border: 0;
+  }
+
+  /* ---------------------------------------------------------------- skip link */
+  /* Lets a keyboard user jump past repeated navigation (WCAG 2.4.1). Hidden
+     until focused, at which point it must be genuinely visible — an
+     off-screen "skip link" that never appears is a common false pass. */
+  .dds-skip-link {
+    position: absolute;
+    inset-block-start: var(--dds-space-xs);
+    inset-inline-start: var(--dds-space-xs);
+    z-index: var(--dds-z-tooltip);
+    padding: var(--dds-space-xs) var(--dds-space-md);
+    background-color: var(--dds-color-surface-raised);
+    color: var(--dds-color-text-link);
+    border: var(--dds-border-thin) solid var(--dds-color-border-default);
+    border-radius: var(--dds-radius-sm);
+    box-shadow: var(--dds-elevation-md);
+
+    /* Off-screen until focused. `translate` rather than `display` so the link
+       stays in the accessibility tree and in the tab order. */
+    translate: 0 -200%;
+  }
+
+  .dds-skip-link:focus-visible {
+    translate: 0 0;
+  }
+
+  /* ------------------------------------------------------- content-visibility */
+  /* Skip rendering work for long off-screen sections. `contain-intrinsic-size`
+     supplies a size estimate so the scrollbar does not jump as sections are
+     rendered on approach.
+
+     Applied by opt-in only: on a short page it is pure overhead, and on a page
+     where in-page search must find text in a collapsed section it is wrong. */
+  .dds-defer-render {
+    content-visibility: auto;
+    contain-intrinsic-size: auto 40rem;
+  }
+}

@@ -1,0 +1,469 @@
+/**
+ * DDS — form validation pattern.
+ *
+ *   <script src="/dds/js/dds.js" defer></script>
+ *   <script src="/dds/js/patterns/form-validation.js" defer></script>
+ *
+ * Accessible client-side validation built on the platform's Constraint
+ * Validation API.
+ *
+ * -----------------------------------------------------------------------------
+ * What this adds, and what it deliberately does not
+ * -----------------------------------------------------------------------------
+ *
+ * The constraints themselves stay in the markup: `required`, `type="email"`,
+ * `minlength`, `pattern`, `min`, `max`. The browser already evaluates them, in
+ * every language, and exposes the result through `checkValidity()`. Re-writing
+ * that in JavaScript means a second rulebook that will drift from the first.
+ *
+ * What the platform does badly is the *presentation*: native validation bubbles
+ * cannot be styled, vanish on their own, are not reliably announced, appear one
+ * at a time, and are lost entirely once the user scrolls. That is what this
+ * replaces.
+ *
+ * Client validation is a convenience, never a guarantee. The server validates
+ * again, always.
+ *
+ * -----------------------------------------------------------------------------
+ * When errors are shown — the part that matters most
+ * -----------------------------------------------------------------------------
+ *
+ * Not while typing. Not on first blur of an untouched field. Only:
+ *
+ *   - on submit, for every invalid field at once, and
+ *   - after that, on blur, for a field the user has already been told about.
+ *
+ * Validating early looks helpful and is not: telling someone their email is
+ * invalid after they have typed two characters is telling them off for not
+ * having finished. People learn to ignore error styling that is always present,
+ * which is exactly the styling you need them to read later.
+ *
+ * -----------------------------------------------------------------------------
+ * The error summary
+ * -----------------------------------------------------------------------------
+ *
+ * On a failed submit, a summary appears at the top listing every problem, each
+ * entry linking to its field, and focus moves to it. This is the single highest
+ * -value accessibility feature in any form: without it a user whose submit
+ * failed has no idea how many things are wrong or where, and has to walk the
+ * whole form again to find out.
+ */
+(function (global) {
+  'use strict';
+
+  var DDS = global.DDS;
+  if (!DDS) {
+    console.error('[DDS] form-validation.js requires dds.js to be loaded first');
+    return;
+  }
+
+  /**
+   * Default messages.
+   *
+   * The browser's own messages are localised but often unhelpful ("Please match
+   * the requested format" tells the user nothing). These say what is wrong and
+   * what to do, and a field can override any of them with
+   * `data-dds-error-<constraint>`.
+   */
+  var MESSAGES = {
+    valueMissing: 'Enter {label}',
+    typeMismatch: 'Enter {label} in the correct format',
+    typeMismatchEmail: 'Enter an email address, for example name@example.org',
+    typeMismatchUrl: 'Enter a full web address, starting with https://',
+    tooShort: '{label} must be at least {minlength} characters',
+    tooLong: '{label} must be {maxlength} characters or fewer',
+    rangeUnderflow: '{label} must be {min} or more',
+    rangeOverflow: '{label} must be {max} or less',
+    stepMismatch: '{label} is not an accepted value',
+    patternMismatch: 'Enter {label} in the correct format',
+    badInput: 'Enter {label} as a number',
+    default: 'Check {label}',
+  };
+
+  /** The visible label text for a control, used inside messages. */
+  function labelFor(field) {
+    // An explicit override wins: a message reads better with "your email
+    // address" than with the terse label "Email".
+    var override = field.getAttribute('data-dds-label');
+    if (override) return override;
+
+    var label = field.labels && field.labels[0];
+    if (label) {
+      // Strip the "(required)" / "(optional)" marker so it does not end up
+      // inside the sentence.
+      var clone = label.cloneNode(true);
+      clone.querySelectorAll('.dds-label-note').forEach(function (note) {
+        note.remove();
+      });
+      return clone.textContent.trim().replace(/\s+/g, ' ').toLowerCase();
+    }
+
+    return field.getAttribute('aria-label') || field.name || 'this field';
+  }
+
+  /** Choose and fill in the message for a field's current validity state. */
+  function messageFor(field) {
+    var validity = field.validity;
+    var label = labelFor(field);
+
+    function resolve(key) {
+      var custom = field.getAttribute('data-dds-error-' + key.toLowerCase());
+      var template = custom || MESSAGES[key] || MESSAGES.default;
+      return template
+        .replace('{label}', label)
+        .replace('{minlength}', field.getAttribute('minlength') || '')
+        .replace('{maxlength}', field.getAttribute('maxlength') || '')
+        .replace('{min}', field.getAttribute('min') || '')
+        .replace('{max}', field.getAttribute('max') || '');
+    }
+
+    if (validity.valueMissing) return resolve('valueMissing');
+
+    if (validity.typeMismatch) {
+      // Type-specific wording, because "correct format" is not actionable.
+      if (field.type === 'email') return resolve('typeMismatchEmail');
+      if (field.type === 'url') return resolve('typeMismatchUrl');
+      return resolve('typeMismatch');
+    }
+
+    if (validity.tooShort) return resolve('tooShort');
+    if (validity.tooLong) return resolve('tooLong');
+    if (validity.rangeUnderflow) return resolve('rangeUnderflow');
+    if (validity.rangeOverflow) return resolve('rangeOverflow');
+    if (validity.stepMismatch) return resolve('stepMismatch');
+    if (validity.patternMismatch) return resolve('patternMismatch');
+    if (validity.badInput) return resolve('badInput');
+    // A message set by application code via setCustomValidity().
+    if (validity.customError) return field.validationMessage;
+
+    return resolve('default');
+  }
+
+  /** Every control in the form that can be validated. */
+  function validatableFields(form) {
+    return Array.prototype.slice
+      .call(form.elements)
+      .filter(function (element) {
+        return (
+          element.willValidate &&
+          // A disabled or hidden control is not the user's problem.
+          !element.disabled &&
+          element.type !== 'submit' &&
+          element.type !== 'button' &&
+          element.type !== 'reset'
+        );
+      })
+      .filter(function (element) {
+        // Skip anything inside a collapsed conditional region: the user cannot
+        // see it, so it must not block them.
+        var hiddenAncestor = element.closest('[hidden]');
+        return !hiddenAncestor;
+      });
+  }
+
+  /** Find (or create) the error element belonging to a field. */
+  function errorElementFor(field) {
+    var wrapper = field.closest('.dds-field, .dds-choice, .dds-fieldgroup') || field.parentElement;
+    if (!wrapper) return null;
+
+    var existing = wrapper.querySelector('[data-dds-error-for="' + field.id + '"]');
+    if (existing) return existing;
+
+    var element = document.createElement('p');
+    element.className = 'dds-error';
+    element.id = DDS.utils.uniqueId('dds-error');
+    element.setAttribute('data-dds-error-for', field.id);
+    element.hidden = true;
+
+    var icon = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+    icon.setAttribute('class', 'dds-icon');
+    icon.setAttribute('aria-hidden', 'true');
+    var use = document.createElementNS('http://www.w3.org/2000/svg', 'use');
+    use.setAttribute('href', '#dds-icon-error');
+    icon.appendChild(use);
+    element.appendChild(icon);
+
+    // The word "Error" for anyone who does not perceive the colour or the icon.
+    var prefix = document.createElement('span');
+    prefix.className = 'dds-sr-only';
+    prefix.textContent = 'Error: ';
+    element.appendChild(prefix);
+
+    var text = document.createElement('span');
+    text.setAttribute('data-dds-error-text', '');
+    element.appendChild(text);
+
+    // After the control, so reading order matches visual order.
+    field.insertAdjacentElement('afterend', element);
+    return element;
+  }
+
+  /** Add an id to a space-separated attribute without disturbing what is there. */
+  function addDescribedBy(field, id) {
+    var current = (field.getAttribute('aria-describedby') || '').split(/\s+/).filter(Boolean);
+    if (current.indexOf(id) === -1) current.push(id);
+    field.setAttribute('aria-describedby', current.join(' '));
+  }
+
+  function removeDescribedBy(field, id) {
+    var current = (field.getAttribute('aria-describedby') || '')
+      .split(/\s+/)
+      .filter(Boolean)
+      .filter(function (value) {
+        return value !== id;
+      });
+
+    if (current.length) {
+      field.setAttribute('aria-describedby', current.join(' '));
+    } else {
+      field.removeAttribute('aria-describedby');
+    }
+  }
+
+  function showError(field, message) {
+    if (!field.id) field.id = DDS.utils.uniqueId('dds-field');
+
+    var element = errorElementFor(field);
+    if (!element) return;
+
+    element.querySelector('[data-dds-error-text]').textContent = message;
+    element.hidden = false;
+
+    field.setAttribute('aria-invalid', 'true');
+
+    /* `aria-errormessage` for the error, `aria-describedby` for the hint.
+       That is the specified pairing: `aria-errormessage` is only exposed while
+       `aria-invalid="true"`, which is exactly the semantics wanted, and it keeps
+       the hint's `aria-describedby` untouched so the format rule survives
+       alongside the failure — the user needs both, not one replaced by the other.
+
+       `aria-describedby` is additionally kept in sync, because screen-reader
+       support for `aria-errormessage` is still uneven and a silently unannounced
+       error is the worst possible outcome here. The duplication is deliberate:
+       assistive technology that understands `aria-errormessage` uses it, and
+       anything that does not still hears the message via the description. */
+    field.setAttribute('aria-errormessage', element.id);
+    addDescribedBy(field, element.id);
+  }
+
+  function clearError(field) {
+    var element = field.closest('.dds-field, .dds-choice, .dds-fieldgroup, form')
+      ? document.querySelector('[data-dds-error-for="' + field.id + '"]')
+      : null;
+
+    field.removeAttribute('aria-invalid');
+    field.removeAttribute('aria-errormessage');
+
+    if (element) {
+      element.hidden = true;
+      element.querySelector('[data-dds-error-text]').textContent = '';
+      removeDescribedBy(field, element.id);
+    }
+  }
+
+  /* =========================================================================
+     Error summary
+     ========================================================================= */
+
+  function summaryElementFor(form) {
+    var existing = form.querySelector('[data-dds-error-summary]');
+    if (existing) return existing;
+
+    var summary = document.createElement('div');
+    summary.setAttribute('data-dds-error-summary', '');
+    summary.className = 'dds-error-summary';
+    // Focusable programmatically, but not a permanent tab stop.
+    summary.tabIndex = -1;
+    summary.hidden = true;
+    form.prepend(summary);
+    return summary;
+  }
+
+  function renderSummary(form, problems) {
+    var summary = summaryElementFor(form);
+    summary.replaceChildren();
+
+    var heading = document.createElement('h2');
+    heading.className = 'dds-error-summary-title';
+
+    var icon = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+    icon.setAttribute('class', 'dds-icon');
+    icon.setAttribute('aria-hidden', 'true');
+    var use = document.createElementNS('http://www.w3.org/2000/svg', 'use');
+    use.setAttribute('href', '#dds-icon-error');
+    icon.appendChild(use);
+    heading.appendChild(icon);
+
+    var headingText = document.createElement('span');
+    headingText.textContent =
+      problems.length === 1
+        ? 'There is 1 problem with this form'
+        : 'There are ' + problems.length + ' problems with this form';
+    heading.appendChild(headingText);
+    summary.appendChild(heading);
+
+    var list = document.createElement('ul');
+    list.className = 'dds-error-summary-list';
+
+    problems.forEach(function (problem) {
+      var item = document.createElement('li');
+      var link = document.createElement('a');
+      link.href = '#' + problem.field.id;
+      // The same wording as the field's own message, so the user is not asked to
+      // reconcile two descriptions of one problem.
+      link.textContent = problem.message;
+
+      link.addEventListener('click', function (event) {
+        // Manage focus explicitly: the default fragment jump scrolls the field
+        // into view but does not always focus it, which leaves a keyboard user
+        // looking at the field without being in it.
+        event.preventDefault();
+        problem.field.focus();
+      });
+
+      item.appendChild(link);
+      list.appendChild(item);
+    });
+
+    summary.appendChild(list);
+    summary.hidden = false;
+
+    return summary;
+  }
+
+  function hideSummary(form) {
+    var summary = form.querySelector('[data-dds-error-summary]');
+    if (summary) {
+      summary.hidden = true;
+      summary.replaceChildren();
+    }
+  }
+
+  /* =========================================================================
+     Enhancement
+     ========================================================================= */
+
+  DDS.register('form-validation', 'form[data-dds-validate]', function (form) {
+    // Take over the messaging. The constraints stay in the markup and are still
+    // evaluated by the browser via checkValidity() — only the native bubble UI
+    // is suppressed.
+    form.setAttribute('novalidate', '');
+
+    // Before the first submit attempt, nothing is shown. This flag is what makes
+    // the form patient.
+    var submitted = false;
+
+    function validateField(field) {
+      if (field.checkValidity()) {
+        clearError(field);
+        return null;
+      }
+      var message = messageFor(field);
+      showError(field, message);
+      return { field: field, message: message };
+    }
+
+    form.addEventListener('submit', function (event) {
+      submitted = true;
+
+      var problems = [];
+      validatableFields(form).forEach(function (field) {
+        if (!field.id) field.id = DDS.utils.uniqueId('dds-field');
+        var problem = validateField(field);
+        if (problem) problems.push(problem);
+      });
+
+      if (!problems.length) {
+        hideSummary(form);
+        return; // let the submit proceed
+      }
+
+      event.preventDefault();
+
+      var summary = renderSummary(form, problems);
+
+      // Move focus to the explanation. Without this the user is returned to
+      // wherever they were, with no indication that anything happened.
+      summary.focus();
+
+      // Assertive: the user pressed submit and is waiting for the outcome, so
+      // interrupting is correct here.
+      DDS.announce(
+        problems.length === 1
+          ? 'There is 1 problem with this form.'
+          : 'There are ' + problems.length + ' problems with this form.',
+        { assertive: true }
+      );
+    });
+
+    /* Bridge the visual state to the programmatic one.
+     *
+     * The CSS shows the invalid styling via `:user-invalid`, which matches only
+     * once the browser's own "user has interacted" flag is set — on blur, or on a
+     * submit attempt. There is no event for that flag changing, so the state is
+     * read directly by testing the selector.
+     *
+     * Testing `:user-invalid` rather than tracking interaction here matters: the
+     * programmatic state then changes at exactly the same moment as the visual
+     * one, using the same definition of "the user has committed to this value".
+     * Two separate notions of "touched" is how the ring and the announcement end
+     * up disagreeing.
+     *
+     * `focusout` rather than `blur`, because blur does not bubble.
+     */
+    function supportsUserInvalid() {
+      try {
+        document.createElement('input').matches(':user-invalid');
+        return true;
+      } catch (error) {
+        return false;
+      }
+    }
+
+    var hasUserInvalid = supportsUserInvalid();
+
+    function syncField(field) {
+      if (!field.willValidate || field.disabled) return;
+
+      // Below the `:user-invalid` floor, fall back to the submit-attempt flag —
+      // the same timing, tracked by hand.
+      var userInvalid = hasUserInvalid
+        ? field.matches(':user-invalid')
+        : submitted && !field.checkValidity();
+
+      if (userInvalid) {
+        showError(field, messageFor(field));
+      } else if (field.getAttribute('aria-invalid') === 'true') {
+        clearError(field);
+      }
+    }
+
+    form.addEventListener(
+      'focusout',
+      function (event) {
+        syncField(event.target);
+      },
+      true
+    );
+
+    // Clear the error the instant the correction becomes valid, so the user gets
+    // immediate confirmation rather than having to submit again to find out.
+    // `:user-invalid` stops matching at the same moment.
+    form.addEventListener('input', function (event) {
+      var field = event.target;
+      if (!field.willValidate) return;
+      if (field.getAttribute('aria-invalid') !== 'true') return;
+      if (field.checkValidity()) clearError(field);
+    });
+  });
+
+  // Exposed so application code can drive the same presentation for a
+  // server-side or asynchronous error.
+  DDS.formValidation = {
+    showError: showError,
+    clearError: clearError,
+    renderSummary: renderSummary,
+    hideSummary: hideSummary,
+    messages: MESSAGES,
+  };
+})(typeof window !== 'undefined' ? window : globalThis);

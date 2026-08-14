@@ -1,0 +1,446 @@
+/* =============================================================================
+   DDS — Patterns
+   =============================================================================
+
+   A Pattern combines components and behaviour to solve a recurring user task.
+   It introduces no new tokens and, ideally, no new visual language — it
+   arranges what already exists and adds the interaction rules.
+
+   The distinction from a Component matters in practice: a Component answers
+   "what does a button look like", a Pattern answers "how does a person find
+   and confirm their address". Patterns are where the accessibility work that
+   cannot live in a single element goes — focus order, live announcements,
+   error recovery, request lifecycle.
+
+   Section index:
+     Combobox · Address search · Form · Error summary · Results ·
+     Empty state · Conditional fields
+   ============================================================================= */
+
+@layer dds.patterns {
+
+  /* ==========================================================================
+     Combobox
+     ==========================================================================
+     A text input with a filtered list of suggestions. The base for address
+     search and for any "search a long known set of values" task.
+
+     Follows the ARIA combobox pattern: the input owns `role="combobox"` with
+     `aria-expanded` and `aria-controls`; the list is a `role="listbox"` of
+     `role="option"` elements; keyboard focus stays in the input and the active
+     option is pointed at with `aria-activedescendant`.
+
+     Why keep focus in the input: the user is still typing. Moving real DOM
+     focus into the list would stop them from refining the query, and it is why
+     `aria-activedescendant` exists.
+
+     Use a native `<select>` for a short, known list. A combobox is for sets
+     too long to scan — it costs the user a decision about whether to type or
+     to browse, and that cost is only worth paying above roughly 15 options.
+
+     Behaviour: js/patterns/combobox.js */
+  .dds-combobox {
+    position: relative;
+    /* Establish a containing block so the listbox positions against the field
+       rather than the page. */
+  }
+
+  /* The listbox. Hidden with the `hidden` attribute rather than
+     `display: none` in CSS, so the state lives in the DOM where JS and
+     assistive technology both read it. */
+  .dds-combobox-list {
+    position: absolute;
+    inset-inline: 0;
+    inset-block-start: calc(100% + var(--dds-space-3xs));
+    z-index: var(--dds-z-dropdown);
+
+    margin: 0;
+    padding: var(--dds-space-3xs);
+    /* A cap plus scrolling: a list that runs off the viewport is unusable, and
+       a long list needs a scroll container, not a longer page. */
+    max-block-size: 18rem;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+
+    list-style: none;
+    background-color: var(--dds-color-surface-raised);
+    border: var(--dds-border-thin) solid var(--dds-color-border-default);
+    border-radius: var(--dds-radius-md);
+    box-shadow: var(--dds-elevation-lg);
+  }
+
+  .dds-combobox-list[hidden] {
+    display: none;
+  }
+
+  .dds-combobox-option {
+    padding: var(--dds-space-xs) var(--dds-space-sm);
+    min-block-size: 2.25rem;
+    border-radius: var(--dds-radius-sm);
+    cursor: pointer;
+    /* The option is scrolled into view by JS on arrow-key navigation. */
+    scroll-margin-block: var(--dds-space-3xs);
+  }
+
+  /* The active option — the one Enter would choose. Driven by
+     `aria-selected`, so the visual state and the announced state cannot
+     diverge. Colour *and* weight change, so "which one am I on" does not
+     depend on perceiving the tint. */
+  .dds-combobox-option[aria-selected="true"] {
+    background-color: var(--dds-color-surface-selected);
+    color: var(--dds-color-text-link);
+    font-weight: var(--dds-font-weight-medium);
+  }
+
+  /* Pointer hover is styled the same way, so mouse and keyboard agree. */
+  .dds-combobox-option:hover {
+    background-color: var(--dds-color-surface-hover);
+  }
+
+  /* The matched substring inside an option. Bold rather than coloured: it has
+     to be visible in a row that is already tinted for the active state. */
+  .dds-combobox-match {
+    font-weight: var(--dds-font-weight-bold);
+  }
+
+  /* A non-selectable row: "no matches", "keep typing", "showing first 20".
+     `role="presentation"` in the markup keeps it out of the option count so
+     the announcement does not claim a result that cannot be chosen. */
+  .dds-combobox-message {
+    padding: var(--dds-space-xs) var(--dds-space-sm);
+    color: var(--dds-color-text-muted);
+    font-size: var(--dds-font-size-sm);
+    cursor: default;
+  }
+
+  /* A two-line option: a primary line plus supporting detail. Used by address
+     search, where the street is the identity and the locality disambiguates. */
+  .dds-combobox-option-primary {
+    display: block;
+  }
+
+  .dds-combobox-option-secondary {
+    display: block;
+    font-size: var(--dds-font-size-sm);
+    color: var(--dds-color-text-muted);
+    font-weight: var(--dds-font-weight-regular);
+  }
+
+  /* On the active row the secondary line must not stay muted — it would drop
+     below contrast against the tinted background. */
+  .dds-combobox-option[aria-selected="true"] .dds-combobox-option-secondary {
+    color: inherit;
+  }
+
+  /* The trailing status area inside the field: a spinner while a request is in
+     flight, a clear button once there is a value. */
+  .dds-combobox-status {
+    display: flex;
+    align-items: center;
+    gap: var(--dds-space-3xs);
+    color: var(--dds-color-text-muted);
+  }
+
+  /* ==========================================================================
+     Address search
+     ==========================================================================
+     A combobox that fills a set of structured address fields, over a
+     replaceable provider.
+
+     The design rules that make this usable, all learned the hard way:
+
+       - The structured fields are ALWAYS present and ALWAYS editable. The
+         search is an accelerator, not the only way in. Every address that a
+         provider does not know must still be enterable by hand, or the form
+         excludes real people at real addresses.
+       - Selecting a result never locks or hides a field. Providers return
+         wrong or stale data, and the user is the authority on where they live.
+       - Fields the provider cannot know (an apartment or care-of line) are
+         never auto-filled, and are cleared when a new address is selected so a
+         stale value cannot silently attach itself to a different address.
+       - Autofill tokens are set on every field, so the browser's own address
+         autofill works even before the user touches the search.
+
+     Behaviour: js/patterns/address-search.js
+     Provider contract: js/providers/README.md */
+  .dds-address-search {
+    display: flex;
+    flex-direction: column;
+    gap: var(--dds-space-md);
+    /* A container so the field grid can respond to the space this pattern is
+       actually given, rather than to the viewport — it has to work inside a
+       narrow column and inside a dialog. */
+    container-type: inline-size;
+    container-name: dds-address;
+  }
+
+  /* Postcode and locality on one line once there is room. Postcode is
+     narrower: sizing a field to its content is itself a hint about the
+     expected input. */
+  .dds-address-locality {
+    display: grid;
+    gap: var(--dds-space-md);
+  }
+
+  @container dds-address (inline-size > 26rem) {
+    .dds-address-locality {
+      /* Postcode gets a fixed-ish share, locality takes the rest. */
+      grid-template-columns: minmax(6rem, 1fr) 2fr;
+    }
+  }
+
+  /* The group of structured fields, visually tied to the search above it. */
+  .dds-address-fields {
+    display: flex;
+    flex-direction: column;
+    gap: var(--dds-space-md);
+  }
+
+  /* ==========================================================================
+     Form
+     ==========================================================================
+     Layout and rhythm for a form. The accessibility of a form is mostly in its
+     markup (see the Field component) — this is the arrangement around it. */
+  .dds-form {
+    display: flex;
+    flex-direction: column;
+    gap: var(--dds-space-lg);
+    /* Forms are read one field at a time, so they stay narrow regardless of
+       how much space is available. A field stretched across a wide screen is
+       harder to scan, not easier. */
+    max-inline-size: var(--dds-container-sm);
+  }
+
+  .dds-form-wide { max-inline-size: var(--dds-container-md); }
+
+  /* A related group of fields with its own caption. */
+  .dds-form-section {
+    display: flex;
+    flex-direction: column;
+    gap: var(--dds-space-md);
+  }
+
+  /* The submit row. Sticky on small screens so the primary action stays
+     reachable in a long form without scrolling to the end. */
+  .dds-form-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--dds-space-xs);
+    align-items: center;
+    padding-block-start: var(--dds-space-xs);
+  }
+
+  /* Two fields side by side once there is room for both to stay usable. */
+  .dds-form-row {
+    display: grid;
+    gap: var(--dds-space-md);
+    grid-template-columns: repeat(auto-fit, minmax(min(12rem, 100%), 1fr));
+  }
+
+  /* ==========================================================================
+     Error summary
+     ==========================================================================
+     A list of everything wrong, at the top of the form, after a failed submit.
+
+     This is the single highest-value accessibility pattern in forms. Without
+     it, a user whose submit failed has no idea how many problems there are or
+     where they live — they have to walk the whole form again.
+
+     How it must behave:
+       - It appears only after a submit attempt, never on page load.
+       - Focus moves to it, so the user lands on the explanation rather than
+         being silently returned to the top of the page.
+       - Every entry is a link to the field it describes, so the user can jump
+         straight there.
+       - The message text matches the per-field message, so the user is not
+             asked to reconcile two different descriptions of one problem.
+       - It is `tabindex="-1"` so it can receive programmatic focus without
+         becoming a permanent tab stop. */
+  .dds-error-summary {
+    padding: var(--dds-space-md);
+    background-color: var(--dds-color-surface-error);
+    border: var(--dds-border-thin) solid var(--dds-color-border-error);
+    border-inline-start-width: var(--dds-space-2xs);
+    border-radius: var(--dds-radius-md);
+  }
+
+  .dds-error-summary:focus-visible {
+    outline: var(--dds-focus-ring-width) solid var(--dds-color-focus-ring);
+    outline-offset: var(--dds-focus-ring-offset);
+  }
+
+  .dds-error-summary-title {
+    display: flex;
+    align-items: center;
+    gap: var(--dds-space-xs);
+
+    font-size: var(--dds-font-size-lg);
+    font-weight: var(--dds-font-weight-semibold);
+    color: var(--dds-color-text-error);
+    margin: 0;
+  }
+
+  .dds-error-summary-list {
+    margin-block-start: var(--dds-space-xs);
+    margin-block-end: 0;
+    padding-inline-start: var(--dds-space-lg);
+  }
+
+  .dds-error-summary-list li + li {
+    margin-block-start: var(--dds-space-2xs);
+  }
+
+  .dds-error-summary-list a {
+    color: var(--dds-color-text-error);
+    font-weight: var(--dds-font-weight-medium);
+  }
+
+  /* ==========================================================================
+     Results
+     ==========================================================================
+     A search-and-results region with its four real states: loading, results,
+     nothing found, and request failed.
+
+     All four are part of the pattern, not afterthoughts. The one most often
+     skipped is "failed", and it is the one where the user most needs to be
+     told what to do next.
+
+     The region carries `aria-busy` while loading and a `role="status"` live
+     region announces the outcome. A visual spinner alone communicates nothing
+     to a screen reader; a result count announcement is what actually tells the
+     user their search worked. */
+  .dds-results {
+    display: flex;
+    flex-direction: column;
+    gap: var(--dds-space-md);
+  }
+
+  /* A count/summary line above the list. */
+  .dds-results-summary {
+    font-size: var(--dds-font-size-sm);
+    color: var(--dds-color-text-muted);
+  }
+
+  .dds-results-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--dds-space-xs);
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  /* Dim the stale list while a new request is in flight, rather than replacing
+     it with a spinner. Keeping the previous results on screen preserves the
+     user's context and avoids a layout collapse on every keystroke. */
+  .dds-results[aria-busy="true"] .dds-results-list {
+    opacity: 0.5;
+    /* Stale results must not be clickable — the user would be acting on data
+       that is about to be replaced. */
+    pointer-events: none;
+  }
+
+  .dds-results-loading {
+    display: flex;
+    align-items: center;
+    gap: var(--dds-space-xs);
+    color: var(--dds-color-text-muted);
+    font-size: var(--dds-font-size-sm);
+  }
+
+  /* ==========================================================================
+     Empty state
+     ==========================================================================
+     Shown when there is nothing to show. Two quite different situations, and
+     conflating them is a common mistake:
+
+       - Nothing yet (a new account, an unused feature): the job is to explain
+         what this is for and offer the first action.
+       - Nothing found (a query that matched nothing): the job is to confirm
+         what was searched and offer a way to broaden it.
+
+     Never a bare "No data". */
+  .dds-empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--dds-space-sm);
+
+    padding: var(--dds-space-2xl) var(--dds-space-md);
+    text-align: center;
+
+    background-color: var(--dds-color-surface-sunken);
+    border: var(--dds-border-thin) dashed var(--dds-color-border-default);
+    border-radius: var(--dds-radius-lg);
+  }
+
+  .dds-empty > .dds-icon {
+    font-size: 2rem;
+    color: var(--dds-color-text-muted);
+  }
+
+  .dds-empty-title {
+    font-size: var(--dds-font-size-lg);
+    font-weight: var(--dds-font-weight-semibold);
+    margin: 0;
+  }
+
+  .dds-empty-body {
+    max-inline-size: var(--dds-measure-narrow);
+    color: var(--dds-color-text-subtle);
+    margin: 0;
+  }
+
+  /* ==========================================================================
+     Conditional fields
+     ==========================================================================
+     Fields that appear because of an earlier answer — progressive disclosure
+     inside a form.
+
+     Rules:
+       - Toggled with the `hidden` attribute, so hidden fields are out of the
+         tab order and out of the accessibility tree. Visually hiding them with
+         CSS alone leaves invisible tab stops, which is deeply disorienting.
+       - The controlling input carries `aria-expanded` and `aria-controls`, so
+         the relationship is announced rather than merely visual.
+       - Revealed content appears immediately after its trigger in the DOM, so
+             reading order and visual order agree (WCAG 1.3.2).
+       - Focus is NOT moved into the revealed region. The user is working
+         through the form in order and will arrive there next; stealing focus
+         would skip whatever sits between. */
+  .dds-conditional {
+    /* An indent plus a rule showing what the fields belong to. */
+    padding-inline-start: var(--dds-space-md);
+    border-inline-start: var(--dds-border-thick) solid var(--dds-color-border-subtle);
+
+    display: flex;
+    flex-direction: column;
+    gap: var(--dds-space-md);
+  }
+
+  .dds-conditional[hidden] {
+    display: none;
+  }
+
+  /* Animating from height 0 to auto requires `interpolate-size`, which is not
+     interoperable yet. Gated behind @supports: where it works the reveal
+     glides, everywhere else it appears instantly, which is perfectly fine. */
+  @supports (interpolate-size: allow-keywords) {
+    @media (prefers-reduced-motion: no-preference) {
+      .dds-conditional {
+        interpolate-size: allow-keywords;
+        transition:
+          block-size var(--dds-duration-fast) var(--dds-ease-standard),
+          opacity var(--dds-duration-fast) var(--dds-ease-standard),
+          content-visibility var(--dds-duration-fast) allow-discrete;
+      }
+
+      @starting-style {
+        .dds-conditional {
+          block-size: 0;
+          opacity: 0;
+        }
+      }
+    }
+  }
+}

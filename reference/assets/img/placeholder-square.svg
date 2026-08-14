@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Reference-page placeholder. Not part of DDS. See placeholder-wide.svg. -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 480" width="480" height="480" role="img" aria-label="">
+  <rect width="480" height="480" fill="#f4f2ee"/>
+  <g stroke="#e8e5df" stroke-width="1">
+    <path d="M0 120h480M0 240h480M0 360h480M120 0v480M240 0v480M360 0v480"/>
+  </g>
+  <circle cx="180" cy="180" r="108" fill="#4649b8" fill-opacity="0.22"/>
+  <rect x="192" y="192" width="192" height="192" fill="#9a4b2c" fill-opacity="0.22"/>
+</svg>

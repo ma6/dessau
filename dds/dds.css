@@ -1,0 +1,85 @@
+/* =============================================================================
+   DDS — Dessau Design System
+   =============================================================================
+
+   The single stylesheet entry point.
+
+       <link rel="stylesheet" href="/dds/dds.css">
+
+   -----------------------------------------------------------------------------
+   Cascade layers
+   -----------------------------------------------------------------------------
+
+   The layer order below is declared BEFORE any layer has content, which is what
+   fixes the order regardless of the order the files actually load in.
+
+   This is the most important architectural decision in the CSS, and it is what
+   a product gets for free by using DDS:
+
+     - Unlayered CSS always beats layered CSS. A product's own stylesheet needs
+       no `!important` and no specificity escalation to override anything here —
+       a plain `.my-thing { padding: 0 }` wins over `.dds-card` automatically.
+     - Inside DDS, a component can use a low-specificity selector without being
+       accidentally overridden by a utility, because the layer decides, not the
+       selector's weight.
+     - `:where()` is used throughout base.css to keep element defaults at zero
+       specificity, so overriding a base style never requires matching a
+       selector chain.
+
+   The practical effect: consumers stop fighting the design system's cascade,
+   which is the single most common reason a design system gets abandoned.
+
+   -----------------------------------------------------------------------------
+   Load cost
+   -----------------------------------------------------------------------------
+
+   `@import` serialises requests: the browser must parse this file before it
+   discovers the others. That is a real cost, accepted here because it keeps the
+   source navigable with no build step, and because the files are small and
+   cache well.
+
+   For production, either:
+     - run `node scripts/bundle.mjs` and ship the generated `dds.min.css`, or
+     - link the layer files directly from your own HTML in the order below, or
+     - concatenate them in whatever pipeline you already have.
+
+   All three are equivalent. Nothing here depends on being imported.
+   ============================================================================= */
+
+@layer dds.reset,
+       dds.foundation,
+       dds.base,
+       dds.typography,
+       dds.layout,
+       dds.components,
+       dds.patterns,
+       dds.utilities;
+
+/* Foundations first: everything downstream reads these custom properties.
+   Primitives before semantics, because the semantic layer points at them. */
+@import url("./css/primitives.css") layer(dds.foundation);
+@import url("./css/semantic.css") layer(dds.foundation);
+
+/* Element defaults and the shared floor (focus, motion, forced colours). */
+@import url("./css/base.css");
+
+/* Type utilities and the reading measure. */
+@import url("./css/typography.css");
+
+/* Layout primitives. */
+@import url("./css/layout.css");
+
+/* Reusable UI building blocks, split by concern so no single file becomes
+   unnavigable. All four land in the same `dds.components` layer — the split is
+   for the reader, not for the cascade. */
+@import url("./css/components.css");
+@import url("./css/components-forms.css");
+@import url("./css/components-navigation.css");
+@import url("./css/components-content.css");
+
+/* Compositions that solve a user task. */
+@import url("./css/patterns.css");
+@import url("./css/patterns-flows.css");
+
+/* Single-purpose helpers. Last, so they win inside DDS. */
+@import url("./css/utilities.css");

@@ -1,0 +1,531 @@
+/* =============================================================================
+   DDS — Form components
+   =============================================================================
+
+   Controls beyond the plain text field. Each one exists because the native
+   element on its own is genuinely insufficient for the job — not because the
+   native one looked wrong.
+
+   Section index:
+     Number stepper · Segmented control · File upload · Range · Character count
+   ============================================================================= */
+
+@layer dds.components {
+
+  /* ==========================================================================
+     Number stepper
+     ==========================================================================
+     A native `<input type="number">` plus explicit minus and plus buttons.
+
+     The native spinner buttons are around 10px tall, appear on hover only, and
+     are absent on touch entirely. For a quantity a user actually adjusts — as
+     opposed to types once — that is not a usable control.
+
+     The input remains the source of truth for `min`, `max` and `step`; the
+     buttons only move the same value. Typing stays possible, which matters when
+     the target is 40 rather than 4.
+
+     Behaviour: js/components-forms.js */
+  .dds-stepper {
+    display: inline-flex;
+    align-items: stretch;
+
+    border: var(--dds-border-thin) solid var(--dds-color-border-field);
+    border-radius: var(--dds-radius-sm);
+    background-color: var(--dds-color-surface-default);
+    /* Contain the children's corners. */
+    overflow: hidden;
+    inline-size: fit-content;
+  }
+
+  /* Move the focus ring to the wrapper, so the indicator matches the visible
+     control rather than only the middle segment of it. */
+  .dds-stepper:has(:focus-visible) {
+    outline: var(--dds-focus-ring-width) solid var(--dds-color-focus-ring);
+    outline-offset: var(--dds-focus-ring-offset);
+  }
+
+  .dds-stepper:has(:user-invalid),
+  .dds-stepper:has([aria-invalid="true"]) {
+    border-color: var(--dds-color-border-error);
+    border-width: var(--dds-border-thick);
+  }
+
+  .dds-stepper-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    /* 2.75rem square: a genuine touch target, unlike the native spinner. */
+    inline-size: 2.75rem;
+    min-block-size: 2.75rem;
+
+    color: var(--dds-color-action-secondary);
+    background-color: var(--dds-color-surface-sunken);
+    border: 0;
+    cursor: pointer;
+
+    transition: background-color var(--dds-duration-instant) var(--dds-ease-standard);
+  }
+
+  .dds-stepper-button:hover:not(:disabled) {
+    background-color: var(--dds-color-surface-hover);
+  }
+
+  .dds-stepper-button:disabled {
+    color: var(--dds-color-text-disabled);
+    cursor: not-allowed;
+  }
+
+  /* Inset, so the ring is not clipped by the wrapper's overflow. */
+  .dds-stepper-button:focus-visible {
+    outline-offset: calc(var(--dds-focus-ring-offset) * -1);
+  }
+
+  .dds-stepper > input {
+    /* Wide enough for four digits without being a text field. */
+    inline-size: 4rem;
+    padding: var(--dds-space-xs) var(--dds-space-2xs);
+
+    font-size: var(--dds-font-size-md);
+    /* Tabular, so the value does not shift horizontally as digits change. */
+    font-variant-numeric: tabular-nums;
+    text-align: center;
+
+    color: var(--dds-color-text-default);
+    background-color: var(--dds-color-surface-default);
+    border: 0;
+    border-inline: var(--dds-border-thin) solid var(--dds-color-border-subtle);
+    /* The wrapper shows the ring. */
+    outline: none;
+  }
+
+  /* Hide the native spinner: it duplicates the buttons and is too small to hit.
+     Both spellings are required for cross-engine coverage. */
+  .dds-stepper > input::-webkit-inner-spin-button,
+  .dds-stepper > input::-webkit-outer-spin-button {
+    appearance: none;
+    margin: 0;
+  }
+
+  .dds-stepper > input[type="number"] {
+    appearance: textfield;
+  }
+
+  /* ==========================================================================
+     Segmented control
+     ==========================================================================
+     A small set of mutually exclusive options, all visible at once. For
+     switching a view — a date range, a density, a sort order.
+
+     Built on radio inputs, so it is one tab stop and arrow keys move between
+     options: the native radio group behaviour is exactly right here, and
+     rebuilding it with buttons and `role="radiogroup"` would only lose things.
+
+     Use it for two to four options whose labels are short. More than that, or
+     longer labels, and it becomes a select. */
+  .dds-segmented {
+    display: inline-flex;
+    padding: var(--dds-space-3xs);
+    gap: var(--dds-space-3xs);
+
+    background-color: var(--dds-color-surface-sunken);
+    border: var(--dds-border-thin) solid var(--dds-color-border-subtle);
+    border-radius: var(--dds-radius-md);
+  }
+
+  .dds-segmented-option {
+    position: relative;
+  }
+
+  /* The input stays focusable and in the accessibility tree; the label is its
+     presentation. Not `display: none`, which would remove it from both. */
+  .dds-segmented-option > input {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    margin: 0;
+    cursor: pointer;
+  }
+
+  .dds-segmented-option > span {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--dds-space-3xs);
+
+    padding: var(--dds-space-2xs) var(--dds-space-sm);
+    min-block-size: 2.25rem;
+
+    font-size: var(--dds-font-size-sm);
+    font-weight: var(--dds-font-weight-medium);
+    color: var(--dds-color-text-subtle);
+    white-space: nowrap;
+
+    border-radius: var(--dds-radius-sm);
+    cursor: pointer;
+
+    transition:
+      background-color var(--dds-duration-instant) var(--dds-ease-standard),
+      color var(--dds-duration-instant) var(--dds-ease-standard);
+  }
+
+  .dds-segmented-option:hover > span {
+    color: var(--dds-color-text-default);
+  }
+
+  /* Selected: a raised surface, the action colour AND a heavier weight. Three
+     cues, because "which view am I looking at" is essential orientation and a
+     tint alone is not enough. */
+  .dds-segmented-option:has(> input:checked) > span {
+    background-color: var(--dds-color-surface-default);
+    color: var(--dds-color-text-link);
+    font-weight: var(--dds-font-weight-semibold);
+    box-shadow: var(--dds-elevation-sm);
+  }
+
+  .dds-segmented-option:has(> input:focus-visible) > span {
+    outline: var(--dds-focus-ring-width) solid var(--dds-color-focus-ring);
+    outline-offset: var(--dds-focus-ring-offset);
+  }
+
+  .dds-segmented-option:has(> input:disabled) > span {
+    color: var(--dds-color-text-disabled);
+    cursor: not-allowed;
+  }
+
+  @media (forced-colors: active) {
+    /* The raised surface is stripped, so selection needs a border. */
+    .dds-segmented-option:has(> input:checked) > span {
+      border: var(--dds-border-thick) solid Highlight;
+    }
+  }
+
+  /* ==========================================================================
+     File upload
+     ==========================================================================
+     A native `<input type="file">` with a drop zone around it.
+
+     The native input stays the control: it opens the platform's file picker,
+     which is the only thing that can reach the user's files, their cloud
+     storage and their camera. Drag-and-drop is added on top and is never the
+     only route — dragging is impossible for many people (WCAG 2.2 2.5.7
+     Dragging Movements) and awkward for most on a laptop trackpad.
+
+     Two attributes on the input matter more than any styling:
+
+       accept="…"  Filters the picker to the formats named in the prose. Without
+                   it the user is shown every file on their device and finds out
+                   about the restriction only after choosing wrongly. It MUST
+                   match the formats the surrounding text promises.
+
+       capture     Opens the camera directly on mobile. A per-case product
+                   decision, never a default: it is right for "photograph the
+                   receipt" and wrong for "upload the scan you already have",
+                   because it can suppress the full picker.
+
+     Behaviour: js/components-forms.js */
+  .dds-upload {
+    display: flex;
+    flex-direction: column;
+    gap: var(--dds-space-xs);
+  }
+
+  .dds-upload-zone {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--dds-space-xs);
+
+    padding: var(--dds-space-xl) var(--dds-space-md);
+    text-align: center;
+
+    background-color: var(--dds-color-surface-sunken);
+    /* Dashed, which is the established convention for "you may drop here". */
+    border: var(--dds-border-thick) dashed var(--dds-color-border-default);
+    border-radius: var(--dds-radius-lg);
+
+    transition:
+      background-color var(--dds-duration-fast) var(--dds-ease-standard),
+      border-color var(--dds-duration-fast) var(--dds-ease-standard);
+  }
+
+  .dds-upload-zone > .dds-icon {
+    font-size: 2rem;
+    color: var(--dds-color-text-muted);
+  }
+
+  /* Focus ring on the zone, because the native input inside is visually hidden
+     but still the thing receiving focus. */
+  .dds-upload-zone:has(input:focus-visible) {
+    outline: var(--dds-focus-ring-width) solid var(--dds-color-focus-ring);
+    outline-offset: var(--dds-focus-ring-offset);
+  }
+
+  /* Drag state, set by JS on dragenter/dragover. */
+  .dds-upload-zone[data-dds-dragging] {
+    background-color: var(--dds-color-surface-selected);
+    border-color: var(--dds-color-action-primary);
+    border-style: solid;
+  }
+
+  .dds-upload-zone:has(input:user-invalid),
+  .dds-upload-zone:has(input[aria-invalid="true"]) {
+    border-color: var(--dds-color-border-error);
+  }
+
+  /* The label wraps the input and is the visible affordance. */
+  .dds-upload-zone label {
+    cursor: pointer;
+  }
+
+  /* A file list. Each entry names the file, its size, and how to remove it. */
+  .dds-upload-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--dds-space-2xs);
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .dds-upload-item {
+    display: flex;
+    align-items: center;
+    gap: var(--dds-space-xs);
+
+    padding: var(--dds-space-2xs) var(--dds-space-xs);
+
+    background-color: var(--dds-color-surface-default);
+    border: var(--dds-border-thin) solid var(--dds-color-border-subtle);
+    border-radius: var(--dds-radius-sm);
+    font-size: var(--dds-font-size-sm);
+  }
+
+  .dds-upload-item > .dds-icon {
+    color: var(--dds-color-text-muted);
+  }
+
+  .dds-upload-item-name {
+    /* Truncate the middle-to-end of a long filename rather than the extension,
+       which is the part that identifies the file type. */
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    min-inline-size: 0;
+    flex-grow: 1;
+  }
+
+  .dds-upload-item-size {
+    color: var(--dds-color-text-muted);
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+  }
+
+  .dds-upload-item-remove {
+    margin-inline-start: auto;
+  }
+
+  .dds-upload-item[data-dds-rejected] {
+    border-color: var(--dds-color-border-error);
+    background-color: var(--dds-color-surface-error);
+  }
+
+  /* ==========================================================================
+     Range
+     ==========================================================================
+     A native `<input type="range">`, tinted by `accent-color` (base.css).
+
+     A range is only appropriate when the exact value does not matter — volume,
+     opacity, a rough threshold. If the user needs to hit a specific number,
+     give them a number field: a slider cannot be operated precisely with a
+     trackpad, and it is very hard to operate at all with a tremor.
+
+     The current value must always be shown as text beside it, and announced. */
+  .dds-range {
+    inline-size: 100%;
+    /* A comfortable target height around the thin track. */
+    min-block-size: 2.75rem;
+  }
+
+  .dds-range-row {
+    display: flex;
+    align-items: center;
+    gap: var(--dds-space-md);
+  }
+
+  .dds-range-value {
+    min-inline-size: 4ch;
+    text-align: end;
+    font-variant-numeric: tabular-nums;
+    font-weight: var(--dds-font-weight-medium);
+  }
+
+  /* ==========================================================================
+     Character count
+     ==========================================================================
+     A live count under a textarea with a `maxlength`.
+
+     `role="status"` with a debounced update, NOT an announcement per keystroke:
+     a screen reader reading a number after every character is unusable. The
+     count becomes urgent only near the limit, which is when it starts being
+     announced more assertively.
+
+     Behaviour: js/components-forms.js */
+  .dds-charcount {
+    display: flex;
+    justify-content: flex-end;
+    font-size: var(--dds-font-size-sm);
+    color: var(--dds-color-text-muted);
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* Approaching the limit. Colour AND weight, so it is not a colour-only cue. */
+  .dds-charcount[data-dds-charcount-state="near"] {
+    color: var(--dds-color-text-warning);
+    font-weight: var(--dds-font-weight-medium);
+  }
+
+  .dds-charcount[data-dds-charcount-state="over"] {
+    color: var(--dds-color-text-error);
+    font-weight: var(--dds-font-weight-semibold);
+  }
+}
+
+@layer dds.components {
+
+  /* ==========================================================================
+     Date field
+     ==========================================================================
+     A native `<input type="date">`.
+
+     Kept native, and the reason is not laziness. The platform picker knows the
+     locale's date order, the first day of the week, the calendar system and the
+     device's own date-entry conventions — and on a phone it is a purpose-built
+     control that a custom one cannot match. A JavaScript date picker has to
+     rebuild all of that, gets the keyboard wrong, and is the single most common
+     source of "I cannot enter my date of birth" complaints.
+
+     `color-scheme` is bound to the theme (semantic.css), so the picker's own
+     chrome follows light and dark without any styling here.
+
+     THE AUTOCOMPLETE RULE, which is easy to get backwards:
+
+       Date of birth        → autocomplete="bday"      (WCAG 1.3.5 expects it)
+       A future date        → autocomplete="off"       (there is nothing to fill)
+
+     Showing only the second case teaches implementers to copy `off` onto a
+     birthdate field, which breaks autofill for exactly the field where it helps
+     most. Both cases belong in the documentation.
+
+     Always give the expected format in a hint. The visible format differs by
+     locale and platform, so a reader cannot infer it from the control. */
+  .dds-date {
+    /* Sizing and chrome come from `.dds-input`; only the native indicator needs
+       attention. */
+    /* WebKit/Blink render a calendar button that inherits no colour. */
+  }
+
+  .dds-input[type="date"]::-webkit-calendar-picker-indicator,
+  .dds-input[type="time"]::-webkit-calendar-picker-indicator,
+  .dds-input[type="month"]::-webkit-calendar-picker-indicator {
+    /* Tint the indicator to the text colour so it is visible in dark mode, where
+       the default dark glyph disappears. `color-scheme` handles the popup itself. */
+    cursor: pointer;
+    opacity: 0.7;
+  }
+
+  .dds-input[type="date"]::-webkit-calendar-picker-indicator:hover {
+    opacity: 1;
+  }
+
+  /* A range of two dates. Stacks when there is not room for both. */
+  .dds-daterange {
+    display: grid;
+    gap: var(--dds-space-md);
+    grid-template-columns: repeat(auto-fit, minmax(min(10rem, 100%), 1fr));
+  }
+
+  /* ==========================================================================
+     Search field
+     ==========================================================================
+     A query input and its submit button as one visual unit.
+
+     A real `<form>` with `role="search"` on it, so the region is findable as a
+     landmark, and a real submit button — not a magnifier that only works with
+     JavaScript.
+
+     `type="search"` rather than `type="text"`: the platform adds a clear control,
+     offers previous queries, and on iOS relabels the keyboard's return key to
+     "Search". None of that is worth giving up for a slightly different clear
+     button.
+
+     The button is never icon-only without a name. A magnifier with no accessible
+     name is announced as "button". */
+  .dds-search {
+    display: flex;
+    align-items: stretch;
+
+    border: var(--dds-border-thin) solid var(--dds-color-border-field);
+    border-radius: var(--dds-radius-sm);
+    background-color: var(--dds-color-surface-default);
+    overflow: hidden;
+  }
+
+  /* The ring goes on the wrapper, so the indicator matches the visible unit
+     rather than one segment of it. */
+  .dds-search:has(:focus-visible) {
+    outline: var(--dds-focus-ring-width) solid var(--dds-color-focus-ring);
+    outline-offset: var(--dds-focus-ring-offset);
+  }
+
+  .dds-search > .dds-icon {
+    align-self: center;
+    margin-inline-start: var(--dds-space-sm);
+    color: var(--dds-color-text-muted);
+  }
+
+  .dds-search > input {
+    flex-grow: 1;
+    min-inline-size: 0;
+    padding: var(--dds-space-xs) var(--dds-space-sm);
+
+    font: inherit;
+    color: var(--dds-color-text-default);
+    background: none;
+    border: 0;
+    outline: none;
+  }
+
+  .dds-search > button {
+    flex-shrink: 0;
+    border-radius: 0;
+    /* Square off the edge that meets the input. */
+    border-start-start-radius: 0;
+    border-end-start-radius: 0;
+  }
+
+  .dds-search > button:focus-visible {
+    outline-offset: calc(var(--dds-focus-ring-offset) * -1);
+  }
+
+  /* ==========================================================================
+     Theme toggle
+     ==========================================================================
+     Switches between light and dark.
+
+     Behaviour: js/dds.js (`data-dds-theme-toggle`).
+
+     Built as a `<button>` with `aria-pressed`, and the accessible name stays
+     CONSTANT — "Dark theme", pressed or not. A control whose name changes when you
+     press it is announced as a different control each time, which is why the
+     tempting "Switch to light theme" label is wrong.
+
+     Both icons are in the markup and CSS shows the relevant one, so there is no
+     flash of the wrong icon before script runs and no icon swap in JavaScript. */
+  .dds-theme-toggle .dds-theme-toggle-dark { display: none; }
+  .dds-theme-toggle .dds-theme-toggle-light { display: inline-block; }
+
+  [data-theme="dark"] .dds-theme-toggle .dds-theme-toggle-dark { display: inline-block; }
+  [data-theme="dark"] .dds-theme-toggle .dds-theme-toggle-light { display: none; }
+}

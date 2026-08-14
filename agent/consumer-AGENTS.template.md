@@ -1,0 +1,149 @@
+# Template: AGENTS.md for a product that uses Dessau
+
+> **This is a template, not an active instruction file.** Copy everything below the
+> line into the product repository as `AGENTS.md`, fill in the `[…]` placeholders,
+> and add the product's own rules at the end. Point `CLAUDE.md` at it — either the
+> same content, a one-line reference, or a symlink. Never two divergent copies.
+>
+> Without this file, an agent working in that repository does not know Dessau
+> exists. It will invent a second button style, use raw hex values, write its own
+> ARIA, and rebuild a pattern that already exists. Every one of those is expensive
+> to find later and free to prevent now.
+
+---
+
+# AGENTS.md — [PRODUCT NAME]
+
+## Dessau
+
+This product's visual and interaction foundation comes from **Dessau** — colours,
+typography, spacing, component markup including ARIA, and the patterns that solve
+recurring tasks.
+
+**Location:** `[PATH, e.g. libs/dessau]`
+**Read first:** `[PATH]/AGENTS.md`, then `[PATH]/agent/index.json`
+**Rendered reference:** `[PATH]/reference/` — serve it and look at it when unsure
+how something should behave.
+
+### Before building any UI
+
+**Check `[PATH]/agent/index.json`.** It lists every component and pattern with its
+files, classes and specification.
+
+If it exists, use it. If something is close but not right, ask whether it should be
+extended in Dessau rather than duplicated here — see "Reporting back" below.
+Building a second, similar thing is the one move that is always wrong.
+
+### What is shared, and what is not
+
+Shared: the **CSS and token layer**, plus the reference markup including ARIA.
+
+**Not** shared: a component runtime. There are no Web Components. The behaviour in
+`[PATH]/dds/js/` is genuinely usable and entirely optional — this product may use
+it as-is or reimplement any of it in its own idiom, keeping identical markup and
+styling.
+
+Icons need one extra step: the sprite from `[PATH]/dds/icons/icons.svg` must be
+**inlined once per document**. An external `<use href="icons.svg#…">` breaks
+`currentColor` silently — the icon renders black regardless of theme.
+
+### Rules that are not negotiable
+
+- **WCAG 2.2 AA is the floor.** It outranks visual preference, convenience and
+  deadline. Calculate contrast, never estimate it.
+- **Semantic values only.** `var(--dds-color-*)`. Never a raw hex, never a fixed
+  pixel where a value exists, and **never a primitive** like
+  `--dds-indigo-600` — a primitive does not follow the theme, so it breaks dark
+  mode and nothing else.
+- **Use `.dds-*` classes; never redefine them.** This product's own styles get this
+  product's namespace. Because Dessau uses cascade layers, an unlayered rule here
+  already wins — **no `!important` is ever needed**.
+- **Take the reference markup, including ARIA, and translate it** into this
+  product's idiom. Do not rebuild it from a screenshot.
+- **Semantic HTML first.** ARIA supplements semantics; it never replaces them.
+- **Progressive enhancement.** The markup works before JavaScript runs.
+- **Native before custom.** `<dialog>`, `<details>`, `<select>`, `<progress>`, the
+  Constraint Validation API, `popover`.
+- **Never colour alone.** Status, selection and error carry text or an icon too.
+- **No Web Components / Custom Elements.** A deliberate Dessau decision; do not
+  introduce them here either.
+- **Light and dark both work.** Dark comes free once semantic values are used, so
+  skipping it is a deliberate decision to record — not a silent omission.
+- **Formats via `DDS.format`.** German by default: `1.234,56 €`, `01.08.2026`,
+  `14:30 Uhr`. Never `parseFloat` on a formatted number.
+- **A placeholder is never a label. Required is stated in words.**
+- **Never style validity from CSS `:invalid`** — it matches before the user has
+  typed.
+
+### Updating Dessau
+
+Dessau is **pinned**, not loaded live from a shared URL. A version update is a
+**deliberate, separate step**: bump the pin, test this product, commit. Never part
+of an unrelated feature commit.
+
+```bash
+git submodule update --remote [PATH]
+```
+
+### Deliberate deviation
+
+Allowed, when there is a real reason — and it must then be **documented here**:
+what, why, and whether it is temporary.
+
+Undocumented deviation is the thing that is not allowed. A documented one makes the
+divergence visible; an undocumented one just looks like a mistake nobody made on
+purpose.
+
+**Current deviations in this product:**
+
+- `[none / list them here]`
+
+### Reporting back
+
+If you build something here that other Dessau consumers would plausibly want — a
+new pattern, a missing value, a genuine gap — **say so explicitly** in your
+response: *"Candidate for Dessau, because …"*. Do not leave it silently
+product-local. Moving it in is a decision for the maintainer, not an automatic
+step.
+
+### Before calling a UI change done
+
+1. Renders correctly in **both** themes — dark is where colour mistakes hide.
+2. Contrast of anything new **calculated**, not estimated.
+3. Keyboard only: everything reachable, focus visible, order matching reading
+   order, nothing trapped.
+4. 320px wide and 400% zoom.
+5. Reduced motion honoured.
+6. No new console errors.
+7. Screen-reader pass on anything with announcements or focus management.
+8. Walk `[PATH]/agent/definition-of-done.md`.
+
+---
+
+## [PRODUCT NAME] — specifics
+
+### Voice and tone
+
+Dessau settles the writing fundamentals (`[PATH]/agent/ux-writing.md`). This
+product decides its own **form of address** and **domain vocabulary** — one choice,
+never mixed within an interface.
+
+- **Form of address:** `[German Sie / German Du / English formal — pick one]`
+- **Domain vocabulary:** `[the nouns of this product's subject matter, and the
+  terms that must never be used for them]`
+
+### Stack and commands
+
+```
+[build / dev / test / lint commands]
+```
+
+### Structure
+
+```
+[where templates, styles, components and tests live]
+```
+
+### Anything else an agent needs
+
+`[domain rules, integrations, data handling, environments, deployment]`

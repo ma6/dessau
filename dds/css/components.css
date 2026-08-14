@@ -1,0 +1,1499 @@
+/* =============================================================================
+   DDS — Components
+   =============================================================================
+
+   Reusable UI building blocks. A component is one thing with one purpose: a
+   button, an input, a card, a dialog. Anything that combines several of these
+   to accomplish a user task is a Pattern and lives in patterns.css.
+
+   Conventions used throughout:
+
+     - Every value comes from a semantic token. No hex, no magic pixel.
+     - State comes from the platform where the platform has it: `:disabled`,
+       `:checked`, `[aria-expanded]`, `[aria-invalid]`, `[open]`, `:invalid`.
+       A `.is-*` class is a last resort, not a first move.
+     - Size and spacing are exposed as custom properties on the component root,
+       so an instance can be adjusted without a new variant class.
+     - Nothing relies on colour alone to convey state.
+
+   Section index:
+     Icon · Button · Link button · Badge · Card · Field · Checkbox & radio ·
+     Switch · Fieldset group · Notice · Dialog · Table · Tabs · Disclosure ·
+     Spinner · Progress · Skeleton · Toast · Tooltip · Kbd
+   ============================================================================= */
+
+@layer dds.components {
+
+  /* ==========================================================================
+     Icon
+     ==========================================================================
+     Sized in `em` so an icon always matches the text it sits beside, at any
+     font size, with no per-context override.
+
+     `currentColor` is what makes an icon theme-aware for free — it picks up the
+     colour of its container, including inside a button whose text colour changes
+     on hover.
+
+     Note what is NOT here: no `fill`, no `stroke`, no `stroke-width`. The sprite
+     is built from Ionicons, which carries those as inline `style` attributes and
+     per-path values tuned to each glyph. A CSS declaration here would beat the
+     presentation attributes and either fill every outline icon solid or erase the
+     solid parts of the ones that have them. The build step
+     (`scripts/build-icons.mjs`) is what makes them theme-aware, by replacing
+     Ionicons' hardcoded `#000` with `currentColor`.
+
+     Icons are decorative by default: the markup carries `aria-hidden="true"` and
+     the meaning lives in adjacent text or the control's accessible name. An icon
+     that is the *only* content of a control needs the CONTROL to be labelled, not
+     the icon. */
+  .dds-icon {
+    /* `inline-block` + vertical alignment keeps the icon on the text baseline
+       rather than sitting on the line box bottom. */
+    display: inline-block;
+    inline-size: 1em;
+    block-size: 1em;
+    vertical-align: -0.125em;
+
+    /* Never let an icon shrink inside a flex row — a squashed icon reads as a
+       rendering bug. */
+    flex-shrink: 0;
+  }
+
+  .dds-icon-sm { font-size: 0.875em; }
+  .dds-icon-lg { font-size: 1.25em; }
+  .dds-icon-xl { font-size: 1.5em; }
+
+  /* ==========================================================================
+     Button
+     ==========================================================================
+     Three emphasis levels (primary, secondary, subtle) plus a danger variant.
+
+     Emphasis is carried by fill and border weight, not by hue: primary is
+     filled, secondary is outlined, subtle is bare. That ordering still reads
+     correctly in greyscale and in forced-colors mode.
+
+     Use a `<button>` for an action and an `<a>` for navigation. `.dds-button`
+     styles either, but the element choice is not cosmetic — it decides whether
+     the control responds to Space or Enter, whether it can be opened in a new
+     tab, and how it is announced. */
+  .dds-button {
+    --dds-button-padding-inline: var(--dds-space-md);
+    --dds-button-padding-block: var(--dds-space-xs);
+    --dds-button-font-size: var(--dds-font-size-md);
+    /* 2.75rem = 44px. WCAG 2.2 requires 24px; 44px is the comfortable target
+       size from platform guidance and is what a thumb actually needs. */
+    --dds-button-min-block-size: 2.75rem;
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--dds-space-xs);
+
+    min-block-size: var(--dds-button-min-block-size);
+    padding: var(--dds-button-padding-block) var(--dds-button-padding-inline);
+
+    font-family: var(--dds-font-body);
+    font-size: var(--dds-button-font-size);
+    font-weight: var(--dds-font-weight-medium);
+    line-height: var(--dds-line-height-snug);
+    /* A button label is a label, never a paragraph. */
+    text-align: center;
+    text-decoration: none;
+    white-space: nowrap;
+
+    border: var(--dds-border-thin) solid transparent;
+    border-radius: var(--dds-radius-md);
+    background-color: transparent;
+    cursor: pointer;
+
+    transition:
+      background-color var(--dds-duration-instant) var(--dds-ease-standard),
+      border-color var(--dds-duration-instant) var(--dds-ease-standard),
+      color var(--dds-duration-instant) var(--dds-ease-standard);
+  }
+
+  /* Keep the underline off buttons that happen to be links. */
+  a.dds-button { text-decoration: none; }
+  a.dds-button:hover { text-decoration: none; }
+
+  /* --- primary: one per view, the most likely next step ------------------- */
+  .dds-button-primary {
+    background-color: var(--dds-color-action-primary);
+    color: var(--dds-color-action-on-primary);
+    border-color: var(--dds-color-action-primary);
+  }
+
+  .dds-button-primary:hover:not(:disabled, [aria-disabled="true"]) {
+    background-color: var(--dds-color-action-primary-hover);
+    border-color: var(--dds-color-action-primary-hover);
+    color: var(--dds-color-action-on-primary);
+  }
+
+  .dds-button-primary:active:not(:disabled, [aria-disabled="true"]) {
+    background-color: var(--dds-color-action-primary-active);
+    border-color: var(--dds-color-action-primary-active);
+  }
+
+  /* --- secondary: equal-weight alternatives ------------------------------ */
+  .dds-button-secondary {
+    background-color: var(--dds-color-surface-default);
+    color: var(--dds-color-action-secondary);
+    border-color: var(--dds-color-border-default);
+  }
+
+  .dds-button-secondary:hover:not(:disabled, [aria-disabled="true"]) {
+    background-color: var(--dds-color-action-secondary-hover);
+    border-color: var(--dds-color-action-secondary);
+    color: var(--dds-color-action-secondary);
+  }
+
+  .dds-button-secondary:active:not(:disabled, [aria-disabled="true"]) {
+    background-color: var(--dds-color-action-secondary-active);
+  }
+
+  /* --- subtle: tertiary, in-table, toolbar ------------------------------- */
+  .dds-button-subtle {
+    color: var(--dds-color-action-secondary);
+  }
+
+  .dds-button-subtle:hover:not(:disabled, [aria-disabled="true"]) {
+    background-color: var(--dds-color-action-secondary-hover);
+    color: var(--dds-color-action-secondary);
+  }
+
+  .dds-button-subtle:active:not(:disabled, [aria-disabled="true"]) {
+    background-color: var(--dds-color-action-secondary-active);
+  }
+
+  /* --- danger: destructive, irreversible --------------------------------- */
+  /* Colour is a reinforcement here, not the warning itself. A destructive
+     action still needs an unambiguous verb ("Delete account", not "Confirm")
+     and, when it cannot be undone, a confirmation step — see the confirmation
+     pattern. */
+  .dds-button-danger {
+    background-color: var(--dds-color-action-danger);
+    color: var(--dds-color-action-on-danger);
+    border-color: var(--dds-color-action-danger);
+  }
+
+  .dds-button-danger:hover:not(:disabled, [aria-disabled="true"]) {
+    background-color: var(--dds-color-action-danger-hover);
+    border-color: var(--dds-color-action-danger-hover);
+    color: var(--dds-color-action-on-danger);
+  }
+
+  .dds-button-danger:active:not(:disabled, [aria-disabled="true"]) {
+    background-color: var(--dds-color-action-danger-active);
+    border-color: var(--dds-color-action-danger-active);
+  }
+
+  /* --- sizes ------------------------------------------------------------- */
+  .dds-button-sm {
+    --dds-button-padding-inline: var(--dds-space-sm);
+    --dds-button-padding-block: var(--dds-space-3xs);
+    --dds-button-font-size: var(--dds-font-size-sm);
+    /* 2rem = 32px: still comfortably above the 24px WCAG 2.2 minimum. Used for
+       dense contexts such as table rows and toolbars. */
+    --dds-button-min-block-size: 2rem;
+  }
+
+  .dds-button-lg {
+    --dds-button-padding-inline: var(--dds-space-lg);
+    --dds-button-padding-block: var(--dds-space-sm);
+    --dds-button-font-size: var(--dds-font-size-lg);
+    --dds-button-min-block-size: 3.25rem;
+  }
+
+  /* Full width, for narrow columns and mobile form submits. */
+  .dds-button-block {
+    display: flex;
+    inline-size: 100%;
+  }
+
+  /* --- icon-only --------------------------------------------------------- */
+  /* Square, and it MUST carry an accessible name — either `aria-label` or a
+     `.dds-visually-hidden` span. An icon-only button with no name is announced
+     as just "button", which tells the user nothing. */
+  .dds-button-icon {
+    --dds-button-padding-inline: var(--dds-space-xs);
+
+    aspect-ratio: 1;
+    padding: var(--dds-space-xs);
+  }
+
+  /* --- disabled --------------------------------------------------------- */
+  /* Both spellings are handled. `:disabled` is correct for a real control;
+     `[aria-disabled="true"]` keeps the control focusable, which is better when
+     the user needs to be able to reach it and find out *why* it is
+     unavailable. Prefer the latter on form submits. */
+  .dds-button:disabled,
+  .dds-button[aria-disabled="true"] {
+    background-color: var(--dds-color-action-disabled);
+    border-color: var(--dds-color-action-disabled);
+    color: var(--dds-color-text-disabled);
+    cursor: not-allowed;
+    /* No opacity: fading the whole control also fades the focus ring. */
+  }
+
+  /* --- busy ------------------------------------------------------------- */
+  /* A button waiting on a request. Keeps its width so the layout does not
+     jump, and pairs with `aria-busy="true"` plus a live region elsewhere —
+     the spinner alone announces nothing. */
+  .dds-button[aria-busy="true"] {
+    cursor: progress;
+  }
+
+  @media (forced-colors: active) {
+    /* Fills are stripped, so emphasis has to come back as border weight. */
+    .dds-button-primary {
+      border-width: var(--dds-border-thick);
+    }
+  }
+
+  /* ==========================================================================
+     Badge
+     ==========================================================================
+     A short, non-interactive status or category label.
+
+     Every status variant pairs its colour with text, and callers are expected
+     to include an icon for the status variants. A badge that says only "3" in
+     red communicates nothing to a reader who does not see red as red. */
+  .dds-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--dds-space-3xs);
+
+    padding: var(--dds-space-3xs) var(--dds-space-xs);
+
+    font-size: var(--dds-font-size-xs);
+    font-weight: var(--dds-font-weight-medium);
+    line-height: var(--dds-line-height-snug);
+    white-space: nowrap;
+
+    border: var(--dds-border-thin) solid var(--dds-color-border-default);
+    border-radius: var(--dds-radius-sm);
+    color: var(--dds-color-text-subtle);
+    background-color: var(--dds-color-surface-default);
+  }
+
+  .dds-badge-success {
+    color: var(--dds-color-text-success);
+    background-color: var(--dds-color-surface-success);
+    border-color: var(--dds-color-border-success);
+  }
+
+  .dds-badge-warning {
+    color: var(--dds-color-text-warning);
+    background-color: var(--dds-color-surface-warning);
+    border-color: var(--dds-color-border-warning);
+  }
+
+  .dds-badge-error {
+    color: var(--dds-color-text-error);
+    background-color: var(--dds-color-surface-error);
+    border-color: var(--dds-color-border-error);
+  }
+
+  .dds-badge-info {
+    color: var(--dds-color-text-info);
+    background-color: var(--dds-color-surface-info);
+    border-color: var(--dds-color-border-info);
+  }
+
+  /* A count badge. Pill-shaped and numeric-aligned. */
+  .dds-badge-count {
+    border-radius: var(--dds-radius-pill);
+    font-variant-numeric: tabular-nums;
+    min-inline-size: 1.5em;
+    justify-content: center;
+  }
+
+  /* ==========================================================================
+     Card
+     ==========================================================================
+     A bounded content group. Deliberately unopinionated about its contents —
+     compose it with `.dds-stack` inside.
+
+     A card is not a button. If the whole card is clickable, put a real link
+     inside it around the heading text and let the card grow the hit area, so
+     the link text is what gets announced rather than the entire card body. */
+  .dds-card {
+    --dds-card-padding: var(--dds-space-lg);
+
+    padding: var(--dds-card-padding);
+    background-color: var(--dds-color-surface-default);
+    border: var(--dds-border-thin) solid var(--dds-color-border-subtle);
+    border-radius: var(--dds-radius-lg);
+  }
+
+  .dds-card-raised {
+    background-color: var(--dds-color-surface-raised);
+    box-shadow: var(--dds-elevation-md);
+  }
+
+  .dds-card-sunken {
+    background-color: var(--dds-color-surface-sunken);
+    border-color: transparent;
+  }
+
+  .dds-card-compact { --dds-card-padding: var(--dds-space-md); }
+
+  /* An interactive card: the hit area covers the card, the accessible name
+     comes from the link inside it.
+
+     `:focus-within` moves the focus ring to the card so the indicator matches
+     the hit area the user is actually about to activate. */
+  .dds-card-link {
+    position: relative;
+    transition:
+      border-color var(--dds-duration-instant) var(--dds-ease-standard),
+      background-color var(--dds-duration-instant) var(--dds-ease-standard);
+  }
+
+  .dds-card-link:hover {
+    border-color: var(--dds-color-border-default);
+    background-color: var(--dds-color-surface-hover);
+  }
+
+  .dds-card-link:focus-within {
+    outline: var(--dds-focus-ring-width) solid var(--dds-color-focus-ring);
+    outline-offset: var(--dds-focus-ring-offset);
+  }
+
+  /* The link inside stretches to cover the card. `::after` rather than making
+     the card itself a link, so only the heading text is the accessible name. */
+  .dds-card-link .dds-card-target::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    /* Above the card background, below any other interactive child so a
+       secondary button inside the card still works. */
+    z-index: 1;
+  }
+
+  /* The stretched link must not swallow other controls in the card. */
+  .dds-card-link :is(button, a:not(.dds-card-target), input, select, textarea) {
+    position: relative;
+    z-index: 2;
+  }
+
+  /* The ring belongs to the card, so suppress the inner link's own ring. */
+  .dds-card-link .dds-card-target:focus-visible {
+    outline: none;
+  }
+
+  /* ==========================================================================
+     Field
+     ==========================================================================
+     The form primitive: label, control, optional hint, optional error.
+
+     Rules that are not negotiable, because breaking them is what makes forms
+     inaccessible:
+
+       - Every control has a visible `<label for>`. A placeholder is not a
+         label: it vanishes on input, it is not announced reliably, and it
+         fails contrast in most designs.
+       - Hint and error are referenced from the control by `aria-describedby`,
+         space-separated, so both are read out.
+       - A required field says "(required)" in words. An asterisk is not
+         self-explanatory, and red alone is unavailable to many readers — red
+         is also reserved for the error state here.
+       - The hint is never removed when an error appears. The user needs the
+             format rule *and* the failure, not one replaced by the other. */
+  .dds-field {
+    display: flex;
+    flex-direction: column;
+    gap: var(--dds-space-2xs);
+  }
+
+  .dds-label {
+    font-size: var(--dds-font-size-sm);
+    font-weight: var(--dds-font-weight-medium);
+    color: var(--dds-color-text-default);
+  }
+
+  /* "(required)" / "(optional)" marker. Muted, because it qualifies the label
+     rather than competing with it. */
+  .dds-label-note {
+    font-weight: var(--dds-font-weight-regular);
+    color: var(--dds-color-text-muted);
+  }
+
+  /* --- the control ------------------------------------------------------- */
+  /* One shared appearance for every text-like control and the select, so a
+     form reads as one form. */
+  .dds-input,
+  .dds-textarea,
+  .dds-select {
+    --dds-input-padding-inline: var(--dds-space-sm);
+    --dds-input-padding-block: var(--dds-space-xs);
+
+    inline-size: 100%;
+    min-block-size: 2.75rem;
+    padding: var(--dds-input-padding-block) var(--dds-input-padding-inline);
+
+    font-family: inherit;
+    font-size: var(--dds-font-size-md);
+    color: var(--dds-color-text-default);
+
+    background-color: var(--dds-color-surface-default);
+    border: var(--dds-border-thin) solid var(--dds-color-border-field);
+    border-radius: var(--dds-radius-sm);
+
+    transition:
+      border-color var(--dds-duration-instant) var(--dds-ease-standard),
+      background-color var(--dds-duration-instant) var(--dds-ease-standard);
+  }
+
+  /* 16px minimum on touch: iOS Safari zooms the viewport when focusing a
+     control with a smaller font size, which is disorienting and hard to
+     recover from. This is why `--dds-font-size-md` is the field size and there
+     is no `.dds-input-sm`. */
+
+  .dds-textarea {
+    min-block-size: 5lh;
+    line-height: var(--dds-line-height-normal);
+  }
+
+  .dds-input:hover:not(:disabled),
+  .dds-textarea:hover:not(:disabled),
+  .dds-select:hover:not(:disabled) {
+    border-color: var(--dds-color-border-strong);
+  }
+
+  /* --- select ----------------------------------------------------------- */
+  /* The native select is kept. Its popup is rendered by the OS, which means it
+     is correct on touch, correct with a screen reader, correct with a keyboard,
+     and correct in a language the developer never tested. A custom listbox
+     gives up all of that to change an arrow.
+
+     `appearance: base-select` is not used yet: it is not interoperable across
+     engines at the time of writing, so the arrow stays native too. */
+  .dds-select {
+    /* Room so long option text does not run under the native arrow. */
+    padding-inline-end: var(--dds-space-xl);
+  }
+
+  /* --- monospace variant ------------------------------------------------ */
+  /* For values transcribed character by character: codes, identifiers,
+     checksums. Ligatures off so character pairs are not visually merged. */
+  .dds-input-code {
+    font-family: var(--dds-font-mono);
+    font-variant-ligatures: none;
+  }
+
+  /* --- invalid ---------------------------------------------------------- */
+  /* Driven by `aria-invalid`, set by the application, NOT by the CSS `:invalid`
+     pseudo-class.
+
+     `:invalid` matches from the moment the page loads, so a required field is
+     styled as an error before the user has typed anything. That trains people
+     to ignore error styling. Validity is shown after the user has had a chance
+     to satisfy it — see the validation pattern. */
+  .dds-input[aria-invalid="true"],
+  .dds-textarea[aria-invalid="true"],
+  .dds-select[aria-invalid="true"] {
+    border-color: var(--dds-color-border-error);
+    /* Double the border rather than only recolouring it, so the invalid state
+       survives greyscale, colour-blindness and forced-colors. */
+    border-width: var(--dds-border-thick);
+  }
+
+  /* --- hint and error --------------------------------------------------- */
+  .dds-hint {
+    font-size: var(--dds-font-size-sm);
+    color: var(--dds-color-text-muted);
+  }
+
+  /* The error message. Icon plus text plus colour — three signals, so no
+     single perceptual channel is load-bearing. */
+  .dds-error {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--dds-space-3xs);
+
+    font-size: var(--dds-font-size-sm);
+    font-weight: var(--dds-font-weight-medium);
+    color: var(--dds-color-text-error);
+  }
+
+  .dds-error .dds-icon {
+    /* Nudge onto the first line's optical centre. */
+    margin-block-start: 0.15em;
+  }
+
+  /* --- input with an adornment ------------------------------------------ */
+  /* An icon or unit sitting inside the control's box (a search glyph, a
+     currency symbol). The wrapper carries the border so the icon is inside the
+     focus ring rather than beside it. */
+  .dds-input-group {
+    display: flex;
+    align-items: center;
+    gap: var(--dds-space-xs);
+
+    padding-inline: var(--dds-space-sm);
+    background-color: var(--dds-color-surface-default);
+    border: var(--dds-border-thin) solid var(--dds-color-border-field);
+    border-radius: var(--dds-radius-sm);
+  }
+
+  .dds-input-group:hover:not(:has(:disabled)) {
+    border-color: var(--dds-color-border-strong);
+  }
+
+  /* Move the ring to the wrapper so the indicator matches the visible control.
+     `:has()` lets the parent react to its child's state with no JS. */
+  .dds-input-group:has(:focus-visible) {
+    outline: var(--dds-focus-ring-width) solid var(--dds-color-focus-ring);
+    outline-offset: var(--dds-focus-ring-offset);
+  }
+
+  .dds-input-group:has([aria-invalid="true"]) {
+    border-color: var(--dds-color-border-error);
+    border-width: var(--dds-border-thick);
+  }
+
+  /* The inner control gives up its own chrome to the wrapper. */
+  .dds-input-group > .dds-input {
+    border: 0;
+    padding-inline: 0;
+    background: none;
+    /* The wrapper shows the ring. */
+    outline: none;
+  }
+
+  .dds-input-group > .dds-icon {
+    color: var(--dds-color-text-muted);
+  }
+
+  .dds-input-group-affix {
+    color: var(--dds-color-text-muted);
+    font-size: var(--dds-font-size-sm);
+    white-space: nowrap;
+  }
+
+  /* ==========================================================================
+     Checkbox and radio
+     ==========================================================================
+     Native inputs, laid out — not replaced.
+
+     `accent-color` (base.css) tints them with the action colour, which is all
+     that is needed. A replacement built from a hidden input and a styled span
+     re-implements keyboard behaviour, indeterminate state, forced-colors
+     rendering and grouping semantics, and usually gets at least one wrong. */
+  .dds-choice {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--dds-space-xs);
+    /* The whole row is the label, so the target area is the text too, not just
+       the 18px box (WCAG 2.5.8). */
+    cursor: pointer;
+    /* Comfortable target height without stretching the visual box. */
+    min-block-size: 2rem;
+    padding-block: var(--dds-space-3xs);
+  }
+
+  .dds-choice > input {
+    /* Optical alignment with the first line of the label text. */
+    margin-block-start: 0.2em;
+    flex-shrink: 0;
+  }
+
+  .dds-choice-label {
+    font-size: var(--dds-font-size-md);
+    line-height: var(--dds-line-height-normal);
+  }
+
+  /* Secondary text under a choice label. Referenced by `aria-describedby` on
+     the input, so it is announced with the option. */
+  .dds-choice-hint {
+    display: block;
+    font-size: var(--dds-font-size-sm);
+    color: var(--dds-color-text-muted);
+  }
+
+  .dds-choice:has(> input:disabled) {
+    cursor: not-allowed;
+    color: var(--dds-color-text-disabled);
+  }
+
+  /* A bordered card around a choice, for a small set of significant options.
+     `:has()` gives the selected card its emphasis with no JS and no class. */
+  .dds-choice-card {
+    padding: var(--dds-space-md);
+    background-color: var(--dds-color-surface-default);
+    border: var(--dds-border-thin) solid var(--dds-color-border-default);
+    border-radius: var(--dds-radius-md);
+    transition:
+      border-color var(--dds-duration-instant) var(--dds-ease-standard),
+      background-color var(--dds-duration-instant) var(--dds-ease-standard);
+  }
+
+  .dds-choice-card:hover:not(:has(> input:disabled)) {
+    background-color: var(--dds-color-surface-hover);
+  }
+
+  /* Selected: border weight *and* fill change, so selection is not colour-only. */
+  .dds-choice-card:has(> input:checked) {
+    border-color: var(--dds-color-action-primary);
+    border-width: var(--dds-border-thick);
+    background-color: var(--dds-color-surface-selected);
+    /* Compensate for the thicker border so the card does not shift by 1px when
+       selected — a visible jitter as the user moves through options. */
+    padding: calc(var(--dds-space-md) - 1px);
+  }
+
+  /* The ring goes on the card, matching the clickable area. */
+  .dds-choice-card:has(> input:focus-visible) {
+    outline: var(--dds-focus-ring-width) solid var(--dds-color-focus-ring);
+    outline-offset: var(--dds-focus-ring-offset);
+  }
+
+  /* ==========================================================================
+     Switch
+     ==========================================================================
+     For a setting that takes effect immediately. A checkbox is for a value
+     that is submitted with a form — the difference is real and users read it:
+     a switch implies "this is now on", a checkbox implies "this will be saved".
+
+     Built on `role="switch"` over a real checkbox input, so it keeps native
+     keyboard behaviour (Space toggles) and native form participation. */
+  .dds-switch {
+    display: flex;
+    align-items: center;
+    gap: var(--dds-space-sm);
+    cursor: pointer;
+    min-block-size: 2.75rem;
+  }
+
+  .dds-switch > input {
+    /* Hide the native box but keep it focusable, in the a11y tree and in the
+       tab order — the visible track below is its presentation. */
+    position: absolute;
+    opacity: 0;
+    inline-size: 2.75rem;
+    block-size: 1.5rem;
+    margin: 0;
+    cursor: pointer;
+  }
+
+  .dds-switch-track {
+    position: relative;
+    inline-size: 2.75rem;
+    block-size: 1.5rem;
+    flex-shrink: 0;
+
+    background-color: var(--dds-color-surface-active);
+    border: var(--dds-border-thin) solid var(--dds-color-border-field);
+    border-radius: var(--dds-radius-pill);
+
+    transition: background-color var(--dds-duration-fast) var(--dds-ease-standard);
+  }
+
+  .dds-switch-track::after {
+    content: "";
+    position: absolute;
+    inset-block-start: 50%;
+    inset-inline-start: 2px;
+    translate: 0 -50%;
+
+    inline-size: 1.125rem;
+    block-size: 1.125rem;
+
+    background-color: var(--dds-color-surface-default);
+    border-radius: var(--dds-radius-circle);
+    box-shadow: var(--dds-elevation-sm);
+
+    transition: translate var(--dds-duration-fast) var(--dds-ease-standard);
+  }
+
+  .dds-switch:has(> input:checked) .dds-switch-track {
+    background-color: var(--dds-color-action-primary);
+    border-color: var(--dds-color-action-primary);
+  }
+
+  .dds-switch:has(> input:checked) .dds-switch-track::after {
+    /* Logical translate so the knob moves the correct way in right-to-left. */
+    translate: 1.25rem -50%;
+  }
+
+  .dds-switch:has(> input:focus-visible) .dds-switch-track {
+    outline: var(--dds-focus-ring-width) solid var(--dds-color-focus-ring);
+    outline-offset: var(--dds-focus-ring-offset);
+  }
+
+  .dds-switch:has(> input:disabled) {
+    cursor: not-allowed;
+    color: var(--dds-color-text-disabled);
+  }
+
+  .dds-switch:has(> input:disabled) .dds-switch-track {
+    background-color: var(--dds-color-surface-disabled);
+  }
+
+  @media (forced-colors: active) {
+    /* The track fill is stripped, so the on state needs a non-colour cue. */
+    .dds-switch:has(> input:checked) .dds-switch-track {
+      border-width: var(--dds-border-thick);
+    }
+  }
+
+  /* ==========================================================================
+     Fieldset group
+     ==========================================================================
+     Wraps a set of related controls under one caption. Required for radio
+     groups and for checkbox groups that answer a single question: without it,
+     a screen reader announces each option with no idea what the question was.
+
+     `<fieldset>` + `<legend>` is the accessible grouping the platform already
+     provides. `role="group"` with `aria-labelledby` is the fallback where a
+     fieldset's layout behaviour gets in the way. */
+  .dds-fieldgroup {
+    display: flex;
+    flex-direction: column;
+    gap: var(--dds-space-sm);
+  }
+
+  .dds-legend {
+    /* Legends do not participate in flex layout in some engines, so it is
+       taken out of the flow expectations and styled as a block. */
+    display: block;
+    font-size: var(--dds-font-size-sm);
+    font-weight: var(--dds-font-weight-semibold);
+    color: var(--dds-color-text-default);
+    margin-block-end: var(--dds-space-2xs);
+  }
+
+  /* Options laid out in a responsive grid — one column when narrow. */
+  .dds-fieldgroup-options {
+    display: grid;
+    gap: var(--dds-space-xs);
+  }
+
+  .dds-fieldgroup-options-inline {
+    grid-auto-flow: column;
+    grid-auto-columns: max-content;
+    gap: var(--dds-space-md);
+  }
+
+  /* ==========================================================================
+     Notice
+     ==========================================================================
+     A contextual message attached to the page or a section.
+
+     Which ARIA role belongs on it depends entirely on *when* it appears:
+       - present at page load, informational  -> no role
+       - appears in response to an action     -> role="status" (polite)
+       - an error that blocks progress        -> role="alert" (assertive)
+     Putting `role="alert"` on a notice that is already on the page means the
+     screen reader announces it on load, out of context. */
+  .dds-notice {
+    display: flex;
+    gap: var(--dds-space-sm);
+    align-items: flex-start;
+
+    padding: var(--dds-space-md);
+    border: var(--dds-border-thin) solid var(--dds-color-border-default);
+    /* A leading edge in the status colour, so the kind of message is legible
+       at a glance and still distinguishable when the tint is imperceptible. */
+    border-inline-start-width: var(--dds-space-2xs);
+    border-radius: var(--dds-radius-md);
+    background-color: var(--dds-color-surface-sunken);
+  }
+
+  .dds-notice-title {
+    font-weight: var(--dds-font-weight-semibold);
+  }
+
+  /* The icon carries no information (it is `aria-hidden`); the visually hidden
+     word before the title is what tells a screen-reader user which kind of
+     message this is. */
+  .dds-notice > .dds-icon {
+    margin-block-start: 0.15em;
+    font-size: 1.25em;
+  }
+
+  .dds-notice-success {
+    background-color: var(--dds-color-surface-success);
+    border-color: var(--dds-color-border-success);
+  }
+  .dds-notice-success > .dds-icon { color: var(--dds-color-text-success); }
+
+  .dds-notice-warning {
+    background-color: var(--dds-color-surface-warning);
+    border-color: var(--dds-color-border-warning);
+  }
+  .dds-notice-warning > .dds-icon { color: var(--dds-color-text-warning); }
+
+  .dds-notice-error {
+    background-color: var(--dds-color-surface-error);
+    border-color: var(--dds-color-border-error);
+  }
+  .dds-notice-error > .dds-icon { color: var(--dds-color-text-error); }
+
+  .dds-notice-info {
+    background-color: var(--dds-color-surface-info);
+    border-color: var(--dds-color-border-info);
+  }
+  .dds-notice-info > .dds-icon { color: var(--dds-color-text-info); }
+
+  /* ==========================================================================
+     Dialog
+     ==========================================================================
+     The native `<dialog>` element, opened with `showModal()`.
+
+     What the platform provides and a div-based modal has to rebuild by hand:
+     focus is moved in and trapped, the rest of the page is made inert,
+     Escape closes it, it renders in the top layer so no z-index or overflow
+     ancestor can clip it, and the backdrop is a real pseudo-element.
+
+     `showModal()` — not the `open` attribute. `<dialog open>` renders
+     non-modally: the page behind it stays focusable and Escape does nothing. */
+  .dds-dialog {
+    --dds-dialog-width: var(--dds-container-sm);
+
+    inline-size: min(var(--dds-dialog-width), calc(100vw - var(--dds-space-xl)));
+    max-block-size: min(80svh, calc(100svh - var(--dds-space-xl)));
+    /* Reset the UA's default border and padding. */
+    padding: 0;
+    border: var(--dds-border-thin) solid var(--dds-color-border-default);
+    border-radius: var(--dds-radius-lg);
+    background-color: var(--dds-color-surface-raised);
+    color: var(--dds-color-text-default);
+    box-shadow: var(--dds-elevation-lg);
+
+    /* The dialog is laid out as a column so the body scrolls and the header
+       and footer stay put. */
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  /* `display` is toggled by the UA between `none` and `block`, so animating
+     requires `transition-behavior: allow-discrete` plus a `@starting-style`
+     entry state. Without those the element would simply appear. */
+  .dds-dialog,
+  .dds-dialog::backdrop {
+    transition:
+      opacity var(--dds-duration-base) var(--dds-ease-standard),
+      translate var(--dds-duration-base) var(--dds-ease-standard),
+      overlay var(--dds-duration-base) allow-discrete,
+      display var(--dds-duration-base) allow-discrete;
+  }
+
+  .dds-dialog:not([open]) {
+    opacity: 0;
+    translate: 0 1rem;
+  }
+
+  .dds-dialog[open] {
+    opacity: 1;
+    translate: 0 0;
+  }
+
+  @starting-style {
+    .dds-dialog[open] {
+      opacity: 0;
+      translate: 0 1rem;
+    }
+  }
+
+  .dds-dialog::backdrop {
+    /* Translucent black works in both themes because it darkens whatever is
+       behind it rather than tinting it. See the overlay tokens in semantic.css. */
+    background-color: var(--dds-color-overlay);
+    opacity: 1;
+  }
+
+  .dds-dialog:not([open])::backdrop {
+    opacity: 0;
+  }
+
+  @starting-style {
+    .dds-dialog[open]::backdrop {
+      opacity: 0;
+    }
+  }
+
+  .dds-dialog-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: var(--dds-space-md);
+
+    padding: var(--dds-space-lg);
+    padding-block-end: var(--dds-space-sm);
+  }
+
+  .dds-dialog-title {
+    font-size: var(--dds-font-size-xl);
+    /* The dialog needs an accessible name: reference this element from the
+       dialog with `aria-labelledby`. */
+    margin: 0;
+  }
+
+  .dds-dialog-body {
+    padding-inline: var(--dds-space-lg);
+    padding-block: var(--dds-space-2xs);
+    overflow-y: auto;
+    /* Keep a scroll gesture inside the dialog rather than chaining to the page
+       behind it once the dialog's content is exhausted. */
+    overscroll-behavior: contain;
+  }
+
+  .dds-dialog-footer {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--dds-space-xs);
+    /* Confirming action last, matching the platform convention on the web and
+       on Windows. The order is a deliberate, single system-wide choice — the
+       cost of inconsistency is a user confirming something they meant to
+       cancel. */
+    justify-content: flex-end;
+
+    padding: var(--dds-space-lg);
+    padding-block-start: var(--dds-space-md);
+  }
+
+  /* A dialog anchored to the bottom edge on small screens: easier to reach
+     one-handed. Container-query-free because it depends on the viewport, which
+     is genuinely what "reachable by a thumb" depends on. */
+  @media (max-width: 30rem) {
+    .dds-dialog-sheet {
+      --dds-dialog-width: 100vw;
+
+      margin-block-end: 0;
+      margin-block-start: auto;
+      max-block-size: 90svh;
+      border-end-end-radius: 0;
+      border-end-start-radius: 0;
+    }
+
+    .dds-dialog-sheet:not([open]) {
+      translate: 0 2rem;
+    }
+  }
+
+  /* ==========================================================================
+     Table
+     ==========================================================================
+     A real `<table>` with real `<th scope>`. A grid of divs cannot be
+     navigated cell-by-cell by a screen reader, which is the entire point of
+     tabular data.
+
+     The wrapper is not optional. A table that overflows needs a scrollable
+     region that is focusable (`tabindex="0"`) and named
+     (`role="region"` + `aria-labelledby` pointing at the caption), or the
+     content past the edge is unreachable without a mouse. */
+  .dds-table-wrap {
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    border: var(--dds-border-thin) solid var(--dds-color-border-subtle);
+    border-radius: var(--dds-radius-md);
+  }
+
+  .dds-table-wrap:focus-visible {
+    outline: var(--dds-focus-ring-width) solid var(--dds-color-focus-ring);
+    outline-offset: calc(var(--dds-focus-ring-offset) * -1);
+  }
+
+  .dds-table {
+    inline-size: 100%;
+    border-collapse: collapse;
+    font-size: var(--dds-font-size-sm);
+  }
+
+  .dds-table :is(th, td) {
+    padding: var(--dds-space-xs) var(--dds-space-sm);
+    text-align: start;
+    /* Horizontal rules only. Vertical rules turn a table into a grid of boxes
+       and make rows harder to follow across. */
+    border-block-end: var(--dds-border-thin) solid var(--dds-color-border-subtle);
+  }
+
+  .dds-table thead th {
+    background-color: var(--dds-color-surface-sunken);
+    font-weight: var(--dds-font-weight-semibold);
+    color: var(--dds-color-text-default);
+    border-block-end: var(--dds-border-thin) solid var(--dds-color-border-default);
+    white-space: nowrap;
+  }
+
+  .dds-table tbody tr:last-child :is(th, td) {
+    border-block-end: 0;
+  }
+
+  /* Numeric columns: right-aligned and tabular so digits line up for
+     comparison down the column. */
+  .dds-table .dds-table-numeric {
+    text-align: end;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .dds-table-zebra tbody tr:nth-child(even) {
+    background-color: var(--dds-color-surface-sunken);
+  }
+
+  /* Row hover only where rows are actually interactive. */
+  .dds-table-interactive tbody tr:hover {
+    background-color: var(--dds-color-surface-hover);
+  }
+
+  /* A sticky header for a long table inside a scrolling wrapper. */
+  .dds-table-sticky thead th {
+    position: sticky;
+    inset-block-start: 0;
+    z-index: var(--dds-z-raised);
+  }
+
+  .dds-table caption {
+    padding: var(--dds-space-sm);
+    text-align: start;
+    font-weight: var(--dds-font-weight-semibold);
+    color: var(--dds-color-text-default);
+  }
+
+  /* ==========================================================================
+     Tabs
+     ==========================================================================
+     ARIA tabs: one tab stop for the whole set, arrow keys to move between
+     tabs. Behaviour is in js/components.js.
+
+     Tabs are the right choice only when the panels are alternative views of
+     one thing. If the content should be readable in sequence, or linkable, or
+     findable by in-page search, use headings and sections instead. */
+  .dds-tabs {
+    display: flex;
+    flex-direction: column;
+    gap: var(--dds-space-md);
+  }
+
+  .dds-tablist {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--dds-space-2xs);
+    border-block-end: var(--dds-border-thin) solid var(--dds-color-border-subtle);
+  }
+
+  .dds-tab {
+    padding: var(--dds-space-xs) var(--dds-space-md);
+    min-block-size: 2.75rem;
+
+    font-family: inherit;
+    font-size: var(--dds-font-size-md);
+    font-weight: var(--dds-font-weight-medium);
+    color: var(--dds-color-text-subtle);
+
+    background: none;
+    border: 0;
+    /* The indicator is part of the box from the start, transparent when
+       inactive, so selecting a tab does not change its height. */
+    border-block-end: var(--dds-border-thick) solid transparent;
+    cursor: pointer;
+
+    transition:
+      color var(--dds-duration-instant) var(--dds-ease-standard),
+      border-color var(--dds-duration-instant) var(--dds-ease-standard);
+  }
+
+  .dds-tab:hover {
+    color: var(--dds-color-text-default);
+    background-color: var(--dds-color-surface-hover);
+  }
+
+  /* Selected state: colour, a bottom rule AND a heavier weight. Three cues,
+     because "which tab am I on" is essential orientation. */
+  .dds-tab[aria-selected="true"] {
+    color: var(--dds-color-text-link);
+    border-block-end-color: var(--dds-color-action-primary);
+    font-weight: var(--dds-font-weight-semibold);
+  }
+
+  /* Inset the ring so it is not clipped by the tablist's bottom border. */
+  .dds-tab:focus-visible {
+    outline-offset: calc(var(--dds-focus-ring-offset) * -1);
+  }
+
+  /* ==========================================================================
+     Disclosure
+     ==========================================================================
+     `<details>`/`<summary>`. Open/close, keyboard operation, and the
+     expanded state exposed to assistive technology all come from the platform;
+     no JS is needed for the basic behaviour.
+
+     `name` on `<details>` makes a set behave as an accordion (only one open)
+     with no script at all. */
+  .dds-disclosure {
+    border: var(--dds-border-thin) solid var(--dds-color-border-subtle);
+    border-radius: var(--dds-radius-md);
+    background-color: var(--dds-color-surface-default);
+  }
+
+  .dds-disclosure > summary {
+    display: flex;
+    align-items: center;
+    gap: var(--dds-space-xs);
+
+    padding: var(--dds-space-sm) var(--dds-space-md);
+    min-block-size: 2.75rem;
+
+    font-weight: var(--dds-font-weight-medium);
+    cursor: pointer;
+    border-radius: var(--dds-radius-md);
+
+    /* Suppress the default triangle; a rotating chevron is supplied below so
+       the affordance is consistent across engines. */
+    list-style: none;
+  }
+
+  /* Safari needs the -webkit- pseudo-element to drop the triangle. */
+  .dds-disclosure > summary::-webkit-details-marker {
+    display: none;
+  }
+
+  .dds-disclosure > summary:hover {
+    background-color: var(--dds-color-surface-hover);
+  }
+
+  .dds-disclosure-marker {
+    margin-inline-start: auto;
+    color: var(--dds-color-text-muted);
+    transition: rotate var(--dds-duration-fast) var(--dds-ease-standard);
+  }
+
+  .dds-disclosure[open] > summary .dds-disclosure-marker {
+    rotate: 180deg;
+  }
+
+  .dds-disclosure-content {
+    padding: 0 var(--dds-space-md) var(--dds-space-md);
+  }
+
+  /* An accordion: a stack of disclosures sharing one border box. */
+  .dds-accordion {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .dds-accordion > .dds-disclosure {
+    border-radius: 0;
+    border-block-end: 0;
+  }
+
+  .dds-accordion > .dds-disclosure:first-child {
+    border-start-start-radius: var(--dds-radius-md);
+    border-start-end-radius: var(--dds-radius-md);
+  }
+
+  .dds-accordion > .dds-disclosure:last-child {
+    border-block-end: var(--dds-border-thin) solid var(--dds-color-border-subtle);
+    border-end-start-radius: var(--dds-radius-md);
+    border-end-end-radius: var(--dds-radius-md);
+  }
+
+  /* ==========================================================================
+     Spinner
+     ==========================================================================
+     An indeterminate progress indicator.
+
+     It is decorative: `aria-hidden="true"`. Loading must be *announced*
+     through a live region, not implied by a rotating shape — a screen-reader
+     user gets nothing from an animation. Pair every spinner with text in a
+     `role="status"` region. */
+  .dds-spinner {
+    --dds-spinner-size: 1.25em;
+
+    display: inline-block;
+    inline-size: var(--dds-spinner-size);
+    block-size: var(--dds-spinner-size);
+
+    border: var(--dds-border-thick) solid var(--dds-color-border-default);
+    /* One transparent quadrant is what makes the rotation legible. */
+    border-block-start-color: var(--dds-color-action-primary);
+    border-radius: var(--dds-radius-circle);
+
+    animation: dds-spin var(--dds-duration-slow) linear infinite;
+  }
+
+  @keyframes dds-spin {
+    to { rotate: 360deg; }
+  }
+
+  /* Under reduced motion, the global rule collapses the duration, which would
+     leave a static broken ring. Replace the rotation with a gentle opacity
+     pulse so there is still a sign of activity without any movement. */
+  @media (prefers-reduced-motion: reduce) {
+    .dds-spinner {
+      animation: dds-pulse 1.5s ease-in-out infinite !important;
+      animation-duration: 1.5s !important;
+      border-block-start-color: var(--dds-color-action-primary);
+    }
+  }
+
+  @keyframes dds-pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.4; }
+  }
+
+  /* ==========================================================================
+     Progress
+     ==========================================================================
+     Native `<progress>` for a determinate task. It exposes value, max and
+     role to assistive technology without any ARIA. */
+  .dds-progress {
+    inline-size: 100%;
+    block-size: var(--dds-space-xs);
+    /* `appearance: none` plus explicit track and value styling is the only
+       interoperable way to restyle progress across engines. */
+    appearance: none;
+    border: 0;
+    border-radius: var(--dds-radius-pill);
+    background-color: var(--dds-color-surface-active);
+    overflow: hidden;
+  }
+
+  /* WebKit / Blink */
+  .dds-progress::-webkit-progress-bar {
+    background-color: var(--dds-color-surface-active);
+    border-radius: var(--dds-radius-pill);
+  }
+
+  .dds-progress::-webkit-progress-value {
+    background-color: var(--dds-color-action-primary);
+    border-radius: var(--dds-radius-pill);
+    transition: inline-size var(--dds-duration-base) var(--dds-ease-standard);
+  }
+
+  /* Gecko */
+  .dds-progress::-moz-progress-bar {
+    background-color: var(--dds-color-action-primary);
+    border-radius: var(--dds-radius-pill);
+  }
+
+  /* ==========================================================================
+     Skeleton
+     ==========================================================================
+     A placeholder for content whose shape is known before its data arrives.
+
+     Purely decorative and `aria-hidden`. The region it sits in carries
+     `aria-busy="true"`, and the arrival of content is announced separately. A
+     skeleton that a screen reader reads out is noise. */
+  .dds-skeleton {
+    --dds-skeleton-height: 1em;
+
+    display: block;
+    block-size: var(--dds-skeleton-height);
+    border-radius: var(--dds-radius-sm);
+    background-color: var(--dds-color-surface-active);
+
+    /* A slow sweep rather than a pulse: less attention-grabbing while a page
+       is still assembling. */
+    background-image: linear-gradient(
+      90deg,
+      transparent 0%,
+      var(--dds-color-surface-hover) 50%,
+      transparent 100%
+    );
+    background-size: 200% 100%;
+    background-repeat: no-repeat;
+    animation: dds-skeleton-sweep 1.4s ease-in-out infinite;
+  }
+
+  @keyframes dds-skeleton-sweep {
+    from { background-position: -100% 0; }
+    to { background-position: 100% 0; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .dds-skeleton {
+      /* No sweep at all — a flat block is a perfectly good placeholder. */
+      background-image: none;
+      animation: none !important;
+    }
+  }
+
+  .dds-skeleton-text { --dds-skeleton-height: 0.75em; }
+  .dds-skeleton-title { --dds-skeleton-height: 1.5em; }
+  .dds-skeleton-block { --dds-skeleton-height: 8rem; }
+
+  /* ==========================================================================
+     Toast
+     ==========================================================================
+     A transient message about something that just happened.
+
+     The solid status fills are used here, and they are identical in both
+     themes on purpose: a fill that changes per theme also needs its text
+     colour to change, and that pairing is where contrast regressions hide.
+
+     The region is `role="status"` (polite) so a toast never interrupts what a
+     screen-reader user is reading. Anything urgent enough to interrupt does
+     not belong in a message that disappears on a timer — and nothing that a
+     user must act on should be in a toast at all, because it will be gone
+     before someone using a screen magnifier finds it. */
+  .dds-toast-region {
+    position: fixed;
+    /* Respect the notch and home indicator on phones. */
+    inset-block-end: max(var(--dds-space-md), env(safe-area-inset-bottom));
+    inset-inline: 0;
+    z-index: var(--dds-z-toast);
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--dds-space-xs);
+
+    /* The region spans the viewport so toasts centre, but must not swallow
+       clicks on the page behind it. */
+    pointer-events: none;
+    padding-inline: var(--dds-space-md);
+  }
+
+  .dds-toast {
+    display: flex;
+    align-items: center;
+    gap: var(--dds-space-xs);
+
+    max-inline-size: min(28rem, 100%);
+    padding: var(--dds-space-xs) var(--dds-space-sm);
+
+    font-size: var(--dds-font-size-sm);
+    border-radius: var(--dds-radius-md);
+    box-shadow: var(--dds-elevation-lg);
+
+    /* The toast itself is interactive (it has a close button). */
+    pointer-events: auto;
+
+    background-color: var(--dds-color-surface-raised);
+    color: var(--dds-color-text-default);
+    border: var(--dds-border-thin) solid var(--dds-color-border-default);
+
+    animation: dds-toast-in var(--dds-duration-base) var(--dds-ease-standard);
+  }
+
+  @keyframes dds-toast-in {
+    from { opacity: 0; translate: 0 0.5rem; }
+    to { opacity: 1; translate: 0 0; }
+  }
+
+  .dds-toast-success {
+    background-color: var(--dds-color-success-solid);
+    color: var(--dds-color-on-success-solid);
+    border-color: var(--dds-color-success-solid);
+  }
+
+  .dds-toast-warning {
+    background-color: var(--dds-color-warning-solid);
+    color: var(--dds-color-on-warning-solid);
+    border-color: var(--dds-color-warning-solid);
+  }
+
+  .dds-toast-error {
+    background-color: var(--dds-color-error-solid);
+    color: var(--dds-color-on-error-solid);
+    border-color: var(--dds-color-error-solid);
+  }
+
+  .dds-toast-info {
+    background-color: var(--dds-color-info-solid);
+    color: var(--dds-color-on-info-solid);
+    border-color: var(--dds-color-info-solid);
+  }
+
+  .dds-toast-close {
+    margin-inline-start: auto;
+    padding: var(--dds-space-3xs);
+    min-inline-size: 24px;
+    min-block-size: 24px;
+
+    color: inherit;
+    background: none;
+    border: 0;
+    border-radius: var(--dds-radius-sm);
+    cursor: pointer;
+    /* Inherit the toast's colour so the control is legible on every variant. */
+    opacity: 0.8;
+  }
+
+  .dds-toast-close:hover { opacity: 1; }
+
+  /* ==========================================================================
+     Tooltip
+     ==========================================================================
+     Supplementary text for a control that already has an accessible name.
+
+     A tooltip must never be the only place information exists: it is
+     unavailable on touch, it is easy to miss, and it disappears. Essential
+     information belongs in a hint below the field.
+
+     WCAG 2.2 1.4.13 (Content on Hover or Focus) requires that the content be
+     dismissable without moving the pointer, hoverable (so it can be read
+     without it vanishing), and persistent until dismissed. `popover` gives the
+     dismiss behaviour (Escape, click outside) for free. */
+  .dds-tooltip {
+    /* `popover` renders in the top layer, so no z-index or overflow ancestor
+       can clip it. */
+    position: absolute;
+    max-inline-size: 20rem;
+    margin: 0;
+    padding: var(--dds-space-2xs) var(--dds-space-xs);
+
+    font-size: var(--dds-font-size-sm);
+    background-color: var(--dds-color-surface-raised);
+    color: var(--dds-color-text-default);
+    border: var(--dds-border-thin) solid var(--dds-color-border-default);
+    border-radius: var(--dds-radius-sm);
+    box-shadow: var(--dds-elevation-md);
+  }
+
+  /* CSS anchor positioning where it exists, so the tooltip tracks its trigger
+     with no JS and no scroll listener.
+
+     No `position-anchor` and no anchor name: a popover invoked through
+     `popovertarget` gets its invoker as its *implicit* anchor, so `anchor()`
+     resolves against the right element automatically. That matters — naming
+     anchors would mean a unique name per tooltip instance, which is exactly the
+     kind of bookkeeping that goes wrong on the tenth one.
+
+     Progressive: without support the tooltip still renders in the top layer,
+     positioned by the UA default. */
+  @supports (anchor-name: --dds-probe) {
+    .dds-tooltip {
+      inset-block-end: anchor(top);
+      justify-self: anchor-center;
+      margin-block-end: var(--dds-space-2xs);
+      /* Flip below rather than overflowing off the top of the viewport. */
+      position-try-fallbacks: flip-block;
+    }
+  }
+
+  /* ==========================================================================
+     Kbd
+     ==========================================================================
+     A key or key combination. Small caps-ish, bordered, so it reads as a
+     physical key rather than as code. */
+  .dds-kbd {
+    display: inline-block;
+    padding: 0.1em 0.4em;
+
+    font-family: var(--dds-font-mono);
+    font-size: 0.85em;
+    line-height: 1.4;
+    white-space: nowrap;
+
+    background-color: var(--dds-color-surface-sunken);
+    border: var(--dds-border-thin) solid var(--dds-color-border-default);
+    border-block-end-width: var(--dds-border-thick);
+    border-radius: var(--dds-radius-sm);
+    color: var(--dds-color-text-default);
+  }
+
+  /* ==========================================================================
+     Divider
+     ========================================================================== */
+  .dds-divider {
+    block-size: 0;
+    margin: 0;
+    border: 0;
+    border-block-start: var(--dds-border-thin) solid var(--dds-color-border-subtle);
+  }
+}

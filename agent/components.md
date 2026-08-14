@@ -1,0 +1,795 @@
+# Components
+
+Every reusable building block, with its contract.
+
+**Rendered:** `reference/components.html`, `reference/content.html`,
+`reference/navigation.html`.
+**Machine-readable:** [`index.json`](index.json).
+
+Each entry states: what it is for, when **not** to use it, the markup contract,
+variants and states, and the accessibility requirements that are not optional.
+
+Rules that apply to every component and are therefore not repeated:
+
+- Values come from the semantic layer only. No hex, no magic pixel.
+- State comes from the platform where the platform has it: `:disabled`,
+  `:checked`, `[aria-expanded]`, `[aria-invalid]`, `[open]`. An `.is-*` class is a
+  last resort.
+- Nothing conveys state by colour alone.
+- Every interactive element clears 24×24px (WCAG 2.2 2.5.8); most clear 44px.
+
+---
+
+## Icon — `.dds-icon`
+
+**For:** a decorative glyph beside text.
+**Not for:** carrying meaning on its own.
+
+```html
+<svg class="dds-icon" aria-hidden="true"><use href="#dds-icon-check"/></svg>
+```
+
+Sized in `em`, so it matches the text beside it at any size. Colour comes from
+`currentColor`.
+
+**Always `aria-hidden="true"`.** An icon that is the only content of a control
+means the **control** needs a name, not the icon:
+
+```html
+<button type="button" class="dds-button dds-button-icon">
+  <span class="dds-sr-only">Delete project</span>
+  <svg class="dds-icon" aria-hidden="true"><use href="#dds-icon-trash"/></svg>
+</button>
+```
+
+The sprite must be **inlined** once per document — `node scripts/sync-icons.mjs`.
+An external `<use href="icons.svg#…">` breaks `currentColor` silently: the icon
+renders in black regardless of theme. Sizes: `.dds-icon-sm` / `-lg` / `-xl`.
+
+---
+
+## Button — `.dds-button`
+
+**For:** an action.
+**Not for:** navigation — use an `<a>`. The element decides whether Space
+activates it, whether it opens in a new tab, and how it is announced.
+
+**Variants:** `-primary` (filled, one per view) · `-secondary` (outlined) ·
+`-subtle` (bare) · `-danger` (destructive).
+**Sizes:** `-sm` (32px) · default (44px) · `-lg`. Plus `-icon` (square) and
+`-block` (full width).
+
+**States:** hover, active, `:disabled`, `[aria-disabled="true"]`,
+`[aria-busy="true"]`.
+
+Prefer `aria-disabled="true"` on a form submit: it keeps the control focusable, so
+the user can reach it and find out *why* it is unavailable. A `disabled` button
+cannot be focused and therefore cannot carry an explanation.
+
+**Accessibility:** name from text or a `.dds-sr-only` span. Emphasis is fill and
+border weight, not hue, so the ordering survives greyscale and forced colours. A
+busy button needs a live region — a spinner announces nothing.
+
+**Content:** name the action with a verb. "Save changes", "Delete project" — not
+"OK", "Yes" or "Submit".
+
+---
+
+## Badge — `.dds-badge`
+
+**For:** a short, non-interactive status or category label.
+**Not for:** anything interactive — that is a chip or a button.
+
+**Variants:** default · `-success` · `-warning` · `-error` · `-info` · `-count`.
+
+**Accessibility:** every status variant pairs its colour with **text and an
+icon**. A badge showing only "3" in red communicates nothing to a reader who does
+not see red as red.
+
+---
+
+## Card — `.dds-card`
+
+**For:** a bounded content group.
+**Not for:** a button. Compose with `.dds-stack` inside.
+
+**Variants:** default · `-raised` · `-sunken` · `-compact` · `-link`.
+
+**Interactive card:** put a real link around the heading text and add
+`.dds-card-target` to it. The card grows the hit area via `::after`; the link text
+is what gets announced, rather than the entire card body.
+
+```html
+<article class="dds-card dds-card-link">
+  <h3><a class="dds-card-target" href="/projects/1">Harbour redevelopment</a></h3>
+  <p>…</p>
+</article>
+```
+
+`:focus-within` moves the ring to the card so the indicator matches the hit area.
+Other controls inside stay clickable.
+
+---
+
+## Field — `.dds-field`
+
+**For:** the form primitive: label, control, optional hint, optional error.
+
+```html
+<div class="dds-field">
+  <label class="dds-label" for="email">
+    Email address <span class="dds-label-note">(required)</span>
+  </label>
+  <input class="dds-input" id="email" name="email" type="email"
+         autocomplete="email" required aria-describedby="email-hint">
+  <p class="dds-hint" id="email-hint">We use this to send confirmations.</p>
+</div>
+```
+
+**Controls:** `.dds-input` · `.dds-textarea` · `.dds-select` ·
+`.dds-input-code` (monospace) · `.dds-input-group` (with an icon or unit inside).
+
+**Non-negotiable, because breaking these is what makes forms inaccessible:**
+
+- A visible `<label for>`. **A placeholder is not a label** — it vanishes on
+  input, fails contrast, and is announced inconsistently.
+- Hint and error referenced from **one** space-separated `aria-describedby`, so
+  both are read.
+- Required stated in words: "(required)". Not an asterisk, not colour — red is
+  reserved for the error state.
+- The hint is **never removed** when an error appears. The user needs the format
+  rule *and* the failure.
+- The right `autocomplete` token (WCAG 1.3.5).
+- Invalid state driven by `aria-invalid`, **never** the CSS `:invalid`
+  pseudo-class — `:invalid` matches from page load, so a required field looks
+  wrong before anything was typed, and people learn to ignore error styling.
+- Invalid state changes border **weight** as well as colour.
+
+**`.dds-input-group`** carries the border, so an icon inside sits within the focus
+ring. `:has()` moves the ring to the wrapper with no JavaScript.
+
+---
+
+## Checkbox and radio — `.dds-choice`
+
+**For:** a boolean, or one of several options.
+
+Native inputs, laid out — **not replaced**. `accent-color` tints them, which is
+all that is needed. A replacement built from a hidden input and a styled span has
+to rebuild keyboard behaviour, indeterminate state, forced-colours rendering and
+grouping semantics, and usually gets at least one wrong.
+
+The whole row is the label, so the target area includes the text.
+
+**`.dds-choice-card`** wraps a choice in a bordered card for a small set of
+significant options. Selected state changes fill **and** border weight, with the
+padding compensated so the card does not shift by 1px.
+
+**A radio group requires `<fieldset>` + `<legend>`.** Without it each option is
+announced with no indication of what the question was.
+
+---
+
+## Switch — `.dds-switch`
+
+**For:** a setting that takes effect **immediately**.
+**Not for:** a value submitted with a form — that is a checkbox. The difference is
+real and users read it: a switch implies "this is now on", a checkbox implies
+"this will be saved".
+
+Built on `role="switch"` over a real checkbox input, so Space toggles it and it
+participates in the form. The visible track is presentation; the input stays
+focusable and in the accessibility tree.
+
+Under forced colours the on state gains a thicker border, because the fill is
+stripped.
+
+---
+
+## Fieldset group — `.dds-fieldgroup`
+
+**For:** related controls under one caption. **Required** for radio groups and for
+checkbox groups answering a single question.
+
+`.dds-legend` for the caption, `.dds-fieldgroup-options` for the layout
+(`-inline` for a horizontal row).
+
+---
+
+## Notice — `.dds-notice`
+
+**For:** a contextual message attached to the page or a section.
+
+**Variants:** `-success` · `-warning` · `-error` · `-info`.
+
+**The ARIA role depends on *when* it appears:**
+
+| Situation | Role |
+| --- | --- |
+| Present at page load, informational | none |
+| Appears in response to an action | `role="status"` |
+| An error blocking progress | `role="alert"` |
+
+Putting `role="alert"` on a notice that is already on the page means it is
+announced on load, out of context.
+
+**Accessibility:** the icon is `aria-hidden`; a `.dds-sr-only` word before the
+title ("Error: ", "Warning: ") is what tells a screen-reader user which kind of
+message it is. A leading edge in the status colour keeps the kind legible when the
+tint is imperceptible.
+
+---
+
+## Dialog — `.dds-dialog`
+
+**For:** a modal task or a confirmation.
+
+**Native `<dialog>` opened with `showModal()`.** Not `<dialog open>` — that
+renders non-modally: the page behind stays focusable and Escape does nothing.
+
+What the platform provides, and a div-based modal has to rebuild: focus moved in
+and trapped, the rest of the page made inert, Escape closes, top-layer rendering
+so no `overflow` ancestor can clip it, a real backdrop pseudo-element, and focus
+returned to the opener.
+
+```html
+<button data-dds-dialog-open="rename">Rename</button>
+
+<dialog class="dds-dialog" id="rename" aria-labelledby="rename-title">
+  <div class="dds-dialog-header">
+    <h2 class="dds-dialog-title" id="rename-title">Rename project</h2>
+    <button class="dds-button dds-button-icon" data-dds-dialog-close>
+      <span class="dds-sr-only">Close</span>
+      <svg class="dds-icon" aria-hidden="true"><use href="#dds-icon-close"/></svg>
+    </button>
+  </div>
+  <div class="dds-dialog-body">…</div>
+  <div class="dds-dialog-footer">
+    <button class="dds-button dds-button-subtle" data-dds-dialog-close>Cancel</button>
+    <button class="dds-button dds-button-primary">Rename</button>
+  </div>
+</dialog>
+```
+
+`aria-labelledby` is required. Confirming action **last** in the footer — one
+system-wide choice, because the cost of inconsistency is someone confirming what
+they meant to cancel. `.dds-dialog-sheet` anchors to the bottom edge on small
+screens. Behaviour: `dds/js/components.js`.
+
+---
+
+## Table — `.dds-table`
+
+**For:** tabular data.
+**Not for:** layout.
+
+A real `<table>` with real `<th scope>`. A grid of divs cannot be navigated cell
+by cell, which is the entire point of tabular data.
+
+**The wrapper is not optional:**
+
+```html
+<div class="dds-table-wrap" role="region" aria-labelledby="cap" tabindex="0">
+  <table class="dds-table">
+    <caption id="cap">Active projects</caption>
+    <thead><tr><th scope="col">Project</th>…</tr></thead>
+    <tbody><tr><th scope="row">Harbour</th>…</tr></tbody>
+  </table>
+</div>
+```
+
+An overflowing table needs a scroll region that is **focusable** (`tabindex="0"`)
+and **named**, or content past the edge is unreachable without a mouse.
+
+**Variants:** `-zebra` · `-interactive` (row hover) · `-sticky` (sticky head).
+`.dds-table-numeric` on a cell right-aligns and makes digits tabular, so a column
+can be compared vertically.
+
+---
+
+## Tabs — `.dds-tabs`
+
+**For:** alternative views of one thing.
+**Not for:** content that should be readable in sequence, linkable, or findable by
+in-page search. Use headings and sections.
+
+One tab stop for the whole set (roving `tabindex`), arrow keys to move, Home/End
+to the ends, selection follows focus. A list of nine tabs must not cost nine
+presses to pass.
+
+`aria-selected` and `hidden` are the state, read from and written to the DOM so
+visual and announced state cannot diverge. Selected state carries colour, a rule
+**and** a heavier weight — "which tab am I on" is essential orientation.
+
+Behaviour: `dds/js/components.js`.
+
+---
+
+## Disclosure — `.dds-disclosure`
+
+**For:** hiding secondary detail.
+
+`<details>` / `<summary>`. Open/close, keyboard operation and the expanded state
+exposed to assistive technology all come from the platform. **No JavaScript.**
+
+`.dds-accordion` stacks several. The `name` attribute on `<details>` makes a set
+behave as an accordion — only one open at a time — with no script at all.
+
+---
+
+## Spinner — `.dds-spinner`
+
+**For:** indeterminate progress.
+
+**Decorative: `aria-hidden="true"`.** Loading must be *announced* through a live
+region. A rotating shape communicates nothing to a screen reader, so every spinner
+is paired with text in a `role="status"` region.
+
+Under reduced motion the rotation is replaced by an opacity pulse — the global
+duration collapse would otherwise leave a static broken ring.
+
+---
+
+## Progress — `.dds-progress`
+
+**For:** determinate progress.
+
+Native `<progress>`, which exposes value, max and role with no ARIA.
+
+---
+
+## Skeleton — `.dds-skeleton`
+
+**For:** a placeholder whose shape is known before its data arrives.
+
+Decorative and `aria-hidden`. The region carries `aria-busy="true"`, and arrival
+is announced separately. A skeleton a screen reader reads out is noise.
+
+Variants: `-text` · `-title` · `-block`. No sweep under reduced motion.
+
+---
+
+## Toast — `DDS.toast()`
+
+**For:** confirming something that just happened.
+
+```js
+DDS.toast('Draft saved', { kind: 'success' });
+DDS.toast('Could not save', { kind: 'error', duration: 0 });
+```
+
+**Never** the only place important information lives, and **never** the only route
+to an action — it disappears on a timer, which excludes anyone reading slowly,
+magnifying the screen, or away from the keyboard.
+
+The region is `role="status"` (polite), so a toast never interrupts. The timer
+pauses on hover and on focus. `duration: 0` stays until dismissed. Uses the solid
+status fills, identical in both themes.
+
+---
+
+## Tooltip — `.dds-tooltip`
+
+**For:** supplementary text for a control that **already has** an accessible name.
+**Not for:** essential information — that belongs in a hint below the field.
+
+Unavailable on touch, easy to miss, and it disappears.
+
+Built on `popover` with `popovertarget`, which supplies the dismiss behaviour
+WCAG 2.2 1.4.13 requires (Escape, click outside) and top-layer rendering. Anchor
+positioning is used where supported, via the **implicit** anchor — no anchor name,
+so there is no per-instance bookkeeping.
+
+---
+
+## Kbd — `.dds-kbd` · Divider — `.dds-divider`
+
+A key or key combination; a horizontal rule. Both self-explanatory.
+
+---
+
+# Form components
+
+## Stepper — `.dds-stepper`
+
+**For:** a quantity the user adjusts, rather than types once.
+
+Native `<input type="number">` plus explicit minus and plus buttons. The native
+spinner buttons are ~10px tall, hover-only, and absent on touch entirely.
+
+The input stays authoritative for `min`/`max`/`step` and remains typeable. Uses
+`stepUp()`/`stepDown()` rather than arithmetic, so floating-point steps are
+correct. Buttons disable at the limits, so the control shows its own boundaries.
+The new value is announced.
+
+---
+
+## Segmented control — `.dds-segmented`
+
+**For:** two to four mutually exclusive options with short labels, all visible.
+**Not for:** more than four, or long labels — use a select.
+
+Built on radio inputs, so it is one tab stop with arrow keys between options.
+Selected state: raised surface, action colour **and** heavier weight.
+
+---
+
+## Upload — `.dds-upload`
+
+**For:** choosing files.
+
+Native `<input type="file">` with a drop zone around it. Drag-and-drop is
+**additive** — dragging is impossible for many people (WCAG 2.2 2.5.7) and awkward
+on a trackpad, so the button is always the primary route.
+
+**Two attributes matter more than any styling:**
+
+- **`accept`** must match the formats the prose promises. Without it the picker
+  shows every file on the device and the restriction is discovered only after
+  choosing wrongly.
+- **`capture`** is a per-case product decision, never a default. Right for
+  "photograph the receipt", wrong for "upload the scan you already have", because
+  it can suppress the full picker.
+
+Each file's remove button names **which** file. Client-side size and type checks
+are convenience; the server checks again.
+
+---
+
+## Date field — `.dds-input[type="date"]`
+
+**For:** a date.
+**Not for:** a custom calendar widget.
+
+Kept native. The platform picker knows the locale's date order, the first day of
+the week, the calendar system and the device's own entry conventions — and on a
+phone it is a purpose-built control a custom one cannot match. A JavaScript date
+picker rebuilds all of that, usually gets the keyboard wrong, and is the most
+common source of "I cannot enter my date of birth".
+
+`color-scheme` is bound to the theme, so the picker's chrome follows light and dark
+with no styling.
+
+**The `autocomplete` rule, which is easy to get backwards:**
+
+| Field | Token |
+| --- | --- |
+| Date of birth | `autocomplete="bday"` — WCAG 1.3.5 expects it |
+| A future date (a start date, an appointment) | `autocomplete="off"` — there is nothing to fill |
+
+Documenting only the second case teaches implementers to copy `off` onto a
+birthdate field, which breaks autofill for exactly the field where it helps most.
+
+**Always give the expected format in a hint.** The displayed format differs by
+locale and platform, so the reader cannot infer it from the control.
+
+`.dds-daterange` lays out a from/to pair, stacking when there is not room.
+
+---
+
+## Search field — `.dds-search`
+
+**For:** a query input and its submit button as one unit.
+**Not for:** a filter control — use the filter bar.
+
+A real `<form role="search">` and a real submit `<button>`, so it works without
+JavaScript and the region is findable as a landmark.
+
+`type="search"` rather than `type="text"`: the platform adds a clear control,
+offers previous queries, and relabels the iOS return key to "Search". Not worth
+giving up for a slightly different clear button.
+
+**The button always has a name.** A magnifier with no accessible name is announced
+as "button".
+
+---
+
+## Theme toggle — `.dds-theme-toggle`
+
+**For:** switching between light and dark.
+**Not for:** any other binary setting — use a switch.
+
+**Behaviour:** `dds/js/dds.js` via `data-dds-theme-toggle`.
+
+A `<button>` with `aria-pressed`. **The accessible name stays constant** — "Dark
+theme", pressed or not. A control whose name changes when you press it is announced
+as a different control each time, which is why the tempting "Switch to light theme"
+label is wrong.
+
+Both icons are in the markup and CSS shows the relevant one, so there is no flash
+of the wrong icon before the script runs and no icon swapping in JavaScript.
+
+An explicit choice is stored and always beats the system preference; with no stored
+choice the system preference is followed live.
+
+---
+
+## Range — `.dds-range`
+
+**For:** a value where the exact number does not matter.
+**Not for:** a specific number — a slider cannot be operated precisely with a
+trackpad and is very hard to operate with a tremor. Use a number field.
+
+The current value is always shown as text beside it, and announced.
+
+---
+
+## Character count — `.dds-charcount`
+
+**For:** a live count under a textarea with `maxlength`.
+
+The visible number updates every keystroke; the **announcement** is debounced and
+only fires once the count starts to matter. A live region reading a number after
+every character is unusable. `maxlength` does the enforcing.
+
+---
+
+# Navigation components
+
+Every component in this group is responsive by **container query**, so it works
+inside a narrow column, a dialog or a preview stage — not only on the page it was
+written for. Note the `-frame` wrappers: a container query cannot style the
+element that establishes the container, only its descendants.
+
+## Site header — `.dds-siteheader`
+
+**One navigation, one place in the DOM.** The narrow and wide layouts are the same
+markup. A separate "mobile menu" is a second copy that drifts, and a screen reader
+announces both.
+
+Below 48rem of container width the links collapse behind a disclosure button
+(`aria-expanded` + `aria-controls`, **not** `role="menu"`). Above it they are
+inline and the button is gone.
+
+The current page carries `aria-current="page"` and colour, weight and a rule.
+Collapsed navigation is hidden with the `hidden` **attribute**, so there are no
+invisible tab stops.
+
+## App topbar — `.dds-topbar`
+
+**For:** application chrome — a persistent bar naming the current context and
+holding the actions that apply to it.
+**Not for:** wayfinding between pages — that is the site header.
+
+The distinction is real. A site header is for moving between pages: brand, primary
+navigation, search. A topbar is for a workspace: it names what you are looking at,
+holds the actions for it, and stays put while the content scrolls. Using one where
+the other belongs produces either a marketing site that feels like an admin tool,
+or an admin tool where the user cannot tell what they are editing.
+
+The context title is a **real heading**, so the document outline reflects where the
+user is. A long object name truncates rather than pushing the actions off screen.
+Below 34rem of container width the actions move to their own row.
+
+---
+
+## Alert banner — `.dds-banner`
+
+**For:** a page-level or application-level message spanning the full width —
+planned downtime, degraded service, an expiring credential.
+**Not for:** a message about one section — that is a notice.
+
+Worth keeping distinct: a notice is attached to what it concerns, a banner concerns
+the whole page and sits above the content, edge to edge. Styling a notice
+full-width instead produces a message that looks page-level and is announced as
+belonging to a section.
+
+**Only ever one at a time.** Two stacked banners means neither is read.
+
+The role follows the same rule as the notice: none when present at page load,
+`role="status"` when it appears, `role="alert"` only when it appears *and* blocks
+what the user was doing. Anything the user must act on is not dismissible.
+
+---
+
+## Site footer — `.dds-sitefooter`
+
+Grouped links, each group a `<nav>` with its own name or a list under a heading. A
+single undifferentiated list of thirty links is valid HTML and practically
+unusable with a screen reader.
+
+## Breadcrumb — `.dds-breadcrumb`
+
+An `<ol>` inside a named `<nav>`; the sequence is the meaning. The separator is a
+CSS pseudo-element, so it is not in the accessibility tree. The last entry is the
+current page: **not a link**, and `aria-current="page"`.
+
+## Pagination — `.dds-pagination`
+
+Real links with real `href`s, so a page is bookmarkable, shareable and openable in
+a new tab. Each accessible name says where it goes — "Page 3", not "3". Current
+page: `aria-current="page"`.
+
+## Step progress — `.dds-steps`
+
+An `<ol>`; each step states its status in **words**. A row of coloured dots
+communicates nothing without sight. `aria-current="step"` on the active one.
+Completed steps may be links if the user may go back; upcoming ones never are.
+
+## Sticky action bar — `.dds-actionbar`
+
+`env(safe-area-inset-bottom)`, or the button sits under the home indicator. The
+scrolling ancestor takes `.dds-actionbar-host`, which reserves space so the bar
+never covers a field that has just been focused (WCAG 2.2 2.4.11).
+
+## Table of contents — `.dds-toc`
+
+`IntersectionObserver`, not a scroll listener. The active entry is
+`aria-current="location"` — **not `"page"`**: the user has not navigated anywhere,
+the reading position moved.
+
+## Menu — `.dds-menu`
+
+`popover` + `popovertarget`. Light dismiss, Escape, top-layer rendering and focus
+return come from the platform — **no JavaScript**.
+
+Items are `<button>` or `<a>` in a list, **not** `role="menu"`/`menuitem`. That
+role switches assistive technology into application mode and changes what keys do;
+it is for a desktop application menu bar, not a dropdown of links.
+
+## Filter bar — `.dds-filterbar` · Toolbar — `.dds-toolbar`
+
+Applied filters **must** be visible as removable chips. A short list with three
+invisible filters applied is the most common dead end in a filtered interface —
+the user concludes the data is missing.
+
+`role="toolbar"` with arrow-key navigation is worth it only when there are enough
+controls that individual tab stops become tedious. For three buttons, three tab
+stops are more predictable.
+
+---
+
+# Content components
+
+## Quote — `.dds-quote`
+
+A `<figure>` containing a `<blockquote>` and a `<figcaption>`. The attribution is
+**not** part of the quotation, so it must not sit inside the `<blockquote>`.
+
+No decorative quotation-mark glyph in the markup — a literal `"` is read aloud,
+and a screen reader already announces a blockquote as a quotation.
+
+Variants: `-accented` · `-centered`.
+
+## Teaser — `.dds-teaser`
+
+An image, a heading, a summary, one link. The link wraps the heading text; the
+card grows the hit area via `.dds-card-link`.
+
+## Facts — `.dds-facts`
+
+A `<dl>`, so each figure is programmatically paired with its label. A grid of divs
+leaves "1,204" and "Documents" as two unrelated strings. The number is visually
+above the label but **second** in the DOM, because `<dt>` must precede `<dd>`.
+
+## Call to action — `.dds-cta`
+
+**One** action. A call-to-action block with three buttons is a menu, and a menu
+does not need this much emphasis.
+
+## Download — `.dds-download`
+
+Format and size in the **visible text**, not a `title`. Someone on a metered
+connection needs to know a link is a 14 MB PDF before tapping it.
+
+## Key-value list — `.dds-keyvalue` · Data list — `.dds-datalist`
+
+A real `<dl>` for paired labels and values (`-columns`, `-divided`).
+
+`.dds-datalist` is the row-based alternative to a table, for two or three fields
+per record. Use a **table** as soon as the user compares values down a column.
+
+## Specs list — `.dds-specs`
+
+**For:** a longer, homogeneous list of properties and values — dimensions,
+materials, technical characteristics.
+**Not for:** a handful of pairs in a summary — use the key-value list.
+
+A `<dl>`, arranged for looking one value up rather than reading all of them: each
+row is a full-width pair with a leader line, so the eye travels from label to value
+without losing the row. The leader is generated content, so a row of literal dots
+is never read aloud.
+
+---
+
+## Byline — `.dds-byline`
+
+**For:** who wrote or owns something, and how to reach them.
+
+Two shapes: compact and inline for the top of an article, `.dds-byline-box` for the
+end of one.
+
+The avatar is decorative (`aria-hidden`); the name is real text. **A contact link
+says whom it reaches** — "Email Ilva Bergström", not "Email". A screen-reader user
+listing the links on a page otherwise hears "Email" with no idea whose.
+
+---
+
+## Progress ring — `.dds-progress-ring`
+
+**For:** determinate progress as a circle, where a bar does not fit — in a table
+row, beside a filename, in a dense dashboard.
+**Not for:** anything wide enough for a bar. A bar reads more accurately, because
+length is easier to judge than angle.
+
+Drawn with a conic gradient, like the donut chart, because it is the same shape
+doing a different job.
+
+The figure is `aria-hidden`. The value belongs on a real `<progress>` or in text
+beside it — a circle communicates nothing to a screen reader. Same rule as the
+charts.
+
+---
+
+## Chip — `.dds-chip`
+
+A badge is read; a chip is **operated**. A chip that removes a filter must name
+what it removes — "Remove filter: approved", not just an ×. Six chips whose
+buttons are all "Remove" are six identical controls.
+
+`.dds-chip-toggle` is a selectable variant on a checkbox.
+
+## Figure — `.dds-figure` · Text-media — `.dds-textmedia`
+
+`alt` replaces the image for someone who cannot see it; a caption is supplementary
+information everyone gets. **They are not interchangeable** — repeating one as the
+other means the same sentence is announced twice. A decorative image takes
+`alt=""` and may still have a caption.
+
+`.dds-textmedia` needs `.dds-textmedia-frame` around it. The `order` that swaps
+the columns is bound **inside** the container query: applied unconditionally it
+would also reverse the stacked order, putting a caption before what it captions
+(WCAG 1.3.2).
+
+## Charts — `.dds-chart`, `.dds-donut`
+
+**The rule is absolute: every chart is accompanied by the same data as a real
+table.** The table may be visually hidden (`.dds-sr-only`), but it must exist — it
+is the only representation that can be read cell by cell, copied and translated.
+The bars are `aria-hidden`.
+
+A donut is only worth using for one value against a whole. For comparing
+categories, bars are read more accurately: angle is much harder to judge than
+length.
+
+## Lightbox — `.dds-lightbox`
+
+The trigger is a real `<a href>` at the full-size file, so without JavaScript the
+click simply opens the image. One shared native `<dialog>`, reused. Arrow keys
+move, Escape closes, position is announced.
+
+`alt` is deliberately **not** a caption source.
+
+## Consent embed — `.dds-embed`
+
+**For:** a third-party embed that must not load until the visitor agrees.
+
+A third-party frame contacts that provider — and can set cookies and log an IP
+address — the moment the page loads. Creating the frame only after a deliberate
+click means no request leaves the page unasked.
+
+The `<iframe>` needs a `title`. `autoplay` is deliberately absent from `allow`.
+Consent is per embed and **not remembered** — remembering it needs a real consent
+record, not a component side effect. There is always a plain link to the content
+on the provider's own site.
+
+## Media — `.dds-media`
+
+Native `<video>`/`<audio>` with `controls`: keyboard operable, screen-reader
+accessible, and they honour the platform's own accessibility settings.
+
+**Video with speech requires `<track kind="captions">`** (WCAG 1.2.2). Reviewed
+auto-generated captions are acceptable; unreviewed ones are not.
+
+## Gallery — `.dds-gallery` · Avatar — `.dds-avatar`
+
+A grid of lightbox triggers; a person as an image or initials.
+
+Initials are `aria-hidden` — "IB" read aloud tells nobody anything. The name goes
+in real text beside the avatar or in a visually hidden span.
+
+---
+
+## Adding a component
+
+See [`recipes/new-component.md`](recipes/new-component.md).

@@ -1,0 +1,579 @@
+/* =============================================================================
+   Reference pages — page chrome
+   =============================================================================
+
+   Styles for the reference site itself: its header, navigation, specimen frames
+   and code blocks.
+
+   This file is NOT part of DDS and must not be shipped to a product. It exists
+   so the reference pages can present the system without polluting it: a
+   "component demo frame" is a documentation concern, not a design system
+   component, and putting it in components.css would mean every product carried
+   it forever.
+
+   It uses `dds.` layers deliberately: `dds.utilities` is the last DDS layer, so
+   an unlayered rule here already wins. Everything is prefixed `ref-` so nothing
+   here can be mistaken for part of the system.
+   ============================================================================= */
+
+/* ------------------------------------------------------------------ shell */
+.ref-page {
+  display: flex;
+  flex-direction: column;
+  min-block-size: 100svh;
+}
+
+.ref-header {
+  position: sticky;
+  inset-block-start: 0;
+  z-index: var(--dds-z-raised);
+
+  background-color: color-mix(in srgb, var(--dds-color-surface-default) 88%, transparent);
+  /* A blur so content scrolling underneath stays legible without a solid bar. */
+  backdrop-filter: blur(8px);
+  border-block-end: var(--dds-border-thin) solid var(--dds-color-border-subtle);
+}
+
+.ref-header-inner {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--dds-space-md);
+  padding-block: var(--dds-space-sm);
+}
+
+.ref-brand {
+  display: flex;
+  align-items: baseline;
+  gap: var(--dds-space-xs);
+
+  font-family: var(--dds-font-display);
+  font-size: var(--dds-font-size-lg);
+  font-weight: var(--dds-font-weight-bold);
+  color: var(--dds-color-text-default);
+  text-decoration: none;
+  letter-spacing: var(--dds-letter-spacing-tight);
+}
+
+.ref-brand:hover {
+  color: var(--dds-color-text-default);
+}
+
+.ref-brand-sub {
+  font-family: var(--dds-font-body);
+  font-size: var(--dds-font-size-xs);
+  font-weight: var(--dds-font-weight-regular);
+  color: var(--dds-color-text-muted);
+  letter-spacing: var(--dds-letter-spacing-normal);
+}
+
+.ref-nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--dds-space-2xs);
+  margin-inline-start: auto;
+}
+
+.ref-nav a {
+  padding: var(--dds-space-2xs) var(--dds-space-sm);
+  min-block-size: 2.25rem;
+  display: inline-flex;
+  align-items: center;
+
+  font-size: var(--dds-font-size-sm);
+  font-weight: var(--dds-font-weight-medium);
+  color: var(--dds-color-text-subtle);
+  text-decoration: none;
+  border-radius: var(--dds-radius-sm);
+}
+
+.ref-nav a:hover {
+  background-color: var(--dds-color-surface-hover);
+  color: var(--dds-color-text-default);
+  text-decoration: none;
+}
+
+/* The current page. Colour plus weight plus an underline — three cues, so
+   "where am I" does not rely on perceiving a tint. */
+.ref-nav a[aria-current="page"] {
+  color: var(--dds-color-text-link);
+  font-weight: var(--dds-font-weight-semibold);
+  background-color: var(--dds-color-surface-selected);
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+}
+
+.ref-main {
+  flex-grow: 1;
+  padding-block: var(--dds-space-2xl);
+}
+
+.ref-footer {
+  border-block-start: var(--dds-border-thin) solid var(--dds-color-border-subtle);
+  padding-block: var(--dds-space-lg);
+  color: var(--dds-color-text-muted);
+  font-size: var(--dds-font-size-sm);
+}
+
+/* ------------------------------------------------------------------ sections */
+.ref-section {
+  padding-block-end: var(--dds-space-2xl);
+  /* Long reference pages have many sections that are off-screen; skip the
+     rendering work for those until they are approached. */
+  content-visibility: auto;
+  contain-intrinsic-size: auto 30rem;
+}
+
+.ref-section-head {
+  padding-block-end: var(--dds-space-md);
+  margin-block-end: var(--dds-space-lg);
+  border-block-end: var(--dds-border-thin) solid var(--dds-color-border-subtle);
+}
+
+/* ------------------------------------------------------------------ specimen */
+/* A frame around a rendered example. The dashed edge says "this is a specimen,
+   not part of the page". */
+.ref-specimen {
+  padding: var(--dds-space-lg);
+  background-color: var(--dds-color-surface-default);
+  border: var(--dds-border-thin) solid var(--dds-color-border-subtle);
+  border-radius: var(--dds-radius-lg);
+}
+
+/* A specimen shown on the page background instead, for anything whose own
+   surface colour is the point. */
+.ref-specimen-plain {
+  background-color: var(--dds-color-surface-page);
+}
+
+.ref-specimen-label {
+  font-size: var(--dds-font-size-xs);
+  font-weight: var(--dds-font-weight-medium);
+  color: var(--dds-color-text-muted);
+  margin-block-end: var(--dds-space-xs);
+}
+
+/* A grid of state variations. */
+.ref-matrix {
+  display: grid;
+  gap: var(--dds-space-md);
+  grid-template-columns: repeat(auto-fit, minmax(min(14rem, 100%), 1fr));
+}
+
+/* ------------------------------------------------------------------- swatches */
+.ref-swatches {
+  display: grid;
+  gap: var(--dds-space-sm);
+  grid-template-columns: repeat(auto-fill, minmax(min(11rem, 100%), 1fr));
+}
+
+.ref-swatch {
+  border: var(--dds-border-thin) solid var(--dds-color-border-subtle);
+  border-radius: var(--dds-radius-md);
+  overflow: hidden;
+}
+
+.ref-swatch-chip {
+  --ref-swatch-color: transparent;
+
+  block-size: 3.5rem;
+
+  /* A chequerboard BEHIND the swatch colour, so a token that is unexpectedly
+     transparent or translucent shows as such instead of looking like the page
+     background.
+
+     The colour is the FIRST background layer and the chequerboard the rest,
+     because background layers stack front to back — the first one listed is on
+     top. Setting the colour with `background-color` instead does not work: the
+     colour layer would then sit underneath every `background-image`, and the
+     chequerboard would be drawn over the swatch, making every single one look
+     chequered. */
+  background-image:
+    linear-gradient(var(--ref-swatch-color), var(--ref-swatch-color)),
+    linear-gradient(45deg, var(--dds-color-surface-sunken) 25%, transparent 25%),
+    linear-gradient(-45deg, var(--dds-color-surface-sunken) 25%, transparent 25%),
+    linear-gradient(45deg, transparent 75%, var(--dds-color-surface-sunken) 75%),
+    linear-gradient(-45deg, transparent 75%, var(--dds-color-surface-sunken) 75%);
+  background-size: auto, 12px 12px, 12px 12px, 12px 12px, 12px 12px;
+  background-position: 0 0, 0 0, 0 6px, 6px -6px, -6px 0;
+
+  /* The chequerboard needs something to sit on, or the transparent squares show
+     the card behind and the effect is invisible on a matching surface. */
+  background-color: var(--dds-color-surface-default);
+}
+
+.ref-swatch-body {
+  padding: var(--dds-space-xs);
+  background-color: var(--dds-color-surface-default);
+  border-block-start: var(--dds-border-thin) solid var(--dds-color-border-subtle);
+}
+
+.ref-swatch-name {
+  display: block;
+  font-family: var(--dds-font-mono);
+  font-size: var(--dds-font-size-2xs);
+  color: var(--dds-color-text-default);
+  overflow-wrap: anywhere;
+}
+
+.ref-swatch-note {
+  display: block;
+  font-size: var(--dds-font-size-2xs);
+  color: var(--dds-color-text-muted);
+  margin-block-start: var(--dds-space-3xs);
+}
+
+/* ------------------------------------------------------------------- rulers */
+/* A spacing ruler drawn at true size, so the scale can be judged rather than
+   read as a number. */
+.ref-ruler {
+  display: flex;
+  align-items: center;
+  gap: var(--dds-space-sm);
+}
+
+.ref-ruler-bar {
+  block-size: var(--dds-space-md);
+  background-color: var(--dds-color-accent);
+  border-radius: var(--dds-radius-sm);
+}
+
+.ref-ruler-name {
+  font-family: var(--dds-font-mono);
+  font-size: var(--dds-font-size-2xs);
+  color: var(--dds-color-text-muted);
+  min-inline-size: 11rem;
+}
+
+/* --------------------------------------------------------------------- code */
+.ref-code {
+  margin: 0;
+  padding: var(--dds-space-md);
+  overflow-x: auto;
+
+  font-family: var(--dds-font-mono);
+  font-size: var(--dds-font-size-sm);
+  line-height: var(--dds-line-height-normal);
+  tab-size: 2;
+
+  background-color: var(--dds-color-surface-sunken);
+  border: var(--dds-border-thin) solid var(--dds-color-border-subtle);
+  border-radius: var(--dds-radius-md);
+  color: var(--dds-color-text-subtle);
+}
+
+.ref-code:focus-visible {
+  outline: var(--dds-focus-ring-width) solid var(--dds-color-focus-ring);
+  outline-offset: calc(var(--dds-focus-ring-offset) * -1);
+}
+
+/* --------------------------------------------------------------- guidance */
+/* Paired do / don't guidance. The heading carries the word, never only the
+   colour of the border. */
+.ref-guidance {
+  display: grid;
+  gap: var(--dds-space-md);
+  grid-template-columns: repeat(auto-fit, minmax(min(18rem, 100%), 1fr));
+}
+
+.ref-do,
+.ref-dont {
+  padding: var(--dds-space-md);
+  border-radius: var(--dds-radius-md);
+  border: var(--dds-border-thin) solid var(--dds-color-border-default);
+  border-inline-start-width: var(--dds-space-2xs);
+}
+
+.ref-do {
+  border-color: var(--dds-color-border-success);
+  background-color: var(--dds-color-surface-success);
+}
+
+.ref-dont {
+  border-color: var(--dds-color-border-error);
+  background-color: var(--dds-color-surface-error);
+}
+
+.ref-do h3,
+.ref-dont h3 {
+  font-size: var(--dds-font-size-md);
+  font-family: var(--dds-font-body);
+  margin-block-end: var(--dds-space-2xs);
+}
+
+.ref-do h3 { color: var(--dds-color-text-success); }
+.ref-dont h3 { color: var(--dds-color-text-error); }
+
+/* ----------------------------------------------------------- theme preview */
+/* Forces a theme on a subtree, so both themes can be seen side by side without
+   toggling the page. The tokens are scoped to `[data-theme]`, so nesting one
+   inside the other simply works. */
+.ref-theme-pair {
+  display: grid;
+  gap: var(--dds-space-md);
+  grid-template-columns: repeat(auto-fit, minmax(min(18rem, 100%), 1fr));
+}
+
+.ref-theme-panel {
+  padding: var(--dds-space-md);
+  background-color: var(--dds-color-surface-page);
+  border: var(--dds-border-thin) solid var(--dds-color-border-default);
+  border-radius: var(--dds-radius-md);
+  color: var(--dds-color-text-default);
+}
+
+/* ------------------------------------------------------------------- tokens */
+.ref-token-table {
+  font-size: var(--dds-font-size-sm);
+}
+
+.ref-token-table code {
+  font-size: var(--dds-font-size-xs);
+  overflow-wrap: anywhere;
+}
+
+/* =============================================================================
+   Breakpoint preview
+   =============================================================================
+
+   A width switcher around a specimen, so every breakpoint can be inspected
+   without resizing the browser window.
+
+   This is the single most useful documentation tool in the system, for one
+   reason: without it, nobody looks at the narrow state. Not the person building
+   the component, not the person reviewing it, and not a tool. The narrow layout
+   is where responsive bugs live, and a switcher is what makes checking it a
+   two-second act instead of a deliberate exercise.
+
+   It only works on components that respond to their CONTAINER rather than the
+   viewport. A component using `@media` reads the real window and ignores the
+   stage entirely — the buttons would visibly do nothing. That is exactly why
+   DDS requires container queries for anything with layout-shifting behaviour.
+   ============================================================================= */
+
+.ref-bp {
+  border: var(--dds-border-thin) solid var(--dds-color-border-subtle);
+  border-radius: var(--dds-radius-md);
+  overflow: hidden;
+}
+
+.ref-bp-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--dds-space-2xs);
+
+  padding: var(--dds-space-2xs);
+  background-color: var(--dds-color-surface-sunken);
+  border-block-end: var(--dds-border-thin) solid var(--dds-color-border-subtle);
+}
+
+.ref-bp-toolbar-label {
+  font-size: var(--dds-font-size-2xs);
+  color: var(--dds-color-text-muted);
+  padding-inline: var(--dds-space-2xs);
+}
+
+/* The horizontal scroller: the stage may be wider than the page area when a
+   large width is selected. */
+.ref-bp-scroll {
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  padding: var(--dds-space-md);
+  background-color: var(--dds-color-surface-page);
+}
+
+.ref-bp-scroll:focus-visible {
+  outline: var(--dds-focus-ring-width) solid var(--dds-color-focus-ring);
+  outline-offset: calc(var(--dds-focus-ring-offset) * -1);
+}
+
+/* The stage. Its inline-size is what the container queries inside actually
+   measure, which is the entire point. */
+.ref-bp-stage {
+  inline-size: 100%;
+  margin-inline: auto;
+  background-color: var(--dds-color-surface-default);
+  border: var(--dds-border-thin) dashed var(--dds-color-border-default);
+  border-radius: var(--dds-radius-sm);
+  /* Establish a containing block so a sticky child behaves predictably. */
+  position: relative;
+  transition: inline-size var(--dds-duration-base) var(--dds-ease-standard);
+}
+
+.ref-bp-readout {
+  margin-inline-start: auto;
+  padding-inline: var(--dds-space-xs);
+  font-family: var(--dds-font-mono);
+  font-size: var(--dds-font-size-2xs);
+  font-variant-numeric: tabular-nums;
+  color: var(--dds-color-text-muted);
+}
+
+/* =============================================================================
+   Code view
+   =============================================================================
+
+   The markup behind a specimen, in a collapsible block.
+
+   Generated from the live DOM rather than maintained by hand. A hand-written
+   code sample beside a live demo is two sources of truth, and the sample is
+   always the one that goes stale — usually silently, and usually in the ARIA
+   attributes, which is the part somebody is most likely to copy without
+   checking.
+   ============================================================================= */
+
+.ref-codeview {
+  margin-block-start: var(--dds-space-sm);
+  border: var(--dds-border-thin) solid var(--dds-color-border-subtle);
+  border-radius: var(--dds-radius-md);
+  background-color: var(--dds-color-surface-default);
+}
+
+.ref-codeview > summary {
+  display: flex;
+  align-items: center;
+  gap: var(--dds-space-xs);
+
+  padding: var(--dds-space-xs) var(--dds-space-sm);
+  min-block-size: 2.5rem;
+
+  font-size: var(--dds-font-size-sm);
+  font-weight: var(--dds-font-weight-medium);
+  color: var(--dds-color-text-link);
+  cursor: pointer;
+  list-style: none;
+  border-radius: var(--dds-radius-md);
+}
+
+.ref-codeview > summary::-webkit-details-marker {
+  display: none;
+}
+
+.ref-codeview > summary:hover {
+  background-color: var(--dds-color-surface-hover);
+}
+
+.ref-codeview-marker {
+  transition: rotate var(--dds-duration-fast) var(--dds-ease-standard);
+}
+
+.ref-codeview[open] .ref-codeview-marker {
+  rotate: 180deg;
+}
+
+.ref-codeview-body {
+  padding: 0 var(--dds-space-sm) var(--dds-space-sm);
+}
+
+.ref-codeview pre {
+  margin: 0;
+  max-block-size: 28rem;
+  overflow: auto;
+  padding: var(--dds-space-sm);
+  background-color: var(--dds-color-surface-sunken);
+  border-radius: var(--dds-radius-sm);
+  font-size: var(--dds-font-size-xs);
+  tab-size: 2;
+}
+
+.ref-codeview-actions {
+  display: flex;
+  justify-content: flex-end;
+  padding-block-start: var(--dds-space-2xs);
+}
+
+/* =============================================================================
+   Mobile behaviour note
+   =============================================================================
+
+   A fixed place for the sentence describing what a component does at narrow
+   widths.
+
+   A fixed location, rather than "somewhere in the prose", because the source
+   this was learned from had the note in maybe a third of its components,
+   scattered between body text, do/don't blocks and nowhere. A consistent slot
+   is what makes its absence visible.
+   ============================================================================= */
+
+.ref-note {
+  display: flex;
+  gap: var(--dds-space-xs);
+  align-items: flex-start;
+
+  margin-block-start: var(--dds-space-sm);
+  padding: var(--dds-space-xs) var(--dds-space-sm);
+
+  font-size: var(--dds-font-size-sm);
+  color: var(--dds-color-text-subtle);
+
+  background-color: var(--dds-color-surface-sunken);
+  border-inline-start: var(--dds-border-thick) solid var(--dds-color-border-default);
+  border-radius: var(--dds-radius-sm);
+}
+
+.ref-note > .dds-icon {
+  margin-block-start: 0.15em;
+  color: var(--dds-color-text-muted);
+}
+
+/* =============================================================================
+   Page layout with a side navigation
+   =============================================================================
+
+   Every reference page carries an "On this page" navigation beside the content.
+   It is generated by `scripts/sync-reference-toc.mjs` from the page's own
+   sections, so it cannot drift from what is actually there.
+
+   The aside comes FIRST in the DOM. On a narrow screen it therefore appears
+   above the content, which is where a reader expects a contents list — and it
+   means reading order matches visual order at both widths with no `order`
+   juggling and no invisible tab stops.
+
+   It is a plain, always-visible list rather than a collapsible one. A
+   `<details>` would be tidier on a phone, but hiding a contents list behind a
+   control that only exists at one width is exactly the kind of state that
+   desynchronises on resize. Eight links are not worth that.
+   ============================================================================= */
+
+.ref-layout {
+  display: grid;
+  gap: var(--dds-space-lg);
+}
+
+.ref-aside {
+  /* Compact on narrow screens: the list sits above the content, so it should
+     not consume the whole first screen. */
+  padding: var(--dds-space-sm) var(--dds-space-md);
+  background-color: var(--dds-color-surface-sunken);
+  border: var(--dds-border-thin) solid var(--dds-color-border-subtle);
+  border-radius: var(--dds-radius-md);
+}
+
+/* Two columns once there is genuinely room. A media query is correct here,
+   unlike inside a component: this is the page shell, so the viewport IS what it
+   depends on. */
+@media (min-width: 64rem) {
+  .ref-layout {
+    grid-template-columns: 15rem minmax(0, 1fr);
+    gap: var(--dds-space-2xl);
+    align-items: start;
+  }
+
+  .ref-aside {
+    position: sticky;
+    /* Clear of the sticky page header. */
+    inset-block-start: 4.5rem;
+    max-block-size: calc(100svh - 6rem);
+    overflow-y: auto;
+
+    /* At this width the list is furniture, not a card. */
+    padding: 0;
+    background: none;
+    border: 0;
+  }
+}
+
+/* The generated list itself reuses the DDS table-of-contents component, so the
+   active-section highlighting and its `aria-current="location"` semantics come
+   from the system rather than from this page. */
