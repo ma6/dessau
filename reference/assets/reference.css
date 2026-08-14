@@ -861,7 +861,18 @@
       2.25rem + var(--dds-space-2xs) + var(--dds-space-2xs) +
       var(--dds-border-thin) + 2rem
     );
-    justify-content: center;
+    /* Pinned to the top of the reserved box, not centred in it.
+       ----------------------------------------------------------------------
+       Centring kept the box the same height and moved its contents: on a page
+       with a second row the pair was centred as a pair, on a page without it the
+       single row was centred alone — so the first-level items sat at a different
+       height depending on which page you were on, and moved as you navigated.
+
+       Fixing the container's height without fixing the position of what is inside
+       it solved half the problem and left the visible half. Top-aligned, the first
+       row is at the same place on all eight pages and the reserved space below is
+       either the second row or nothing. */
+    justify-content: flex-start;
   }
 
   /* The second row sits directly under its parent, sharing an edge with it. */

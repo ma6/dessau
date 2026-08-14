@@ -196,6 +196,32 @@ test('the header is the same height on every page', async ({ page }) => {
   ).toBe(1);
 });
 
+test('the first-level entries sit at the same height on every page', async ({ page }) => {
+  await page.setViewportSize(WIDE);
+
+  const tops = new Map();
+
+  for (const file of PAGES) {
+    await page.goto(`/reference/${file}`);
+    const box = await page.locator('.ref-nav').boundingBox();
+    tops.set(file, Math.round(box.y));
+  }
+
+  /**
+   * A constant header height is not enough on its own. With the rows centred in a
+   * reserved box, a page with a second row centred the pair and a page without it
+   * centred the single row alone — so the first level moved as you navigated, inside a
+   * header that no longer changed size. Half a fix, and the visible half was the half
+   * left over.
+   */
+  expect(
+    new Set(tops.values()).size,
+    'the first-level navigation is at a different height depending on the page, so the ' +
+      'entries move as you navigate: ' +
+      [...tops].map(([f, y]) => `${f}=${y}`).join(', ')
+  ).toBe(1);
+});
+
 test('the collapsed menu does not change the header height', async ({ page }) => {
   await page.setViewportSize(NARROW);
   await page.goto('/reference/components.html');
