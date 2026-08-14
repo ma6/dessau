@@ -222,6 +222,56 @@ test('the first-level entries sit at the same height on every page', async ({ pa
   ).toBe(1);
 });
 
+test('the brand and the theme toggle sit on the navigation row, on every page', async ({ page }) => {
+  await page.setViewportSize(WIDE);
+
+  const rows = new Map();
+
+  for (const file of PAGES) {
+    await page.goto(`/reference/${file}`);
+
+    rows.set(
+      file,
+      await page.evaluate(() => {
+        const top = (selector) =>
+          Math.round(document.querySelector(selector).getBoundingClientRect().top);
+        return {
+          brand: top('.ref-brand'),
+          nav: top('.ref-nav'),
+          theme: top('.ref-header-inner > .dds-theme-toggle'),
+        };
+      })
+    );
+  }
+
+  /**
+   * All three on one line, and the same line everywhere.
+   *
+   * `align-items: center` centred the brand and the theme toggle against the tallest
+   * item in the row — the navigation panel, two rows tall on most pages. So the brand
+   * sat below the navigation it belongs beside, and any difference between the panel's
+   * real height and its reserved height moved both of them.
+   *
+   * Comparing the three to each other AND across pages is what makes this hold: equal
+   * positions on one page prove alignment, equal positions across pages prove nothing
+   * moves as you navigate, and only both together are the property being asked for.
+   */
+  for (const [file, { brand, nav, theme }] of rows) {
+    expect(
+      { brand, theme },
+      `on ${file} the brand or the theme toggle is off the navigation's line ` +
+        `(nav=${nav}, brand=${brand}, theme=${theme})`
+    ).toEqual({ brand: nav, theme: nav });
+  }
+
+  const distinct = new Set([...rows.values()].map((r) => r.nav));
+  expect(
+    distinct.size,
+    'the header row is at a different height depending on the page: ' +
+      [...rows].map(([f, r]) => `${f}=${r.nav}`).join(', ')
+  ).toBe(1);
+});
+
 test('the collapsed menu does not change the header height', async ({ page }) => {
   await page.setViewportSize(NARROW);
   await page.goto('/reference/components.html');

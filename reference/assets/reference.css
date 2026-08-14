@@ -35,12 +35,24 @@
 }
 
 .ref-header-inner {
+  /* One height for the header's top row, and everything in it hangs off this.
+     ------------------------------------------------------------------------
+     `align-items: center` was centring the brand and the theme toggle against the
+     TALLEST item in the row — which is the navigation panel, two rows tall on most
+     pages. So the brand sat lower than the navigation it belongs beside, and any
+     difference between the panel's real height and its reserved height moved both
+     of them.
+
+     Aligning to the start of the row instead, with one shared row height, means the
+     panel can only grow downwards. Nothing else in the header can be moved by it. */
+  --ref-row: 2.25rem;
+
   /* The containing block for the collapsed navigation overlay. */
   position: relative;
 
   display: flex;
   flex-wrap: wrap;
-  align-items: center;
+  align-items: flex-start;
   gap: var(--dds-space-md);
   padding-block: var(--dds-space-sm);
 }
@@ -49,6 +61,12 @@
   display: flex;
   align-items: baseline;
   gap: var(--dds-space-xs);
+
+  /* The shared row height, so the brand sits on the same line as the first row of
+     navigation rather than being centred against the whole panel. */
+  min-block-size: var(--ref-row);
+  align-content: center;
+  flex-wrap: wrap;
 
   font-family: var(--dds-font-display);
   font-size: var(--dds-font-size-lg);
@@ -108,9 +126,16 @@
 }
 
 /* The menu button is pushed to the end of the row; the theme toggle follows it,
-   which is where a utility control is looked for. */
+   which is where a utility control is looked for. Both share the row height, so
+   neither can be moved by the panel growing. */
 .ref-nav-toggle {
   margin-inline-start: auto;
+}
+
+.ref-header-inner > .dds-theme-toggle {
+  min-block-size: var(--ref-row);
+  display: inline-flex;
+  align-items: center;
 }
 
 /* Only where the toggle exists to reopen it. */
@@ -128,7 +153,7 @@
 
 .ref-nav a {
   padding: var(--dds-space-2xs) var(--dds-space-sm);
-  min-block-size: 2.25rem;
+  min-block-size: var(--ref-row);
   display: inline-flex;
   align-items: center;
 
@@ -858,7 +883,7 @@
        structure to serve a layout constraint. Calculated from the same values the
        rows are built from, so it tracks a change to either. */
     min-block-size: calc(
-      2.25rem + var(--dds-space-2xs) + var(--dds-space-2xs) +
+      var(--ref-row) + var(--dds-space-2xs) + var(--dds-space-2xs) +
       var(--dds-border-thin) + 2rem
     );
     /* Pinned to the top of the reserved box, not centred in it.
