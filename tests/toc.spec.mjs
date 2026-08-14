@@ -21,8 +21,27 @@
  */
 
 import { test, expect } from '@playwright/test';
+import { readdir, readFile } from 'node:fs/promises';
 
-const PAGES = ['patterns', 'components', 'content', 'navigation', 'foundations'];
+/**
+ * Every reference page that has a side navigation, read from the filesystem.
+ *
+ * A hard-coded list was five names long and two pages out of date within a day of
+ * those pages being written — and the gap is invisible, because the tests that do run
+ * all pass. Deriving it means a new page is covered the moment it exists, which is the
+ * only version of this that stays true.
+ */
+const PAGES = (
+  await Promise.all(
+    (await readdir('reference'))
+      .filter((name) => name.endsWith('.html'))
+      .sort()
+      .map(async (name) => {
+        const source = await readFile(`reference/${name}`, 'utf8');
+        return source.includes('data-dds-toc') ? name.replace('.html', '') : null;
+      })
+  )
+).filter(Boolean);
 
 /**
  * Scroll to the true bottom of the page.
