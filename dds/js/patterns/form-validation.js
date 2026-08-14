@@ -158,7 +158,46 @@
         // see it, so it must not block them.
         var hiddenAncestor = element.closest('[hidden]');
         return !hiddenAncestor;
+      })
+      .filter(function (element, _index, all) {
+        /**
+         * A radio group is ONE question with one answer, so it gets one error.
+         *
+         * Every radio in a required group reports the same `valueMissing`, and
+         * treating them as separate fields produced one identical message per
+         * option: "Enter how we should reply" printed beside every radio, and
+         * repeated in the error summary once per option. Only the first radio of
+         * each name survives here; the rest are the same field.
+         */
+        if (element.type !== 'radio') return true;
+        return all.indexOf(all.filter(function (other) {
+          return other.type === 'radio' && other.name === element.name;
+        })[0]) === all.indexOf(element);
       });
+  }
+
+  /**
+   * Where a field's error message belongs in the DOM.
+   *
+   * For a normal control that is directly after it. For a radio or checkbox inside
+   * a group it is emphatically NOT: the input sits inside its own `<label>`, so
+   * `afterend` puts the message between the radio and the word it labels —
+   * "( ) [Enter how we should reply] By email". The message belongs after the whole
+   * set of options, where the user reads it once, having seen all the choices.
+   */
+  function errorAnchorFor(field) {
+    var group = field.closest('.dds-fieldgroup');
+
+    if (group && (field.type === 'radio' || field.type === 'checkbox')) {
+      // After the options, still inside the fieldset so it stays associated with
+      // the legend.
+      return {
+        node: group.querySelector('.dds-fieldgroup-options') || group,
+        position: 'beforeend',
+      };
+    }
+
+    return { node: field, position: 'afterend' };
   }
 
   /** Find (or create) the error element belonging to a field. */
@@ -193,8 +232,12 @@
     text.setAttribute('data-dds-error-text', '');
     element.appendChild(text);
 
-    // After the control, so reading order matches visual order.
-    field.insertAdjacentElement('afterend', element);
+    // Reading order has to match visual order, which for a group means after the
+    // options rather than after the one input that happened to be validated.
+    var anchor = errorAnchorFor(field);
+    if (anchor.position === 'beforeend') anchor.node.appendChild(element);
+    else anchor.node.insertAdjacentElement(anchor.position, element);
+
     return element;
   }
 

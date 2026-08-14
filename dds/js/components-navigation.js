@@ -4,7 +4,7 @@
  *   <script src="/dds/js/dds.js" defer></script>
  *   <script src="/dds/js/components-navigation.js" defer></script>
  *
- * Contents: site header disclosure · table of contents
+ * Contents: site header disclosure · table of contents · content navigation
  *
  * The menu component needs no JavaScript at all: it uses the `popover`
  * attribute with `popovertarget`, which the platform handles.
@@ -153,31 +153,52 @@
     }
 
     var visible = new Set();
+    /** True once the end of the document is on screen. See `endObserver` below. */
+    var atEnd = false;
+    var lastLink = links[links.length - 1];
+
+    function update() {
+      /**
+       * The end of the page wins outright.
+       *
+       * No `rootMargin` can make a short final section active. The reading band sits
+       * near the top of the viewport, and at the bottom of the page there is nothing
+       * left to scroll — so a short last section stays below the band forever while
+       * the section above it keeps the marker. The result is a table of contents with
+       * one entry that can never be reached, which was exactly the symptom.
+       *
+       * Once the end of the document is visible, the last section is the last thing
+       * on screen regardless of geometry, so the answer is known without measuring.
+       */
+      if (atEnd) {
+        mark(lastLink);
+        return;
+      }
+
+      if (!visible.size) return;
+
+      // Several sections can be in the band at once; the topmost is being read.
+      var topmost = Array.from(visible).sort(function (a, b) {
+        return a.getBoundingClientRect().top - b.getBoundingClientRect().top;
+      })[0];
+
+      mark(byId.get(topmost));
+    }
 
     var observer = new IntersectionObserver(
       function (entries) {
         entries.forEach(function (entry) {
-          if (entry.isIntersecting) {
-            visible.add(entry.target);
-          } else {
-            visible.delete(entry.target);
-          }
+          if (entry.isIntersecting) visible.add(entry.target);
+          else visible.delete(entry.target);
         });
 
-        if (!visible.size) return;
-
-        // Several sections can be in view at once; the topmost one is the one
-        // being read.
-        var topmost = Array.from(visible).sort(function (a, b) {
-          return a.getBoundingClientRect().top - b.getBoundingClientRect().top;
-        })[0];
-
-        mark(byId.get(topmost));
+        update();
       },
       {
-        /* A band near the top of the viewport rather than the whole viewport.
-           Using the full viewport means the last section never becomes active on
-           a short page, because it never reaches the top. */
+        /* A band near the top of the viewport rather than the whole viewport: with
+           the full viewport, every section in view intersects at once and the marker
+           jumps around. The band answers "what is being read", not "what is on
+           screen". */
         rootMargin: '-10% 0px -70% 0px',
         threshold: 0,
       }
@@ -186,5 +207,235 @@
     byId.forEach(function (link, target) {
       observer.observe(target);
     });
+
+    /**
+     * A zero-height sentinel after the last section, watched by its own observer.
+     *
+     * A scroll listener would answer the same question and run on every frame to do
+     * it. An observer on a sentinel costs nothing while the user is anywhere else in
+     * the document, and reports exactly once when the end comes into view.
+     */
+    var lastTarget = Array.from(byId.keys()).sort(function (a, b) {
+      return a.getBoundingClientRect().top - b.getBoundingClientRect().top;
+    }).pop();
+
+    if (lastTarget && lastTarget.parentNode) {
+      var sentinel = document.createElement('div');
+      sentinel.setAttribute('aria-hidden', 'true');
+      sentinel.setAttribute('data-dds-toc-sentinel', '');
+      sentinel.style.blockSize = '1px';
+      // Never adds height of its own to the page.
+      sentinel.style.marginBlockStart = '-1px';
+      lastTarget.parentNode.insertBefore(sentinel, lastTarget.nextSibling);
+
+      var endObserver = new IntersectionObserver(
+        function (entries) {
+          atEnd = entries[entries.length - 1].isIntersecting;
+          update();
+        },
+        { threshold: 0 }
+      );
+
+      endObserver.observe(sentinel);
+    }
   });
+
+  /* =========================================================================
+     Content navigation
+     =========================================================================
+     Markup:
+       <div class="dds-contentnav-frame">
+         <div class="dds-contentnav-layout" data-dds-contentnav>
+           <button class="dds-contentnav-toggle dds-button dds-button-secondary"
+                   type="button" data-dds-contentnav-toggle
+                   aria-expanded="false" aria-controls="help-nav">…</button>
+           <div class="dds-contentnav-scrim" data-dds-contentnav-scrim></div>
+           <nav class="dds-contentnav" id="help-nav" aria-labelledby="help-nav-title">
+             <p class="dds-contentnav-title" id="help-nav-title">…</p>
+             <button class="dds-contentnav-close …" data-dds-contentnav-close>…</button>
+             …
+           </nav>
+           <div data-dds-contentnav-content>… the page content …</div>
+         </div>
+       </div>
+
+     Above 64rem of container width this component does nothing: the CSS turns the
+     panel into a sticky column, hides the toggle, the close button and the scrim,
+     and forces the nav visible and tabbable. There is nothing for JavaScript to
+     manage, so it stays out of the way.
+
+     Below it, the nav is a modal panel over the content, and three things have to
+     be true while it is open.
+
+     ---------------------------------------------------------------------------
+     1. The content behind it is `inert`, not focus-trapped
+     ---------------------------------------------------------------------------
+
+     `inert` is what a focus trap was always trying to approximate, done by the
+     platform: the subtree leaves the tab order AND the accessibility tree. A
+     hand-written trap only does the first — it cycles Tab within the panel while a
+     screen reader can still walk straight into the content behind, reading a page
+     the user cannot see or reach. It also has to bookkeep the first and last
+     focusable element, which is wrong the moment a disclosure inside the panel
+     opens.
+
+     `inert` goes on the CONTENT, not on the panel. Marking the panel's siblings
+     would be equivalent only if the panel had no other siblings, which is not
+     something this component can promise about a page it does not own.
+
+     ---------------------------------------------------------------------------
+     2. Escape closes it, and focus returns to the toggle
+     ---------------------------------------------------------------------------
+
+     Returning focus is not a nicety. Focus left on a hidden element lands on
+     `<body>`, and the next Tab starts from the top of the page — so someone who
+     opened the panel, changed their mind and pressed Escape is silently sent back
+     to the skip link.
+
+     ---------------------------------------------------------------------------
+     3. Following a link must not restore focus
+     ---------------------------------------------------------------------------
+
+     The panel closes on navigation because these links go to other pages. Moving
+     focus back to the toggle first would fight the navigation, so the close path
+     for a link deliberately skips the focus restore.
+
+     Without JavaScript: the nav is a plain `<nav>` full of working links, visible
+     as a column at wide widths. Only the narrow-width panel behaviour is lost —
+     the links themselves never depended on it. */
+
+  var CONTENTNAV_WIDE = 64 * 16; // 64rem, matching the container query.
+
+  DDS.register('contentnav', '[data-dds-contentnav]', function (layout) {
+    var nav = layout.querySelector('.dds-contentnav');
+    var toggle = layout.querySelector('[data-dds-contentnav-toggle]');
+    var scrim = layout.querySelector('[data-dds-contentnav-scrim]');
+    var closeButton = layout.querySelector('[data-dds-contentnav-close]');
+    var content = layout.querySelector('[data-dds-contentnav-content]');
+
+    if (!nav || !toggle) return;
+
+    /**
+     * Whether the layout is currently wide enough that the nav is a column.
+     *
+     * Measured on the frame that establishes the container, so it answers the same
+     * question the container query does. Reading the viewport instead would be
+     * wrong for a component placed in a narrow column of a wide window — which is
+     * the entire reason this is a container query.
+     */
+    function isWide() {
+      var frame = layout.closest('.dds-contentnav-frame') || layout;
+      return frame.getBoundingClientRect().width >= CONTENTNAV_WIDE;
+    }
+
+    function isOpen() {
+      return nav.hasAttribute('data-dds-open');
+    }
+
+    function open() {
+      if (isWide() || isOpen()) return;
+
+      nav.setAttribute('data-dds-open', '');
+      if (scrim) scrim.setAttribute('data-dds-open', '');
+      toggle.setAttribute('aria-expanded', 'true');
+
+      // The page behind is genuinely unavailable, to a pointer and to a screen
+      // reader alike.
+      if (content) content.inert = true;
+      document.documentElement.classList.add('dds-scroll-locked');
+
+      // Focus the panel itself rather than its first link: the panel is labelled,
+      // so a screen reader announces what just opened before reading the list.
+      nav.focus();
+    }
+
+    /**
+     * @param {{ restoreFocus?: boolean }} [options]
+     *   `restoreFocus` defaults to true. It is false when a link inside the panel
+     *   was followed — moving focus back to the toggle would compete with the
+     *   navigation that is already under way.
+     */
+    function close(options) {
+      if (!isOpen()) return;
+
+      var restoreFocus = !options || options.restoreFocus !== false;
+
+      nav.removeAttribute('data-dds-open');
+      if (scrim) scrim.removeAttribute('data-dds-open');
+      toggle.setAttribute('aria-expanded', 'false');
+
+      if (content) content.inert = false;
+      document.documentElement.classList.remove('dds-scroll-locked');
+
+      // Order matters: focus has to move out before the panel becomes
+      // `visibility: hidden`, or it lands on `<body>` and the next Tab restarts
+      // from the top of the page.
+      if (restoreFocus) toggle.focus();
+    }
+
+    /* The panel needs to be focusable to be announced, but must never be a tab
+       stop of its own — hence -1 rather than 0. */
+    if (!nav.hasAttribute('tabindex')) nav.setAttribute('tabindex', '-1');
+
+    toggle.setAttribute('aria-expanded', String(isOpen()));
+    if (!toggle.getAttribute('aria-controls') && nav.id) {
+      toggle.setAttribute('aria-controls', nav.id);
+    }
+
+    toggle.addEventListener('click', function () {
+      if (isOpen()) close();
+      else open();
+    });
+
+    if (closeButton) {
+      closeButton.addEventListener('click', function () {
+        close();
+      });
+    }
+
+    if (scrim) {
+      scrim.addEventListener('click', function () {
+        close();
+      });
+    }
+
+    nav.addEventListener('keydown', function (event) {
+      if (event.key !== 'Escape') return;
+      // Only when it is actually a panel — at column width Escape belongs to
+      // whatever else on the page might want it.
+      if (isWide() || !isOpen()) return;
+      event.stopPropagation();
+      close();
+    });
+
+    // A link goes to another page, so the panel closes without taking focus back.
+    nav.addEventListener('click', function (event) {
+      var link = event.target.closest && event.target.closest('a[href]');
+      if (link) close({ restoreFocus: false });
+    });
+
+    /**
+     * Growing past the threshold turns the panel into a column, and the CSS makes
+     * it visible again on its own. What the CSS cannot undo is the state this
+     * function set on other elements: `inert` on the content and the scroll lock
+     * would both survive, leaving a page that looks normal and cannot be scrolled
+     * or clicked.
+     */
+    var wasWide = isWide();
+    window.addEventListener('resize', function () {
+      var wide = isWide();
+      if (wide === wasWide) return;
+      wasWide = wide;
+
+      if (wide && isOpen()) {
+        // Not `close()`: focus should not be yanked to a toggle that is now hidden.
+        nav.removeAttribute('data-dds-open');
+        if (scrim) scrim.removeAttribute('data-dds-open');
+        toggle.setAttribute('aria-expanded', 'false');
+        if (content) content.inert = false;
+        document.documentElement.classList.remove('dds-scroll-locked');
+      }
+    });
+  });
+
 })(typeof window !== 'undefined' ? window : globalThis);

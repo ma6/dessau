@@ -472,12 +472,35 @@
     // browser had already moved focus, which made the list flicker.
     document.addEventListener('pointerdown', handleDocumentPointerDown);
 
-    // Closing on blur has to tolerate focus moving to the list itself.
-    input.addEventListener('blur', function () {
-      // A timeout lets a click on an option land first.
-      setTimeout(function () {
-        if (!root.contains(document.activeElement)) close();
-      }, 0);
+    /**
+     * Pressing an option must not move focus out of the input.
+     *
+     * Without this, clicking a suggestion did nothing at all. The sequence is
+     * `pointerdown` → the input blurs → the blur handler closes the list →
+     * `mouseup` → `click`. By the time the click would arrive, the option is
+     * hidden, so the listener on it never runs: the field stays empty and the
+     * component looks broken while the keyboard path works perfectly.
+     *
+     * Deferring the blur with a timer is the usual attempt, and it is a race — the
+     * timer and the click are separate tasks with no guaranteed order. Preventing
+     * the default on `pointerdown` removes the race instead of narrowing it: focus
+     * never leaves the input, so there is no blur to tolerate.
+     */
+    list.addEventListener('pointerdown', function (event) {
+      event.preventDefault();
+    });
+
+    /**
+     * Blur still closes the list, for the cases that are not a click on an option:
+     * Tab away, a click elsewhere on the page, the window losing focus.
+     *
+     * `relatedTarget` is where focus is going. Checking it is exact, where checking
+     * `document.activeElement` after a timeout was both delayed and wrong — during
+     * a pointer press on a non-focusable list item, `activeElement` is `<body>`.
+     */
+    input.addEventListener('blur', function (event) {
+      if (event.relatedTarget && root.contains(event.relatedTarget)) return;
+      close();
     });
 
     return {
