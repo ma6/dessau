@@ -482,6 +482,10 @@
     gap: var(--dds-space-lg);
   }
 
+  /* Text beside media above 40rem, stacked below. Split at 40rem each column
+     is around 20rem, which at the body size is roughly 45 characters — the low end
+     of a readable measure. Any narrower and side-by-side stops being a favour to
+     the reader. */
   @container dds-textmedia (inline-size > 40rem) {
     .dds-textmedia {
       grid-template-columns: 1fr 1fr;
@@ -542,9 +546,15 @@
 
   /* `--dds-chart-value` is a percentage set inline per bar. Inline is correct
      here: it is data, not styling, and it is the one case where a value cannot
-     come from a token. */
+     come from a token.
+
+     Declared here with a zero default rather than left to a `var()` fallback, so
+     the input is a stated part of the contract and not just an implementation
+     detail of one declaration. An inline value overrides it. */
   .dds-chart-bar {
-    inline-size: var(--dds-chart-value, 0%);
+    --dds-chart-value: 0%;
+
+    inline-size: var(--dds-chart-value);
     block-size: 100%;
     background-color: var(--dds-color-accent);
     border-radius: var(--dds-radius-sm);
@@ -700,6 +710,15 @@
     border: 0;
     background-color: transparent;
 
+    /* NOTE: no `display` here — see the rule below. */
+  }
+
+  /* Set ONLY on `[open]`. The UA closes a dialog with
+     `dialog:not([open]) { display: none }`, and author styles beat UA styles — so
+     an unconditional `display` here leaves the closed viewer rendered as a
+     full-viewport, fully transparent overlay that swallows every click on the
+     page, including the ones meant to open it. */
+  .dds-lightbox[open] {
     display: grid;
     grid-template-rows: 1fr auto;
     place-items: center;

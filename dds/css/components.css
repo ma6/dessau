@@ -469,9 +469,63 @@
 
      `appearance: base-select` is not used yet: it is not interoperable across
      engines at the time of writing, so the arrow stays native too. */
+  /* --- the arrow -------------------------------------------------------- */
+  /* `appearance: none`, and then the chevron from the sprite.
+     ------------------------------------------------------------------------
+     What this gives up is only the BUTTON chrome. The popup stays native: the
+     option list, the keyboard behaviour, the touch picker on a phone, the
+     platform's own type-ahead and the screen-reader semantics are all untouched,
+     because none of them are styleable and none of them should be replaced.
+
+     What it buys is the arrow's position. The native arrow is painted by the
+     browser hard against the inline end edge, and `padding-inline-end` does not
+     move it — padding only reserves room for the text. So a select sitting in a
+     row of inputs had its arrow flush to the border while every other control had
+     0.75rem of breathing room, which read as a misaligned control rather than as
+     a deliberate difference.
+
+     The chevron is a real `<use>` into the sprite rather than a background image,
+     because a background image cannot be `currentColor`: a data-URI SVG is a
+     separate document, so its fill would have to be a hardcoded value and would
+     stop following the theme. That is why the select needs the wrapper. */
+  .dds-select-wrap {
+    position: relative;
+    display: block;
+  }
+
   .dds-select {
-    /* Room so long option text does not run under the native arrow. */
-    padding-inline-end: var(--dds-space-xl);
+    appearance: none;
+
+    /* Room for the chevron, plus the standard inline padding beyond it, so long
+       option text never runs underneath. */
+    padding-inline-end: calc(var(--dds-space-sm) * 2 + 1em);
+  }
+
+  /* In forced-colors the author background is discarded, so the chevron would be
+     the only thing left indicating this is a select. It uses `currentColor`, which
+     resolves to the user's own text colour there — but `appearance: none` also
+     removes the control's system border, so it is restated. */
+  @media (forced-colors: active) {
+    .dds-select {
+      border: var(--dds-border-thin) solid ButtonBorder;
+    }
+  }
+
+  .dds-select-arrow {
+    position: absolute;
+    inset-inline-end: var(--dds-space-sm);
+    inset-block-start: 50%;
+    translate: 0 -50%;
+
+    color: var(--dds-color-text-muted);
+    /* The select owns the whole hit area. Without this the arrow swallows the
+       click that is most likely to be aimed at it. */
+    pointer-events: none;
+  }
+
+  .dds-select:disabled + .dds-select-arrow,
+  .dds-select-wrap:has(.dds-select:disabled) .dds-select-arrow {
+    opacity: 0.5;
   }
 
   /* --- monospace variant ------------------------------------------------ */
@@ -517,9 +571,25 @@
     color: var(--dds-color-text-error);
   }
 
-  .dds-error .dds-icon {
-    /* Nudge onto the first line's optical centre. */
-    margin-block-start: 0.15em;
+  /* Aligning an icon to the first line of the text beside it.
+     ==========================================================================
+     `block-size: 1lh` makes the icon's box exactly one line tall. An SVG's default
+     `preserveAspectRatio` then letterboxes the square glyph inside that box and
+     centres it, so the icon lands on the line's optical centre by construction —
+     at any font size, any line height, and in any language whose default leading
+     differs.
+
+     The width stays `1em`, which is what keeps the glyph from stretching.
+
+     This replaces a hand-tuned `margin-block-start`, which was the visible symptom:
+     0.15em was right for one size/leading combination and left the icon sitting
+     noticeably high everywhere else, most obviously in a validation message. A
+     magic number that has to be re-derived per context is a number that will be
+     wrong in the context nobody checked. */
+  .dds-error > .dds-icon,
+  .dds-notice > .dds-icon {
+    block-size: 1lh;
+    align-self: flex-start;
   }
 
   /* --- input with an adornment ------------------------------------------ */
@@ -594,8 +664,11 @@
   }
 
   .dds-choice > input {
-    /* Optical alignment with the first line of the label text. */
-    margin-block-start: 0.2em;
+    /* Centred on the first line of the label, by giving the control a one-line-tall
+       box to sit in rather than nudging it with a margin. A native checkbox has a
+       fixed size (base.css), so the box is what moves, not the control. */
+    block-size: 1lh;
+    align-self: flex-start;
     flex-shrink: 0;
   }
 
@@ -809,7 +882,9 @@
      word before the title is what tells a screen-reader user which kind of
      message this is. */
   .dds-notice > .dds-icon {
-    margin-block-start: 0.15em;
+    /* Larger than the body text: a notice is a block-level message, and the icon
+       is its marker rather than an inline annotation. Alignment is handled by the
+       shared `1lh` rule above. */
     font-size: 1.25em;
   }
 
@@ -862,11 +937,24 @@
     color: var(--dds-color-text-default);
     box-shadow: var(--dds-elevation-lg);
 
-    /* The dialog is laid out as a column so the body scrolls and the header
-       and footer stay put. */
-    display: flex;
     flex-direction: column;
     overflow: hidden;
+
+    /* NOTE: no `display` here — see the rule below. */
+  }
+
+  /* `display` is set ONLY on `[open]`, and this is load-bearing rather than tidy.
+     The UA stylesheet closes a dialog with `dialog:not([open]) { display: none }`.
+     Author styles beat UA styles, so declaring `display: flex` on `.dds-dialog`
+     unconditionally overrides that and leaves every closed dialog rendered: it
+     still takes part in layout and still intercepts pointer events, so an
+     invisible panel swallows clicks meant for the page underneath.
+
+     With `display` scoped to `[open]`, the closed state falls back to the UA's
+     `display: none`, and `transition-behavior: allow-discrete` below still
+     animates the change. */
+  .dds-dialog[open] {
+    display: flex;
   }
 
   /* `display` is toggled by the UA between `none` and `block`, so animating

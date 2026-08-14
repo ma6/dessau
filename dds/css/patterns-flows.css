@@ -338,6 +338,10 @@
     gap: var(--dds-space-lg);
   }
 
+  /* Filters move from above the results to a column beside them at 52rem. That
+     is the width at which the sidebar can take its ~16rem and still leave the
+     results grid two full columns — one column of results next to a filter rail
+     wastes the space it just took. */
   @container dds-filtering (inline-size >= 52rem) {
     .dds-filtering-split {
       grid-template-columns: 16rem 1fr;

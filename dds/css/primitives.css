@@ -221,6 +221,36 @@
   --dds-container-xl: 75rem;  /* 1200px */
 
   /* ---------------------------------------------------------------------------
+     Breakpoints — named, and deliberately few.
+
+     Four names for the four situations a PAGE layout genuinely distinguishes.
+     They exist so a conversation has vocabulary ("this breaks at tablet") and so
+     the page shell has a documented set to choose from rather than a number
+     someone picked.
+
+     THEY ARE NOT FOR COMPONENTS. A component responds to its container, not the
+     viewport — see agent/responsive.md. These four are for the page shell and for
+     the genuinely device-dependent cases: reachability by thumb, print,
+     orientation.
+
+     A HARD LIMITATION, stated because it surprises people: CSS cannot use a
+     custom property in a media or container query condition.
+
+         @media (min-width: var(--dds-breakpoint-tablet))   /* does NOT work */
+
+     The query condition is evaluated before custom properties are resolved. So
+     these values are documentation and a single place to read the numbers from —
+     every query still writes its own literal. `scripts/build-foundations.mjs`
+     extracts every width actually used in the CSS into
+     `dds/foundations.json`, so the documented set and the used set can be compared
+     rather than trusted.
+     --------------------------------------------------------------------------- */
+  --dds-breakpoint-phone: 30rem;    /* 480px  — below this, one hand, one column */
+  --dds-breakpoint-tablet: 48rem;   /* 768px  — two columns of readable text fit */
+  --dds-breakpoint-laptop: 64rem;   /* 1024px — a sidebar plus content fits */
+  --dds-breakpoint-desktop: 80rem;  /* 1280px — a third region fits */
+
+  /* ---------------------------------------------------------------------------
      Elevation. Two-part shadows (a tight contact shadow plus a soft ambient
      one) because a single blur reads as a glow rather than as height.
      Dark mode overrides these in the semantic layer — the same shadow that

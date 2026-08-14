@@ -133,6 +133,11 @@
     font-weight: var(--dds-font-weight-semibold);
   }
 
+  /* The header's navigation is inline from 48rem and behind a disclosure below
+     it. 48rem is also the named tablet breakpoint, which is a coincidence worth
+     stating: the header happens to be the one component whose content threshold
+     lands on the shell's. It is still written as a container query, because a
+     header placed in a narrow column should collapse regardless of the window. */
   @container dds-siteheader (inline-size >= 48rem) {
     /* Wide enough: navigation inline, disclosure button gone. */
     .dds-siteheader-toggle {
@@ -196,6 +201,9 @@
     gap: var(--dds-space-lg);
   }
 
+  /* The footer's link groups sit side by side from 40rem. Below that they are
+     stacked: three columns of short link text at less than 40rem produces columns
+     narrower than their own longest link, which then wraps every item. */
   @container dds-sitefooter (inline-size >= 40rem) {
     .dds-sitefooter-groups {
       grid-template-columns: repeat(auto-fit, minmax(min(11rem, 100%), 1fr));
@@ -386,11 +394,19 @@
     font-size: var(--dds-font-size-sm);
   }
 
-  /* The number marker. Generated content, so the visible number cannot drift
-     from the list position. */
-  .dds-step::before {
-    content: counter(dds-step);
+  /* The marker: a number, or an icon once the step is done.
+     ==========================================================================
+     A real element rather than a `::before` on the step, because a completed step
+     shows a tick and a tick has to be an icon from the sprite. A pseudo-element
+     cannot contain markup, which leaves only `content: "\2713"` — a Unicode
+     character, in whichever fallback font happens to have it, announced by a
+     screen reader as "check mark" in the middle of the step's label.
 
+     The number still comes from a CSS counter, so it cannot drift from the list
+     position, and `:has()` decides which of the two is shown: a marker containing
+     an icon does not also number itself. That keeps the rule in one place instead
+     of requiring the markup and a data attribute to agree. */
+  .dds-step-marker {
     display: grid;
     place-items: center;
     flex-shrink: 0;
@@ -407,16 +423,25 @@
     border-radius: var(--dds-radius-circle);
   }
 
-  .dds-step[data-dds-step="done"]::before {
-    /* A tick replaces the number. Colour AND glyph change, and the status is
-       also stated in the step's text. */
-    content: "\2713";
+  /* Numbered unless it holds an icon. */
+  .dds-step-marker:not(:has(.dds-icon))::before {
+    content: counter(dds-step);
+  }
+
+  .dds-step-marker .dds-icon {
+    inline-size: 1rem;
+    block-size: 1rem;
+  }
+
+  /* Done. Colour AND shape change, and the status is also stated in the step's
+     text — none of the three is load-bearing on its own. */
+  .dds-step[data-dds-step="done"] .dds-step-marker {
     color: var(--dds-color-on-success-solid);
     background-color: var(--dds-color-success-solid);
     border-color: var(--dds-color-success-solid);
   }
 
-  .dds-step[aria-current="step"]::before {
+  .dds-step[aria-current="step"] .dds-step-marker {
     color: var(--dds-color-action-on-primary);
     background-color: var(--dds-color-action-primary);
     border-color: var(--dds-color-action-primary);
@@ -432,6 +457,10 @@
     font-weight: var(--dds-font-weight-regular);
   }
 
+  /* Steps turn from a stacked list into a row at 34rem. That is where four
+     labels of two or three words each stop needing to wrap, which is what makes
+     the row readable rather than a set of broken fragments. Four is the practical
+     ceiling for a step indicator, so it is the case the threshold is set for. */
   @container dds-steps (inline-size >= 34rem) {
     .dds-steps {
       flex-direction: row;
@@ -804,9 +833,16 @@
     flex-shrink: 0;
   }
 
+  /* Below 34rem the actions drop onto their own row. That is the width at which a
+     truncated object title plus two or three buttons leaves the title showing
+     about four characters — at which point the bar has stopped telling the user
+     what they are looking at, which is its entire job. Giving the actions a second
+     row costs vertical space and keeps the title readable.
+
+     The same number as the step indicator, by coincidence rather than for a shared
+     reason: one is about four labels fitting in a row, this is about a title
+     surviving beside its buttons. */
   @container dds-topbar (inline-size < 34rem) {
-    /* Narrow: the actions move to their own row rather than being crushed
-       alongside a truncated title. */
     .dds-topbar-actions {
       flex-basis: 100%;
       justify-content: flex-end;
@@ -885,4 +921,310 @@
     border-block-end-color: var(--dds-color-border-success);
   }
   .dds-banner-success > .dds-icon { color: var(--dds-color-text-success); }
+}
+
+@layer dds.components {
+
+  /* ==========================================================================
+     Content navigation
+     ==========================================================================
+     A persistent, GROUPED navigation for content that spans several pages — a
+     help centre, documentation, a multi-part guide. Group headings plus a link
+     list; a fixed column when there is room, a panel over the content when there
+     is not.
+
+     Three navigation components, and the distinction is worth keeping:
+
+       .dds-primary-nav   the site's top-level sections, in the header
+       .dds-contentnav    grouped navigation WITHIN a body of content   ← this
+       .dds-appnav        flat navigation between areas of a signed-in app
+       .dds-toc           anchor navigation WITHIN one page
+
+     Confusing this with the table of contents is the easy mistake: this moves you
+     between pages, the table of contents moves you within one. Different job,
+     different `aria-current` value.
+
+     ---------------------------------------------------------------------------
+     Why this is not a <dialog>
+     ---------------------------------------------------------------------------
+
+     A modal panel is the right behaviour at narrow widths, and `<dialog>` +
+     `showModal()` would normally be the way to get it. It does not work here.
+
+     The same element has to be a static column above the threshold, and the UA
+     stylesheet closes a dialog with `dialog:not([open]) { display: none }`.
+     Overriding that to make a closed dialog render as a column is precisely the
+     bug that `check-css.mjs` now guards against. The alternative — a dialog for
+     narrow and a separate column for wide — means two copies of the navigation,
+     which drift and are both announced by a screen reader.
+
+     So it stays one plain `<nav>`, and the part that actually mattered comes from
+     the platform anyway: **`inert` on the page content** while the panel is open.
+     That is what a focus trap was ever for, and the platform does it properly —
+     no tab cycling, no first/last-element bookkeeping, and the content is removed
+     from the accessibility tree rather than merely skipped.
+
+     Behaviour: js/components-navigation.js */
+  .dds-contentnav-frame {
+    container-type: inline-size;
+    container-name: dds-contentnav;
+  }
+
+  .dds-contentnav-layout {
+    display: grid;
+    gap: var(--dds-space-lg);
+  }
+
+  /* --- the navigation itself --------------------------------------------- */
+  .dds-contentnav {
+    /* Below the threshold this is a panel over the content. Positioned fixed
+       rather than absolute, so it covers the viewport regardless of where in the
+       page it sits. */
+    position: fixed;
+    inset-block: 0;
+    inset-inline-start: 0;
+    z-index: var(--dds-z-panel);
+
+    inline-size: min(20rem, 85%);
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    padding: var(--dds-space-md);
+
+    background-color: var(--dds-color-surface-raised);
+    border-inline-end: var(--dds-border-thin) solid var(--dds-color-border-default);
+    box-shadow: var(--dds-elevation-lg);
+
+    /* Closed: slid out of view. `translate` rather than `left`, so it is
+       composited and does not trigger layout on every frame. */
+    translate: -100% 0;
+    transition: translate var(--dds-duration-slow) var(--dds-ease-standard);
+  }
+
+  .dds-contentnav[data-dds-open] {
+    translate: 0 0;
+  }
+
+  /* Closed AND not animating: out of the tab order entirely.
+     `visibility: hidden` rather than `display: none` so the slide still animates
+     — and unlike a purely visual `translate`, it genuinely removes the links from
+     the tab order. A panel that is off-screen but still tabbable is the classic
+     off-canvas bug: focus disappears and Tab appears to do nothing. */
+  .dds-contentnav:not([data-dds-open]) {
+    visibility: hidden;
+    transition:
+      translate var(--dds-duration-slow) var(--dds-ease-standard),
+      visibility 0s var(--dds-duration-slow);
+  }
+
+  .dds-contentnav-title {
+    font-family: var(--dds-font-body);
+    font-size: var(--dds-font-size-sm);
+    font-weight: var(--dds-font-weight-semibold);
+    color: var(--dds-color-text-muted);
+    margin-block-end: var(--dds-space-xs);
+  }
+
+  /* A group. `<strong>` for the heading rather than a heading level, because the
+     document's heading outline belongs to the content, not to the navigation
+     beside it — injecting h3s here would corrupt it. */
+  .dds-contentnav-group + .dds-contentnav-group {
+    margin-block-start: var(--dds-space-md);
+    padding-block-start: var(--dds-space-md);
+    border-block-start: var(--dds-border-thin) solid var(--dds-color-border-subtle);
+  }
+
+  .dds-contentnav-group-title {
+    display: block;
+    font-size: var(--dds-font-size-sm);
+    font-weight: var(--dds-font-weight-semibold);
+    color: var(--dds-color-text-default);
+    margin-block-end: var(--dds-space-2xs);
+  }
+
+  .dds-contentnav ul {
+    display: flex;
+    flex-direction: column;
+    gap: var(--dds-space-3xs);
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .dds-contentnav a {
+    display: flex;
+    align-items: center;
+    padding: var(--dds-space-2xs) var(--dds-space-xs);
+    min-block-size: 2.25rem;
+
+    font-size: var(--dds-font-size-sm);
+    color: var(--dds-color-text-subtle);
+    text-decoration: none;
+    border-radius: var(--dds-radius-sm);
+  }
+
+  .dds-contentnav a:hover {
+    background-color: var(--dds-color-surface-hover);
+    color: var(--dds-color-text-default);
+    text-decoration: none;
+  }
+
+  /* Current page: fill, colour AND weight. Three cues, because "where am I" is
+     essential orientation. */
+  .dds-contentnav a[aria-current="page"] {
+    background-color: var(--dds-color-surface-selected);
+    color: var(--dds-color-text-link);
+    font-weight: var(--dds-font-weight-semibold);
+  }
+
+  /* --- the scrim ---------------------------------------------------------- */
+  /* A real element rather than a pseudo-element, so it can be a click target
+      without the navigation having to own the whole viewport. */
+  .dds-contentnav-scrim {
+    position: fixed;
+    inset: 0;
+    z-index: var(--dds-z-scrim);
+
+    background-color: var(--dds-color-overlay);
+    opacity: 0;
+    /* Not clickable while closed. */
+    pointer-events: none;
+    transition: opacity var(--dds-duration-slow) var(--dds-ease-standard);
+  }
+
+  .dds-contentnav-scrim[data-dds-open] {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  .dds-contentnav-close {
+    margin-block-end: var(--dds-space-sm);
+  }
+
+  /* --- wide: a static column --------------------------------------------- */
+
+  /* The panel becomes a permanent column at 64rem. That is where a ~16rem nav rail
+     can be given away and still leave the content around 46rem — roughly 70
+     characters at the body size, which is the middle of a comfortable measure.
+     Below it, taking the rail would push the prose below a readable width, so the
+     navigation goes back to being summoned rather than always present. */
+  @container dds-contentnav (inline-size >= 64rem) {
+    .dds-contentnav-layout {
+      grid-template-columns: 14rem minmax(0, 1fr);
+      align-items: start;
+    }
+
+    /* No longer a panel: an ordinary sticky column. Every panel-specific
+       property is unwound explicitly rather than left to be overridden by
+       accident. */
+    .dds-contentnav,
+    .dds-contentnav:not([data-dds-open]) {
+      position: sticky;
+      inset-block-start: var(--dds-space-md);
+      inset-inline-start: auto;
+      z-index: var(--dds-z-base);
+
+      inline-size: auto;
+      max-block-size: calc(100svh - var(--dds-space-2xl));
+      padding: 0;
+
+      background: none;
+      border-inline-end: 0;
+      box-shadow: none;
+
+      /* Always visible and always tabbable at this width, whatever the
+         disclosure state was when the viewport grew. */
+      visibility: visible;
+      translate: 0 0;
+      transition: none;
+    }
+
+    /* The panel-only furniture has no job here. */
+    .dds-contentnav-close,
+    .dds-contentnav-toggle,
+    .dds-contentnav-scrim {
+      display: none;
+    }
+  }
+
+  /* ==========================================================================
+     App navigation
+     ==========================================================================
+     Flat navigation between the areas of a signed-in application — the sidebar of
+     an account area or a dashboard.
+
+     Deliberately distinct from the content navigation above: no groups, no
+     off-canvas mechanic. If it needs grouping, it has outgrown this and should be
+     a content navigation instead; if it needs to collapse, the app is a site and
+     wants a header.
+
+     Pairs with `.dds-sidebar` (layout.css) for the column, or with an app topbar.
+     This component is only the navigation, not the page shell — which is why the
+     layout primitive stays separate and reusable. */
+  .dds-appnav ul {
+    display: flex;
+    flex-direction: column;
+    gap: var(--dds-space-3xs);
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .dds-appnav a {
+    display: flex;
+    align-items: center;
+    gap: var(--dds-space-xs);
+
+    padding: var(--dds-space-xs) var(--dds-space-sm);
+    min-block-size: 2.75rem;
+
+    font-size: var(--dds-font-size-sm);
+    font-weight: var(--dds-font-weight-medium);
+    color: var(--dds-color-text-subtle);
+    text-decoration: none;
+    border-radius: var(--dds-radius-sm);
+  }
+
+  .dds-appnav a:hover {
+    background-color: var(--dds-color-surface-hover);
+    color: var(--dds-color-text-default);
+    text-decoration: none;
+  }
+
+  .dds-appnav a[aria-current="page"] {
+    background-color: var(--dds-color-surface-selected);
+    color: var(--dds-color-text-link);
+    font-weight: var(--dds-font-weight-semibold);
+  }
+
+  /* An icon in a nav item is decorative — the label carries the meaning. */
+  .dds-appnav a > .dds-icon {
+    color: var(--dds-color-text-muted);
+  }
+
+  .dds-appnav a[aria-current="page"] > .dds-icon {
+    color: currentColor;
+  }
+
+  /* A count or status at the trailing edge of an item. */
+  .dds-appnav-meta {
+    margin-inline-start: auto;
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* A labelled section, for an app navigation that has grown just enough to need
+     one break — but not enough to become a content navigation. */
+  .dds-appnav-section + .dds-appnav-section {
+    margin-block-start: var(--dds-space-md);
+    padding-block-start: var(--dds-space-md);
+    border-block-start: var(--dds-border-thin) solid var(--dds-color-border-subtle);
+  }
+
+  .dds-appnav-section-title {
+    display: block;
+    padding-inline: var(--dds-space-sm);
+    font-size: var(--dds-font-size-xs);
+    font-weight: var(--dds-font-weight-semibold);
+    color: var(--dds-color-text-muted);
+    margin-block-end: var(--dds-space-2xs);
+  }
 }

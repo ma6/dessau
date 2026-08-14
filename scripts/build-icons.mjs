@@ -58,7 +58,11 @@ const ICON_MAP = [
     group: 'Navigation',
     icons: [
       ['chevron-down', 'chevron-down-outline'],
-      ['chevron-up', 'chevron-up-outline'],
+      /* No `chevron-up`. A disclosure rotates `chevron-down` by 180deg, which
+         animates the change and needs one symbol instead of two — so an "up"
+         chevron had no caller and was weight in every page's sprite. Rotating also
+         keeps the two states unmistakably the same control, which two separate
+         glyphs do not guarantee. `scripts/check-icons.mjs` is what noticed. */
       ['chevron-left', 'chevron-back-outline'],
       ['chevron-right', 'chevron-forward-outline'],
       ['arrow-right', 'arrow-forward-outline'],

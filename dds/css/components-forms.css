@@ -516,16 +516,110 @@
 
      Behaviour: js/dds.js (`data-dds-theme-toggle`).
 
-     Built as a `<button>` with `aria-pressed`, and the accessible name stays
-     CONSTANT — "Dark theme", pressed or not. A control whose name changes when you
-     press it is announced as a different control each time, which is why the
-     tempting "Switch to light theme" label is wrong.
+     ---------------------------------------------------------------------------
+     Deliberately styled as a text link, not as a button
+     ---------------------------------------------------------------------------
 
-     Both icons are in the markup and CSS shows the relevant one, so there is no
-     flash of the wrong icon before script runs and no icon swap in JavaScript. */
-  .dds-theme-toggle .dds-theme-toggle-dark { display: none; }
-  .dds-theme-toggle .dds-theme-toggle-light { display: inline-block; }
+     Transparent, inheriting colour and font size, underlined on hover. It sits in
+     a header or footer utility row where a filled or outlined button would
+     out-shout the navigation beside it — the theme is a preference, not an action
+     the page wants you to take.
 
-  [data-theme="dark"] .dds-theme-toggle .dds-theme-toggle-dark { display: inline-block; }
-  [data-theme="dark"] .dds-theme-toggle .dds-theme-toggle-light { display: none; }
+     It is still a real `<button>`. It changes state rather than navigating, so an
+     `<a>` would be wrong however it looks: an anchor is announced as a link, is
+     opened in a new tab by a middle click, and does nothing on Space.
+
+     ---------------------------------------------------------------------------
+     Two variants
+     ---------------------------------------------------------------------------
+
+     `.dds-theme-toggle`             icon + label. Preferred.
+     `.dds-theme-toggle-icon`        icon only. Needs an `aria-label`.
+
+     Prefer the labelled one. Sun and moon are conventional but not universal, and
+     "which one means the current state and which the next?" is genuinely ambiguous
+     without words.
+
+     ---------------------------------------------------------------------------
+     Both icons live in the markup
+     ---------------------------------------------------------------------------
+
+     CSS shows the relevant one. That means no flash of the wrong icon before the
+     script runs, and no icon swapping in JavaScript — the sprite reference is
+     static and the theme attribute does the choosing.
+
+     ---------------------------------------------------------------------------
+     Naming: the label describes the NEXT action, and no `aria-pressed`
+     ---------------------------------------------------------------------------
+
+     The visible label says where pressing takes you — "Dark" while light is
+     active. So the accessible name must say the same thing (WCAG 2.5.3 Label in
+     Name), which makes this an ACTION button, not a toggle button.
+
+     Therefore no `aria-pressed`. The two valid patterns are:
+
+       action button  changing name, no aria-pressed   ← this one
+       toggle button  constant name, aria-pressed
+
+     Combining them announces "switch to dark theme, not pressed", which
+     double-encodes the state and leaves the listener unsure whether the control
+     describes the current mode or the next one. Pick one; the visible label here
+     picks the first. */
+  .dds-theme-toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--dds-space-2xs);
+
+    padding: 0;
+    /* Overrides the 24px interactive floor from base.css: this control is inline
+       text, and its hit area comes from the line it sits on rather than from a
+       box. The label plus icon is comfortably wider than 24px in the inline
+       direction. */
+    min-inline-size: 0;
+    min-block-size: 0;
+
+    font: inherit;
+    color: inherit;
+    background: none;
+    border: 0;
+    border-radius: var(--dds-radius-sm);
+    cursor: pointer;
+
+    transition: color var(--dds-duration-instant) var(--dds-ease-standard);
+  }
+
+  /* Underline on hover rather than a background wash — it reads as the text link
+     it is styled to be. */
+  .dds-theme-toggle:hover {
+    color: var(--dds-color-text-link);
+    text-decoration: underline;
+    text-underline-offset: 0.2em;
+  }
+
+  .dds-theme-toggle-label {
+    font-size: inherit;
+  }
+
+  /* Icon-only: a square target, because there is no label to enlarge the hit
+     area. Back up to the comfortable 44px. */
+  .dds-theme-toggle-icon {
+    justify-content: center;
+    inline-size: 2.75rem;
+    block-size: 2.75rem;
+    min-inline-size: 2.75rem;
+    min-block-size: 2.75rem;
+  }
+
+  .dds-theme-toggle-icon:hover {
+    background-color: var(--dds-color-surface-hover);
+    text-decoration: none;
+  }
+
+  /* Which icon shows. The moon means "dark is available"; the sun means "light is
+     available" — each names the NEXT state, matching the label. */
+  .dds-theme-toggle .dds-theme-toggle-sun { display: none; }
+  .dds-theme-toggle .dds-theme-toggle-moon { display: inline-block; }
+
+  [data-theme="dark"] .dds-theme-toggle .dds-theme-toggle-sun { display: inline-block; }
+  [data-theme="dark"] .dds-theme-toggle .dds-theme-toggle-moon { display: none; }
 }
