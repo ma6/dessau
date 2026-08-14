@@ -537,13 +537,25 @@
   }
 
   /* --- invalid ---------------------------------------------------------- */
-  /* Driven by `aria-invalid`, set by the application, NOT by the CSS `:invalid`
-     pseudo-class.
+  /* Driven by `:user-invalid` and by `aria-invalid`, NEVER by `:invalid`.
 
      `:invalid` matches from the moment the page loads, so a required field is
-     styled as an error before the user has typed anything. That trains people
-     to ignore error styling. Validity is shown after the user has had a chance
-     to satisfy it — see the validation pattern. */
+     styled as an error before the user has typed anything. That trains people to
+     ignore error styling.
+
+     `:user-invalid` is the one that is safe: the browser sets its own "the user has
+     interacted" flag on blur or on a submit attempt, so the styling appears exactly
+     when the user has committed to a value. It is Baseline since 2023, and it means
+     a field shows its error state with no JavaScript at all.
+
+     `aria-invalid` stays alongside it, set by the validation pattern, because it is
+     the PROGRAMMATIC state — the part a screen reader reads. The two are kept in
+     step by the pattern testing `:user-invalid` directly rather than tracking
+     interaction itself, so the ring and the announcement cannot disagree about what
+     "touched" means. */
+  .dds-input:user-invalid,
+  .dds-textarea:user-invalid,
+  .dds-select:user-invalid,
   .dds-input[aria-invalid="true"],
   .dds-textarea[aria-invalid="true"],
   .dds-select[aria-invalid="true"] {
@@ -552,6 +564,64 @@
        survives greyscale, colour-blindness and forced-colors. */
     border-width: var(--dds-border-thick);
   }
+
+  /* --- positive confirmation, opt-in ------------------------------------- */
+  /* A tick once a checked input is actually valid.
+     ------------------------------------------------------------------------
+     Opt-in via `.dds-input-confirm`, and deliberately not the default. Confirming
+     every field the moment it is correct is noise — most fields are correct and
+     saying so about all of them means saying nothing. It earns its place on the
+     few where the user cannot tell whether they got it right: a transcribed
+     reference code, an IBAN, a password meeting a rule they cannot see.
+
+     `:user-valid` matches only after the user has committed to a value, the same
+     way `:user-invalid` does. `:valid` would show a tick on an empty optional
+     field from page load, which is the mirror image of the `:invalid` problem.
+
+     The tick is a `background-image` mask rather than generated content, because
+     `content:` on an input does nothing — an input is a replaced element and has
+     no pseudo-element children to place text into. The mask takes its colour from
+     `background-color`, so it follows the theme. */
+  .dds-input-confirm:user-valid {
+    border-color: var(--dds-color-border-success);
+    /* Room for the tick, plus the normal inline padding beyond it. */
+    padding-inline-end: calc(var(--dds-input-padding-inline) * 2 + 1em);
+  }
+
+  .dds-confirm-wrap {
+    position: relative;
+    display: block;
+  }
+
+  /* Hidden until the field is both interacted with and valid. `:has()` on the
+     wrapper, because the tick is a sibling of the input rather than inside it. */
+  .dds-confirm-mark {
+    position: absolute;
+    inset-inline-end: var(--dds-space-sm);
+    inset-block-start: 50%;
+    translate: 0 -50%;
+
+    color: var(--dds-color-text-success);
+    /* The input owns the whole hit area. */
+    pointer-events: none;
+
+    /* Not `display: none`: the transition needs something to animate from, and a
+       tick that appears instantly reads as a glitch rather than as feedback. */
+    opacity: 0;
+    scale: 0.8;
+    transition:
+      opacity var(--dds-duration-fast) var(--dds-ease-standard),
+      scale var(--dds-duration-fast) var(--dds-ease-standard);
+  }
+
+  .dds-confirm-wrap:has(.dds-input-confirm:user-valid) .dds-confirm-mark {
+    opacity: 1;
+    scale: 1;
+  }
+
+  /* The tick is decorative. Whether the value is acceptable is communicated by the
+     absence of an error message, which is what a screen reader already gets — a
+     second "this is fine" announcement per field is noise. */
 
   /* --- hint and error --------------------------------------------------- */
   .dds-hint {

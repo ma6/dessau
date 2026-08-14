@@ -35,6 +35,11 @@
  *    usually the narrow one, at every width.
  *
  * Zero dependencies, Node stdlib only. Exit code 1 on any finding.
+ * @catches An undefined custom property, a primitive colour leaking past the
+ *   semantic layer, a raw colour value, a class the JavaScript toggles that no
+ *   stylesheet defines, `display` on a dialog outside `[open]`, and a container
+ *   query whose container does not exist.
+ *
  */
 
 import { readFile, readdir } from 'node:fs/promises';

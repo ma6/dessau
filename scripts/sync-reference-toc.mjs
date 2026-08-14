@@ -24,6 +24,8 @@
  * navigation to a new page requires nothing but the section markup.
  *
  * Zero dependencies, Node stdlib only.
+ * @catches A stale "On this page" navigation, when run with `--check`.
+ *
  */
 
 import { readFile, writeFile, readdir } from 'node:fs/promises';

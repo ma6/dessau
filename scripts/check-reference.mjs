@@ -32,6 +32,12 @@
  * twelve components had no demo anywhere in the repository.
  *
  * Zero dependencies, Node stdlib only. Exit code 1 on any finding.
+ * @catches A documented component with no rendered example, an anchor or in-page
+ *   link that does not resolve, a token name no stylesheet declares, an asset
+ *   that does not load, unbalanced markup, a forced `data-theme` with no rule to
+ *   match, a flex component missing its `-body` wrapper, and a stale generated
+ *   block.
+ *
  */
 
 import { readFile, readdir, access } from 'node:fs/promises';
@@ -303,6 +309,50 @@ if (!namedBreakpoints.length) {
         report(
           `reference/foundations.html does not render ${name} — it is declared in ` +
             `the CSS but the foundations page never shows it`
+        );
+      }
+    }
+  }
+}
+
+/* ------------------------ 5b. the root redirect points somewhere real */
+
+/**
+ * `index.html` at the repository root is a zero-delay meta refresh into the
+ * reference. Its target is a plain string in an attribute, so a renamed or moved
+ * landing page leaves a redirect that resolves to nothing — and the failure is a
+ * blank page or a 404 at the single most likely entry point, reached by anyone who
+ * opens the repository in a browser for the first time.
+ */
+{
+  const rootIndex = join(ROOT, 'index.html');
+
+  if (await exists(rootIndex)) {
+    const source = await readFile(rootIndex, 'utf8');
+    const refresh = source.match(/http-equiv="refresh"\s+content="(\d+);\s*url=([^"]+)"/i);
+
+    if (!refresh) {
+      report('index.html has no meta refresh, so opening the repository root does nothing');
+    } else {
+      const [, delay, target] = refresh;
+
+      if (Number(delay) !== 0) {
+        report(
+          `index.html redirects after ${delay}s. A DELAYED redirect fails WCAG 2.2.1 ` +
+            `Timing Adjustable — the reader is moved off the page with no way to stop ` +
+            `it. Only a zero-delay redirect is exempt.`
+        );
+      }
+
+      if (!(await exists(join(ROOT, target.split(/[?#]/)[0])))) {
+        report(`index.html redirects to ${target}, which does not exist`);
+      }
+
+      // The visible fallback matters when the refresh is blocked.
+      if (!new RegExp(`href="${target.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}"`).test(source)) {
+        report(
+          `index.html redirects to ${target} but offers no link to it — if the refresh ` +
+            `is blocked, the page is a dead end`
         );
       }
     }

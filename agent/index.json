@@ -455,20 +455,23 @@
       "purpose": "Label, control, hint, error — the form primitive.",
       "notFor": "A control without a visible label.",
       "classes": [
-        ".dds-field",
-        ".dds-label",
-        ".dds-label-note",
-        ".dds-input",
-        ".dds-input-code",
-        ".dds-input-group",
-        ".dds-input-group-affix",
-        ".dds-textarea",
-        ".dds-select",
-        ".dds-hint",
+        ".dds-confirm-mark",
+        ".dds-confirm-wrap",
         ".dds-error",
         ".dds-error-summary",
         ".dds-error-summary-list",
-        ".dds-error-summary-title"
+        ".dds-error-summary-title",
+        ".dds-field",
+        ".dds-hint",
+        ".dds-input",
+        ".dds-input-code",
+        ".dds-input-confirm",
+        ".dds-input-group",
+        ".dds-input-group-affix",
+        ".dds-label",
+        ".dds-label-note",
+        ".dds-select",
+        ".dds-textarea"
       ],
       "css": [
         "dds/css/components.css",
@@ -477,7 +480,7 @@
       "spec": "## Field — `.dds-field`",
       "reference": "reference/components.html#field",
       "native": "input, textarea, select",
-      "accessibility": "Visible <label for>. Hint and error in one aria-describedby. Required in words. aria-invalid, never CSS :invalid."
+      "accessibility": "Visible <label for>. Hint and error in one aria-describedby. Required in words. aria-invalid, never CSS :invalid. Invalid state comes from `:user-invalid` (after the user commits to a value, never `:invalid`, which matches from page load) plus `aria-invalid` for the programmatic state. Positive confirmation is opt-in via `.dds-input-confirm` with `:user-valid`, and its tick is aria-hidden — that a value is acceptable is already carried by the absence of an error."
     },
     {
       "name": "fieldgroup",

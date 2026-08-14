@@ -27,6 +27,9 @@
  * asking for it to be written a second time.
  *
  * Zero dependencies, Node stdlib only.
+ * @catches A stale breakpoint table on the foundations page, and a container
+ *   query with no stated reason for its threshold.
+ *
  */
 
 import { readFile, writeFile, readdir } from 'node:fs/promises';

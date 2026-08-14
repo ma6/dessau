@@ -34,6 +34,10 @@
  *
  * Zero dependencies, Node stdlib only. Exit code 1 on any unjustified hit, and on
  * a missing term list.
+ * @catches Any prohibited term in a committable file **or in a commit message** —
+ *   names, domain vocabulary, internal hosts, cliché placeholder data, and
+ *   phrases that describe provenance without naming it.
+ *
  */
 
 import { readFile } from 'node:fs/promises';

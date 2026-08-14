@@ -32,6 +32,9 @@
  * a failure rather than a surprise.
  *
  * Zero dependencies, Node stdlib only.
+ * @catches A stale inline icon sprite, or a page referring to an icon the sprite
+ *   does not have.
+ *
  */
 
 import { readFile, writeFile, readdir } from 'node:fs/promises';

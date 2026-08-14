@@ -23,6 +23,11 @@
  * which will then build a second one.
  *
  * Zero dependencies, Node stdlib only. Exit code 1 on any finding.
+ * @catches A claim in `agent/index.json` that no longer holds — a missing class,
+ *   file, hook or specification section — and the reverse: a component in the CSS
+ *   that no entry covers, which an agent cannot discover and will build a second
+ *   time.
+ *
  */
 
 import { readFile, readdir, access } from 'node:fs/promises';

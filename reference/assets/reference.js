@@ -352,6 +352,60 @@
     }
   }
 
+
+  /* =========================================================================
+     Locale switch — for the writing page's format table
+
+     Calls the real `DDS.format.setLocale()` and re-renders, so the table shows what
+     a product would actually get rather than a transcription of what it should get.
+     Two locales because the standard names two: German is the default and English is
+     the documented alternative.
+     ========================================================================= */
+  function wireLocaleSwitch(group) {
+    /* `renderAll` runs again on every theme change, so wiring has to happen once.
+       Without this each theme toggle would add another click listener and one press
+       would switch the locale twice — which is invisible, because switching twice to
+       the same value looks like switching once. */
+    if (group.hasAttribute('data-ref-locale-bound')) return;
+
+    var buttons = Array.prototype.slice.call(
+      group.querySelectorAll('[data-ref-locale]')
+    );
+    if (!buttons.length || !DDS || !DDS.format) return;
+
+    group.setAttribute('data-ref-locale-bound', '');
+
+    /** The currency has to follow the locale, or `en-GB` formats pounds as euros. */
+    var CURRENCY = { 'de-DE': 'EUR', 'en-GB': 'GBP' };
+
+    function select(locale) {
+      DDS.format.setLocale(locale, CURRENCY[locale]);
+      DDS.format.refresh();
+
+      buttons.forEach(function (button) {
+        var active = button.getAttribute('data-ref-locale') === locale;
+        // `aria-pressed` rather than a class: the state is what the control reports,
+        // and a screen reader gets it from the attribute either way.
+        button.setAttribute('aria-pressed', String(active));
+      });
+
+      // The table changed under the reader; say so once, politely.
+      if (DDS.announce) {
+        DDS.announce(
+          locale === 'de-DE'
+            ? 'Formate auf Deutsch umgestellt'
+            : 'Formats switched to English'
+        );
+      }
+    }
+
+    buttons.forEach(function (button) {
+      button.addEventListener('click', function () {
+        select(button.getAttribute('data-ref-locale'));
+      });
+    });
+  }
+
   /* =========================================================================
      Everything that needs re-rendering when the theme changes
      ========================================================================= */
@@ -362,6 +416,7 @@
     scope.querySelectorAll('[data-ref-rulers]').forEach(renderRulers);
     scope.querySelectorAll('[data-ref-breakpoints]').forEach(renderBreakpoints);
     scope.querySelectorAll('[data-ref-icons]').forEach(renderIcons);
+    scope.querySelectorAll('[data-ref-locale-switch]').forEach(wireLocaleSwitch);
   }
 
   function init() {

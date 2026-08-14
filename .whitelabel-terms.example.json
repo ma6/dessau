@@ -92,6 +92,7 @@
   "allowed": {
     "agent/ux-writing.md:Mustermann": "A do-not rule about demo data. The cliché has to be named to be prohibited.",
     "agent/ux-writing.md:John Doe": "Same rule, same line.",
-    "agent/ux-writing.md:example.com": "Recommends the RFC 2606 reserved domains for addresses that must not resolve."
+    "agent/ux-writing.md:example.com": "Recommends the RFC 2606 reserved domains for addresses that must not resolve.",
+    "reference/writing.html:Lorem ipsum": "A do-not rule on the writing page. The cliché has to be named to be prohibited — and the reason given: it has the wrong word lengths and no diacritics, so it hides the bugs real example data exposes."
   }
 }

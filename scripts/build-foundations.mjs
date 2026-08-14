@@ -27,6 +27,9 @@
  * no longer the ones you edit.
  *
  * Zero dependencies, Node stdlib only.
+ * @catches A stale machine-readable export, when run with `--check`. The CSS is
+ *   the source of truth and `dds/foundations.json` is downstream of it.
+ *
  */
 
 import { readFile, writeFile, readdir } from 'node:fs/promises';

@@ -18,6 +18,9 @@
  *
  *   node scripts/check-contrast.mjs
  *   node scripts/check-contrast.mjs --verbose   # print passing pairs too
+ * @catches Any colour pair below its WCAG 2.2 AA threshold, in both themes —
+ *   text, borders, focus rings and status fills.
+ *
  */
 
 import { readFile } from 'node:fs/promises';

@@ -196,6 +196,35 @@ checkbox groups answering a single question.
 
 ---
 
+### Validity state — `:user-invalid`, `aria-invalid`, and opt-in confirmation
+
+Three selectors, and getting the split wrong is the common mistake.
+
+**Never `:invalid`.** It matches from the moment the page loads, so a required field is
+styled as an error before anyone has typed. That teaches people to ignore error styling
+everywhere else in the product.
+
+**`:user-invalid` for the visual state.** The browser sets its own "the user has
+interacted" flag on blur or on a submit attempt, so the styling appears exactly when the
+user has committed to a value. Baseline since 2023, and it means a field shows its error
+state with **no JavaScript at all**.
+
+**`aria-invalid` for the programmatic state**, set by the validation pattern — that is
+the part a screen reader reads. The two stay in step because the pattern tests
+`:user-invalid` directly rather than tracking interaction itself; two separate notions
+of "touched" is how the border and the announcement end up disagreeing.
+
+**Positive confirmation is opt-in**, via `.dds-input-confirm` inside
+`.dds-confirm-wrap`, driven by `:user-valid`. Not the default: confirming every field
+the moment it is correct is noise, because most fields are correct and saying so about
+all of them means saying nothing. It earns its place where the user genuinely cannot
+tell whether they got it right — a transcribed code, an account number, a password
+meeting a rule they cannot see.
+
+The tick is `aria-hidden`. That a value is acceptable is already communicated by the
+absence of an error message, which a screen reader gets for free; a second "this one is
+fine" per field is noise in the place noise costs most.
+
 ## Notice — `.dds-notice`
 
 **For:** a contextual message attached to the page or a section.

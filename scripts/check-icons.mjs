@@ -36,6 +36,10 @@
  * be. That is the single easiest thing to miss in a page full of working icons.
  *
  * Zero dependencies, Node stdlib only. Exit code 1 on any finding.
+ * @catches A Unicode glyph or emoji used as an icon, a `content:` escape drawing
+ *   one, a `<use>` naming a symbol that is not on the page (which renders as
+ *   nothing at all), and a symbol no page uses.
+ *
  */
 
 import { readFile } from 'node:fs/promises';
