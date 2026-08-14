@@ -15,6 +15,114 @@
     "dark"
   ],
   "themeSelector": "[data-theme=\"dark\"]",
+  "breakpoints": {
+    "description": "Named page-shell breakpoints, plus every width actually used in a media or container query. CSS cannot use a custom property in a query condition, so the named set is documentation and each query writes its own literal — listing the real ones means the two can be compared rather than trusted. A width here that is not one of the four named ones is a documented component-local exception, derived from content rather than from a device.",
+    "named": {
+      "--dds-breakpoint-phone": {
+        "value": "30rem",
+        "pixels": 480
+      },
+      "--dds-breakpoint-tablet": {
+        "value": "48rem",
+        "pixels": 768
+      },
+      "--dds-breakpoint-laptop": {
+        "value": "64rem",
+        "pixels": 1024
+      },
+      "--dds-breakpoint-desktop": {
+        "value": "80rem",
+        "pixels": 1280
+      }
+    },
+    "inUse": [
+      {
+        "width": "26rem",
+        "pixels": 416,
+        "containerQueries": 1,
+        "mediaQueries": 0,
+        "containers": [
+          "dds-address"
+        ],
+        "files": [
+          "dds/css/patterns.css"
+        ]
+      },
+      {
+        "width": "30rem",
+        "pixels": 480,
+        "containerQueries": 0,
+        "mediaQueries": 1,
+        "containers": [],
+        "files": [
+          "dds/css/components.css"
+        ]
+      },
+      {
+        "width": "34rem",
+        "pixels": 544,
+        "containerQueries": 2,
+        "mediaQueries": 0,
+        "containers": [
+          "dds-steps",
+          "dds-topbar"
+        ],
+        "files": [
+          "dds/css/components-navigation.css"
+        ]
+      },
+      {
+        "width": "40rem",
+        "pixels": 640,
+        "containerQueries": 2,
+        "mediaQueries": 0,
+        "containers": [
+          "dds-sitefooter",
+          "dds-textmedia"
+        ],
+        "files": [
+          "dds/css/components-content.css",
+          "dds/css/components-navigation.css"
+        ]
+      },
+      {
+        "width": "48rem",
+        "pixels": 768,
+        "containerQueries": 1,
+        "mediaQueries": 0,
+        "containers": [
+          "dds-siteheader"
+        ],
+        "files": [
+          "dds/css/components-navigation.css"
+        ]
+      },
+      {
+        "width": "52rem",
+        "pixels": 832,
+        "containerQueries": 1,
+        "mediaQueries": 0,
+        "containers": [
+          "dds-filtering"
+        ],
+        "files": [
+          "dds/css/patterns-flows.css"
+        ]
+      },
+      {
+        "width": "64rem",
+        "pixels": 1024,
+        "containerQueries": 1,
+        "mediaQueries": 0,
+        "containers": [
+          "dds-contentnav"
+        ],
+        "files": [
+          "dds/css/components-navigation.css"
+        ]
+      }
+    ]
+  },
   "layers": {
     "palette": {
       "description": "Primitive values. Literal, no intent, no theme awareness. Components must NOT consume these — a primitive does not follow the theme, so using one breaks dark mode and nothing else.",
@@ -394,6 +502,20 @@
           },
           "--dds-container-xl": {
             "value": "75rem"
+          }
+        },
+        "other": {
+          "--dds-breakpoint-phone": {
+            "value": "30rem"
+          },
+          "--dds-breakpoint-tablet": {
+            "value": "48rem"
+          },
+          "--dds-breakpoint-laptop": {
+            "value": "64rem"
+          },
+          "--dds-breakpoint-desktop": {
+            "value": "80rem"
           }
         },
         "elevation": {
@@ -871,7 +993,7 @@
     }
   },
   "counts": {
-    "palette": 141,
+    "palette": 145,
     "semantic": 0,
     "darkOverrides": 50
   }

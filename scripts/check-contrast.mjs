@@ -65,7 +65,11 @@ function extractTokens(css, blockSelector) {
   // a header comment. That match returned an empty token set and every dark
   // pair was silently checked against the light values instead.
   const anchored = new RegExp(
-    `^\\s*${blockSelector.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\s*\\{`,
+    // The selector may head a list — `:root, [data-theme="light"] { … }` — so a
+    // trailing comma-separated tail is allowed before the brace. Without this the
+    // extractor threw the moment the light values gained a second selector, which
+    // was the correct failure but not a useful one.
+    `^\\s*${blockSelector.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\s*(?:,[^{}]*)?\\{`,
     'm'
   );
   const found = anchored.exec(css);

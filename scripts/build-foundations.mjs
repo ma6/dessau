@@ -29,7 +29,7 @@
  * Zero dependencies, Node stdlib only.
  */
 
-import { readFile, writeFile } from 'node:fs/promises';
+import { readFile, writeFile, readdir } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
 
@@ -41,7 +41,11 @@ const OUT = join(ROOT, 'dds/foundations.json');
 /** Read a rule's declarations, anchored so a mention in prose is not matched. */
 function extractBlock(css, selector) {
   const anchored = new RegExp(
-    `^\\s*${selector.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\s*\\{`,
+    // The selector may head a list — `:root, [data-theme="light"] { … }` — so a
+    // trailing comma-separated tail is allowed before the brace. Without this the
+    // extractor threw the moment the light values gained a second selector, which
+    // was the correct failure but not a useful one.
+    `^\\s*${selector.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\s*(?:,[^{}]*)?\\{`,
     'm'
   );
   const found = anchored.exec(css);
@@ -136,6 +140,79 @@ for (const name of semanticLight.keys()) {
   };
 }
 
+/* ------------------------------------------------------------- breakpoints */
+
+/**
+ * Every width actually used in a media or container query, extracted from the CSS.
+ *
+ * This exists because CSS cannot use a custom property in a query condition — the
+ * condition is evaluated before custom properties resolve. So every query writes
+ * its own literal, and a documented breakpoint set is a promise nothing enforces.
+ *
+ * Extracting the real ones means the documented set and the used set can be
+ * compared instead of trusted. A component-local width that appears here and is not
+ * one of the four named breakpoints is not a mistake — it is a documented exception,
+ * derived from the component's content rather than from a device.
+ */
+async function extractQueries() {
+  const found = [];
+
+  for (const name of await readdir(join(ROOT, 'dds/css'))) {
+    if (!name.endsWith('.css')) continue;
+    const css = (await readFile(join(ROOT, 'dds/css', name), 'utf8'))
+      // Comments discuss widths in prose; only real rules count.
+      .replace(/\/\*[\s\S]*?\*\//g, '');
+
+    // @container <name> (inline-size >= 40rem)  |  @media (min-width: 30rem)
+    const pattern =
+      /@(container|media)\s*([\w-]*)\s*\(([^)]*?(?:inline-size|width)[^)]*?)\)/g;
+
+    for (const match of css.matchAll(pattern)) {
+      const [, kind, containerName, condition] = match;
+      const width = condition.match(/([\d.]+)(rem|px|em)/);
+      if (!width) continue;
+
+      found.push({
+        kind,
+        container: containerName || null,
+        condition: condition.trim().replace(/\s+/g, ' '),
+        width: width[0],
+        file: 'dds/css/' + name,
+      });
+    }
+  }
+
+  // Group by width so the same threshold used twice reads as one entry.
+  const byWidth = new Map();
+  for (const item of found) {
+    if (!byWidth.has(item.width)) byWidth.set(item.width, []);
+    byWidth.get(item.width).push(item);
+  }
+
+  return [...byWidth.entries()]
+    .map(([width, uses]) => ({
+      width,
+      pixels: width.endsWith('rem') ? parseFloat(width) * 16 : parseFloat(width),
+      containerQueries: uses.filter((u) => u.kind === 'container').length,
+      mediaQueries: uses.filter((u) => u.kind === 'media').length,
+      containers: [...new Set(uses.map((u) => u.container).filter(Boolean))].sort(),
+      files: [...new Set(uses.map((u) => u.file))].sort(),
+    }))
+    .sort((a, b) => a.pixels - b.pixels);
+}
+
+const queries = await extractQueries();
+
+/** The four named page-shell breakpoints, read from the CSS. */
+const namedBreakpoints = {};
+for (const [name, raw] of primitives) {
+  if (!name.startsWith('--dds-breakpoint-')) continue;
+  namedBreakpoints[name] = {
+    value: raw,
+    pixels: raw.endsWith('rem') ? parseFloat(raw) * 16 : parseFloat(raw),
+  };
+}
+
 const output = {
   $schema: 'https://dessau.local/foundations.schema.json',
   name: 'Dessau Design System foundations',
@@ -152,6 +229,18 @@ const output = {
 
   themes: ['light', 'dark'],
   themeSelector: '[data-theme="dark"]',
+
+  breakpoints: {
+    description:
+      'Named page-shell breakpoints, plus every width actually used in a media or ' +
+      'container query. CSS cannot use a custom property in a query condition, so the ' +
+      'named set is documentation and each query writes its own literal — listing the ' +
+      'real ones means the two can be compared rather than trusted. A width here that ' +
+      'is not one of the four named ones is a documented component-local exception, ' +
+      'derived from content rather than from a device.',
+    named: namedBreakpoints,
+    inUse: queries,
+  },
 
   layers: {
     palette: {
@@ -200,5 +289,6 @@ console.log(
   `Wrote dds/foundations.json\n` +
     `  ${primitives.size} palette values\n` +
     `  ${semanticLight.size} semantic values\n` +
-    `  ${semanticDark.size} dark-mode overrides`
+    `  ${semanticDark.size} dark-mode overrides\n` +
+    `  ${queries.length} distinct query widths`
 );

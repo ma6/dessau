@@ -14,6 +14,18 @@
    in `[data-theme="dark"]`; anything not listed there inherits from `:root` on
    purpose (spacing, radius, type — none of it is theme-dependent).
 
+   THE LIGHT VALUES ARE ALSO ON `[data-theme="light"]`, and that is not
+   redundancy. Without it the theme is only overridable in one direction: a
+   subtree can be forced to dark inside a light page, because there is a
+   `[data-theme="dark"]` rule to match — but a subtree marked
+   `data-theme="light"` inside a DARK page matches no rule at all, inherits the
+   dark values from the root, and silently stays dark.
+
+   Which is exactly what happened. The reference's side-by-side theme comparison
+   worked in light mode and showed two identical dark panels in dark mode, with
+   the light one labelled "Light". Symmetry here is what makes forcing a theme on
+   any subtree work in both directions.
+
    `color-scheme` is bound to the theme so native controls (date pickers,
    scrollbars, the search field's clear button, form autofill) follow along
    without any extra styling.
@@ -21,7 +33,8 @@
    Verified by: node scripts/check-contrast.mjs
    ============================================================================= */
 
-:root {
+:root,
+[data-theme="light"] {
   color-scheme: light;
 
   /* ---------------------------------------------------------------- surfaces */
