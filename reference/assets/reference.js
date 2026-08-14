@@ -196,6 +196,163 @@
   }
 
   /* =========================================================================
+     The icon set — read from the sprite
+
+     Rendered from the `<symbol>` elements actually present in the page, so the
+     gallery cannot be missing an icon or showing one that has been removed.
+
+     The previous version was a hand-written list of `<use>` elements. Keeping it
+     complete was nobody's job, so an icon added to `scripts/build-icons.mjs` would
+     simply not appear here — invisible, because a gallery of icons looks complete
+     by definition.
+     ========================================================================= */
+  function renderIcons(container) {
+    var symbols = Array.prototype.slice.call(
+      document.querySelectorAll('[data-dds-icons] symbol[id^="dds-icon-"]')
+    );
+
+    container.replaceChildren();
+
+    if (!symbols.length) {
+      var missing = document.createElement('p');
+      missing.className = 'dds-text-sm dds-text-error';
+      missing.textContent =
+        'No sprite found in this page. Run: node scripts/sync-icons.mjs';
+      container.appendChild(missing);
+      return;
+    }
+
+    symbols.forEach(function (symbol) {
+      var role = symbol.id.replace('dds-icon-', '');
+
+      var cell = document.createElement('div');
+      cell.className = 'ref-icon';
+
+      var svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+      svg.setAttribute('class', 'dds-icon');
+      // Decorative here: the role name beside it is the real text.
+      svg.setAttribute('aria-hidden', 'true');
+      svg.setAttribute('focusable', 'false');
+      var use = document.createElementNS('http://www.w3.org/2000/svg', 'use');
+      use.setAttribute('href', '#' + symbol.id);
+      svg.appendChild(use);
+      cell.appendChild(svg);
+
+      var name = document.createElement('code');
+      name.className = 'ref-icon-name';
+      // The role, not the upstream file name: the role is the stable part, and
+      // swapping which Ionicon backs it must not change any markup.
+      name.textContent = role;
+      cell.appendChild(name);
+
+      container.appendChild(cell);
+    });
+
+    var count = document.createElement('p');
+    count.className = 'dds-text-2xs dds-text-muted';
+    count.textContent =
+      symbols.length + ' icons in the sprite, read from this page at runtime.';
+    container.appendChild(count);
+  }
+
+  /* =========================================================================
+     Breakpoints — live
+
+     Rendered from the values the browser has actually resolved, and re-rendered
+     on resize, so the page shows which breakpoint is active right now rather than
+     a table of numbers someone typed.
+
+     That matters more here than elsewhere. CSS cannot use a custom property in a
+     media query condition, so nothing in the browser enforces that these four
+     values are the ones any query uses — the documented set and the used set stay
+     in agreement only because `scripts/check-reference.mjs` compares them. Reading
+     them live at least removes the page itself as a source of drift.
+     ========================================================================= */
+  function renderBreakpoints(container) {
+    var names;
+    try {
+      names = JSON.parse(container.getAttribute('data-ref-breakpoints'));
+    } catch (error) {
+      console.error('[reference] bad breakpoint list', error, container);
+      return;
+    }
+
+    function draw() {
+      var viewport = window.innerWidth;
+
+      var resolved = names.map(function (name) {
+        var value = tokenValue(name, container);
+        var pixels = parseFloat(value) * (value.indexOf('rem') !== -1 ? 16 : 1);
+        return { name: name, value: value, pixels: pixels };
+      });
+
+      // The active breakpoint is the largest one the viewport has reached. Below
+      // the smallest, none is active — that is the base case, not an error.
+      var active = null;
+      resolved.forEach(function (entry) {
+        if (viewport >= entry.pixels) active = entry.name;
+      });
+
+      container.replaceChildren();
+
+      var readout = document.createElement('p');
+      readout.className = 'ref-breakpoint-readout dds-text-sm';
+      readout.setAttribute('role', 'status');
+      readout.textContent =
+        'Viewport ' + viewport + 'px — active: ' +
+        (active ? active.replace('--dds-breakpoint-', '') : 'base (below phone)');
+      container.appendChild(readout);
+
+      var list = document.createElement('div');
+      list.className = 'ref-breakpoint-list';
+
+      resolved.forEach(function (entry) {
+        var reached = viewport >= entry.pixels;
+
+        var row = document.createElement('div');
+        row.className = 'ref-breakpoint';
+        if (entry.name === active) row.setAttribute('data-active', '');
+
+        var label = document.createElement('code');
+        label.className = 'ref-breakpoint-name';
+        label.textContent = entry.name;
+        row.appendChild(label);
+
+        var value = document.createElement('span');
+        value.className = 'ref-breakpoint-value dds-numeric';
+        value.textContent = entry.value + ' (' + entry.pixels + 'px)';
+        row.appendChild(value);
+
+        var state = document.createElement('span');
+        state.className = 'ref-breakpoint-state dds-text-2xs';
+        // Wording is about the viewport, not about the breakpoint being "on":
+        // a breakpoint below the current width is reached, not active.
+        state.textContent = entry.name === active
+          ? 'active'
+          : reached ? 'reached' : 'not reached';
+        row.appendChild(state);
+
+        list.appendChild(row);
+      });
+
+      container.appendChild(list);
+    }
+
+    draw();
+
+    if (!container.hasAttribute('data-ref-breakpoints-bound')) {
+      container.setAttribute('data-ref-breakpoints-bound', '');
+      var frame = null;
+      window.addEventListener('resize', function () {
+        // Resize fires continuously; one redraw per frame is enough and keeps the
+        // readout from thrashing a screen reader via role="status".
+        if (frame) cancelAnimationFrame(frame);
+        frame = requestAnimationFrame(draw);
+      });
+    }
+  }
+
+  /* =========================================================================
      Everything that needs re-rendering when the theme changes
      ========================================================================= */
   function renderAll(root) {
@@ -203,6 +360,8 @@
 
     scope.querySelectorAll('[data-ref-swatches]').forEach(renderSwatches);
     scope.querySelectorAll('[data-ref-rulers]').forEach(renderRulers);
+    scope.querySelectorAll('[data-ref-breakpoints]').forEach(renderBreakpoints);
+    scope.querySelectorAll('[data-ref-icons]').forEach(renderIcons);
   }
 
   function init() {
@@ -221,10 +380,18 @@
     }
   }
 
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', init);
-  } else {
+  /* A deferred script runs after parsing, when `readyState` is already
+     `"interactive"` — never `"loading"`. Testing for `"loading"` therefore always
+     took the else branch and ran `init()` immediately, before any later deferred
+     script had loaded. It happened to work here only because this file is nearly
+     last; the same guard in `dds.js` meant nothing on any page was enhanced.
+
+     `"complete"` covers being loaded dynamically after the page has settled,
+     when there is no event left to wait for. */
+  if (document.readyState === 'complete') {
     init();
+  } else {
+    document.addEventListener('DOMContentLoaded', init, { once: true });
   }
 
   global.ReferencePage = { renderAll: renderAll, tokenValue: tokenValue, contrastRatio: contrastRatio };

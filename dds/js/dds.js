@@ -41,6 +41,29 @@
   var THEME_STORAGE_KEY = 'dds-theme';
   /** Used when neither a stored choice nor a system preference is available. */
   var FALLBACK_THEME = 'dark';
+
+  /**
+   * Toggle wording, per language.
+   *
+   * `data-dds-theme-toggle="de"` picks a set; the default is English. Two strings
+   * per theme: `short` is the visible label, `action` is the accessible name, and
+   * `action` begins with `short` so the name contains the visible label
+   * (WCAG 2.5.3 Label in Name).
+   *
+   * Kept here rather than in the markup so that every toggle in a document stays
+   * consistent without the page having to repeat the strings — and so switching
+   * one updates the wording on all of them.
+   */
+  var THEME_LABELS = {
+    en: {
+      dark: { short: 'Dark', action: 'Dark theme — switch on' },
+      light: { short: 'Light', action: 'Light theme — switch on' },
+    },
+    de: {
+      dark: { short: 'Dunkel', action: 'Dunkel — dunkles Design einschalten' },
+      light: { short: 'Hell', action: 'Hell — helles Design einschalten' },
+    },
+  };
   var ENHANCED_FLAG = 'ddsEnhanced';
 
   /* =========================================================================
@@ -50,6 +73,14 @@
   var registry = [];
 
   /**
+   * Whether the initial document-wide sweep has run.
+   *
+   * Registrations that arrive after it enhance themselves immediately (see
+   * `register`), which is what makes script order irrelevant.
+   */
+  var swept = false;
+
+  /**
    * Register a progressive enhancement.
    *
    * @param {string} name      Unique name, used to mark elements as enhanced.
@@ -57,7 +88,27 @@
    * @param {(element: Element) => void} setup  Called once per element.
    */
   function register(name, selector, setup) {
-    registry.push({ name: name, selector: selector, setup: setup });
+    var entry = { name: name, selector: selector, setup: setup };
+    registry.push(entry);
+
+    /**
+     * If the first sweep has already happened, enhance this one pattern now.
+     *
+     * Without it, load order silently decides whether anything works. Every
+     * pattern lives in its own file and registers when that file runs, so a
+     * pattern registered after the sweep would never be applied — the markup
+     * renders, the behaviour is simply absent, and nothing reports a problem.
+     *
+     * That is not a hypothetical ordering worry. It shipped: `enhance(document)`
+     * ran while `document.readyState` was `"interactive"`, which is the state
+     * during deferred script execution — so the sweep ran immediately after
+     * `dds.js` and before any component or pattern file had registered. Nothing
+     * on any reference page was enhanced.
+     *
+     * Making registration self-sufficient means order genuinely does not matter,
+     * which is what a system dropped in as plain script tags needs.
+     */
+    if (swept) applyEntry(entry, document);
   }
 
   /**
@@ -72,31 +123,36 @@
     var scope = root || document;
 
     registry.forEach(function (entry) {
-      var elements = Array.prototype.slice.call(scope.querySelectorAll(entry.selector));
+      applyEntry(entry, scope);
+    });
+  }
 
-      // `querySelectorAll` looks only at descendants, so a root that itself
-      // matches would be skipped. That is the common case when enhancing a
-      // freshly inserted element.
-      if (scope.nodeType === 1 && scope.matches && scope.matches(entry.selector)) {
-        elements.unshift(scope);
+  /** Apply one registered enhancement within one scope. */
+  function applyEntry(entry, scope) {
+    var elements = Array.prototype.slice.call(scope.querySelectorAll(entry.selector));
+
+    // `querySelectorAll` looks only at descendants, so a root that itself
+    // matches would be skipped. That is the common case when enhancing a
+    // freshly inserted element.
+    if (scope.nodeType === 1 && scope.matches && scope.matches(entry.selector)) {
+      elements.unshift(scope);
+    }
+
+    elements.forEach(function (element) {
+      var done = element.dataset[ENHANCED_FLAG];
+      var seen = done ? done.split(' ') : [];
+      if (seen.indexOf(entry.name) !== -1) return;
+
+      seen.push(entry.name);
+      element.dataset[ENHANCED_FLAG] = seen.join(' ').trim();
+
+      try {
+        entry.setup(element);
+      } catch (error) {
+        // One broken enhancement must not stop the others. The element keeps
+        // whatever behaviour its markup already had.
+        console.error('[DDS] enhancement "' + entry.name + '" failed', error, element);
       }
-
-      elements.forEach(function (element) {
-        var done = element.dataset[ENHANCED_FLAG];
-        var seen = done ? done.split(' ') : [];
-        if (seen.indexOf(entry.name) !== -1) return;
-
-        seen.push(entry.name);
-        element.dataset[ENHANCED_FLAG] = seen.join(' ').trim();
-
-        try {
-          entry.setup(element);
-        } catch (error) {
-          // One broken enhancement must not stop the others. The element keeps
-          // whatever behaviour its markup already had.
-          console.error('[DDS] enhancement "' + entry.name + '" failed', error, element);
-        }
-      });
     });
   }
 
@@ -188,10 +244,32 @@
     document.documentElement.dataset.ddsTheme = theme;
     document.documentElement.dataset.theme = theme;
 
-    // Keep every toggle in the document in sync — there may be one in the
-    // header and another in a settings panel.
+    /* Keep every toggle in the document in sync. There may be one in the header,
+       one in a footer utility row and one in a settings panel — switching at any
+       of them updates all of them, because they all reflect one piece of state.
+
+       The label and the accessible name both describe the NEXT action, so they
+       swap together. No `aria-pressed`: see the naming note in
+       components-forms.css. A control cannot both rename itself and claim a
+       pressed state without contradicting itself. */
+    var next = theme === 'dark' ? 'light' : 'dark';
+
     document.querySelectorAll('[data-dds-theme-toggle]').forEach(function (button) {
-      button.setAttribute('aria-pressed', theme === 'dark' ? 'true' : 'false');
+      var labels = THEME_LABELS[button.getAttribute('data-dds-theme-toggle') || 'en'] ||
+        THEME_LABELS.en;
+
+      var label = button.querySelector('.dds-theme-toggle-label');
+      if (label) label.textContent = labels[next].short;
+
+      /* The accessible name. Where there is a visible label, the name must contain
+         it (WCAG 2.5.3), so the full sentence starts with the same word. Where
+         there is not — the icon-only variant — this is the only name the control
+         has. */
+      button.setAttribute('aria-label', labels[next].action);
+
+      // Left over from an earlier toggle-button spelling; remove it so the two
+      // patterns cannot end up mixed on one control.
+      button.removeAttribute('aria-pressed');
     });
 
     themeListeners.forEach(function (listener) {
@@ -260,19 +338,26 @@
   }
 
   register('theme-toggle', '[data-dds-theme-toggle]', function (button) {
-    // `aria-pressed` rather than swapping the label: the control is one thing
-    // in two states ("Dark mode, pressed"), not two different controls. The
-    // label must therefore stay constant — a button whose name changes when you
-    // press it is announced as a different control each time.
-    button.setAttribute('aria-pressed', currentTheme() === 'dark' ? 'true' : 'false');
+    // `type="button"`, or a toggle inside a form submits it.
+    if (button.tagName === 'BUTTON' && !button.getAttribute('type')) button.type = 'button';
 
     button.addEventListener('click', function () {
       theme.toggle();
-      // The visual change is obvious to a sighted user and invisible to a
-      // screen-reader user, so state changes are spoken.
-      announce(currentTheme() === 'dark' ? 'Dark theme on' : 'Light theme on');
+
+      /* Announce the resulting state, not the next action. The label has just
+         changed to say what pressing again would do, which is not what the user
+         needs to hear — they need confirmation of what just happened. The change
+         is obvious to a sighted user and invisible otherwise. */
+      var applied = currentTheme();
+      var labels = THEME_LABELS[button.getAttribute('data-dds-theme-toggle') || 'en'] ||
+        THEME_LABELS.en;
+      announce(labels[applied].short + ' — ' + (applied === 'dark' ? 'dark theme on' : 'light theme on'));
     });
   });
+
+  // Paint the label and name on load, so a server-rendered toggle is correct
+  // before anyone touches it.
+  applyTheme(currentTheme());
 
   /* =========================================================================
      Small shared helpers
@@ -353,13 +438,36 @@
 
   global.DDS = DDS;
 
-  // Enhance once the document is parsed. `defer` scripts run before
-  // DOMContentLoaded fires, so the event is the right hook either way.
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', function () {
-      enhance(document);
-    });
-  } else {
+  /* =========================================================================
+     The initial sweep
+     =========================================================================
+
+     Timed to DOMContentLoaded, and the distinction matters more than it looks.
+
+     A deferred script runs AFTER parsing finishes, at which point
+     `document.readyState` is already `"interactive"` — not `"loading"`. An
+     earlier version tested for `"loading"`, took the else branch, and swept the
+     document the instant `dds.js` finished executing: before `components.js`,
+     before every pattern file, before anything had called `register`. The
+     registry was empty, the sweep enhanced nothing, and every interactive demo on
+     every page was inert. No error, no warning — the markup renders and simply
+     does nothing, which is the failure mode progressive enhancement is supposed
+     to make survivable, not silent.
+
+     Waiting for DOMContentLoaded lets every deferred script register first.
+     `register` covers whatever arrives later.
+
+     `"complete"` is checked as well, for the case where `dds.js` is loaded
+     dynamically long after the page settled; there is no event left to wait for
+     then. ========================================================================= */
+  function sweep() {
+    swept = true;
     enhance(document);
+  }
+
+  if (document.readyState === 'complete') {
+    sweep();
+  } else {
+    document.addEventListener('DOMContentLoaded', sweep, { once: true });
   }
 })(typeof window !== 'undefined' ? window : globalThis);

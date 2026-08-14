@@ -331,9 +331,11 @@
     document.querySelectorAll('[data-ref-code]').forEach(buildCodeView);
   }
 
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', init);
-  } else {
+  /* DOMContentLoaded, not `readyState === 'loading'` — a deferred script is
+     already past `"loading"` when it runs. See the note in reference.js. */
+  if (document.readyState === 'complete') {
     init();
+  } else {
+    document.addEventListener('DOMContentLoaded', init, { once: true });
   }
 })(typeof window !== 'undefined' ? window : globalThis);

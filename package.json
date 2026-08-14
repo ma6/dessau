@@ -1,0 +1,29 @@
+{
+  "name": "dessau",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Foundations for digital products. The DDS design system, its reference, and structured context for coding agents.",
+  "type": "module",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "check": "npm run check:css && npm run check:contrast && npm run check:icons && npm run check:index && npm run check:reference && npm run check:generated && npm run check:whitelabel",
+
+    "check:css": "node scripts/check-css.mjs",
+    "check:contrast": "node scripts/check-contrast.mjs",
+    "check:icons": "node scripts/check-icons.mjs",
+    "check:index": "node scripts/check-agent-index.mjs",
+    "check:reference": "node scripts/check-reference.mjs",
+    "check:whitelabel": "node scripts/audit-whitelabel.mjs",
+
+    "check:generated": "node scripts/build-foundations.mjs --check && node scripts/sync-breakpoints.mjs --check",
+
+    "build": "node scripts/build-foundations.mjs && node scripts/sync-icons.mjs && node scripts/sync-breakpoints.mjs && node scripts/sync-reference-toc.mjs && node scripts/bundle.mjs",
+
+    "test": "playwright test"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.62.1"
+  }
+}
