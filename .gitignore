@@ -61,9 +61,11 @@ npm-debug.log*
 # Create it from .whitelabel-terms.example.json.
 /.whitelabel-terms.json
 
-# One-off cleanup script, and the issue list it deletes. Both are working files.
+# One-off working scripts. A list of issues inside the repository goes stale the
+# moment the issues exist, so it lives here rather than as a document.
 /cleanup.sh
 /ISSUES-TO-CREATE.md
+/create-issues.sh
 
 # Build and test output.
 # `.tmp-ionicons/` is the upstream icon checkout that build-icons.mjs reads; the
