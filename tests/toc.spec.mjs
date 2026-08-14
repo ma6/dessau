@@ -21,14 +21,47 @@
  */
 
 import { test, expect } from '@playwright/test';
-import { pathToFileURL } from 'node:url';
-import { join } from 'node:path';
 
 const PAGES = ['patterns', 'components', 'content', 'navigation', 'foundations'];
 
+/**
+ * Scroll to the true bottom of the page.
+ *
+ * A single `scrollTo(scrollHeight)` is not enough here, and the reason is worth
+ * knowing rather than working around blindly. `.ref-section` uses
+ * `content-visibility: auto` with `contain-intrinsic-size: auto 30rem`, so an
+ * off-screen section is *estimated* at 30rem and its real height only replaces the
+ * estimate once it comes near the viewport.
+ *
+ * So scrolling to what is currently `scrollHeight` reveals sections, their real
+ * heights land, and the page becomes taller than the target that was just jumped to.
+ * The scroll therefore stops somewhere short of the end — by a different amount on
+ * every page, which is exactly why some pages passed this test and some failed while
+ * the component behaved identically on all of them.
+ *
+ * Repeating until the height stops changing is the honest fix: it reaches the bottom
+ * the way a person scrolling would, rather than assuming one jump gets there.
+ */
+async function scrollToBottom(page) {
+  await page.evaluate(async () => {
+    let previous = -1;
+
+    // Bounded: a page whose height never settles is a bug, not something to loop on.
+    for (let attempt = 0; attempt < 20; attempt += 1) {
+      const height = document.documentElement.scrollHeight;
+      if (height === previous) break;
+      previous = height;
+
+      window.scrollTo({ top: height, behavior: 'instant' });
+      // One frame for layout, one for the observers that layout triggers.
+      await new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+    }
+  });
+}
+
 for (const name of PAGES) {
   test(`${name}: the last table-of-contents entry activates at the end of the page`, async ({ page }) => {
-    await page.goto(pathToFileURL(join(process.cwd(), `reference/${name}.html`)).href);
+    await page.goto(`/reference/${name}.html`);
 
     const toc = page.locator('[data-dds-toc]').first();
     const links = toc.locator('a[href^="#"]');
@@ -39,9 +72,7 @@ for (const name of PAGES) {
     const last = links.nth(count - 1);
     const target = await last.getAttribute('href');
 
-    await page.evaluate(() =>
-      window.scrollTo({ top: document.documentElement.scrollHeight, behavior: 'instant' })
-    );
+    await scrollToBottom(page);
 
     // The observer reports asynchronously; expect() polls, so no fixed wait.
     await expect(
@@ -56,7 +87,7 @@ for (const name of PAGES) {
 }
 
 test('the marker is "location", not "page"', async ({ page }) => {
-  await page.goto(pathToFileURL(join(process.cwd(), 'reference/patterns.html')).href);
+  await page.goto('/reference/patterns.html');
 
   await page.evaluate(() => window.scrollTo({ top: 800, behavior: 'instant' }));
 
@@ -70,7 +101,7 @@ test('the marker is "location", not "page"', async ({ page }) => {
 });
 
 test('the sentinel adds no height to the page', async ({ page }) => {
-  await page.goto(pathToFileURL(join(process.cwd(), 'reference/patterns.html')).href);
+  await page.goto('/reference/patterns.html');
 
   const grew = await page.evaluate(() => {
     const sentinel = document.querySelector('[data-dds-toc-sentinel]');

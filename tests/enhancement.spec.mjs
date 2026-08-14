@@ -28,11 +28,9 @@
  */
 
 import { test, expect } from '@playwright/test';
-import { pathToFileURL } from 'node:url';
-import { join } from 'node:path';
 
-const page_ = (name) =>
-  pathToFileURL(join(process.cwd(), `reference/${name}.html`)).href;
+/** Resolved against the baseURL in playwright.config.mjs. */
+const page_ = (name) => `/reference/${name}.html`;
 
 test('every registered enhancement has been applied after load', async ({ page }) => {
   const problems = [];
@@ -106,7 +104,18 @@ test('keyboard: arrow keys move the active option without moving focus', async (
   await page.goto(page_('patterns'));
 
   const input = page.locator('#ref-city');
+  const list = input.locator('xpath=../ul');
+
   await input.fill('B');
+
+  /**
+   * Wait for the list before pressing a key. The query is debounced, so an ArrowDown
+   * sent immediately after typing arrives while there is nothing to move through —
+   * which fails as "no active option" and looks exactly like the keyboard handling
+   * being broken.
+   */
+  await expect(list.locator('[role="option"]').first()).toBeVisible();
+
   await input.press('ArrowDown');
 
   /**
@@ -153,7 +162,16 @@ test('the address search fills every field from one selection', async ({ page })
   await page.goto(page_('patterns'));
 
   const search = page.locator('[data-dds-address-combobox] input').first();
-  await search.fill('Rudolf');
+
+  /**
+   * A street that is actually in the mock provider, and at least three characters —
+   * the address search sets `minLength: 3`, because a one-character address query
+   * matches everything and teaches the user nothing.
+   *
+   * The previous query was a street that had been replaced in the demo data, so the
+   * test was asserting against an address the provider had never heard of.
+   */
+  await search.fill('Talwiesen');
 
   const option = page.locator('[data-dds-address-combobox] [role="option"]').first();
   await expect(option).toBeVisible();

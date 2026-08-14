@@ -22,12 +22,8 @@
  */
 
 import { test, expect } from '@playwright/test';
-import { pathToFileURL } from 'node:url';
-import { join } from 'node:path';
 
-const FOUNDATIONS = pathToFileURL(
-  join(process.cwd(), 'reference/foundations.html')
-).href;
+const FOUNDATIONS = '/reference/foundations.html';
 
 /** Read a semantic token as the browser resolves it for one element. */
 async function tokenOn(locator, name) {

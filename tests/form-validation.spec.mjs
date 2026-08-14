@@ -22,15 +22,22 @@
  */
 
 import { test, expect } from '@playwright/test';
-import { pathToFileURL } from 'node:url';
-import { join } from 'node:path';
 
-const PATTERNS = pathToFileURL(join(process.cwd(), 'reference/patterns.html')).href;
+const PATTERNS = '/reference/patterns.html';
 
 test('a required radio group gets exactly one error, after the options', async ({ page }) => {
   await page.goto(PATTERNS);
 
-  const group = page.locator('.dds-fieldgroup').filter({ hasText: 'How should we reply?' });
+  /**
+   * Scoped to the validation section. The same question is asked again in the wizard,
+   * so an unscoped locator matches two fieldsets and fails on strict mode — which
+   * reads as the component being wrong rather than the selector.
+   */
+  const group = page
+    .locator('#validation .dds-fieldgroup')
+    .filter({ hasText: 'How should we reply?' })
+    .first();
+
   await expect(group).toBeVisible();
 
   // Submit the step without choosing, which is what triggers validation.
@@ -49,9 +56,9 @@ test('a required radio group gets exactly one error, after the options', async (
    * wrong place still reads as nonsense.
    */
   const afterLastOption = await page.evaluate(() => {
-    const group_ = [...document.querySelectorAll('.dds-fieldgroup')].find((f) =>
-      f.textContent.includes('How should we reply?')
-    );
+    const group_ = [
+      ...document.querySelectorAll('#validation .dds-fieldgroup'),
+    ].find((f) => f.textContent.includes('How should we reply?'));
     if (!group_) return null;
 
     const error = group_.querySelector('.dds-error:not([hidden])');
@@ -81,10 +88,7 @@ test('a required radio group gets exactly one error, after the options', async (
 test('the error summary lists a radio group once', async ({ page }) => {
   await page.goto(PATTERNS);
 
-  const form = page
-    .locator('form')
-    .filter({ has: page.locator('.dds-fieldgroup', { hasText: 'How should we reply?' }) })
-    .first();
+  const form = page.locator('#validation form[data-dds-validate]').first();
 
   await form.locator('button[type="submit"], [data-dds-wizard-next]').first().click();
 

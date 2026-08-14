@@ -233,7 +233,23 @@
           atEnd = entries[entries.length - 1].isIntersecting;
           update();
         },
-        { threshold: 0 }
+        {
+          /**
+           * Fire slightly BEFORE the sentinel is on screen. A positive bottom margin
+           * expands the root downwards, so "the end" counts as reached once it is
+           * within a fifth of a viewport.
+           *
+           * That tolerance is not cosmetic. On a page using
+           * `content-visibility: auto`, off-screen sections are laid out at an
+           * estimated height and grow to their real height as they approach — so the
+           * page gets taller while you scroll towards its end, and a jump to the
+           * bottom lands short by an amount that differs per page. Requiring the
+           * sentinel to be exactly in view made the last entry activate on some pages
+           * and not others, with the component behaving identically on all of them.
+           */
+          rootMargin: '0px 0px 20% 0px',
+          threshold: 0,
+        }
       );
 
       endObserver.observe(sentinel);

@@ -26,13 +26,22 @@
  * correct in the source.
  *
  * -----------------------------------------------------------------------------
- * No web server
+ * Served over HTTP, and why that had to change
  * -----------------------------------------------------------------------------
  *
- * The reference pages are opened over `file://`. That is deliberate: it is how a
- * person actually opens them, and it means the tests exercise the same thing the
- * documentation promises — no build, no server, open the file. If something only
- * works when served, the reference is broken and the test should say so.
+ * These tests first ran over `file://`, on the reasoning that it is how a person
+ * actually opens the pages and that anything which only works when served is broken.
+ *
+ * That was wrong in one specific way, and the first run said so. A font preloaded
+ * with `crossorigin` — which is required for a preload to be usable at all — is
+ * blocked by CORS from a `file://` origin, because the origin is `null`. Every page
+ * therefore logged two console errors that had nothing to do with the page, which
+ * made "assert there were no console errors" unusable.
+ *
+ * The pages do work from `file://`. What does not work is self-hosted fonts, and no
+ * amount of markup fixes that: it is a property of the protocol. So the tests are
+ * served, and the limitation is documented in README.md rather than encoded into an
+ * assertion that would have to ignore real errors to tolerate it.
  */
 
 import { defineConfig, devices } from '@playwright/test';
@@ -48,9 +57,20 @@ export default defineConfig({
   reporter: process.env.CI ? 'github' : 'list',
 
   use: {
-    // Reference pages are local files; there is no base URL to resolve against.
-    baseURL: undefined,
+    baseURL: 'http://127.0.0.1:8123',
     trace: 'retain-on-failure',
+  },
+
+  /**
+   * Python's own server, because it is already the command README.md tells a reader
+   * to use. One fewer dependency, and the tests exercise the same setup the
+   * documentation describes.
+   */
+  webServer: {
+    command: 'python3 -m http.server 8123 --bind 127.0.0.1',
+    url: 'http://127.0.0.1:8123/reference/index.html',
+    reuseExistingServer: !process.env.CI,
+    stdout: 'ignore',
   },
 
   projects: [

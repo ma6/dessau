@@ -83,8 +83,13 @@ Then <http://localhost:8000/reference/>.
 | `reference/navigation.html` | Header, footer, breadcrumb, steps, menus — with a width switcher |
 | `reference/patterns.html` | Address search, validation, wizard, filtering, authentication |
 
-A `file://` open mostly works; `@import` and `<use>` resolution are more faithful
-over HTTP.
+A `file://` open mostly works, with one real exception: **self-hosted fonts do not
+load.** A font preloaded with `crossorigin` — which is required for a preload to be
+usable — is blocked by CORS from a `file://` origin, because that origin is `null`.
+The pages fall back to the system font stack and otherwise behave normally.
+
+`@import` and `<use>` resolution are also more faithful over HTTP. The browser tests
+serve the pages for the same reason.
 
 ---
 
