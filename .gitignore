@@ -64,3 +64,10 @@ npm-debug.log*
 # One-off cleanup script, and the issue list it deletes. Both are working files.
 /cleanup.sh
 /ISSUES-TO-CREATE.md
+
+# Build and test output.
+# `.tmp-ionicons/` is the upstream icon checkout that build-icons.mjs reads; the
+# generated sprite IS committed, the source checkout is not.
+/.tmp-ionicons/
+/test-results/
+/playwright-report/

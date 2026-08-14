@@ -4,193 +4,137 @@
  *
  *   node scripts/audit-whitelabel.mjs
  *
- * Repository-wide, case-insensitive search for any trace of the source project,
- * its organisation, its domain or its process baggage — across everything that is
- * or could become part of Dessau's Git history.
+ * Repository-wide, case-insensitive search for any term that must not appear in
+ * Dessau: names, domain vocabulary, internal hosts, retired typefaces, cliché
+ * placeholder data.
  *
- * `src/` is excluded because it IS the source material and is git-ignored. So are
- * the bootstrap instructions, which necessarily name what they are asking to be
- * removed. Everything else is in scope: file contents, filenames, directory names,
- * comments, metadata, URLs, SVG contents, and demo data.
+ * Scope is every file that can enter the history — contents, filenames, directory
+ * names, comments, metadata, URLs, SVG contents, demo data. Anything git ignores is
+ * out of scope, because it cannot be committed.
  *
- * Run before any commit that could carry inherited material.
+ * -----------------------------------------------------------------------------
+ * The term list lives OUTSIDE the repository
+ * -----------------------------------------------------------------------------
  *
- * Zero dependencies, Node stdlib only. Exit code 1 on any hit.
+ * `.whitelabel-terms.json`, which is git-ignored. Copy
+ * `.whitelabel-terms.example.json` to create it.
+ *
+ * The reason is not convenience. An audit that enumerates the names it searches
+ * for becomes the most reliable place in the repository to find those names — the
+ * check would be the single largest trace of exactly what it exists to keep out.
+ * Keeping the list local removes that trace, and the audit still runs.
+ *
+ * If the file is missing, this script FAILS rather than passing with nothing to
+ * search for. A check that cannot fail is worse than no check, because it is
+ * trusted.
+ *
+ * Zero dependencies, Node stdlib only. Exit code 1 on any unjustified hit, and on
+ * a missing term list.
  */
 
-import { readFile, readdir } from 'node:fs/promises';
+import { readFile } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
-import { dirname, join, relative, basename } from 'node:path';
+import { dirname, join } from 'node:path';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
+const CONFIG_PATH = join(ROOT, '.whitelabel-terms.json');
 
-/** Paths never scanned. Each exclusion is deliberate and justified. */
-const EXCLUDE_DIRS = new Set([
-  '.git',
-  'node_modules',
-  'dist', // generated, git-ignored
-  'src', // the source material itself; git-ignored
-]);
+/* ------------------------------------------------------------------- config */
+
+let config;
+try {
+  config = JSON.parse(await readFile(CONFIG_PATH, 'utf8'));
+} catch (error) {
+  console.error('\nCannot run: .whitelabel-terms.json is missing or unreadable.\n');
+  console.error('  ' + (error.code === 'ENOENT' ? 'File not found.' : error.message));
+  console.error('\nCreate it from the template:\n');
+  console.error('  cp .whitelabel-terms.example.json .whitelabel-terms.json\n');
+  console.error('The list is deliberately kept out of the repository — an audit that');
+  console.error('enumerates the names it looks for is the best place to find them.');
+  console.error('See the comment in the example file.\n');
+  process.exit(1);
+}
+
+const TERMS = Array.isArray(config.terms) ? config.terms : [];
+const ALLOWED = new Map(Object.entries(config.allowed || {}));
+
+if (!TERMS.length) {
+  console.error('\nCannot run: .whitelabel-terms.json contains no terms.\n');
+  console.error('An audit with an empty term list passes unconditionally, which is');
+  console.error('worse than no audit at all.\n');
+  process.exit(1);
+}
+
+/* ----------------------------------------------------------------- scanning */
+
+/**
+ * Scope: exactly the files that can enter the history.
+ *
+ * That is what the audit is about, so it is asked of git in one command rather than
+ * approximated with a hand-maintained exclusion list — which drifts from
+ * `.gitignore` and then scans too much or, worse, too little.
+ *
+ *   git ls-files --cached --others --exclude-standard
+ *
+ * That is "tracked files, plus untracked files git would let you add" — precisely
+ * the set that can be committed. Local reference material, working notes, generated
+ * output and the term list itself are all ignored and therefore out of scope.
+ *
+ * An earlier attempt piped paths into `git check-ignore --stdin` via `execFile`.
+ * `execFile` has no `input` option, so the child waited on stdin forever and the
+ * script hung. Listing is the right operation anyway: one call, no stdin.
+ */
+async function committableFiles() {
+  const { execFile } = await import('node:child_process');
+  const { promisify } = await import('node:util');
+  const run = promisify(execFile);
+
+  const { stdout } = await run(
+    'git',
+    ['-C', ROOT, 'ls-files', '--cached', '--others', '--exclude-standard'],
+    { maxBuffer: 16 * 1024 * 1024 }
+  );
+
+  return stdout.split('\n').filter(Boolean);
+}
 
 const EXCLUDE_FILES = new Set([
-  // The bootstrap instructions name the things they ask to be removed. Both are
-  // git-ignored and never enter the history.
-  'DESSAU_BOOTSTRAP.md',
-  // This file: it contains the search terms by definition.
-  'audit-whitelabel.mjs',
+  // Contains the search terms by definition.
+  'scripts/audit-whitelabel.mjs',
+  // Lists terms by definition.
+  '.whitelabel-terms.example.json',
 ]);
 
-const EXCLUDE_PATTERNS = [/^MINI_PROMPT.*\.txt$/, /\.(ttf|woff2?|otf|png|jpe?g|gif|webp|ico|wav|mp[34])$/i];
-
-/**
- * Terms to search for.
- *
- * `word: true` requires a word boundary — without it, `HK` matches inside
- * "checkbox" and `lp-` inside "help-", producing noise that hides real hits.
- */
-const TERMS = [
-  // --- the source project ---
-  { term: 'lily', word: true },
-  { term: 'lilly', word: true },
-  { term: 'lily patch' },
-  { term: 'lilly patch' },
-  { term: 'lily-patch' },
-  { term: 'lilly-patch' },
-  { term: 'lp-', raw: /(^|[^a-z0-9-])lp-/i },
-  { term: '--lp-' },
-  { term: 'data-lp' },
-  { term: 'window.LilyPatch' },
-  { term: 'fleur-de-lis' },
-
-  // --- the organisation ---
-  { term: 'HK', word: true },
-  { term: 'haftpflicht' },
-  { term: 'haftpflichtkasse' },
-  { term: 'VVaG', word: true },
-  { term: 'meineHK' },
-
-  // --- the domain ---
-  { term: 'versicherung' },
-  { term: 'insurance', word: true },
-  { term: 'tarif' },
-  { term: 'policen' },
-  { term: 'schadennummer' },
-  { term: 'sparte' },
-  { term: 'makler' },
-  { term: 'endkundenportal' },
-  { term: 'extranet' },
-
-  // --- internal systems, people, places ---
-  { term: 'jaimes' },
-  { term: 'DOWT-', raw: /DOWT-\d/i },
-  { term: 'ro-docker' },
-  { term: 'ro-nexus' },
-  { term: 'scm/dowt' },
-  { term: 'rudolf-reusch' },
-  { term: 'reusch' },
-
-  // --- process baggage that does not belong in a solo-maintained foundation ---
-  { term: 'DORA', word: true },
-  { term: 'vier-augen' },
-  { term: 'four-eyes' },
-  { term: 'Verfahrensanweisung' },
-  { term: 'CAB', word: true },
-  { term: 'Freigabe-Gate' },
-  { term: 'peer approval' },
-  { term: 'mandatory review' },
-
-  // --- retired typography and cliché demo data ---
-  { term: 'Filson' },
-  { term: 'IBM Plex' },
-  { term: 'Mustermann' },
-  { term: 'Lorem ipsum' },
-  { term: 'John Doe' },
-  { term: 'example.com' },
-];
-
-/**
- * Justified exceptions.
- *
- * Some of these terms legitimately appear as PROHIBITIONS — "no four-eyes rule",
- * "never use Max Mustermann". Removing the term from the search instead would be
- * weaker: the audit would then no longer catch the term appearing as real content.
- *
- * So each exception is enumerated with a reason, and anything not listed here is
- * still a failure. An audit with visible, justified exceptions is stronger than one
- * with quiet omissions.
- *
- * Matched as `<file>:<term>`.
- */
-const ALLOWED = new Map([
-  [
-    'AGENTS.md:four-eyes',
-    'Names the process Dessau deliberately does not have, so an agent does not invent it.',
-  ],
-  [
-    'AGENTS.md:peer approval',
-    'Same — stating the absence is the requirement.',
-  ],
-  [
-    'README.md:peer approval',
-    'Same, in the human-facing summary.',
-  ],
-  [
-    'agent/principles.md:four-eyes',
-    'Principle 13: no invented process. The absence has to be stated to be binding.',
-  ],
-  [
-    'agent/principles.md:peer approval',
-    'Same.',
-  ],
-  [
-    'agent/ux-writing.md:Mustermann',
-    'A do-not rule about demo data. The cliché has to be named to be prohibited.',
-  ],
-  [
-    'agent/ux-writing.md:John Doe',
-    'Same rule, same line.',
-  ],
-  [
-    'agent/ux-writing.md:example.com',
-    'Recommends the RFC 2606 reserved domains for addresses that must not resolve.',
-  ],
-]);
+// Binary formats: nothing readable to search.
+const BINARY = /\.(ttf|woff2?|otf|png|jpe?g|gif|webp|ico|wav|mp[34])$/i;
 
 function matcher(entry) {
-  if (entry.raw) return entry.raw;
+  if (entry.raw) return new RegExp(entry.raw, 'i');
   const escaped = entry.term.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
   return new RegExp(entry.word ? `\\b${escaped}\\b` : escaped, 'i');
 }
 
-async function walk(directory, files = []) {
-  for (const item of await readdir(directory, { withFileTypes: true })) {
-    if (item.name.startsWith('.') && item.name !== '.gitignore') continue;
-    if (EXCLUDE_DIRS.has(item.name)) continue;
-
-    const path = join(directory, item.name);
-
-    if (item.isDirectory()) {
-      await walk(path, files);
-      continue;
-    }
-
-    if (EXCLUDE_FILES.has(item.name)) continue;
-    if (EXCLUDE_PATTERNS.some((pattern) => pattern.test(item.name))) continue;
-
-    files.push(path);
-  }
-  return files;
+let files;
+try {
+  files = (await committableFiles())
+    .filter((path) => !EXCLUDE_FILES.has(path))
+    .filter((path) => !BINARY.test(path))
+    .sort();
+} catch (error) {
+  console.error('\nCannot run: `git ls-files` failed.\n');
+  console.error('  ' + error.message);
+  console.error('\nThe audit defines its scope as "files that can be committed", so it');
+  console.error('needs a git repository. Rather than fall back to scanning everything —');
+  console.error('which would report git-ignored reference material as findings — it stops.\n');
+  process.exit(1);
 }
-
-const files = (await walk(ROOT)).sort();
 const findings = [];
 /** Hits that matched a justified exception; reported, not failed. */
 const allowed = [];
 
 /* --- filenames and directory names ---------------------------------------- */
 
-for (const file of files) {
-  const relativePath = relative(ROOT, file);
+for (const relativePath of files) {
   for (const entry of TERMS) {
     if (matcher(entry).test(relativePath)) {
       findings.push({ file: relativePath, line: 0, term: entry.term, text: '(in the path)' });
@@ -200,11 +144,10 @@ for (const file of files) {
 
 /* --- file contents --------------------------------------------------------- */
 
-for (const file of files) {
-  const relativePath = relative(ROOT, file);
+for (const relativePath of files) {
   let source;
   try {
-    source = await readFile(file, 'utf8');
+    source = await readFile(join(ROOT, relativePath), 'utf8');
   } catch {
     continue; // unreadable or binary
   }
@@ -215,11 +158,13 @@ for (const file of files) {
     const pattern = matcher(entry);
     lines.forEach((line, index) => {
       if (!pattern.test(line)) return;
+
       const key = relativePath + ':' + entry.term;
       if (ALLOWED.has(key)) {
         allowed.push({ file: relativePath, line: index + 1, term: entry.term });
         return;
       }
+
       findings.push({
         file: relativePath,
         line: index + 1,
@@ -263,7 +208,7 @@ if (allowed.length) {
 
 console.log(
   `\n${files.length} files scanned, ${TERMS.length} terms searched ` +
-    `(case-insensitive, excluding src/ and the bootstrap instructions).\n` +
+    `(case-insensitive; git-ignored files are out of scope).\n` +
     (findings.length === 0
       ? `CLEAN — 0 unjustified hits, ${allowed.length} justified.`
       : `${findings.length} UNJUSTIFIED HIT(S).`)

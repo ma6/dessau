@@ -3,7 +3,8 @@
  * Dessau — inline the icon sprite into every HTML page.
  *
  *   node scripts/sync-icons.mjs
- *   node scripts/sync-icons.mjs --check   # verify only, exit 1 if stale
+ *   node scripts/sync-icons.mjs --check          # verify only, exit 1 if stale
+ *   node scripts/sync-icons.mjs --dir=../my-app  # a consuming product's pages
  *
  * -----------------------------------------------------------------------------
  * Why the sprite has to be inlined at all
@@ -35,11 +36,27 @@
 
 import { readFile, writeFile, readdir } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
-import { dirname, join, relative } from 'node:path';
+import { dirname, join, relative, resolve } from 'node:path';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 const SPRITE_PATH = join(ROOT, 'dds/icons/icons.svg');
 const CHECK_ONLY = process.argv.includes('--check');
+
+/**
+ * Where to look for HTML files.
+ *
+ * Defaults to this repository. `--dir=<path>` points it at a consuming product
+ * instead, which is the whole reason the sprite step is scriptable rather than a
+ * documented copy-and-paste: a product has the same duplication problem Dessau
+ * does, and the same need for a `--check` that fails on a stale copy.
+ *
+ * Relative paths resolve against the current working directory, so
+ * `--dir=../my-app` reads the way it looks.
+ */
+const dirArgument = process.argv.find((argument) => argument.startsWith('--dir='));
+const TARGET = dirArgument
+  ? resolve(process.cwd(), dirArgument.slice('--dir='.length))
+  : ROOT;
 
 const START_MARKER = '<!-- DDS_ICON_SPRITE:START';
 const END_MARKER = '<!-- DDS_ICON_SPRITE:END -->';
@@ -93,7 +110,7 @@ const availableIds = new Set(
   [...spriteSource.matchAll(/<symbol\s+id="([^"]+)"/g)].map((match) => match[1])
 );
 
-const htmlFiles = await findHtmlFiles(ROOT);
+const htmlFiles = await findHtmlFiles(TARGET);
 
 let updated = 0;
 let stale = 0;
@@ -102,7 +119,7 @@ let brokenReferences = 0;
 
 for (const file of htmlFiles) {
   const source = await readFile(file, 'utf8');
-  const shortPath = relative(ROOT, file);
+  const shortPath = relative(TARGET, file);
 
   const startIndex = source.indexOf(START_MARKER);
   const endIndex = source.indexOf(END_MARKER);
@@ -144,7 +161,8 @@ for (const file of htmlFiles) {
 const problems = stale + brokenReferences;
 
 console.log(
-  `\n${htmlFiles.length} HTML files scanned, ${availableIds.size} icons available.` +
+  `\n${htmlFiles.length} HTML files scanned in ${relative(process.cwd(), TARGET) || '.'}, ` +
+    `${availableIds.size} icons available.` +
     (CHECK_ONLY
       ? stale === 0
         ? ' All inline sprites are current.'

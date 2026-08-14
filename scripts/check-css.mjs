@@ -4,7 +4,7 @@
  *
  *   node scripts/check-css.mjs
  *
- * Catches five classes of mistake that produce NO error anywhere — no console
+ * Catches six classes of mistake that produce NO error anywhere — no console
  * message, no broken layout, no failing test. Just a piece of design that is
  * quietly absent. Every one of these is the kind of thing that gets noticed
  * weeks later, in a product, by a user.
@@ -260,7 +260,51 @@ for (const [file, css] of stripped) {
   }
 }
 
-/* ------------------------------------------------------ 5. container queries */
+/* ------------- 5. `display` on a dialog outside its open state ------------- */
+
+/**
+ * A `<dialog>` is closed by the UA stylesheet with
+ * `dialog:not([open]) { display: none }`. Author styles beat UA styles, so
+ * declaring `display` on the dialog's own class unconditionally overrides that —
+ * and the closed dialog stays in the layout, invisible but still intercepting
+ * pointer events. A full-viewport dialog then becomes an invisible overlay that
+ * swallows every click on the page, including the one meant to open it.
+ *
+ * Found the hard way. The symptom was "the lightbox does not work", which points
+ * nowhere near the CSS, and the dialog markup and JavaScript were both correct.
+ *
+ * The same applies to `popover`, which the UA also closes with `display: none`.
+ * `display` must be scoped to `[open]` or `:popover-open`.
+ */
+{
+  const DIALOG_ROOT = /\.dds-(dialog|lightbox|menu|tooltip)\b/;
+
+  for (const [file, css] of stripped) {
+    // These files have no nested braces inside a declaration block, so scanning
+    // to the next `}` is enough to isolate a rule.
+    for (const match of css.matchAll(/([^{}]+)\{([^{}]*)\}/g)) {
+      const [, selector, body] = match;
+
+      if (!DIALOG_ROOT.test(selector)) continue;
+      // A descendant part may set `display` freely; only the root rule matters.
+      if (/\.dds-(dialog|lightbox|menu|tooltip)-[\w-]+/.test(selector)) continue;
+      // Already correctly scoped, or targeting the backdrop.
+      if (/\[open\]|popover-open|::backdrop/.test(selector)) continue;
+
+      if (!/(^|[;\s])display\s*:/.test(body)) continue;
+
+      report(
+        file,
+        lineOf(css, match.index),
+        'dialog-display-unscoped',
+        `${selector.trim().replace(/\s+/g, ' ')} sets \`display\` outside [open] — the ` +
+          `closed dialog stays in the layout and swallows pointer events. Scope it to [open].`
+      );
+    }
+  }
+}
+
+/* ------------------------------------------------------ 6. container queries */
 
 const containerNames = new Set();
 for (const css of stripped.values()) {

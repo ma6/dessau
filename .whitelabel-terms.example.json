@@ -1,0 +1,50 @@
+{
+  "$comment": [
+    "Term list for scripts/audit-whitelabel.mjs.",
+    "",
+    "Copy this file to `.whitelabel-terms.json`, which is git-ignored, and fill in",
+    "the terms that must never appear in this repository.",
+    "",
+    "WHY THE LIST IS NOT IN THE REPOSITORY: an audit that enumerates the names it",
+    "is looking for becomes the most reliable place to find those names. The check",
+    "would then be the single largest trace of exactly what it exists to keep out.",
+    "Keeping the list local removes that, and the audit still runs.",
+    "",
+    "The audit FAILS LOUDLY if `.whitelabel-terms.json` is missing, rather than",
+    "quietly passing with nothing to search for — a check that cannot fail is worse",
+    "than no check, because it is trusted.",
+    "",
+    "Fields per entry:",
+    "  term  — the string to search for, case-insensitively",
+    "  word  — true to require a word boundary. Without it, a two-letter",
+    "          abbreviation matches inside ordinary words and the noise hides the",
+    "          real hits.",
+    "  raw   — a regular expression source string, when a plain term is not enough",
+    "",
+    "`allowed` enumerates justified exceptions as `<file>:<term>`, each with a",
+    "reason. Some terms legitimately appear as PROHIBITIONS — naming a process the",
+    "project deliberately does not have, so nobody reintroduces it. Removing the",
+    "term from the search instead would be weaker: the audit would no longer catch",
+    "it appearing as real content."
+  ],
+
+  "terms": [
+    { "term": "example-predecessor-name" },
+    { "term": "example-organisation" },
+    { "term": "example-domain-word" },
+    { "term": "ExampleAbbrev", "word": true },
+    { "term": "example-internal-host" },
+    { "term": "TICKET-", "raw": "TICKET-\\d" },
+    { "term": "retired-typeface-name" },
+    { "term": "Mustermann" },
+    { "term": "John Doe" },
+    { "term": "Lorem ipsum" },
+    { "term": "example.com" }
+  ],
+
+  "allowed": {
+    "agent/ux-writing.md:Mustermann": "A do-not rule about demo data. The cliché has to be named to be prohibited.",
+    "agent/ux-writing.md:John Doe": "Same rule, same line.",
+    "agent/ux-writing.md:example.com": "Recommends the RFC 2606 reserved domains for addresses that must not resolve."
+  }
+}
