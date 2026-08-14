@@ -491,16 +491,73 @@ as "button".
 
 **Behaviour:** `dds/js/dds.js` via `data-dds-theme-toggle`.
 
-A `<button>` with `aria-pressed`. **The accessible name stays constant** — "Dark
-theme", pressed or not. A control whose name changes when you press it is announced
-as a different control each time, which is why the tempting "Switch to light theme"
-label is wrong.
+```html
+<button type="button" class="dds-theme-toggle" data-dds-theme-toggle>
+  <svg class="dds-icon dds-theme-toggle-moon" aria-hidden="true"><use href="#dds-icon-moon"/></svg>
+  <svg class="dds-icon dds-theme-toggle-sun" aria-hidden="true"><use href="#dds-icon-sun"/></svg>
+  <span class="dds-theme-toggle-label">Dark</span>
+</button>
+```
 
-Both icons are in the markup and CSS shows the relevant one, so there is no flash
-of the wrong icon before the script runs and no icon swapping in JavaScript.
+**Variants:** `.dds-theme-toggle` (icon + label, **preferred**) ·
+`.dds-theme-toggle-icon` (icon only, compact).
 
-An explicit choice is stored and always beats the system preference; with no stored
-choice the system preference is followed live.
+Prefer the labelled one. Sun and moon are conventional but not universal, and
+"which one is the current state and which the next?" is genuinely ambiguous without
+words.
+
+**German wording:** `data-dds-theme-toggle="de"`.
+
+### Styled as a text link, still a button
+
+Transparent, inheriting colour and font size, underlined on hover. It sits in a
+header or footer utility row where a filled control would out-shout the navigation
+beside it — the theme is a preference, not an action the page wants you to take.
+
+It is still a real `<button>`: it changes state rather than navigating, so an `<a>`
+would be wrong however it looks. An anchor is announced as a link, opens in a new
+tab on a middle click, and does nothing on Space.
+
+### Both icons are in the markup
+
+CSS chooses which shows, keyed off `[data-theme]`. So there is no flash of the wrong
+icon before the script runs, and no icon swapping in JavaScript.
+
+Each icon names the **next** state — the moon means "dark is available" — matching
+the label.
+
+### No `aria-pressed`, deliberately
+
+The visible label says where pressing takes you: "Dark" while light is active. The
+accessible name must therefore say the same thing (WCAG 2.5.3 Label in Name), which
+makes this an **action button**, not a toggle button.
+
+Two valid patterns, which must not be mixed:
+
+| Pattern | Name | `aria-pressed` |
+| --- | --- | --- |
+| **Action button** ← this one | changes | absent |
+| Toggle button | constant | carries the state |
+
+Combining them announces "switch to dark theme, not pressed" — double-encoding the
+state and leaving the listener unsure whether the control describes the current mode
+or the next one.
+
+Pressing announces the **result** ("Light — light theme on"), not the next action.
+The label has just changed to describe what pressing again would do, which is not
+what the user needs to hear.
+
+### All toggles stay in sync
+
+Every `[data-dds-theme-toggle]` in the document updates together — header, footer
+utility row, settings panel — because they all reflect one piece of state.
+
+### It must be on every page
+
+Not a nicety. Theme resolution is: explicit choice → system preference → dark
+(DECISIONS 012). Light-on-dark is harder to read with astigmatism, which is common,
+so the toggle is the only route out of a default someone cannot read comfortably. A
+product that hides it in a settings page has broken that decision.
 
 ---
 
@@ -617,6 +674,69 @@ never covers a field that has just been focused (WCAG 2.2 2.4.11).
 `IntersectionObserver`, not a scroll listener. The active entry is
 `aria-current="location"` — **not `"page"`**: the user has not navigated anywhere,
 the reading position moved.
+
+## Content navigation — `.dds-contentnav`
+
+Grouped navigation between the pages of one body of content. A sticky column from
+64rem of **container** width; a modal panel over the content below it. One `<nav>`
+in one place — never a narrow copy and a wide copy, because two copies drift and a
+screen reader announces both.
+
+**Four navigation components, four jobs.** Getting this wrong is the common
+mistake:
+
+| Component | Moves you between |
+| --- | --- |
+| `.dds-siteheader` + `.dds-primary-nav` | the site's top-level sections |
+| `.dds-contentnav` | the pages of one body of content |
+| `.dds-appnav` | areas of a signed-in application |
+| `.dds-toc` | positions within one page |
+
+**Not a `<dialog>`, and this is not a preference.** A modal panel is right at narrow
+widths and `showModal()` would normally be how to get it. It cannot be used: the
+same element has to be a static column above the threshold, and the UA stylesheet
+closes a dialog with `dialog:not([open]) { display: none }`. Overriding that leaves
+every closed dialog in the layout swallowing clicks — the bug `check-css.mjs` now
+guards against.
+
+What actually mattered comes from the platform regardless: **`inert` on
+`[data-dds-contentnav-content]`** while the panel is open. That takes the content
+out of the tab order *and* out of the accessibility tree. A hand-written focus trap
+only does the first, so a screen reader walks into content the user cannot see, and
+it has to bookkeep the first and last focusable element — wrong the moment
+something inside the panel expands.
+
+Required behaviour:
+
+- Escape closes and **returns focus to the toggle**. Focus left on a hidden element
+  falls to `<body>`, so the next Tab restarts at the skip link.
+- Following a link closes **without** restoring focus — otherwise it competes with
+  the navigation already under way.
+- Growing past the threshold must clear `inert` and the scroll lock. The CSS makes
+  the column visible again on its own; it cannot undo state set on other elements,
+  and a page that looks normal but cannot be scrolled is the result.
+- `aria-current="page"`, because these are other pages.
+
+Without JavaScript: a plain `<nav>` of working links, a column at wide widths. Only
+the panel behaviour is lost.
+
+## App navigation — `.dds-appnav`
+
+Flat navigation between the areas of a signed-in application. Optional labelled
+sections (`.dds-appnav-section`) and a trailing count (`.dds-appnav-meta`).
+
+No JavaScript, and no column of its own — pair it with `.dds-sidebar` or an app
+topbar. Keeping the navigation separate from the shell is what lets the same
+navigation sit in a sidebar, a topbar layout or a panel.
+
+If it needs real grouping it has outgrown this and wants `.dds-contentnav`. If it
+needs to collapse behind a button, the app is a site and wants `.dds-siteheader`.
+
+`aria-current="page"` marks the current area and shows it **three** ways: a fill, a
+heavier weight and a coloured label. A fill alone disappears in forced-colors mode
+and in greyscale. Icons are `aria-hidden` — the label carries the meaning, and an
+icon-only navigation asks every user to learn a private symbol vocabulary while
+giving a screen-reader user nothing.
 
 ## Menu — `.dds-menu`
 

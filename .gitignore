@@ -30,6 +30,9 @@ desktop.ini
 # ---------------------------------------------------------------------------
 node_modules/
 dist/
+# Local caches from running npx here rather than globally.
+.npm-cache/
+.playwright-browsers/
 build/
 coverage/
 .cache/
@@ -39,9 +42,6 @@ npm-debug.log*
 .env.*
 !.env.example
 .claude/settings.local.json
-
-# Scratch directory used by scripts/build-icons.mjs when fetching upstream SVGs.
-/.tmp-ionicons/
 
 # ---------------------------------------------------------------------------
 # The modern-web-guidance skill
@@ -56,11 +56,11 @@ npm-debug.log*
 # ---------------------------------------------------------------------------
 /.agents/
 
-# ---------------------------------------------------------------------------
-# Undecided working file, deliberately left out of the initial commit
-# ---------------------------------------------------------------------------
-# Dessau currently states that it has no brand assets — a foundation is not a
-# brand (docs/inherited.md). A logo draft contradicts that, so it is not
-# committed without a decision either way. Delete this line to include it.
-# ---------------------------------------------------------------------------
-/logo-entwurf.png
+# The audit's term list. Deliberately outside the repository — an audit that
+# enumerates the names it searches for is the best place to find them.
+# Create it from .whitelabel-terms.example.json.
+/.whitelabel-terms.json
+
+# One-off cleanup script, and the issue list it deletes. Both are working files.
+/cleanup.sh
+/ISSUES-TO-CREATE.md

@@ -65,6 +65,50 @@
   ],
   "components": [
     {
+      "name": "actionbar",
+      "purpose": "Keeping the primary action reachable in a long form.",
+      "notFor": "A page header.",
+      "classes": [
+        ".dds-actionbar",
+        ".dds-actionbar-host",
+        ".dds-actionbar-info"
+      ],
+      "css": "dds/css/components-navigation.css",
+      "spec": "## Sticky action bar — `.dds-actionbar`",
+      "reference": "reference/navigation.html#toolbar",
+      "accessibility": "safe-area-inset-bottom; .dds-actionbar-host reserves scroll space (WCAG 2.4.11)."
+    },
+    {
+      "name": "appnav",
+      "purpose": "Flat navigation between the areas of a signed-in application — an account area or a dashboard sidebar. Optional labelled sections and a trailing count per item.",
+      "notFor": "Anything that needs real grouping (use contentnav) or that needs to collapse behind a button (the app is a site — use siteheader). Provides no column of its own: pair it with .dds-sidebar or an app topbar.",
+      "classes": [
+        ".dds-appnav",
+        ".dds-appnav-meta",
+        ".dds-appnav-section",
+        ".dds-appnav-section-title"
+      ],
+      "css": "dds/css/components-navigation.css",
+      "spec": "## App navigation — `.dds-appnav`",
+      "reference": "reference/navigation.html#contentnav",
+      "accessibility": "aria-current=\"page\" on the current area, shown three ways — fill, weight and colour — because a fill alone vanishes in forced-colors and in greyscale. Icons are aria-hidden; the visible label carries the meaning. Items are 2.75rem tall for WCAG 2.5.8 Target Size."
+    },
+    {
+      "name": "avatar",
+      "purpose": "A person, as an image or initials.",
+      "notFor": "An icon.",
+      "classes": [
+        ".dds-avatar",
+        ".dds-avatar-group",
+        ".dds-avatar-lg",
+        ".dds-avatar-sm"
+      ],
+      "css": "dds/css/components-content.css",
+      "spec": "## Gallery — `.dds-gallery` · Avatar — `.dds-avatar`",
+      "reference": "reference/content.html#media",
+      "accessibility": "Initials are aria-hidden; the name goes in real text."
+    },
+    {
       "name": "badge",
       "purpose": "A short, non-interactive status or category label.",
       "notFor": "Anything interactive.",
@@ -80,6 +124,37 @@
       "spec": "## Badge — `.dds-badge`",
       "reference": "reference/components.html#badge",
       "accessibility": "Status variants pair colour with text AND an icon."
+    },
+    {
+      "name": "banner",
+      "purpose": "A page-level or application-level message, full width.",
+      "notFor": "A message about one section — use a notice.",
+      "classes": [
+        ".dds-banner",
+        ".dds-banner-body",
+        ".dds-banner-dismiss",
+        ".dds-banner-error",
+        ".dds-banner-info",
+        ".dds-banner-success",
+        ".dds-banner-title",
+        ".dds-banner-warning"
+      ],
+      "css": "dds/css/components-navigation.css",
+      "spec": "## Alert banner — `.dds-banner`",
+      "reference": "reference/navigation.html#topbar",
+      "accessibility": "Only one at a time. No role when present at load; role=status or alert only when it appears."
+    },
+    {
+      "name": "breadcrumb",
+      "purpose": "Where the current page sits in the hierarchy.",
+      "notFor": "A sequence of steps — use step progress.",
+      "classes": [
+        ".dds-breadcrumb"
+      ],
+      "css": "dds/css/components-navigation.css",
+      "spec": "## Breadcrumb — `.dds-breadcrumb`",
+      "reference": "reference/navigation.html#breadcrumb",
+      "accessibility": "ol in a named nav. Separator is a pseudo-element. Last entry not a link."
     },
     {
       "name": "button",
@@ -101,6 +176,22 @@
       "reference": "reference/components.html#button",
       "native": "button",
       "accessibility": "Name from text or a .dds-sr-only span. Prefer aria-disabled on submits."
+    },
+    {
+      "name": "byline",
+      "purpose": "Who wrote or owns something, and how to reach them.",
+      "notFor": "A general contact block.",
+      "classes": [
+        ".dds-byline",
+        ".dds-byline-body",
+        ".dds-byline-box",
+        ".dds-byline-meta",
+        ".dds-byline-name"
+      ],
+      "css": "dds/css/components-content.css",
+      "spec": "## Byline — `.dds-byline`",
+      "reference": "reference/content.html#media",
+      "accessibility": "Avatar aria-hidden, name real text. A contact link names whom it reaches."
     },
     {
       "name": "card",
@@ -136,6 +227,42 @@
       "accessibility": "Visible count every keystroke; announcement debounced."
     },
     {
+      "name": "chart",
+      "purpose": "A bar or donut chart.",
+      "notFor": "Precise values — use a table.",
+      "classes": [
+        ".dds-chart",
+        ".dds-chart-bar",
+        ".dds-chart-bars",
+        ".dds-chart-label",
+        ".dds-chart-row",
+        ".dds-chart-track",
+        ".dds-chart-value",
+        ".dds-donut",
+        ".dds-donut-caption",
+        ".dds-donut-wrap"
+      ],
+      "css": "dds/css/components-content.css",
+      "spec": "## Charts — `.dds-chart`, `.dds-donut`",
+      "reference": "reference/content.html#chart",
+      "accessibility": "ALWAYS accompanied by the same data as a real table. Bars are aria-hidden."
+    },
+    {
+      "name": "chip",
+      "purpose": "A removable token for an applied filter or selected value.",
+      "notFor": "A status label — use a badge.",
+      "classes": [
+        ".dds-chip",
+        ".dds-chip-label",
+        ".dds-chip-remove",
+        ".dds-chip-toggle"
+      ],
+      "css": "dds/css/components-content.css",
+      "spec": "## Chip — `.dds-chip`",
+      "reference": "reference/content.html#chip",
+      "accessibility": "The remove button names WHICH filter it removes."
+    },
+    {
       "name": "choice",
       "purpose": "A checkbox or radio, laid out.",
       "notFor": "Replacing the native input.",
@@ -150,6 +277,62 @@
       "reference": "reference/components.html#choice",
       "native": "input[type=checkbox], input[type=radio]",
       "accessibility": "Radio groups require fieldset + legend. Whole row is the label."
+    },
+    {
+      "name": "contentnav",
+      "purpose": "Grouped navigation between the pages of one body of content — a help centre, documentation, a multi-part guide. A sticky column at 64rem of container width and above; a modal panel over the content below it.",
+      "notFor": "Navigation within a single page (use toc), the site's top-level sections (use siteheader), or flat navigation between areas of a signed-in app (use appnav). If it needs no groups, it wants appnav.",
+      "classes": [
+        ".dds-contentnav",
+        ".dds-contentnav-close",
+        ".dds-contentnav-frame",
+        ".dds-contentnav-group",
+        ".dds-contentnav-group-title",
+        ".dds-contentnav-layout",
+        ".dds-contentnav-scrim",
+        ".dds-contentnav-title",
+        ".dds-contentnav-toggle"
+      ],
+      "css": "dds/css/components-navigation.css",
+      "spec": "## Content navigation — `.dds-contentnav`",
+      "reference": "reference/navigation.html#contentnav",
+      "js": "dds/js/components-navigation.js",
+      "hooks": [
+        "data-dds-contentnav",
+        "data-dds-contentnav-close",
+        "data-dds-contentnav-content",
+        "data-dds-contentnav-scrim",
+        "data-dds-contentnav-toggle"
+      ],
+      "accessibility": "One <nav>, never two copies. Deliberately NOT a <dialog>: the same element must be a static column above the threshold, and the UA closes a dialog with display:none. Instead `inert` goes on [data-dds-contentnav-content] while the panel is open, which removes it from the tab order AND the accessibility tree — what a focus trap only approximates. Escape closes and returns focus to the toggle; following a link closes without restoring focus, so it does not fight the navigation. aria-current=\"page\", since these are other pages."
+    },
+    {
+      "name": "cta",
+      "purpose": "A prominent block inviting one specific next step.",
+      "notFor": "A menu of options.",
+      "classes": [
+        ".dds-cta",
+        ".dds-cta-body",
+        ".dds-cta-title"
+      ],
+      "css": "dds/css/components-content.css",
+      "spec": "## Call to action — `.dds-cta`",
+      "reference": "reference/content.html#promotion"
+    },
+    {
+      "name": "datalist",
+      "purpose": "A list of records with two or three fields each.",
+      "notFor": "Values compared down a column — use a table.",
+      "classes": [
+        ".dds-datalist",
+        ".dds-datalist-actions",
+        ".dds-datalist-body",
+        ".dds-datalist-meta",
+        ".dds-datalist-title"
+      ],
+      "css": "dds/css/components-content.css",
+      "spec": "## Key-value list — `.dds-keyvalue` · Data list — `.dds-datalist`",
+      "reference": "reference/content.html#lists"
     },
     {
       "name": "date-field",
@@ -217,604 +400,6 @@
       "native": "hr"
     },
     {
-      "name": "field",
-      "purpose": "Label, control, hint, error — the form primitive.",
-      "notFor": "A control without a visible label.",
-      "classes": [
-        ".dds-field",
-        ".dds-label",
-        ".dds-label-note",
-        ".dds-input",
-        ".dds-input-code",
-        ".dds-input-group",
-        ".dds-input-group-affix",
-        ".dds-textarea",
-        ".dds-select",
-        ".dds-hint",
-        ".dds-error",
-        ".dds-error-summary",
-        ".dds-error-summary-list",
-        ".dds-error-summary-title"
-      ],
-      "css": [
-        "dds/css/components.css",
-        "dds/css/patterns.css"
-      ],
-      "spec": "## Field — `.dds-field`",
-      "reference": "reference/components.html#field",
-      "native": "input, textarea, select",
-      "accessibility": "Visible <label for>. Hint and error in one aria-describedby. Required in words. aria-invalid, never CSS :invalid."
-    },
-    {
-      "name": "fieldgroup",
-      "purpose": "Related controls under one caption.",
-      "notFor": "A single control.",
-      "classes": [
-        ".dds-fieldgroup",
-        ".dds-fieldgroup-options",
-        ".dds-fieldgroup-options-inline",
-        ".dds-legend"
-      ],
-      "css": "dds/css/components.css",
-      "spec": "## Fieldset group — `.dds-fieldgroup`",
-      "reference": "reference/components.html#choice",
-      "native": "fieldset, legend",
-      "accessibility": "Required for radio groups."
-    },
-    {
-      "name": "icon",
-      "purpose": "A decorative glyph beside text.",
-      "notFor": "Carrying meaning on its own — the control gets the name.",
-      "classes": [
-        ".dds-icon",
-        ".dds-icon-lg",
-        ".dds-icon-sm",
-        ".dds-icon-xl"
-      ],
-      "css": [
-        "dds/css/components-content.css",
-        "dds/css/components.css"
-      ],
-      "spec": "## Icon — `.dds-icon`",
-      "reference": "reference/components.html#feedback",
-      "accessibility": "Always aria-hidden. The sprite must be inlined per document."
-    },
-    {
-      "name": "kbd",
-      "purpose": "A key or key combination.",
-      "notFor": "Code — use .dds-code.",
-      "classes": [
-        ".dds-kbd"
-      ],
-      "css": "dds/css/components.css",
-      "spec": "## Kbd — `.dds-kbd` · Divider — `.dds-divider`",
-      "reference": "reference/components.html#feedback",
-      "native": "kbd"
-    },
-    {
-      "name": "notice",
-      "purpose": "A contextual message attached to the page or a section.",
-      "notFor": "A transient confirmation — use a toast.",
-      "classes": [
-        ".dds-notice",
-        ".dds-notice-error",
-        ".dds-notice-info",
-        ".dds-notice-success",
-        ".dds-notice-title",
-        ".dds-notice-warning"
-      ],
-      "css": "dds/css/components.css",
-      "spec": "## Notice — `.dds-notice`",
-      "reference": "reference/components.html#notice",
-      "accessibility": "Role depends on WHEN it appears: none / role=status / role=alert."
-    },
-    {
-      "name": "progress",
-      "purpose": "Determinate progress.",
-      "notFor": "Indeterminate work.",
-      "classes": [
-        ".dds-progress"
-      ],
-      "css": "dds/css/components.css",
-      "spec": "## Progress — `.dds-progress`",
-      "reference": "reference/components.html#feedback",
-      "native": "progress"
-    },
-    {
-      "name": "range",
-      "purpose": "A value where the exact number does not matter.",
-      "notFor": "A specific number.",
-      "classes": [
-        ".dds-range",
-        ".dds-range-row",
-        ".dds-range-value"
-      ],
-      "css": "dds/css/components-forms.css",
-      "spec": "## Range — `.dds-range`",
-      "reference": "reference/components.html#controls",
-      "native": "input[type=range]",
-      "accessibility": "Value always shown as text and announced."
-    },
-    {
-      "name": "search",
-      "purpose": "A query input and its submit button as one unit.",
-      "notFor": "A filter control — use the filter bar.",
-      "classes": [
-        ".dds-search"
-      ],
-      "css": "dds/css/components-forms.css",
-      "spec": "## Search field — `.dds-search`",
-      "reference": "reference/components.html#controls",
-      "native": "input[type=search]",
-      "accessibility": "role=\"search\" on the form. A real submit button with a name, never an unnamed magnifier."
-    },
-    {
-      "name": "segmented",
-      "purpose": "Two to four exclusive options, all visible.",
-      "notFor": "More than four, or long labels.",
-      "classes": [
-        ".dds-segmented",
-        ".dds-segmented-option"
-      ],
-      "css": "dds/css/components-forms.css",
-      "spec": "## Segmented control — `.dds-segmented`",
-      "reference": "reference/components.html#controls",
-      "accessibility": "Radio inputs: one tab stop, arrow keys. Selected changes fill AND weight."
-    },
-    {
-      "name": "skeleton",
-      "purpose": "A placeholder whose shape is known before its data.",
-      "notFor": "Content that has arrived.",
-      "classes": [
-        ".dds-skeleton",
-        ".dds-skeleton-block",
-        ".dds-skeleton-text",
-        ".dds-skeleton-title"
-      ],
-      "css": "dds/css/components.css",
-      "spec": "## Skeleton — `.dds-skeleton`",
-      "reference": "reference/components.html#feedback",
-      "accessibility": "aria-hidden; the region carries aria-busy."
-    },
-    {
-      "name": "spinner",
-      "purpose": "Indeterminate progress.",
-      "notFor": "Communicating progress on its own.",
-      "classes": [
-        ".dds-spinner"
-      ],
-      "css": "dds/css/components.css",
-      "spec": "## Spinner — `.dds-spinner`",
-      "reference": "reference/components.html#feedback",
-      "accessibility": "aria-hidden. Pair with text in a role=status region. Non-moving fallback under reduced motion."
-    },
-    {
-      "name": "stepper",
-      "purpose": "A quantity the user adjusts rather than types once.",
-      "notFor": "A value typed once.",
-      "classes": [
-        ".dds-stepper",
-        ".dds-stepper-button"
-      ],
-      "css": "dds/css/components-forms.css",
-      "spec": "## Stepper — `.dds-stepper`",
-      "reference": "reference/components.html#controls",
-      "js": "dds/js/components-forms.js",
-      "hooks": [
-        "data-dds-stepper"
-      ],
-      "native": "input[type=number]",
-      "accessibility": "Buttons disable at the limits; the new value is announced."
-    },
-    {
-      "name": "switch",
-      "purpose": "A setting that takes effect immediately.",
-      "notFor": "A value submitted with a form — use a checkbox.",
-      "classes": [
-        ".dds-switch",
-        ".dds-switch-track"
-      ],
-      "css": "dds/css/components.css",
-      "spec": "## Switch — `.dds-switch`",
-      "reference": "reference/components.html#choice",
-      "accessibility": "role=\"switch\" over a real checkbox. Forced colours: border weight changes."
-    },
-    {
-      "name": "table",
-      "purpose": "Tabular data.",
-      "notFor": "Layout.",
-      "classes": [
-        ".dds-table",
-        ".dds-table-interactive",
-        ".dds-table-numeric",
-        ".dds-table-sticky",
-        ".dds-table-wrap",
-        ".dds-table-zebra"
-      ],
-      "css": "dds/css/components.css",
-      "spec": "## Table — `.dds-table`",
-      "reference": "reference/components.html#table",
-      "native": "table",
-      "accessibility": "th scope, a caption, and a focusable named wrapper for overflow."
-    },
-    {
-      "name": "tabs",
-      "purpose": "Alternative views of one thing.",
-      "notFor": "Content that should be readable in sequence or linkable.",
-      "classes": [
-        ".dds-tabs",
-        ".dds-tablist",
-        ".dds-tab"
-      ],
-      "css": "dds/css/components.css",
-      "spec": "## Tabs — `.dds-tabs`",
-      "reference": "reference/components.html#tabs",
-      "js": "dds/js/components.js",
-      "hooks": [
-        "data-dds-tabs"
-      ],
-      "accessibility": "One tab stop, arrow keys, Home/End. aria-selected + hidden are the state."
-    },
-    {
-      "name": "theme-toggle",
-      "purpose": "Switching between light and dark.",
-      "notFor": "Any other binary setting — use a switch.",
-      "classes": [
-        ".dds-theme-toggle",
-        ".dds-theme-toggle-dark",
-        ".dds-theme-toggle-light"
-      ],
-      "css": "dds/css/components-forms.css",
-      "js": "dds/js/dds.js",
-      "hooks": [
-        "data-dds-theme-toggle"
-      ],
-      "spec": "## Theme toggle — `.dds-theme-toggle`",
-      "reference": "reference/components.html#controls",
-      "accessibility": "A button with aria-pressed. The accessible name stays CONSTANT — a name that changes when pressed is announced as a different control."
-    },
-    {
-      "name": "toast",
-      "purpose": "Confirming something that just happened.",
-      "notFor": "Anything the user must read or act on.",
-      "classes": [
-        ".dds-toast",
-        ".dds-toast-close",
-        ".dds-toast-error",
-        ".dds-toast-info",
-        ".dds-toast-region",
-        ".dds-toast-success",
-        ".dds-toast-warning"
-      ],
-      "css": "dds/css/components.css",
-      "spec": "## Toast — `DDS.toast()`",
-      "reference": "reference/components.html#feedback",
-      "js": "dds/js/components.js",
-      "accessibility": "role=status region. Timer pauses on hover and focus. duration 0 stays."
-    },
-    {
-      "name": "tooltip",
-      "purpose": "Supplementary text for a control that already has a name.",
-      "notFor": "Essential information.",
-      "classes": [
-        ".dds-tooltip"
-      ],
-      "css": "dds/css/components.css",
-      "spec": "## Tooltip — `.dds-tooltip`",
-      "reference": "reference/components.html#feedback",
-      "native": "popover",
-      "accessibility": "popover gives the WCAG 1.4.13 dismiss behaviour."
-    },
-    {
-      "name": "upload",
-      "purpose": "Choosing files.",
-      "notFor": "The only route being drag and drop.",
-      "classes": [
-        ".dds-upload",
-        ".dds-upload-item",
-        ".dds-upload-item-name",
-        ".dds-upload-item-remove",
-        ".dds-upload-item-size",
-        ".dds-upload-list",
-        ".dds-upload-zone"
-      ],
-      "css": "dds/css/components-forms.css",
-      "spec": "## Upload — `.dds-upload`",
-      "reference": "reference/components.html#controls",
-      "js": "dds/js/components-forms.js",
-      "hooks": [
-        "data-dds-upload"
-      ],
-      "native": "input[type=file]",
-      "accessibility": "accept must match the prose. Drag and drop is additive (WCAG 2.5.7)."
-    },
-    {
-      "name": "actionbar",
-      "purpose": "Keeping the primary action reachable in a long form.",
-      "notFor": "A page header.",
-      "classes": [
-        ".dds-actionbar",
-        ".dds-actionbar-host",
-        ".dds-actionbar-info"
-      ],
-      "css": "dds/css/components-navigation.css",
-      "spec": "## Sticky action bar — `.dds-actionbar`",
-      "reference": "reference/navigation.html#toolbar",
-      "accessibility": "safe-area-inset-bottom; .dds-actionbar-host reserves scroll space (WCAG 2.4.11)."
-    },
-    {
-      "name": "banner",
-      "purpose": "A page-level or application-level message, full width.",
-      "notFor": "A message about one section — use a notice.",
-      "classes": [
-        ".dds-banner",
-        ".dds-banner-body",
-        ".dds-banner-dismiss",
-        ".dds-banner-error",
-        ".dds-banner-info",
-        ".dds-banner-success",
-        ".dds-banner-title",
-        ".dds-banner-warning"
-      ],
-      "css": "dds/css/components-navigation.css",
-      "spec": "## Alert banner — `.dds-banner`",
-      "reference": "reference/navigation.html#topbar",
-      "accessibility": "Only one at a time. No role when present at load; role=status or alert only when it appears."
-    },
-    {
-      "name": "breadcrumb",
-      "purpose": "Where the current page sits in the hierarchy.",
-      "notFor": "A sequence of steps — use step progress.",
-      "classes": [
-        ".dds-breadcrumb"
-      ],
-      "css": "dds/css/components-navigation.css",
-      "spec": "## Breadcrumb — `.dds-breadcrumb`",
-      "reference": "reference/navigation.html#breadcrumb",
-      "accessibility": "ol in a named nav. Separator is a pseudo-element. Last entry not a link."
-    },
-    {
-      "name": "filterbar",
-      "purpose": "Filter controls plus the chips showing what is applied.",
-      "notFor": "A search field alone.",
-      "classes": [
-        ".dds-filterbar",
-        ".dds-filterbar-applied",
-        ".dds-filterbar-controls"
-      ],
-      "css": "dds/css/components-navigation.css",
-      "spec": "## Filter bar — `.dds-filterbar` · Toolbar — `.dds-toolbar`",
-      "reference": "reference/navigation.html#toolbar",
-      "accessibility": "Applied filters must be visible as removable chips."
-    },
-    {
-      "name": "menu",
-      "purpose": "A list of actions revealed from a button.",
-      "notFor": "Page navigation.",
-      "classes": [
-        ".dds-menu",
-        ".dds-menu-item",
-        ".dds-menu-item-danger",
-        ".dds-menu-label",
-        ".dds-menu-separator"
-      ],
-      "css": "dds/css/components-navigation.css",
-      "spec": "## Menu — `.dds-menu`",
-      "reference": "reference/navigation.html#toolbar",
-      "native": "popover",
-      "accessibility": "popover + popovertarget, no JS. Buttons/links in a list, NOT role=menu."
-    },
-    {
-      "name": "pagination",
-      "purpose": "Navigation between pages of a list.",
-      "notFor": "Steps in a process.",
-      "classes": [
-        ".dds-pagination",
-        ".dds-pagination-gap",
-        ".dds-pagination-link"
-      ],
-      "css": "dds/css/components-navigation.css",
-      "spec": "## Pagination — `.dds-pagination`",
-      "reference": "reference/navigation.html#breadcrumb",
-      "accessibility": "Real links with hrefs. Names say where they go. aria-current=page."
-    },
-    {
-      "name": "sitefooter",
-      "purpose": "Grouped footer links and a closing line.",
-      "notFor": "Primary navigation.",
-      "classes": [
-        ".dds-sitefooter",
-        ".dds-sitefooter-base",
-        ".dds-sitefooter-frame",
-        ".dds-sitefooter-group",
-        ".dds-sitefooter-groups"
-      ],
-      "css": "dds/css/components-navigation.css",
-      "spec": "## Site footer — `.dds-sitefooter`",
-      "reference": "reference/navigation.html#sitefooter",
-      "accessibility": "Each group a named nav or a list under a heading."
-    },
-    {
-      "name": "siteheader",
-      "purpose": "Product name and primary navigation.",
-      "notFor": "A secondary nav.",
-      "classes": [
-        ".dds-siteheader",
-        ".dds-siteheader-actions",
-        ".dds-siteheader-brand",
-        ".dds-siteheader-frame",
-        ".dds-siteheader-toggle",
-        ".dds-primary-nav"
-      ],
-      "css": "dds/css/components-navigation.css",
-      "spec": "## Site header — `.dds-siteheader`",
-      "reference": "reference/navigation.html#siteheader",
-      "js": "dds/js/components-navigation.js",
-      "hooks": [
-        "data-dds-nav-toggle"
-      ],
-      "accessibility": "One nav, one DOM location. aria-expanded + aria-controls, not role=menu. hidden attribute."
-    },
-    {
-      "name": "steps",
-      "purpose": "Position within a multi-step process.",
-      "notFor": "A hierarchy — use a breadcrumb.",
-      "classes": [
-        ".dds-steps",
-        ".dds-steps-frame",
-        ".dds-step",
-        ".dds-step-status"
-      ],
-      "css": "dds/css/components-navigation.css",
-      "spec": "## Step progress — `.dds-steps`",
-      "reference": "reference/navigation.html#steps",
-      "accessibility": "Status in words. aria-current=step. Upcoming steps are never links."
-    },
-    {
-      "name": "toc",
-      "purpose": "In-page anchor navigation for a long document.",
-      "notFor": "Site navigation.",
-      "classes": [
-        ".dds-toc",
-        ".dds-toc-sticky",
-        ".dds-toc-title"
-      ],
-      "css": "dds/css/components-navigation.css",
-      "spec": "## Table of contents — `.dds-toc`",
-      "reference": "reference/navigation.html#toc",
-      "js": "dds/js/components-navigation.js",
-      "hooks": [
-        "data-dds-toc"
-      ],
-      "accessibility": "IntersectionObserver. aria-current=\"location\", not \"page\"."
-    },
-    {
-      "name": "toolbar",
-      "purpose": "A grouped row of controls above a list or editor.",
-      "notFor": "A form.",
-      "classes": [
-        ".dds-toolbar",
-        ".dds-toolbar-group",
-        ".dds-toolbar-spacer"
-      ],
-      "css": "dds/css/components-navigation.css",
-      "spec": "## Filter bar — `.dds-filterbar` · Toolbar — `.dds-toolbar`",
-      "reference": "reference/navigation.html#toolbar",
-      "accessibility": "role=toolbar only when there are enough controls to justify it."
-    },
-    {
-      "name": "topbar",
-      "purpose": "Application chrome naming the current context and its actions.",
-      "notFor": "Wayfinding between pages — use the site header.",
-      "classes": [
-        ".dds-topbar",
-        ".dds-topbar-actions",
-        ".dds-topbar-context",
-        ".dds-topbar-frame",
-        ".dds-topbar-meta",
-        ".dds-topbar-title"
-      ],
-      "css": "dds/css/components-navigation.css",
-      "spec": "## App topbar — `.dds-topbar`",
-      "reference": "reference/navigation.html#topbar",
-      "accessibility": "The context title is a real heading, so the outline reflects where the user is."
-    },
-    {
-      "name": "avatar",
-      "purpose": "A person, as an image or initials.",
-      "notFor": "An icon.",
-      "classes": [
-        ".dds-avatar",
-        ".dds-avatar-group",
-        ".dds-avatar-lg",
-        ".dds-avatar-sm"
-      ],
-      "css": "dds/css/components-content.css",
-      "spec": "## Gallery — `.dds-gallery` · Avatar — `.dds-avatar`",
-      "reference": "reference/content.html#media",
-      "accessibility": "Initials are aria-hidden; the name goes in real text."
-    },
-    {
-      "name": "byline",
-      "purpose": "Who wrote or owns something, and how to reach them.",
-      "notFor": "A general contact block.",
-      "classes": [
-        ".dds-byline",
-        ".dds-byline-body",
-        ".dds-byline-box",
-        ".dds-byline-meta",
-        ".dds-byline-name"
-      ],
-      "css": "dds/css/components-content.css",
-      "spec": "## Byline — `.dds-byline`",
-      "reference": "reference/content.html#media",
-      "accessibility": "Avatar aria-hidden, name real text. A contact link names whom it reaches."
-    },
-    {
-      "name": "chart",
-      "purpose": "A bar or donut chart.",
-      "notFor": "Precise values — use a table.",
-      "classes": [
-        ".dds-chart",
-        ".dds-chart-bar",
-        ".dds-chart-bars",
-        ".dds-chart-label",
-        ".dds-chart-row",
-        ".dds-chart-track",
-        ".dds-chart-value",
-        ".dds-donut",
-        ".dds-donut-caption",
-        ".dds-donut-wrap"
-      ],
-      "css": "dds/css/components-content.css",
-      "spec": "## Charts — `.dds-chart`, `.dds-donut`",
-      "reference": "reference/content.html#chart",
-      "accessibility": "ALWAYS accompanied by the same data as a real table. Bars are aria-hidden."
-    },
-    {
-      "name": "chip",
-      "purpose": "A removable token for an applied filter or selected value.",
-      "notFor": "A status label — use a badge.",
-      "classes": [
-        ".dds-chip",
-        ".dds-chip-label",
-        ".dds-chip-remove",
-        ".dds-chip-toggle"
-      ],
-      "css": "dds/css/components-content.css",
-      "spec": "## Chip — `.dds-chip`",
-      "reference": "reference/content.html#chip",
-      "accessibility": "The remove button names WHICH filter it removes."
-    },
-    {
-      "name": "cta",
-      "purpose": "A prominent block inviting one specific next step.",
-      "notFor": "A menu of options.",
-      "classes": [
-        ".dds-cta",
-        ".dds-cta-body",
-        ".dds-cta-title"
-      ],
-      "css": "dds/css/components-content.css",
-      "spec": "## Call to action — `.dds-cta`",
-      "reference": "reference/content.html#promotion"
-    },
-    {
-      "name": "datalist",
-      "purpose": "A list of records with two or three fields each.",
-      "notFor": "Values compared down a column — use a table.",
-      "classes": [
-        ".dds-datalist",
-        ".dds-datalist-actions",
-        ".dds-datalist-body",
-        ".dds-datalist-meta",
-        ".dds-datalist-title"
-      ],
-      "css": "dds/css/components-content.css",
-      "spec": "## Key-value list — `.dds-keyvalue` · Data list — `.dds-datalist`",
-      "reference": "reference/content.html#lists"
-    },
-    {
       "name": "download",
       "purpose": "A link to a file.",
       "notFor": "A navigation link.",
@@ -866,6 +451,51 @@
       "accessibility": "A real dl, so each figure is paired with its label."
     },
     {
+      "name": "field",
+      "purpose": "Label, control, hint, error — the form primitive.",
+      "notFor": "A control without a visible label.",
+      "classes": [
+        ".dds-field",
+        ".dds-label",
+        ".dds-label-note",
+        ".dds-input",
+        ".dds-input-code",
+        ".dds-input-group",
+        ".dds-input-group-affix",
+        ".dds-textarea",
+        ".dds-select",
+        ".dds-hint",
+        ".dds-error",
+        ".dds-error-summary",
+        ".dds-error-summary-list",
+        ".dds-error-summary-title"
+      ],
+      "css": [
+        "dds/css/components.css",
+        "dds/css/patterns.css"
+      ],
+      "spec": "## Field — `.dds-field`",
+      "reference": "reference/components.html#field",
+      "native": "input, textarea, select",
+      "accessibility": "Visible <label for>. Hint and error in one aria-describedby. Required in words. aria-invalid, never CSS :invalid."
+    },
+    {
+      "name": "fieldgroup",
+      "purpose": "Related controls under one caption.",
+      "notFor": "A single control.",
+      "classes": [
+        ".dds-fieldgroup",
+        ".dds-fieldgroup-options",
+        ".dds-fieldgroup-options-inline",
+        ".dds-legend"
+      ],
+      "css": "dds/css/components.css",
+      "spec": "## Fieldset group — `.dds-fieldgroup`",
+      "reference": "reference/components.html#choice",
+      "native": "fieldset, legend",
+      "accessibility": "Required for radio groups."
+    },
+    {
       "name": "figure",
       "purpose": "An image with a caption.",
       "notFor": "A decorative image with no caption.",
@@ -883,6 +513,20 @@
       "accessibility": "alt replaces, caption supplements. Never interchangeable."
     },
     {
+      "name": "filterbar",
+      "purpose": "Filter controls plus the chips showing what is applied.",
+      "notFor": "A search field alone.",
+      "classes": [
+        ".dds-filterbar",
+        ".dds-filterbar-applied",
+        ".dds-filterbar-controls"
+      ],
+      "css": "dds/css/components-navigation.css",
+      "spec": "## Filter bar — `.dds-filterbar` · Toolbar — `.dds-toolbar`",
+      "reference": "reference/navigation.html#toolbar",
+      "accessibility": "Applied filters must be visible as removable chips."
+    },
+    {
       "name": "gallery",
       "purpose": "A grid of lightbox triggers.",
       "notFor": "A carousel.",
@@ -892,6 +536,36 @@
       "css": "dds/css/components-content.css",
       "spec": "## Gallery — `.dds-gallery` · Avatar — `.dds-avatar`",
       "reference": "reference/content.html#lightbox"
+    },
+    {
+      "name": "icon",
+      "purpose": "A decorative glyph beside text.",
+      "notFor": "Carrying meaning on its own — the control gets the name.",
+      "classes": [
+        ".dds-icon",
+        ".dds-icon-lg",
+        ".dds-icon-sm",
+        ".dds-icon-xl"
+      ],
+      "css": [
+        "dds/css/components-content.css",
+        "dds/css/components.css"
+      ],
+      "spec": "## Icon — `.dds-icon`",
+      "reference": "reference/components.html#feedback",
+      "accessibility": "Always aria-hidden. The sprite must be inlined per document."
+    },
+    {
+      "name": "kbd",
+      "purpose": "A key or key combination.",
+      "notFor": "Code — use .dds-code.",
+      "classes": [
+        ".dds-kbd"
+      ],
+      "css": "dds/css/components.css",
+      "spec": "## Kbd — `.dds-kbd` · Divider — `.dds-divider`",
+      "reference": "reference/components.html#feedback",
+      "native": "kbd"
     },
     {
       "name": "keyvalue",
@@ -951,6 +625,66 @@
       "accessibility": "Video with speech requires <track kind=captions> (WCAG 1.2.2)."
     },
     {
+      "name": "menu",
+      "purpose": "A list of actions revealed from a button.",
+      "notFor": "Page navigation.",
+      "classes": [
+        ".dds-menu",
+        ".dds-menu-item",
+        ".dds-menu-item-danger",
+        ".dds-menu-label",
+        ".dds-menu-separator"
+      ],
+      "css": "dds/css/components-navigation.css",
+      "spec": "## Menu — `.dds-menu`",
+      "reference": "reference/navigation.html#toolbar",
+      "native": "popover",
+      "accessibility": "popover + popovertarget, no JS. Buttons/links in a list, NOT role=menu."
+    },
+    {
+      "name": "notice",
+      "purpose": "A contextual message attached to the page or a section.",
+      "notFor": "A transient confirmation — use a toast.",
+      "classes": [
+        ".dds-notice",
+        ".dds-notice-error",
+        ".dds-notice-info",
+        ".dds-notice-success",
+        ".dds-notice-title",
+        ".dds-notice-warning"
+      ],
+      "css": "dds/css/components.css",
+      "spec": "## Notice — `.dds-notice`",
+      "reference": "reference/components.html#notice",
+      "accessibility": "Role depends on WHEN it appears: none / role=status / role=alert."
+    },
+    {
+      "name": "pagination",
+      "purpose": "Navigation between pages of a list.",
+      "notFor": "Steps in a process.",
+      "classes": [
+        ".dds-pagination",
+        ".dds-pagination-gap",
+        ".dds-pagination-link"
+      ],
+      "css": "dds/css/components-navigation.css",
+      "spec": "## Pagination — `.dds-pagination`",
+      "reference": "reference/navigation.html#breadcrumb",
+      "accessibility": "Real links with hrefs. Names say where they go. aria-current=page."
+    },
+    {
+      "name": "progress",
+      "purpose": "Determinate progress.",
+      "notFor": "Indeterminate work.",
+      "classes": [
+        ".dds-progress"
+      ],
+      "css": "dds/css/components.css",
+      "spec": "## Progress — `.dds-progress`",
+      "reference": "reference/components.html#feedback",
+      "native": "progress"
+    },
+    {
       "name": "progress-ring",
       "purpose": "Determinate progress as a circle, where a bar does not fit.",
       "notFor": "Anything wide enough for a bar — a bar reads more accurately.",
@@ -980,6 +714,99 @@
       "accessibility": "figure + blockquote + figcaption. Attribution outside the quotation."
     },
     {
+      "name": "range",
+      "purpose": "A value where the exact number does not matter.",
+      "notFor": "A specific number.",
+      "classes": [
+        ".dds-range",
+        ".dds-range-row",
+        ".dds-range-value"
+      ],
+      "css": "dds/css/components-forms.css",
+      "spec": "## Range — `.dds-range`",
+      "reference": "reference/components.html#controls",
+      "native": "input[type=range]",
+      "accessibility": "Value always shown as text and announced."
+    },
+    {
+      "name": "search",
+      "purpose": "A query input and its submit button as one unit.",
+      "notFor": "A filter control — use the filter bar.",
+      "classes": [
+        ".dds-search"
+      ],
+      "css": "dds/css/components-forms.css",
+      "spec": "## Search field — `.dds-search`",
+      "reference": "reference/components.html#controls",
+      "native": "input[type=search]",
+      "accessibility": "role=\"search\" on the form. A real submit button with a name, never an unnamed magnifier."
+    },
+    {
+      "name": "segmented",
+      "purpose": "Two to four exclusive options, all visible.",
+      "notFor": "More than four, or long labels.",
+      "classes": [
+        ".dds-segmented",
+        ".dds-segmented-option"
+      ],
+      "css": "dds/css/components-forms.css",
+      "spec": "## Segmented control — `.dds-segmented`",
+      "reference": "reference/components.html#controls",
+      "accessibility": "Radio inputs: one tab stop, arrow keys. Selected changes fill AND weight."
+    },
+    {
+      "name": "sitefooter",
+      "purpose": "Grouped footer links and a closing line.",
+      "notFor": "Primary navigation.",
+      "classes": [
+        ".dds-sitefooter",
+        ".dds-sitefooter-base",
+        ".dds-sitefooter-frame",
+        ".dds-sitefooter-group",
+        ".dds-sitefooter-groups"
+      ],
+      "css": "dds/css/components-navigation.css",
+      "spec": "## Site footer — `.dds-sitefooter`",
+      "reference": "reference/navigation.html#sitefooter",
+      "accessibility": "Each group a named nav or a list under a heading."
+    },
+    {
+      "name": "siteheader",
+      "purpose": "Product name and primary navigation.",
+      "notFor": "A secondary nav.",
+      "classes": [
+        ".dds-siteheader",
+        ".dds-siteheader-actions",
+        ".dds-siteheader-brand",
+        ".dds-siteheader-frame",
+        ".dds-siteheader-toggle",
+        ".dds-primary-nav"
+      ],
+      "css": "dds/css/components-navigation.css",
+      "spec": "## Site header — `.dds-siteheader`",
+      "reference": "reference/navigation.html#siteheader",
+      "js": "dds/js/components-navigation.js",
+      "hooks": [
+        "data-dds-nav-toggle"
+      ],
+      "accessibility": "One nav, one DOM location. aria-expanded + aria-controls, not role=menu. hidden attribute."
+    },
+    {
+      "name": "skeleton",
+      "purpose": "A placeholder whose shape is known before its data.",
+      "notFor": "Content that has arrived.",
+      "classes": [
+        ".dds-skeleton",
+        ".dds-skeleton-block",
+        ".dds-skeleton-text",
+        ".dds-skeleton-title"
+      ],
+      "css": "dds/css/components.css",
+      "spec": "## Skeleton — `.dds-skeleton`",
+      "reference": "reference/components.html#feedback",
+      "accessibility": "aria-hidden; the region carries aria-busy."
+    },
+    {
       "name": "specs",
       "purpose": "A longer, homogeneous list of properties and values.",
       "notFor": "A handful of pairs in a summary — use the key-value list.",
@@ -991,6 +818,100 @@
       "reference": "reference/content.html#lists",
       "native": "dl",
       "accessibility": "A real dl. The leader dots are generated content, so they are not read aloud."
+    },
+    {
+      "name": "spinner",
+      "purpose": "Indeterminate progress.",
+      "notFor": "Communicating progress on its own.",
+      "classes": [
+        ".dds-spinner"
+      ],
+      "css": "dds/css/components.css",
+      "spec": "## Spinner — `.dds-spinner`",
+      "reference": "reference/components.html#feedback",
+      "accessibility": "aria-hidden. Pair with text in a role=status region. Non-moving fallback under reduced motion."
+    },
+    {
+      "name": "stepper",
+      "purpose": "A quantity the user adjusts rather than types once.",
+      "notFor": "A value typed once.",
+      "classes": [
+        ".dds-stepper",
+        ".dds-stepper-button"
+      ],
+      "css": "dds/css/components-forms.css",
+      "spec": "## Stepper — `.dds-stepper`",
+      "reference": "reference/components.html#controls",
+      "js": "dds/js/components-forms.js",
+      "hooks": [
+        "data-dds-stepper"
+      ],
+      "native": "input[type=number]",
+      "accessibility": "Buttons disable at the limits; the new value is announced."
+    },
+    {
+      "name": "steps",
+      "purpose": "Position within a multi-step process.",
+      "notFor": "A hierarchy — use a breadcrumb.",
+      "classes": [
+        ".dds-steps",
+        ".dds-steps-frame",
+        ".dds-step",
+        ".dds-step-status"
+      ],
+      "css": "dds/css/components-navigation.css",
+      "spec": "## Step progress — `.dds-steps`",
+      "reference": "reference/navigation.html#steps",
+      "accessibility": "Status in words. aria-current=step. Upcoming steps are never links."
+    },
+    {
+      "name": "switch",
+      "purpose": "A setting that takes effect immediately.",
+      "notFor": "A value submitted with a form — use a checkbox.",
+      "classes": [
+        ".dds-switch",
+        ".dds-switch-track"
+      ],
+      "css": "dds/css/components.css",
+      "spec": "## Switch — `.dds-switch`",
+      "reference": "reference/components.html#choice",
+      "accessibility": "role=\"switch\" over a real checkbox. Forced colours: border weight changes."
+    },
+    {
+      "name": "table",
+      "purpose": "Tabular data.",
+      "notFor": "Layout.",
+      "classes": [
+        ".dds-table",
+        ".dds-table-interactive",
+        ".dds-table-numeric",
+        ".dds-table-sticky",
+        ".dds-table-wrap",
+        ".dds-table-zebra"
+      ],
+      "css": "dds/css/components.css",
+      "spec": "## Table — `.dds-table`",
+      "reference": "reference/components.html#table",
+      "native": "table",
+      "accessibility": "th scope, a caption, and a focusable named wrapper for overflow."
+    },
+    {
+      "name": "tabs",
+      "purpose": "Alternative views of one thing.",
+      "notFor": "Content that should be readable in sequence or linkable.",
+      "classes": [
+        ".dds-tabs",
+        ".dds-tablist",
+        ".dds-tab"
+      ],
+      "css": "dds/css/components.css",
+      "spec": "## Tabs — `.dds-tabs`",
+      "reference": "reference/components.html#tabs",
+      "js": "dds/js/components.js",
+      "hooks": [
+        "data-dds-tabs"
+      ],
+      "accessibility": "One tab stop, arrow keys, Home/End. aria-selected + hidden are the state."
     },
     {
       "name": "teaser",
@@ -1007,6 +928,130 @@
       "spec": "## Teaser — `.dds-teaser`",
       "reference": "reference/content.html#promotion",
       "accessibility": "Link wraps the heading text; the card grows the hit area."
+    },
+    {
+      "name": "theme-toggle",
+      "purpose": "Switching between light and dark, styled as a text link.",
+      "notFor": "Any other binary setting — use a switch.",
+      "classes": [
+        ".dds-theme-toggle",
+        ".dds-theme-toggle-icon",
+        ".dds-theme-toggle-label",
+        ".dds-theme-toggle-moon",
+        ".dds-theme-toggle-sun"
+      ],
+      "css": "dds/css/components-forms.css",
+      "js": "dds/js/dds.js",
+      "hooks": [
+        "data-dds-theme-toggle"
+      ],
+      "spec": "## Theme toggle — `.dds-theme-toggle`",
+      "reference": "reference/components.html#controls",
+      "accessibility": "An action button: the label and accessible name describe the NEXT state, so there is NO aria-pressed. Combining a changing name with aria-pressed double-encodes the state. Both icons are in the markup; CSS chooses."
+    },
+    {
+      "name": "toast",
+      "purpose": "Confirming something that just happened.",
+      "notFor": "Anything the user must read or act on.",
+      "classes": [
+        ".dds-toast",
+        ".dds-toast-close",
+        ".dds-toast-error",
+        ".dds-toast-info",
+        ".dds-toast-region",
+        ".dds-toast-success",
+        ".dds-toast-warning"
+      ],
+      "css": "dds/css/components.css",
+      "spec": "## Toast — `DDS.toast()`",
+      "reference": "reference/components.html#feedback",
+      "js": "dds/js/components.js",
+      "accessibility": "role=status region. Timer pauses on hover and focus. duration 0 stays."
+    },
+    {
+      "name": "toc",
+      "purpose": "In-page anchor navigation for a long document.",
+      "notFor": "Site navigation.",
+      "classes": [
+        ".dds-toc",
+        ".dds-toc-sticky",
+        ".dds-toc-title"
+      ],
+      "css": "dds/css/components-navigation.css",
+      "spec": "## Table of contents — `.dds-toc`",
+      "reference": "reference/navigation.html#toc",
+      "js": "dds/js/components-navigation.js",
+      "hooks": [
+        "data-dds-toc"
+      ],
+      "accessibility": "IntersectionObserver. aria-current=\"location\", not \"page\"."
+    },
+    {
+      "name": "toolbar",
+      "purpose": "A grouped row of controls above a list or editor.",
+      "notFor": "A form.",
+      "classes": [
+        ".dds-toolbar",
+        ".dds-toolbar-group",
+        ".dds-toolbar-spacer"
+      ],
+      "css": "dds/css/components-navigation.css",
+      "spec": "## Filter bar — `.dds-filterbar` · Toolbar — `.dds-toolbar`",
+      "reference": "reference/navigation.html#toolbar",
+      "accessibility": "role=toolbar only when there are enough controls to justify it."
+    },
+    {
+      "name": "tooltip",
+      "purpose": "Supplementary text for a control that already has a name.",
+      "notFor": "Essential information.",
+      "classes": [
+        ".dds-tooltip"
+      ],
+      "css": "dds/css/components.css",
+      "spec": "## Tooltip — `.dds-tooltip`",
+      "reference": "reference/components.html#feedback",
+      "native": "popover",
+      "accessibility": "popover gives the WCAG 1.4.13 dismiss behaviour."
+    },
+    {
+      "name": "topbar",
+      "purpose": "Application chrome naming the current context and its actions.",
+      "notFor": "Wayfinding between pages — use the site header.",
+      "classes": [
+        ".dds-topbar",
+        ".dds-topbar-actions",
+        ".dds-topbar-context",
+        ".dds-topbar-frame",
+        ".dds-topbar-meta",
+        ".dds-topbar-title"
+      ],
+      "css": "dds/css/components-navigation.css",
+      "spec": "## App topbar — `.dds-topbar`",
+      "reference": "reference/navigation.html#topbar",
+      "accessibility": "The context title is a real heading, so the outline reflects where the user is."
+    },
+    {
+      "name": "upload",
+      "purpose": "Choosing files.",
+      "notFor": "The only route being drag and drop.",
+      "classes": [
+        ".dds-upload",
+        ".dds-upload-item",
+        ".dds-upload-item-name",
+        ".dds-upload-item-remove",
+        ".dds-upload-item-size",
+        ".dds-upload-list",
+        ".dds-upload-zone"
+      ],
+      "css": "dds/css/components-forms.css",
+      "spec": "## Upload — `.dds-upload`",
+      "reference": "reference/components.html#controls",
+      "js": "dds/js/components-forms.js",
+      "hooks": [
+        "data-dds-upload"
+      ],
+      "native": "input[type=file]",
+      "accessibility": "accept must match the prose. Drag and drop is additive (WCAG 2.5.7)."
     }
   ],
   "patterns": [
@@ -1197,7 +1242,7 @@
     },
     {
       "name": "auth",
-      "purpose": "Signing in, and recovering access.",
+      "purpose": "Signing in, and recovering access: sign-in, a one-time code, and a password reset in three steps (request, code, new password).",
       "notFor": "A general form.",
       "classes": [
         ".dds-auth",
@@ -1211,9 +1256,13 @@
       "reference": "reference/patterns.html#auth",
       "js": "dds/js/patterns/auth.js",
       "hooks": [
-        "data-dds-password-toggle"
+        "data-dds-password-toggle",
+        "data-dds-password-confirm",
+        "data-dds-password-new",
+        "data-dds-password-repeat",
+        "data-dds-password-match"
       ],
-      "accessibility": "WCAG 2.2 3.3.8. Password managers must work. Never block paste. One field for a one-time code."
+      "accessibility": "WCAG 2.2 3.3.8 Accessible Authentication. `autocomplete=\"new-password\"` on BOTH password fields, so a manager can generate and save; `off` on either one disables the manager rather than the autofill. Never block paste. One field for a code, never six boxes. The reset code is alphanumeric with `inputmode=\"text\"` — a numeric keypad cannot type letters. A mismatch is reported once the confirmation is at least as long as the first entry or the field is left, via `role=\"status\"`, and the text is only rewritten when it changes so it is not repeated per keystroke. Never a clickable reset link in the email: a bearer credential in an inbox is forwarded, pre-fetched by mail scanners, and lands the user in a different browser. Identical response and timing whether or not an account exists."
     },
     {
       "name": "filtering",

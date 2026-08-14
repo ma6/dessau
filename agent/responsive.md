@@ -73,25 +73,60 @@ rather than on available space:
 
 ---
 
-## No breakpoint proliferation
+## Four named breakpoints, and no proliferation
 
-There is no global breakpoint scale, deliberately. A component states the width at
-which **its own** layout stops working, in `rem`, next to the rule that changes.
+Two different things, and both are true.
 
-Values in use, and why each:
+**There are four named breakpoints**, in `primitives.css`, for the page shell:
 
-| Width | Component | Because |
+| Token | Value | For |
 | --- | --- | --- |
-| 26rem | Address locality row | Postcode + locality fit side by side |
-| 34rem | Step progress | Four steps fit horizontally |
-| 40rem | Text-media, footer groups | Two columns of readable text |
-| 48rem | Site header | Four nav links plus brand and actions |
-| 52rem | Filtering | A 16rem sidebar plus usable results |
-| 30rem (max) | Dialog sheet | Phone-sized, viewport-dependent |
-| 64rem | Reference page shell | Sidebar plus content, viewport-dependent |
+| `--dds-breakpoint-phone` | 30rem / 480px | one hand, one column |
+| `--dds-breakpoint-tablet` | 48rem / 768px | two columns of readable text fit |
+| `--dds-breakpoint-laptop` | 64rem / 1024px | a sidebar plus content fits |
+| `--dds-breakpoint-desktop` | 80rem / 1280px | a third region fits |
 
-Each is derived from **content**, not from a device. Nobody designs for "tablet";
-they design for "two columns of this text stop being readable below here".
+They exist so the shell has a documented set to choose from and so a conversation has
+vocabulary — "this breaks at tablet" instead of a number someone picked. They are for
+the page shell and for the genuinely device-dependent cases: reachability by thumb,
+print, orientation.
+
+**A component does not use them.** A component responds to its container, and its
+switching point comes from its own content — the width at which two columns of *its*
+text stop being readable, or *its* labels stop fitting beside *its* controls. That
+width has no relationship to any device and must not be rounded to one. Nobody designs
+for "tablet"; they design for "two columns of this text stop being readable below
+here".
+
+So the four are a vocabulary for the shell, not a grid every component snaps to. That
+is the distinction the old wording missed by claiming there was no scale at all.
+
+### A custom property cannot be used in a query
+
+```css
+@media (min-width: var(--dds-breakpoint-tablet))   /* does NOT work */
+```
+
+A query condition is evaluated before custom properties are resolved, so the value is
+never substituted and the query simply never matches — silently, with no error. Every
+query writes its own literal, which means the named set is documentation rather than
+something the browser enforces.
+
+Two things keep it honest:
+
+- `scripts/build-foundations.mjs` extracts every width actually used into
+  `dds/foundations.json` under `breakpoints.inUse`, so the documented set and the used
+  set can be compared rather than trusted.
+- `scripts/sync-breakpoints.mjs` generates the table on
+  `reference/foundations.html` from the stylesheets, including the reason from the
+  comment above each query. Hand-writing that table produced three wrong rows on the
+  first attempt.
+
+### Every threshold states its reason
+
+Next to the query, in a comment — not in a central document that drifts from it. A
+threshold with no stated reason is a number nobody can safely change, and seven of the
+nine in use had none until the generator asked for them.
 
 ---
 
@@ -137,9 +172,9 @@ must be neutral there — by leaving the rule out, not by resetting it.
 **A component with width-dependent behaviour gets a sentence describing it**, in a
 fixed place: a `.ref-note` immediately after the specimen on the reference page.
 
-A fixed location, rather than "somewhere in the prose". The source this was learned
-from had such a note on roughly a third of its components, scattered between body
-text, do/don't blocks and nowhere at all. A consistent slot is what makes its
+A fixed location, rather than "somewhere in the prose". Scattered between body
+text, a do/don't block and nowhere at all, such a note is impossible to audit — you
+cannot see which components are missing one. A consistent slot is what makes its
 absence visible.
 
 ---

@@ -16,9 +16,9 @@ Assessed on: readability, accessibility, suitability for interface work,
 character, language coverage, available weights, variable-font support, and web
 performance.
 
-Dessau does not inherit its typography: one of its faces was
-commercially licensed and not redistributable, and reusing the other would have
-tied Dessau's identity to something it is meant to be independent of.
+Redistributability is a hard requirement, not a preference: a foundation whose
+typography cannot travel with it is a foundation that has to be re-decided by every
+product that uses it.
 
 ---
 

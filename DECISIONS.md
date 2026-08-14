@@ -183,10 +183,9 @@ unannounced error is the worst outcome available.
 `index.json`, and points at the rendered pages by anchor. There is no parallel set
 of agent-facing rendered pages.
 
-**Why.** The source this was generalised from maintained two rendered
-representations and had to keep them in sync by hand. Two copies of every component
-drift, and the drift always shows up in the ARIA attributes — which is precisely
-the part someone copies without checking.
+**Why.** Two rendered representations of the same component have to be kept in
+sync by hand, and hand-synced copies drift. The drift shows up in the ARIA
+attributes first — which is precisely the part someone copies without reading.
 
 **Consequence.** `check-agent-index.mjs` verifies that every entry in `index.json`
 resolves to real classes, real files, real hooks and a real specification section —
@@ -382,3 +381,105 @@ describe the architectural layer, which is the useful distinction; `tokens` name
 the mechanism, which is the least interesting thing about them.
 
 See `LESSONS_LEARNED.md`.
+
+---
+
+## 018 — Registration is self-sufficient, so script order cannot break anything
+
+**Decision.** `DDS.register(name, selector, setup)` enhances matching elements
+immediately if the initial document sweep has already run. The sweep itself is bound
+to `DOMContentLoaded`, never to `readyState === 'loading'`.
+
+**Why.** A deferred script executes after parsing, when `document.readyState` is
+already `"interactive"`. Testing for `"loading"` therefore always took the
+else branch and swept the document the instant `dds.js` finished — before
+`components.js` and before every pattern file had registered. The registry was
+empty; **nothing on any page was ever enhanced**, silently, because progressive
+enhancement means the markup works without it.
+
+**Why the condition was not simply corrected.** Correcting it makes the current
+script order work. Making registration self-sufficient makes *every* order work,
+including a lazily loaded pattern and a product registering its own enhancement from
+application code. Dessau is dropped in as plain script tags with no bundler to
+guarantee order, so order must not be load-bearing.
+
+**Verified by.** `tests/enhancement.spec.mjs`. No static check can find this: the
+registry is only empty at one moment during page load.
+
+---
+
+## 019 — The reference is verified, not maintained
+
+**Decision.** `scripts/check-reference.mjs` is a release gate. It checks that every
+indexed component is *rendered* on its reference page, that anchors resolve, that
+every `--dds-*` name printed is one the CSS declares, that assets load, that markup
+nests correctly, that a forced `data-theme` has a rule to match, that flex components
+carry their `-body` wrapper, and that generated blocks are not stale.
+
+**Why.** The reference is read as authoritative, so a page that has drifted is worse
+than a missing one: a gap prompts a look at the CSS, a wrong page is simply believed.
+Twelve components were documented with no rendered example anywhere, and the previous
+check passed all of them — it verified the page *existed*.
+
+**Consequence.** Two blocks are generated rather than written: the breakpoint
+threshold table (`sync-breakpoints.mjs`) and the icon gallery (rendered from the
+sprite at runtime). Both had been hand-written, and both were wrong.
+
+---
+
+## 020 — The theme is overridable in both directions
+
+**Decision.** Light values are declared on `:root, [data-theme="light"]`, not on
+`:root` alone.
+
+**Why.** Custom properties inherit, so a subtree marked with a theme that has no rule
+keeps whatever the root set. With only `[data-theme="dark"]` declared, a panel forced
+to light inside a dark page matched nothing and stayed dark — rendering correctly, in
+the wrong theme, next to a label saying "Light". It worked in light mode, which is why
+looking at it did not find it.
+
+**Cost.** Both extractors (`build-foundations.mjs`, `check-contrast.mjs`) anchor their
+selector match to the start of a line and now accept a selector list. Both failed
+loudly on the change, which was the right behaviour.
+
+**Verified by.** `tests/theme-scoping.spec.mjs`, which asserts the values resolve
+differently *and* the right way round — comparing them only proves they differ, and a
+swapped pair would pass that.
+
+---
+
+## 021 — Icons are a foundation, and never a character
+
+**Decision.** The icon set lives in `reference/foundations.html`, alongside colour and
+type. Every icon is a `<use>` into the inlined sprite;
+`scripts/check-icons.mjs` fails the build on a Unicode glyph, an emoji, or a
+`content:` escape used as a picture.
+
+**Why a glyph is not an icon.** A screen reader announces it — `×` on a close button
+is read as "multiplication sign". It renders in whatever font happens to have it, so
+weight, baseline and optical size are all wrong and shift when the font stack falls
+through differently. Coverage is not guaranteed, and a missing glyph is a tofu box on
+exactly the platform nobody tested. The sprite has none of those problems: it is
+`currentColor`, it is `aria-hidden`, and the label lives in text.
+
+**What the check also catches.** A `<use>` naming a symbol not present on the page
+renders as *nothing at all* — no error, no fallback, just empty space in a page full
+of working icons. It also reports a symbol no page uses, which is how `chevron-up`
+was found to be dead weight: a disclosure rotates `chevron-down` by 180°, so the
+second glyph never had a caller.
+
+---
+
+## 022 — Optical alignment is derived, never tuned
+
+**Decision.** An icon beside text gets `block-size: 1lh` and
+`align-self: flex-start`, not a hand-picked `margin-block-start`.
+
+**Why.** `1lh` makes the icon's box exactly one line tall, and an SVG's default
+`preserveAspectRatio` centres the square glyph inside it — correct at any font size,
+any line height, and in a language whose default leading differs. The `0.15em` it
+replaced was measured by eye at one size and sat visibly high everywhere else.
+
+**Same reasoning, elsewhere.** `.dds-choice > input` centres on its label's first line
+the same way. Sizing a native checkbox is not an option, so the box moves rather than
+the control.

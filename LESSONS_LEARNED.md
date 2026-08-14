@@ -205,23 +205,23 @@ list was the right answer.
 
 ---
 
-## Ask before generalising away breadth
+## Agree what is being dropped before dropping it
 
-A first pass reduced roughly seventy-eight source components to about forty, on the
-principle that a small excellent foundation beats a large catalogue.
+A first pass through the component set cut it roughly in half, on the principle that
+a small excellent foundation beats a large catalogue.
 
-That principle is right and the application was wrong. The things cut were not
-speculative features — they were solved problems with their accessibility work
-already done: the width switcher that makes anyone actually look at the narrow
-state, the full WCAG catalogue organised by check frequency, the writing standard as
-its own layer, and around twenty genuinely reusable components.
+That principle is right and the application was wrong. What got cut was not
+speculative — it was solved problems with their accessibility work already done: the
+width switcher that makes anyone actually look at the narrow state, the full WCAG
+catalogue organised by check frequency, the writing standard as its own layer, and
+around twenty genuinely reusable components.
 
 Rebuilding them cost far more than keeping them would have.
 
-**Do:** when scoping a foundation, inventory the surface explicitly — *keep and
-generalise / convert to pattern / rewrite / remove* — and get the removals agreed
-before writing anything. "Small and excellent" is about not inventing speculative
-features. It is not a licence to discard proven ones.
+**Do:** when reducing a set of components, classify every one explicitly — *keep /
+convert to pattern / rewrite / remove* — and get the removals agreed **before**
+writing anything. "Small and excellent" is about not inventing speculative features.
+It is not a licence to discard proven ones.
 
 ---
 
@@ -237,3 +237,131 @@ class that does nothing. Missing context at least prompts someone to look.
 hooks, specification sections — is checked against the implementation, in both
 directions: an entry that no longer resolves **and** a component in the CSS that no
 entry covers.
+
+---
+
+## A check that verifies the wrong thing is indistinguishable from one that works
+
+`check-agent-index.mjs` verified that every documented component had a `reference`
+page and that the page existed. Every entry passed for weeks. Twelve components had
+no rendered example anywhere in the repository.
+
+The check was answering "does the file exist" while claiming to answer "can this be
+seen to work". Both produce a green line of output.
+
+The same shape appeared three more times in one afternoon:
+
+- The contrast checker located the dark-theme block with `indexOf('[data-theme="dark"]')`,
+  which matched the mention of that selector in the file's own header comment. It
+  read an empty token set and silently compared the light values against
+  themselves — 148 pairs, all passing, all the same theme twice.
+- A class-presence check matched `\bdds-banner\b`. A hyphen is a non-word character,
+  so `dds-banner-info` matched too: a page showing four variants looked like it
+  showed thirteen roots, and two genuinely missing components stayed hidden.
+- A breakpoint check required the CSS value to appear as a literal on the
+  foundations page. `64rem` passed only because the generated threshold table
+  happened to contain a 64rem row; `80rem` failed on a page that was entirely
+  correct.
+
+**Do:** when writing a check, deliberately break the thing it is meant to catch and
+confirm it goes red. A check that has never failed has not been tested — it has only
+been observed to pass, which is the same output.
+
+**Do:** be suspicious of a check that passes on the first run. Both the contrast bug
+and the demo-coverage gap announced themselves as clean.
+
+---
+
+## The most expensive bug was three characters of state name
+
+`enhance(document)` was guarded like this:
+
+```js
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', function () { enhance(document); });
+} else {
+  enhance(document);
+}
+```
+
+A deferred script runs *after* parsing finishes, when `readyState` is already
+`"interactive"` — never `"loading"`. So the else branch ran every time, sweeping the
+document the instant `dds.js` finished executing: before `components.js`, before
+every pattern file, before anything had called `register`. The registry was empty.
+
+**Nothing on any page was ever enhanced.** No error, no warning. The combobox never
+became a combobox, the lightbox never got its magnifier, the validation never ran,
+the scroll lock never engaged. Several of those were reported separately as
+individual broken components, and each was investigated as its own bug.
+
+Progressive enhancement is what made it invisible: the markup works on its own, so a
+page with zero enhancement still renders, still submits, still navigates. The
+property that makes the architecture robust is the same property that hid a total
+failure of it.
+
+**Do:** the fix was not to correct the condition. It was to make registration
+self-sufficient — a `register()` call arriving after the initial sweep enhances
+matching elements immediately. Load order now cannot decide whether anything works,
+which is what a system dropped in as plain script tags needs.
+
+**Do:** assert on the observable consequence in a browser. `tests/enhancement.spec.mjs`
+checks that elements which opted in are actually marked as enhanced. No static check
+can find this — the registry is only empty at one particular moment during load.
+
+---
+
+## Flex does not lay out text
+
+`.ref-note` was `display: flex` with a `gap`, to sit an icon beside a sentence.
+Every child of a flex container becomes a flex item, *including each inline element
+and each run of text between them*. A sentence containing four `<code>` spans came
+out as eleven items with a gap between all of them — the words strewn across two
+ragged columns with the numbers boxed out on their own.
+
+It was reported as "the notes look strange", and it reads as a font or a wrapping
+problem. Nothing points at the layout mode.
+
+**Do:** a container that holds prose is a block. Put the icon out of flow —
+`position: absolute` — rather than making it a sibling item of the text. Components
+that genuinely are flex rows (`.dds-notice`, `.dds-banner`) define a `-body` wrapper
+for their text, and `check-reference.mjs` now verifies every instance has one.
+
+---
+
+## Hand-tuned optical alignment is a number that will be wrong somewhere
+
+An icon beside text was aligned with `margin-block-start: 0.15em`, derived by eye at
+one font size. At every other size and line height it sat visibly high — most
+obviously in a validation message, which is where it was finally noticed.
+
+`block-size: 1lh` makes the icon's box exactly one line tall, and an SVG's default
+`preserveAspectRatio` centres the glyph inside it. The alignment is then correct by
+construction, at any size, any leading, and in a language whose default leading
+differs.
+
+**Do:** prefer a rule that derives the value from the context over a constant that
+happened to look right in the context it was measured in.
+
+---
+
+## Generated beats written, wherever the content is derivable
+
+A hand-written table of component breakpoint thresholds had three wrong rows within
+the hour of being written — the content navigation listed at 48rem when its query
+says 64rem, and two rows naming components that had nothing to do with the width
+beside them. A hand-written icon gallery was a list of 24 `<use>` elements whose
+completeness was nobody's job, with a caption stating the exact opposite of how the
+icons work.
+
+Neither produced any signal. A wrong table looks exactly like a right one, and a
+gallery of icons looks complete by definition.
+
+**Do:** derive it. `sync-breakpoints.mjs` generates the threshold table from the
+stylesheets, including the rationale from the comment above each query; the icon
+gallery renders from the `<symbol>` elements present in the page. What cannot be
+derived — *why* 34rem and not 32rem — is written once, next to the thing it explains,
+and pulled from there.
+
+**Do:** when generation surfaces a gap, fix the gap rather than the generator. Seven
+of nine thresholds turned out to have no stated reason at all. A threshold nobody can
+justify is a number nobody can safely change.

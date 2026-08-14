@@ -34,9 +34,11 @@ shared URL. See `agent/architecture.md` → Distribution.
 <body>
   <a class="dds-skip-link" href="#main">Zum Hauptinhalt springen</a>
 
-  <!-- The icon sprite, inlined once. Copy it from dds/icons/icons.svg, or run
-       scripts/sync-icons.mjs against your own pages. An external <use href> breaks
-       currentColor silently. -->
+  <!-- The icon sprite goes between these markers. Fill them in with:
+         node libs/dessau/scripts/sync-icons.mjs --dir=.
+       An external <use href="icons.svg#…"> breaks currentColor silently. -->
+  <!-- DDS_ICON_SPRITE:START -->
+  <!-- DDS_ICON_SPRITE:END -->
 
   <header>…</header>
   <main id="main">…</main>
@@ -49,7 +51,25 @@ shared URL. See `agent/architecture.md` → Distribution.
 </html>
 ```
 
-## 3. Set the locale
+## 3. Inline the icon sprite
+
+```bash
+node libs/dessau/scripts/sync-icons.mjs --dir=.
+node libs/dessau/scripts/sync-icons.mjs --dir=. --check   # in CI
+```
+
+The markers in the shell above are where it goes. Then reference icons by role:
+
+```html
+<svg class="dds-icon" aria-hidden="true"><use href="#dds-icon-check"/></svg>
+```
+
+The script also reports any `<use>` pointing at an icon that does not exist — a typo
+there renders nothing at all, with no error anywhere.
+
+Re-run it whenever Dessau is updated.
+
+## 4. Set the locale
 
 German is the default. Only call this if the product is not German:
 
@@ -57,7 +77,7 @@ German is the default. Only call this if the product is not German:
 DDS.format.setLocale('en-GB');
 ```
 
-## 4. Give agents the context
+## 5. Give agents the context
 
 Copy `agent/consumer-AGENTS.template.md` into the product as `AGENTS.md`, fill in
 the paths, and add the product's own rules below the Dessau section. Point
@@ -66,14 +86,14 @@ the paths, and add the product's own rules below the Dessau section. Point
 Without this, an agent working in that repository does not know Dessau exists and
 will invent a second button style, use raw hex values and write its own ARIA.
 
-## 5. Decide two things, and write them down
+## 6. Decide two things, and write them down
 
 - **Dark mode.** It works automatically once semantic values are used. Skipping it
   is therefore a deliberate decision to record, not a silent omission.
 - **Form of address.** German *Sie* or *Du*; one choice, never mixed. See
   `agent/ux-writing.md` → level 3.
 
-## 6. Before shipping
+## 7. Before shipping
 
 - `python3 -m http.server` and check **both themes**.
 - Keyboard only, mouse unplugged.

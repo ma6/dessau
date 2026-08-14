@@ -17,6 +17,55 @@ Principles → Foundations → Components → Patterns → Products
 
 ---
 
+## Set up a development machine
+
+Assumes macOS with [Homebrew](https://brew.sh). Nothing here is needed to *use*
+Dessau in a product — that has no dependencies at all. This is for working on
+Dessau itself: the checks, the generated files and the browser tests.
+
+```bash
+# Node — runs the checks and the generators. Node 20 or newer.
+brew install node
+
+# GitHub CLI — issues and pull requests from the terminal.
+brew install gh
+gh auth login
+
+# Playwright — the browser tests. The npm package first, then the browsers,
+# which are a separate ~500 MB download and not part of the package.
+npm install
+npx playwright install chromium webkit
+```
+
+Check it worked:
+
+```bash
+node --version          # v20 or newer
+gh auth status          # logged in
+npx playwright --version
+```
+
+Then run everything:
+
+```bash
+npm run check           # every static gate
+npx playwright test     # the browser tests
+```
+
+Playwright puts its browsers in `~/Library/Caches/ms-playwright` on macOS. To keep
+them inside the repository instead — useful if a sandbox cannot read your home
+directory:
+
+```bash
+PLAYWRIGHT_BROWSERS_PATH=.playwright-browsers npx playwright install chromium webkit
+```
+
+`.playwright-browsers/` is git-ignored. Set the same variable when running the
+tests, or they will look in the default location and report the browsers as
+missing.
+
+---
+
 ## Look at it
 
 ```bash
@@ -39,10 +88,27 @@ over HTTP.
 
 ---
 
-## Use it
+## Start a new project
 
-One stylesheet, and two scripts if you want the behaviour. No build step, no
-dependencies, no framework.
+Seven steps. No build step, no dependencies, no framework.
+
+### 1. Bring Dessau in
+
+Pinned and local — never loaded at runtime from a shared URL, so a change here can
+never reach your product untested. ([Why](agent/architecture.md#distribution-a-pinned-artefact-not-a-live-endpoint))
+
+```bash
+# Recommended: a submodule, pinned to a commit
+git submodule add <dessau-url> libs/dessau
+
+# Or copy it in. Simpler to start, updates pulled by hand. Fine for a prototype.
+cp -R <dessau>/dds libs/dessau/dds
+```
+
+Only `dds/` is needed at runtime. `agent/`, `docs/`, `reference/` and `scripts/`
+are for working *on* Dessau and for reading.
+
+### 2. The page shell
 
 ```html
 <!DOCTYPE html>
@@ -50,27 +116,160 @@ dependencies, no framework.
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Specific page name — Product</title>
+  <meta name="color-scheme" content="dark light">
 
-  <!-- Blocking, in <head>, before any stylesheet: sets the theme before the first
-       paint. Any later and the page flashes on every navigation. -->
-  <script src="/dds/js/theme-init.js"></script>
-  <link rel="stylesheet" href="/dds/dds.css">
+  <!-- BLOCKING, and before any stylesheet. Sets the theme before the first paint;
+       any later and the page flashes on every navigation. Do not add defer. -->
+  <script src="/libs/dessau/dds/js/theme-init.js"></script>
+
+  <link rel="stylesheet" href="/libs/dessau/dds/dds.css">
+
+  <!-- Your own CSS last, and UNLAYERED. It then overrides anything in Dessau with
+       no !important and no specificity fight. -->
+  <link rel="stylesheet" href="/assets/product.css">
 </head>
 <body>
-  <!-- Inline the icon sprite once per document — see dds/icons/icons.svg. -->
+  <a class="dds-skip-link" href="#main">Zum Hauptinhalt springen</a>
 
-  <main>…</main>
+  <!-- DDS_ICON_SPRITE:START -->
+  <!-- DDS_ICON_SPRITE:END -->
 
-  <script src="/dds/js/dds.js" defer></script>
-  <script src="/dds/js/components.js" defer></script>
+  <header>…</header>
+  <main id="main">…</main>
+  <footer>…</footer>
+
+  <script src="/libs/dessau/dds/js/dds.js" defer></script>
+  <script src="/libs/dessau/dds/js/format.js" defer></script>
+  <script src="/libs/dessau/dds/js/components.js" defer></script>
 </body>
 </html>
 ```
 
-**Every component renders correctly with CSS alone.** The scripts add behaviour the
-platform does not provide; they are never what makes a page work.
+Two load-order rules, both load-bearing: **`theme-init.js` is synchronous and in
+`<head>`**, and **`dds.js` comes before every other Dessau script**.
 
-Full setup: [`agent/recipes/new-product.md`](agent/recipes/new-product.md).
+### 3. Inline the icon sprite
+
+Those two markers in the shell are where the sprite goes. Fill them in:
+
+```bash
+node libs/dessau/scripts/sync-icons.mjs --dir=.
+node libs/dessau/scripts/sync-icons.mjs --dir=. --check   # in CI
+```
+
+Then reference an icon by role:
+
+```html
+<svg class="dds-icon" aria-hidden="true"><use href="#dds-icon-check"/></svg>
+```
+
+**The sprite must be inlined, not linked.** `<use href="icons.svg#…">` pointing at a
+file breaks `currentColor` silently — the icon renders, in black, regardless of
+theme. Re-run the command whenever you update Dessau.
+
+### 4. Load only the behaviour you use
+
+Every component renders correctly with **CSS alone**. These add behaviour the
+platform does not provide.
+
+| Script | Gives you |
+| --- | --- |
+| `js/dds.js` | **Required by all the others.** `register` / `enhance` / `announce` / `theme` |
+| `js/format.js` | `DDS.format` — numbers, dates, currency, file sizes |
+| `js/components.js` | Dialog opener, tabs, `DDS.toast()`, copy-to-clipboard |
+| `js/components-forms.js` | Number stepper, file upload, character count |
+| `js/components-navigation.js` | Header disclosure, table of contents |
+| `js/components-content.js` | Lightbox, consent embed |
+| `js/patterns/combobox.js` | Autocomplete |
+| `js/patterns/address-search.js` | Address search — **needs `combobox.js`** |
+| `js/patterns/form-validation.js` | Accessible validation and error summary |
+| `js/patterns/conditional-fields.js` | Fields revealed by an earlier answer |
+| `js/patterns/wizard.js` | Multi-step form |
+| `js/patterns/derived-output.js` | A read-only value resolved from input |
+| `js/patterns/auth.js` | Password reveal toggle |
+
+All `defer`, all in that order. Adding markup later? `DDS.enhance(element)` — that
+is the whole integration for dynamic content.
+
+### 5. Set the locale
+
+German is the default. Only call this if your product is not German:
+
+```js
+DDS.format.setLocale('en-GB');
+```
+
+```js
+DDS.format.currency(1234.56);       // 1.234,56 €
+DDS.format.dateLong('2026-08-01');  // 1. August 2026
+DDS.format.parseNumber('1.234,56'); // 1234.56  — never use parseFloat
+```
+
+### 6. Give agents the context
+
+```bash
+cp libs/dessau/agent/consumer-AGENTS.template.md AGENTS.md
+# fill in the [PATH] placeholders, then point CLAUDE.md at it
+```
+
+Do this. Without it an agent working in your repository does not know Dessau exists,
+and will invent a second button style, use raw hex values, write its own ARIA, and
+rebuild a pattern that already exists.
+
+### 7. Decide two things, and write them down
+
+- **Dark mode.** It works automatically once you use semantic values. Skipping it is
+  therefore a deliberate decision to record, not a silent omission.
+- **Form of address.** German *Sie* or *Du* — one choice, never mixed within an
+  interface. ([Why it belongs to you](agent/ux-writing.md#the-three-levels))
+
+---
+
+### Your first component
+
+```html
+<div class="dds-field">
+  <label class="dds-label" for="email">
+    E-Mail-Adresse <span class="dds-label-note">(erforderlich)</span>
+  </label>
+  <input class="dds-input" id="email" name="email" type="email"
+         autocomplete="email" required aria-describedby="email-hint">
+  <p class="dds-hint" id="email-hint">Nur zur Bestätigung der Anfrage.</p>
+</div>
+```
+
+That is the whole contract: a visible label, the right `autocomplete`, required
+stated in words, and the hint referenced from the control. Copy the rest from
+[`reference/`](reference/) — every component there has a **Show markup** block with
+its real, current markup.
+
+### Before you ship
+
+```bash
+python3 -m http.server 8000 --bind 127.0.0.1
+```
+
+1. **Both themes.** Dark is where colour mistakes hide.
+2. **Keyboard only** — unplug the mouse. Everything reachable, focus always visible.
+3. **320px wide**, and **400% zoom**.
+4. **Disable JavaScript.** Forms must still submit.
+5. A screen-reader pass over one complete flow.
+
+Then walk [`agent/definition-of-done.md`](agent/definition-of-done.md).
+
+### Updating Dessau later
+
+```bash
+git submodule update --remote libs/dessau
+node libs/dessau/scripts/sync-icons.mjs --dir=.   # the sprite may have changed
+```
+
+A deliberate, separate step: bump, test, commit. **Never part of an unrelated
+feature commit.**
+
+Step-by-step recipes for the recurring jobs — a new component, a new pattern, an
+accessible form — are in [`agent/recipes/`](agent/recipes/).
 
 ---
 

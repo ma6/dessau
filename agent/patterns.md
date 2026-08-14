@@ -355,6 +355,51 @@ out a lot of received practice:
 
 ---
 
+### Password reset — three steps
+
+**Step 1, request.** One email field, `autocomplete="username email"`. The response is
+identical whether or not an account exists — "If that address has an account, we have
+sent a code", never "no account found". A reset form that distinguishes the two is a
+free account-enumeration oracle: an address list can be tested against it to learn who
+has an account, which for a health, legal or dating service is a disclosure in itself.
+Match the response *time* too, or the difference is measurable.
+
+**Step 2, the code. Never a clickable link.** A reset link is a bearer credential
+sitting in an inbox: it gets forwarded, it gets pre-fetched by mail security tooling
+which silently consumes single-use tokens, it appears in referrer headers and history,
+and it opens in whichever browser the mail client prefers — usually not the one the
+user was in. A typed code keeps the session where it started, survives a mail client
+that strips links, and can be read out over the phone to someone who needs help.
+
+The code is `[A-Za-z0-9]{6}` with `autocapitalize="characters"`, accepted in either
+case, and `inputmode="text"` — **not `numeric`**, because a numeric keypad cannot type
+letters and a code field that will not accept the code in it is a dead end on a phone.
+Six digits is 10⁶ combinations; six alphanumerics is about 2×10⁹, which is what makes a
+short code safe to leave valid for fifteen minutes. `.dds-input-code` sets a monospace
+face with ligatures off so `0`/`O` and `1`/`l` are distinguishable when transcribing.
+`autocomplete="one-time-code"` stays on it. One field, never six boxes.
+
+**Step 3, the new password.** `autocomplete="new-password"` on **both** fields. Not
+`off`, and not only on the first: that token is how a manager knows to generate and
+then to save, and setting it on one field leaves the user retyping 24 random characters
+into the other. `off` on either is worse than useless — browsers largely ignore it for
+passwords, and where honoured it disables the manager rather than the autofill.
+
+`minlength="12"` and nothing else. No character-class rules: they measurably push
+people towards `Password1!` and are no longer recommended by NIST or the BSI.
+
+The mismatch is announced once the confirmation is at least as long as the first entry,
+or once the field is left — never on the second keystroke. "Passwords do not match" is
+true of every confirmation field until the moment it is not, and saying so immediately
+teaches people to ignore it. `role="status"`, not `role="alert"`: this is progress
+feedback, not an interruption. The text is only written when it changes, or a screen
+reader repeats it on every keypress. `setCustomValidity` carries the state so the
+browser and the validation pattern agree — without it the form would submit with two
+different passwords and only the message beside the field would have noticed.
+
+Without JavaScript: two ordinary password fields, compared by the server, which has to
+compare them anyway. The client-side check is a convenience and never the authority.
+
 ## Filtering — `.dds-filtering`
 
 **For:** narrowing a list, and being able to tell what has been narrowed.
