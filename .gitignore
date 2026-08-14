@@ -71,3 +71,10 @@ npm-debug.log*
 /.tmp-ionicons/
 /test-results/
 /playwright-report/
+
+# Working files that are yours, not Dessau's. Listed so a `git add -A` cannot pull
+# them into the history by accident — which is exactly how one was lost once.
+/logo-entwurf.png
+/*.sketch
+/*.fig
+/*.afdesign
