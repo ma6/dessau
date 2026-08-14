@@ -31,6 +31,13 @@ const PAGES = (await readdir('reference'))
 /** Matches the media query in reference.css. */
 const WIDE = { width: 1280, height: 900 };
 const NARROW = { width: 480, height: 900 };
+/**
+ * The floor, not a fourth opinion about layout: WCAG 2.2 1.4.10 Reflow is
+ * measured at 320px, and `agent/responsive.md` names it as the width everything
+ * has to survive. The header wrap this file caught at 480px had more room there
+ * than it has here, so 480 passing is not evidence 320 does.
+ */
+const PHONE = { width: 320, height: 900 };
 
 test('the navigation survives growing past the threshold while collapsed', async ({ page }) => {
   await page.setViewportSize(NARROW);
@@ -296,7 +303,7 @@ test('the collapsed menu does not change the header height', async ({ page }) =>
 });
 
 test('the theme toggle is the last control in the header row', async ({ page }) => {
-  for (const size of [WIDE, NARROW]) {
+  for (const size of [WIDE, NARROW, PHONE]) {
     await page.setViewportSize(size);
     await page.goto('/reference/components.html');
 
@@ -319,8 +326,17 @@ test('the theme toggle is the last control in the header row', async ({ page }) 
         `a utility control belongs at the end, which is where it is looked for`
     ).toContain('theme-toggle');
 
-    // And it really is the rightmost thing, not merely last in the DOM.
+    // And it really is the rightmost thing, not merely last in the DOM. Being
+    // last and being at the end are the same thing only while the row does not
+    // wrap: at 480px the brand and the Menu button filled it, and the toggle went
+    // to a line of its own, at the far left.
     const rightmost = Math.max(...positions.map((p) => p.end));
-    expect(last.end, 'the theme toggle is not the rightmost control').toBe(rightmost);
+    expect(
+      last.end,
+      `at ${size.width}px the theme toggle is not the rightmost control — ` +
+        `the header row has wrapped (${positions
+          .map((p) => `${p.name}=${p.end}`)
+          .join(', ')})`
+    ).toBe(rightmost);
   }
 });

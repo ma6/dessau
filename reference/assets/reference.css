@@ -147,6 +147,48 @@
   letter-spacing: var(--dds-letter-spacing-normal);
 }
 
+/* Below the tablet breakpoint the sub-line is not drawn, and that is a layout
+   fix rather than a matter of taste.
+   ----------------------------------------------------------------------------
+   `.ref-header-inner` wraps. Its in-flow children below the shell threshold are
+   the brand, the Menu button and the theme toggle, and at 480px the first two
+   very nearly fill the 448px content box on their own — around 290px of brand,
+   most of it this sub-line, plus around 110px of button. The toggle then had
+   nowhere to go but the next line, where it sat at the far LEFT: a utility
+   control is looked for at the end, and it was the first thing on a row of its
+   own.
+
+   `margin-inline-start: auto` on the Menu button does not rescue it. An auto
+   margin is resolved per line, after wrapping has already happened.
+
+   Nor does making the brand shrinkable. A wrapping flex container breaks lines
+   using each item's HYPOTHETICAL main size and only shrinks what is left on a
+   line that still overflows — so by the time shrinking could apply, the toggle
+   is already on the next line. The brand has to be genuinely narrower, not
+   merely willing to be.
+
+   So the sub-line goes, and it goes with the sr-only recipe rather than
+   `display: none`: it is part of the link's accessible name — "Dessau
+   Foundations for digital products" — and that name should not change with the
+   viewport. Same reasoning as `.ref-brand-name` above.
+
+   47.999rem is the named tablet breakpoint from the far side. At 768px the row
+   needs about 476px of its 736px, so there is real headroom above the threshold
+   rather than a value tuned until one test went green. */
+@media (max-width: 47.999rem) {
+  .ref-brand-sub {
+    position: absolute;
+    inline-size: 1px;
+    block-size: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+    border: 0;
+  }
+}
+
 /* --------------------------------------------------------------- navigation */
 /* Two levels, and a disclosure below the shell's threshold.
    ----------------------------------------------------------------------------
