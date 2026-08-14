@@ -105,10 +105,25 @@ test('the error summary lists a radio group once', async ({ page }) => {
 test('an error is announced programmatically, not only coloured', async ({ page }) => {
   await page.goto(PATTERNS);
 
-  const form = page.locator('form').filter({ has: page.locator('#w-name') }).first();
-  await form.locator('[data-dds-wizard-next], button[type="submit"]').first().click();
+  /**
+   * Exercised through the validation form, which is where this property is defined.
+   *
+   * It was first written against the wizard, which reaches the same behaviour through
+   * its own step-validation code — the most indirect available route to a rule that is
+   * not about wizards at all. It failed on WebKit and passed on Chromium, and the
+   * failure said nothing useful about the rule being tested.
+   *
+   * Whether the wizard's own path sets the programmatic state on every engine is a
+   * separate question, and it has its own issue rather than being smuggled in here.
+   */
+  const form = page.locator('#validation form[data-dds-validate]').first();
+  await form.locator('button[type="submit"]').first().click();
 
-  const name = page.locator('#w-name');
+  const name = page.locator('#v-name');
+
+  // The visible message first: it is the observable outcome, and waiting for it means
+  // the assertions below are not racing the handler that produces both.
+  await expect(form.locator('.dds-error:not([hidden])').first()).toBeVisible();
 
   /**
    * Colour and an icon are not enough on their own. The programmatic state is what a

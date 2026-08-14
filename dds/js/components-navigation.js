@@ -187,7 +187,41 @@
       return a.getBoundingClientRect().top - b.getBoundingClientRect().top;
     });
 
+    /**
+     * Whether the page cannot scroll any further.
+     *
+     * Measured fresh, every time. That is the difference between this and the two
+     * attempts before it: a sentinel observed once, or a margin tuned once, are both
+     * fixed against a page whose height changes as `content-visibility: auto` sections
+     * grow. Reading the numbers at the moment the question is asked has no such
+     * problem.
+     *
+     * Two pixels of tolerance, because fractional device pixels mean an exact
+     * comparison never matches on a scaled display.
+     */
+    function atBottom() {
+      return (
+        window.innerHeight + window.scrollY >=
+        document.documentElement.scrollHeight - 2
+      );
+    }
+
     function update() {
+      /**
+       * At the end of the page, the last section is the answer regardless of geometry.
+       *
+       * Without this the reading line has exactly the flaw the band had, only at a
+       * different threshold: a last section shorter than the distance from the line to
+       * the bottom of the viewport never gets its top above the line, so its entry
+       * stays permanently unreachable. Which sections are short enough differs per
+       * page, which is why this failed on some pages and not others — twice, in two
+       * different mechanisms, before the cause was named.
+       */
+      if (atBottom()) {
+        mark(byId.get(targets[targets.length - 1]));
+        return;
+      }
+
       var line = window.innerHeight * 0.25;
       var current = null;
 
