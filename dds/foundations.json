@@ -367,6 +367,9 @@
           "--dds-space-md": {
             "value": "1rem"
           },
+          "--dds-space-ml": {
+            "value": "1.25rem"
+          },
           "--dds-space-lg": {
             "value": "1.5rem"
           },
@@ -993,7 +996,7 @@
     }
   },
   "counts": {
-    "palette": 145,
+    "palette": 146,
     "semantic": 0,
     "darkOverrides": 50
   }

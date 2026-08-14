@@ -78,6 +78,7 @@
   .dds-stack-xs  { --dds-stack-space: var(--dds-space-xs); }
   .dds-stack-sm  { --dds-stack-space: var(--dds-space-sm); }
   .dds-stack-md  { --dds-stack-space: var(--dds-space-md); }
+  .dds-stack-ml  { --dds-stack-space: var(--dds-space-ml); }
   .dds-stack-lg  { --dds-stack-space: var(--dds-space-lg); }
   .dds-stack-xl  { --dds-stack-space: var(--dds-space-xl); }
   .dds-stack-2xl { --dds-stack-space: var(--dds-space-2xl); }

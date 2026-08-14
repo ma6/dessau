@@ -218,6 +218,7 @@ that needs 14px is a layout that has not decided yet.
 | `--dds-space-xs` | 8px | Inside small controls |
 | `--dds-space-sm` | 12px | Label to control |
 | `--dds-space-md` | 16px | Default gap |
+| `--dds-space-ml` | 20px | The one midpoint — see below |
 | `--dds-space-lg` | 24px | Between groups |
 | `--dds-space-xl` | 32px | Between blocks |
 | `--dds-space-2xl` | 48px | Between sections |
@@ -226,6 +227,24 @@ that needs 14px is a layout that has not decided yet.
 Reaching for a step that does not exist silently invalidates the whole
 declaration — it falls back to `inherit`/`initial`, not to the previous
 declaration. `node scripts/check-css.mjs` guards against it.
+
+### The one midpoint
+
+`ml` (20px) is the single in-between value, and it exists because the ramp had its
+**widest relative jump in its most-used region**: 16 to 24 is 1.5×, while 12 to 16 and
+24 to 32 are both 1.33×.
+
+Everywhere else the ratio widens as the values grow, which is correct — a 16px
+difference is a decision at 32px and noise at 72px. In the middle it was the other way
+round, so the place needing the finest resolution had the coarsest.
+
+The name is the least-bad option rather than a good one: a t-shirt scale has no clean
+word for a midpoint. **If a second midpoint is ever needed, renumber the whole ramp**
+(`space-1` … `space-10`) rather than inventing another two-letter name. One exception is
+an exception; two are a naming scheme that has stopped working.
+
+`.dds-stack-ml`, `.dds-mbs-ml` and `.dds-mbe-ml` exist alongside it, because a step that
+the utilities cannot reach is a step half the system cannot use.
 
 ---
 

@@ -142,12 +142,25 @@
      An undefined custom property invalidates the whole declaration silently,
      so `scripts/check-css.mjs` guards against reaching for a step that does
      not exist.
+
+     `ml` (20px) is the one midpoint, and it is here because the ramp had its
+     WIDEST relative jump in its most-used region: 16px to 24px is 1.5x, while
+     12 to 16 and 24 to 32 are both 1.33x. Everywhere else the ratio widens as
+     the values grow, which is right — a 16px difference matters at 32px and
+     does not at 72px. In the middle it was the other way round.
+
+     The name is the least-bad option rather than a good one: a t-shirt scale
+     has no clean word for a midpoint. **If a second midpoint is ever needed,
+     that is the signal to renumber the whole ramp** (`space-1` … `space-9`)
+     rather than to invent another two-letter name. One exception is an
+     exception; two are a naming scheme that has stopped working.
      --------------------------------------------------------------------------- */
   --dds-space-3xs: 0.125rem; /*  2px — hairline nudges, icon optical alignment */
   --dds-space-2xs: 0.25rem;  /*  4px — base unit */
   --dds-space-xs:  0.5rem;   /*  8px — inside small controls */
   --dds-space-sm:  0.75rem;  /* 12px — label to control */
   --dds-space-md:  1rem;     /* 16px — default gap */
+  --dds-space-ml:  1.25rem;  /* 20px — see the note below */
   --dds-space-lg:  1.5rem;   /* 24px — between groups */
   --dds-space-xl:  2rem;     /* 32px — between blocks */
   --dds-space-2xl: 3rem;     /* 48px — between sections */
