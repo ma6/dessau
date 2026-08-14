@@ -423,6 +423,15 @@
   margin-block-start: var(--dds-space-3xs);
 }
 
+/* A specimen whose token does not resolve. Bordered in the error colour so it cannot
+   be mistaken for a value that happens to be transparent or zero. */
+.ref-swatch-missing,
+.ref-ruler-missing {
+  border: var(--dds-border-thin) solid var(--dds-color-border-error);
+  border-radius: var(--dds-radius-sm);
+  padding: var(--dds-space-xs);
+}
+
 /* ------------------------------------------------------------------- rulers */
 /* A spacing ruler drawn at true size, so the scale can be judged rather than
    read as a number. */

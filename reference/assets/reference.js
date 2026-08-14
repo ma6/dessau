@@ -107,6 +107,25 @@
       var swatch = document.createElement('div');
       swatch.className = 'ref-swatch';
 
+      /* Same failure as the rulers: an unresolved custom property is an empty string,
+         which is a valid colour layer that paints nothing — so the chip would show the
+         chequerboard and read as "this token is transparent" rather than as "this token
+         is not there". */
+      if (!value) {
+        swatch.classList.add('ref-swatch-missing');
+        var note = document.createElement('p');
+        note.className = 'ref-swatch-name dds-text-error';
+        note.textContent = name + ' does not resolve';
+        var why = document.createElement('span');
+        why.className = 'ref-swatch-note';
+        why.textContent = 'Not declared, or a cached stylesheet. Reload without cache.';
+        swatch.appendChild(note);
+        swatch.appendChild(why);
+        container.appendChild(swatch);
+        console.error('[reference] ' + name + ' resolved to an empty string', container);
+        return;
+      }
+
       var chip = document.createElement('div');
       chip.className = 'ref-swatch-chip';
       /* Set as a custom property, not `background-color`. The chip draws the
@@ -176,6 +195,32 @@
       label.className = 'ref-ruler-name';
       label.textContent = name;
       row.appendChild(label);
+
+      /**
+       * A token that does not resolve says so, loudly.
+       *
+       * `getPropertyValue` returns an empty string for a custom property that is not
+       * declared, and an empty string is a perfectly valid `inline-size` — so the row
+       * rendered with its name, no bar and no number, and looked like a gap in the
+       * ramp rather than like a failure. That is the exact shape of silent failure the
+       * rest of this repository is built to refuse.
+       *
+       * The common cause is not a missing token at all: it is a cached stylesheet. The
+       * page reloads, the JSON list already names the new token, and the CSS the
+       * browser kept does not have it yet. Saying which of the two it is saves the
+       * next person the ten minutes it cost this time.
+       */
+      if (!value) {
+        var missing = document.createElement('span');
+        missing.className = 'ref-ruler-missing dds-text-error dds-text-xs';
+        missing.textContent =
+          name + ' does not resolve — either it is not declared, or this page is ' +
+          'using a cached stylesheet. Reload without cache.';
+        row.appendChild(missing);
+        container.appendChild(row);
+        console.error('[reference] ' + name + ' resolved to an empty string', container);
+        return;
+      }
 
       var bar = document.createElement('div');
       bar.className = 'ref-ruler-bar';
