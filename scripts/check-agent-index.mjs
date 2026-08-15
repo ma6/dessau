@@ -178,6 +178,98 @@ for (const root of [...roots].sort()) {
   }
 }
 
+/* ------------------- every entry says what it does when narrow, truthfully */
+
+/**
+ * `responsive` answers one question per entry: what does this do at 320px?
+ *
+ * It exists because the answer was previously nowhere. `agent/responsive.md`
+ * held several pages of doctrine, `primitives.css` held four named breakpoints
+ * that cannot be used in a query, and between them sat one width media query and
+ * eight container queries for sixty-odd components — so "does this component
+ * adapt, and how?" could only be answered by reading the stylesheets (#74).
+ *
+ * The field is one of four kinds, and the kind is what is checked:
+ *
+ *   container — it responds to the space it was given, at a stated threshold
+ *   viewport  — it genuinely depends on the device, at a stated threshold
+ *   self      — it adapts with no threshold: wrapping, `auto-fit`, `fit-content`
+ *   none      — nothing about it changes with width, and that is correct
+ *
+ * Only the falsifiable half is verified, and deliberately so: a claim of
+ * `container` or `viewport` must be backed by a query the CSS actually contains,
+ * and a claim of `self` or `none` must NOT be — so a component that gains a query
+ * while its entry still says "nothing changes" is caught. Whether a prose
+ * description is a *good* description is not something a script can judge, and
+ * pretending otherwise would make this a spellchecker with opinions.
+ */
+const KINDS = new Set(['container', 'viewport', 'self', 'none']);
+
+/** Class names appearing inside a width-conditional block, by query type. */
+const widthQueried = { container: new Set(), viewport: new Set() };
+
+for (const match of cssCode.matchAll(/@(container|media)([^{]*)\{/g)) {
+  const [, atRule, condition] = match;
+  if (!/inline-size|min-width|max-width|width\s*[<>]/.test(condition)) continue;
+
+  let depth = 1;
+  let i = match.index + match[0].length;
+  while (depth > 0 && i < cssCode.length) {
+    if (cssCode[i] === '{') depth += 1;
+    else if (cssCode[i] === '}') depth -= 1;
+    i += 1;
+  }
+
+  const bucket = atRule === 'container' ? widthQueried.container : widthQueried.viewport;
+  for (const rule of cssCode.slice(match.index + match[0].length, i).matchAll(/\.(dds-[\w-]+)/g)) {
+    bucket.add(`.${rule[1]}`);
+  }
+}
+
+for (const entry of entries) {
+  const declared = entry.responsive;
+
+  if (!declared) {
+    report(
+      `${entry.kind} "${entry.name}": has no "responsive" field — what it does at ` +
+        `320px is then recorded nowhere an agent reads`
+    );
+    continue;
+  }
+
+  const kind = declared.split(' — ')[0].trim();
+  if (!KINDS.has(kind)) {
+    report(
+      `${entry.kind} "${entry.name}": responsive starts with "${kind}", which is not ` +
+        `one of ${[...KINDS].join(', ')}`
+    );
+    continue;
+  }
+
+  const classes = entry.classes || [];
+  const inContainer = classes.some((name) => widthQueried.container.has(name));
+  const inViewport = classes.some((name) => widthQueried.viewport.has(name));
+
+  if (kind === 'container' && !inContainer) {
+    report(
+      `${entry.kind} "${entry.name}": claims a container query, and none of its ` +
+        `classes appears inside one`
+    );
+  }
+  if (kind === 'viewport' && !inViewport) {
+    report(
+      `${entry.kind} "${entry.name}": claims a viewport query, and none of its ` +
+        `classes appears inside one`
+    );
+  }
+  if ((kind === 'self' || kind === 'none') && (inContainer || inViewport)) {
+    report(
+      `${entry.kind} "${entry.name}": says "${kind}", but its CSS now has a width ` +
+        `query — the entry describes a component that has changed underneath it`
+    );
+  }
+}
+
 /* ------------------------------------------------------------------ report */
 
 if (findings.length) {

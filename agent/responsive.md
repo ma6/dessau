@@ -344,6 +344,36 @@ query is caught the same day rather than when somebody remembers to look.
 
 ---
 
+## What every component says about itself
+
+Each entry in [`index.json`](index.json) carries a `responsive` field, which
+answers one question: **what does this do at 320px?** One of four kinds, and the
+kind is the part that is checked:
+
+| Kind | Means | Example |
+| --- | --- | --- |
+| `container` | responds to the space it was given, at a stated threshold | `siteheader — dds-siteheader (inline-size >= 48rem)` |
+| `viewport` | genuinely depends on the device | `dialog — (max-width: 30rem)` |
+| `self` | adapts with no threshold at all | `breadcrumb — wraps when it runs out of room` |
+| `none` | nothing about it changes with width, and that is correct | `badge` |
+
+Today that is 9 · 1 · 28 · 38 across seventy-six entries, which is the honest
+shape of the system: most components have nothing to change, a quarter adapt by
+themselves, and ten have a threshold.
+
+`scripts/check-agent-index.mjs` verifies the falsifiable half. A claim of
+`container` or `viewport` must be backed by a query the CSS actually contains,
+and a claim of `self` or `none` must not be — so a component that gains a query
+while its entry still says "nothing changes" is caught the same day. Whether the
+prose after the dash is a *good* description is not something a script can judge,
+and pretending otherwise would make the check a spellchecker with opinions.
+
+The point of the field is not the field. It is that "does this component adapt,
+and how?" used to be answerable only by reading the stylesheets — which is why
+the four named breakpoints came to read as decoration.
+
+---
+
 ## What to verify
 
 1. **320px wide** — no horizontal page scroll, nothing clipped, nothing

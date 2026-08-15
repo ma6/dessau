@@ -53,7 +53,10 @@ only in someone's head or only in a CSS comment, it belongs here.
 
 **Before building anything:** query `index.json`. It is the fastest route to
 "does this already exist?", and extending something that exists is always
-correct where adding a near-duplicate is always wrong.
+correct where adding a near-duplicate is always wrong. Every entry also carries
+a `responsive` field saying what that component does at 320px — `container`,
+`viewport`, `self` or `none`, with the threshold where there is one. See
+[`responsive.md`](responsive.md#what-every-component-says-about-itself).
 
 **While building:** `foundations.md` for values, `components.md` or
 `patterns.md` for the contract, `conventions.md` for naming,

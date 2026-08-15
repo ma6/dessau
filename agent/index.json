@@ -95,7 +95,8 @@
       "css": "dds/css/components-navigation.css",
       "spec": "## Sticky action bar — `.dds-actionbar`",
       "reference": "reference/navigation.html#actionbar",
-      "accessibility": "safe-area-inset-bottom; .dds-actionbar-host reserves scroll space (WCAG 2.4.11)."
+      "accessibility": "safe-area-inset-bottom; .dds-actionbar-host reserves scroll space (WCAG 2.4.11).",
+      "responsive": "self — wraps when it runs out of room"
     },
     {
       "name": "appnav",
@@ -110,7 +111,8 @@
       "css": "dds/css/components-navigation.css",
       "spec": "## App navigation — `.dds-appnav`",
       "reference": "reference/navigation.html#appnav",
-      "accessibility": "aria-current=\"page\" on the current area, carried by a leading rail in the action colour. The fill and the heavier weight support it and cannot replace it: the fill measures 1.01:1 against the surface behind it in dark mode, so an edge is what survives greyscale and forced colours (#33). Icons are aria-hidden; the visible label carries the meaning. Items are 2.75rem tall for WCAG 2.5.8 Target Size."
+      "accessibility": "aria-current=\"page\" on the current area, carried by a leading rail in the action colour. The fill and the heavier weight support it and cannot replace it: the fill measures 1.01:1 against the surface behind it in dark mode, so an edge is what survives greyscale and forced colours (#33). Icons are aria-hidden; the visible label carries the meaning. Items are 2.75rem tall for WCAG 2.5.8 Target Size.",
+      "responsive": "none — nothing about it changes with width"
     },
     {
       "name": "avatar",
@@ -125,7 +127,8 @@
       "css": "dds/css/components-content.css",
       "spec": "## Gallery — `.dds-gallery` · Avatar — `.dds-avatar`",
       "reference": "reference/content.html#avatar",
-      "accessibility": "Initials are aria-hidden; the name goes in real text."
+      "accessibility": "Initials are aria-hidden; the name goes in real text.",
+      "responsive": "none — nothing about it changes with width"
     },
     {
       "name": "badge",
@@ -142,7 +145,8 @@
       "css": "dds/css/components.css",
       "spec": "## Badge — `.dds-badge`",
       "reference": "reference/components.html#badge",
-      "accessibility": "Status variants pair colour with text AND an icon."
+      "accessibility": "Status variants pair colour with text AND an icon.",
+      "responsive": "none — nothing about it changes with width"
     },
     {
       "name": "banner",
@@ -161,7 +165,8 @@
       "css": "dds/css/components-navigation.css",
       "spec": "## Alert banner — `.dds-banner`",
       "reference": "reference/navigation.html#banner",
-      "accessibility": "Only one at a time. No role when present at load; role=status or alert only when it appears."
+      "accessibility": "Only one at a time. No role when present at load; role=status or alert only when it appears.",
+      "responsive": "self — shrinks rather than pushing its neighbours out"
     },
     {
       "name": "breadcrumb",
@@ -173,7 +178,8 @@
       "css": "dds/css/components-navigation.css",
       "spec": "## Breadcrumb — `.dds-breadcrumb`",
       "reference": "reference/navigation.html#breadcrumb",
-      "accessibility": "ol in a named nav. Separator is a pseudo-element. Last entry not a link."
+      "accessibility": "ol in a named nav. Separator is a pseudo-element. Last entry not a link.",
+      "responsive": "self — wraps when it runs out of room"
     },
     {
       "name": "button",
@@ -194,7 +200,8 @@
       "spec": "## Button — `.dds-button`",
       "reference": "reference/components.html#button",
       "native": "button",
-      "accessibility": "Name from text or a .dds-sr-only span. Prefer aria-disabled on submits."
+      "accessibility": "Name from text or a .dds-sr-only span. Prefer aria-disabled on submits.",
+      "responsive": "none — nothing about it changes with width"
     },
     {
       "name": "byline",
@@ -210,7 +217,8 @@
       "css": "dds/css/components-content.css",
       "spec": "## Byline — `.dds-byline`",
       "reference": "reference/content.html#byline",
-      "accessibility": "Avatar aria-hidden, name real text. A contact link names whom it reaches."
+      "accessibility": "Avatar aria-hidden, name real text. A contact link names whom it reaches.",
+      "responsive": "self — wraps when it runs out of room"
     },
     {
       "name": "card",
@@ -227,7 +235,8 @@
       "css": "dds/css/components.css",
       "spec": "## Card — `.dds-card`",
       "reference": "reference/components.html#card",
-      "accessibility": "Interactive card: link wraps the heading; .dds-card-target stretches the hit area."
+      "accessibility": "Interactive card: link wraps the heading; .dds-card-target stretches the hit area.",
+      "responsive": "none — nothing about it changes with width"
     },
     {
       "name": "charcount",
@@ -243,7 +252,8 @@
       "hooks": [
         "data-dds-charcount"
       ],
-      "accessibility": "Visible count every keystroke; announcement debounced."
+      "accessibility": "Visible count every keystroke; announcement debounced.",
+      "responsive": "none — nothing about it changes with width"
     },
     {
       "name": "chart",
@@ -264,7 +274,8 @@
       "css": "dds/css/components-content.css",
       "spec": "## Charts — `.dds-chart`, `.dds-donut`",
       "reference": "reference/content.html#chart",
-      "accessibility": "ALWAYS accompanied by the same data as a real table. Bars are aria-hidden."
+      "accessibility": "ALWAYS accompanied by the same data as a real table. Bars are aria-hidden.",
+      "responsive": "self — the label column is a share of the row and wraps beyond it"
     },
     {
       "name": "chip",
@@ -279,7 +290,8 @@
       "css": "dds/css/components-content.css",
       "spec": "## Chip — `.dds-chip`",
       "reference": "reference/content.html#chip",
-      "accessibility": "The remove button names WHICH filter it removes."
+      "accessibility": "The remove button names WHICH filter it removes.",
+      "responsive": "none — nothing about it changes with width"
     },
     {
       "name": "choice",
@@ -295,7 +307,8 @@
       "spec": "## Checkbox and radio — `.dds-choice`",
       "reference": "reference/components.html#choice",
       "native": "input[type=checkbox], input[type=radio]",
-      "accessibility": "Radio groups require fieldset + legend. Whole row is the label."
+      "accessibility": "Radio groups require fieldset + legend. Whole row is the label.",
+      "responsive": "none — nothing about it changes with width"
     },
     {
       "name": "contentnav",
@@ -324,7 +337,8 @@
         "data-dds-contentnav-scrim",
         "data-dds-contentnav-toggle"
       ],
-      "accessibility": "One <nav>, never two copies. Deliberately NOT a <dialog>: the same element must be a static column above the threshold, and the UA closes a dialog with display:none. Instead `inert` goes on [data-dds-contentnav-content] while the panel is open, which removes it from the tab order AND the accessibility tree — what a focus trap only approximates. Escape closes and returns focus to the toggle; following a link closes without restoring focus, so it does not fight the navigation. aria-current=\"page\", since these are other pages."
+      "accessibility": "One <nav>, never two copies. Deliberately NOT a <dialog>: the same element must be a static column above the threshold, and the UA closes a dialog with display:none. Instead `inert` goes on [data-dds-contentnav-content] while the panel is open, which removes it from the tab order AND the accessibility tree — what a focus trap only approximates. Escape closes and returns focus to the toggle; following a link closes without restoring focus, so it does not fight the navigation. aria-current=\"page\", since these are other pages.",
+      "responsive": "container — dds-contentnav (inline-size >= 64rem)"
     },
     {
       "name": "cta",
@@ -337,7 +351,8 @@
       ],
       "css": "dds/css/components-content.css",
       "spec": "## Call to action — `.dds-cta`",
-      "reference": "reference/content.html#cta"
+      "reference": "reference/content.html#cta",
+      "responsive": "self — wraps when it runs out of room"
     },
     {
       "name": "datalist",
@@ -352,7 +367,8 @@
       ],
       "css": "dds/css/components-content.css",
       "spec": "## Key-value list — `.dds-keyvalue` · Data list — `.dds-datalist`",
-      "reference": "reference/content.html#datalist"
+      "reference": "reference/content.html#datalist",
+      "responsive": "self — wraps when it runs out of room"
     },
     {
       "name": "date-field",
@@ -366,7 +382,8 @@
       "spec": "## Date field — `.dds-input[type=\"date\"]`",
       "reference": "reference/components.html#date-field",
       "native": "input[type=date]",
-      "accessibility": "autocomplete=\"bday\" for a date of birth; \"off\" only for a future date. Always give the expected format in a hint."
+      "accessibility": "autocomplete=\"bday\" for a date of birth; \"off\" only for a future date. Always give the expected format in a hint.",
+      "responsive": "self — the column count follows the space"
     },
     {
       "name": "dialog",
@@ -389,7 +406,8 @@
         "data-dds-dialog-close"
       ],
       "native": "dialog",
-      "accessibility": "aria-labelledby required. showModal(), never <dialog open>."
+      "accessibility": "aria-labelledby required. showModal(), never <dialog open>.",
+      "responsive": "viewport — (max-width: 30rem)"
     },
     {
       "name": "disclosure",
@@ -404,7 +422,8 @@
       "spec": "## Disclosure — `.dds-disclosure`",
       "reference": "reference/components.html#disclosure",
       "native": "details, summary",
-      "accessibility": "No JavaScript. <details name> gives accordion behaviour."
+      "accessibility": "No JavaScript. <details name> gives accordion behaviour.",
+      "responsive": "none — nothing about it changes with width"
     },
     {
       "name": "accordion",
@@ -417,7 +436,8 @@
       "spec": "## Accordion — `.dds-accordion`",
       "reference": "reference/components.html#accordion",
       "native": "details, summary",
-      "accessibility": "No JavaScript. A shared <details name> makes the set exclusive; omit it and several may be open."
+      "accessibility": "No JavaScript. A shared <details name> makes the set exclusive; omit it and several may be open.",
+      "responsive": "none — nothing about it changes with width"
     },
     {
       "name": "divider",
@@ -429,7 +449,8 @@
       "css": "dds/css/components.css",
       "spec": "## Kbd — `.dds-kbd` · Divider — `.dds-divider`",
       "reference": "reference/components.html#divider",
-      "native": "hr"
+      "native": "hr",
+      "responsive": "none — nothing about it changes with width"
     },
     {
       "name": "download",
@@ -444,7 +465,8 @@
       "css": "dds/css/components-content.css",
       "spec": "## Download — `.dds-download`",
       "reference": "reference/content.html#download",
-      "accessibility": "Format and size in the visible text, not a title."
+      "accessibility": "Format and size in the visible text, not a title.",
+      "responsive": "self — shrinks rather than pushing its neighbours out"
     },
     {
       "name": "embed",
@@ -464,7 +486,8 @@
         "data-dds-embed-src",
         "data-dds-embed-consent"
       ],
-      "accessibility": "iframe needs a title. No autoplay. Always a plain link to the provider."
+      "accessibility": "iframe needs a title. No autoplay. Always a plain link to the provider.",
+      "responsive": "none — nothing about it changes with width"
     },
     {
       "name": "facts",
@@ -480,7 +503,8 @@
       "spec": "## Facts — `.dds-facts`",
       "reference": "reference/content.html#facts",
       "native": "dl",
-      "accessibility": "A real dl, so each figure is paired with its label."
+      "accessibility": "A real dl, so each figure is paired with its label.",
+      "responsive": "self — the column count follows the space"
     },
     {
       "name": "field",
@@ -512,7 +536,8 @@
       "spec": "## Field — `.dds-field`",
       "reference": "reference/components.html#field",
       "native": "input, textarea, select",
-      "accessibility": "Visible <label for>. Hint and error in one aria-describedby. Required in words. aria-invalid, never CSS :invalid. Invalid state comes from `:user-invalid` (after the user commits to a value, never `:invalid`, which matches from page load) plus `aria-invalid` for the programmatic state. Positive confirmation is opt-in via `.dds-input-confirm` with `:user-valid`, and its tick is aria-hidden — that a value is acceptable is already carried by the absence of an error."
+      "accessibility": "Visible <label for>. Hint and error in one aria-describedby. Required in words. aria-invalid, never CSS :invalid. Invalid state comes from `:user-invalid` (after the user commits to a value, never `:invalid`, which matches from page load) plus `aria-invalid` for the programmatic state. Positive confirmation is opt-in via `.dds-input-confirm` with `:user-valid`, and its tick is aria-hidden — that a value is acceptable is already carried by the absence of an error.",
+      "responsive": "none — nothing about it changes with width"
     },
     {
       "name": "fieldgroup",
@@ -528,7 +553,8 @@
       "spec": "## Fieldset group — `.dds-fieldgroup`",
       "reference": "reference/components.html#choice",
       "native": "fieldset, legend",
-      "accessibility": "Required for radio groups."
+      "accessibility": "Required for radio groups.",
+      "responsive": "self — wraps when it runs out of room"
     },
     {
       "name": "figure",
@@ -541,7 +567,8 @@
       "spec": "## Figure — `.dds-figure`",
       "reference": "reference/content.html#figure",
       "native": "figure",
-      "accessibility": "alt replaces, caption supplements. Never interchangeable."
+      "accessibility": "alt replaces, caption supplements. Never interchangeable.",
+      "responsive": "none — nothing about it changes with width"
     },
     {
       "name": "textmedia",
@@ -556,7 +583,8 @@
       "css": "dds/css/components-content.css",
       "spec": "## Text-media — `.dds-textmedia`",
       "reference": "reference/content.html#textmedia",
-      "accessibility": "The column swap is bound inside the container query, so the stacked reading order is not reversed (WCAG 1.3.2)."
+      "accessibility": "The column swap is bound inside the container query, so the stacked reading order is not reversed (WCAG 1.3.2).",
+      "responsive": "container — dds-textmedia (inline-size > 40rem)"
     },
     {
       "name": "filterbar",
@@ -570,7 +598,8 @@
       "css": "dds/css/components-navigation.css",
       "spec": "## Filter bar — `.dds-filterbar` · Toolbar — `.dds-toolbar`",
       "reference": "reference/navigation.html#filterbar",
-      "accessibility": "Applied filters must be visible as removable chips."
+      "accessibility": "Applied filters must be visible as removable chips.",
+      "responsive": "self — wraps when it runs out of room"
     },
     {
       "name": "gallery",
@@ -581,7 +610,8 @@
       ],
       "css": "dds/css/components-content.css",
       "spec": "## Gallery — `.dds-gallery` · Avatar — `.dds-avatar`",
-      "reference": "reference/content.html#gallery"
+      "reference": "reference/content.html#gallery",
+      "responsive": "self — the column count follows the space"
     },
     {
       "name": "icon",
@@ -599,7 +629,8 @@
       ],
       "spec": "## Icon — `.dds-icon`",
       "reference": "reference/foundations.html#icons",
-      "accessibility": "Always aria-hidden. The sprite must be inlined per document."
+      "accessibility": "Always aria-hidden. The sprite must be inlined per document.",
+      "responsive": "none — nothing about it changes with width"
     },
     {
       "name": "kbd",
@@ -611,7 +642,8 @@
       "css": "dds/css/components.css",
       "spec": "## Kbd — `.dds-kbd` · Divider — `.dds-divider`",
       "reference": "reference/components.html#kbd",
-      "native": "kbd"
+      "native": "kbd",
+      "responsive": "none — nothing about it changes with width"
     },
     {
       "name": "keyvalue",
@@ -625,7 +657,8 @@
       "css": "dds/css/components-content.css",
       "spec": "## Key-value list — `.dds-keyvalue` · Data list — `.dds-datalist`",
       "reference": "reference/content.html#keyvalue",
-      "native": "dl"
+      "native": "dl",
+      "responsive": "self — the label column is a share of the row and wraps beyond it"
     },
     {
       "name": "lightbox",
@@ -655,7 +688,8 @@
         "data-dds-lightbox-caption"
       ],
       "native": "dialog",
-      "accessibility": "Trigger is a real <a href> opening in a new tab without JS. Arrow keys, Escape, position announced."
+      "accessibility": "Trigger is a real <a href> opening in a new tab without JS. Arrow keys, Escape, position announced.",
+      "responsive": "none — nothing about it changes with width"
     },
     {
       "name": "media",
@@ -668,7 +702,8 @@
       "spec": "## Media — `.dds-media`",
       "reference": "reference/content.html#media",
       "native": "video, audio",
-      "accessibility": "Video with speech requires <track kind=captions> (WCAG 1.2.2)."
+      "accessibility": "Video with speech requires <track kind=captions> (WCAG 1.2.2).",
+      "responsive": "none — nothing about it changes with width"
     },
     {
       "name": "menu",
@@ -685,7 +720,8 @@
       "spec": "## Menu — `.dds-menu`",
       "reference": "reference/navigation.html#toolbar",
       "native": "popover",
-      "accessibility": "popover + popovertarget, no JS. Buttons/links in a list, NOT role=menu."
+      "accessibility": "popover + popovertarget, no JS. Buttons/links in a list, NOT role=menu.",
+      "responsive": "self — capped to the viewport less a gutter, so it cannot be wider than the screen"
     },
     {
       "name": "notice",
@@ -702,7 +738,8 @@
       "css": "dds/css/components.css",
       "spec": "## Notice — `.dds-notice`",
       "reference": "reference/components.html#notice",
-      "accessibility": "Role depends on WHEN it appears: none / role=status / role=alert."
+      "accessibility": "Role depends on WHEN it appears: none / role=status / role=alert.",
+      "responsive": "none — nothing about it changes with width"
     },
     {
       "name": "password",
@@ -723,7 +760,8 @@
         "data-dds-password",
         "data-dds-password-toggle"
       ],
-      "accessibility": "WCAG 2.2 3.3.8 Accessible Authentication: typing a long password blind is a cognitive function test, so the reveal is a requirement and therefore not opt-in — `type=\"password\"` is the opt-in signal (see DECISIONS.md). A real <button type=\"button\"> whose accessible name stays CONSTANT, with the state in aria-pressed; a button that renames itself is announced as a different control each time. Only `type` changes — `autocomplete` is never rewritten and paste is never blocked, because the password manager is what makes 3.3.8 satisfiable. The change is announced via DDS.announce. The caret is restored after the type switch. A disabled field disables its toggle. Without JavaScript: an ordinary masked input that still submits. data-dds-password takes one value, \"off\", which leaves the field alone; the wording comes from the nearest [lang] (en, de), never from an attribute repeating what <html lang> already says. An authored toggle is wired rather than duplicated, and an input already inside .dds-password or .dds-input-group is not wrapped again."
+      "accessibility": "WCAG 2.2 3.3.8 Accessible Authentication: typing a long password blind is a cognitive function test, so the reveal is a requirement and therefore not opt-in — `type=\"password\"` is the opt-in signal (see DECISIONS.md). A real <button type=\"button\"> whose accessible name stays CONSTANT, with the state in aria-pressed; a button that renames itself is announced as a different control each time. Only `type` changes — `autocomplete` is never rewritten and paste is never blocked, because the password manager is what makes 3.3.8 satisfiable. The change is announced via DDS.announce. The caret is restored after the type switch. A disabled field disables its toggle. Without JavaScript: an ordinary masked input that still submits. data-dds-password takes one value, \"off\", which leaves the field alone; the wording comes from the nearest [lang] (en, de), never from an attribute repeating what <html lang> already says. An authored toggle is wired rather than duplicated, and an input already inside .dds-password or .dds-input-group is not wrapped again.",
+      "responsive": "self — shrinks rather than pushing its neighbours out"
     },
     {
       "name": "pagination",
@@ -737,7 +775,8 @@
       "css": "dds/css/components-navigation.css",
       "spec": "## Pagination — `.dds-pagination`",
       "reference": "reference/navigation.html#pagination",
-      "accessibility": "Real links with hrefs. Names say where they go. aria-current=page."
+      "accessibility": "Real links with hrefs. Names say where they go. aria-current=page.",
+      "responsive": "container — dds-pagination (inline-size < 28rem)"
     },
     {
       "name": "progress",
@@ -749,7 +788,8 @@
       "css": "dds/css/components.css",
       "spec": "## Progress — `.dds-progress`",
       "reference": "reference/components.html#progress",
-      "native": "progress"
+      "native": "progress",
+      "responsive": "none — nothing about it changes with width"
     },
     {
       "name": "progress-ring",
@@ -763,7 +803,8 @@
       "css": "dds/css/components-content.css",
       "spec": "## Progress ring — `.dds-progress-ring`",
       "reference": "reference/content.html#progress-ring",
-      "accessibility": "aria-hidden. The value goes on a real <progress> or in text beside it."
+      "accessibility": "aria-hidden. The value goes on a real <progress> or in text beside it.",
+      "responsive": "none — nothing about it changes with width"
     },
     {
       "name": "quote",
@@ -778,7 +819,8 @@
       "spec": "## Quote — `.dds-quote`",
       "reference": "reference/content.html#quote",
       "native": "figure, blockquote",
-      "accessibility": "figure + blockquote + figcaption. Attribution outside the quotation."
+      "accessibility": "figure + blockquote + figcaption. Attribution outside the quotation.",
+      "responsive": "none — nothing about it changes with width"
     },
     {
       "name": "range",
@@ -793,7 +835,8 @@
       "spec": "## Range — `.dds-range`",
       "reference": "reference/components.html#range",
       "native": "input[type=range]",
-      "accessibility": "Value always shown as text and announced."
+      "accessibility": "Value always shown as text and announced.",
+      "responsive": "none — nothing about it changes with width"
     },
     {
       "name": "search",
@@ -806,7 +849,8 @@
       "spec": "## Search field — `.dds-search`",
       "reference": "reference/components.html#search",
       "native": "input[type=search]",
-      "accessibility": "role=\"search\" on the form. A real submit button with a name, never an unnamed magnifier."
+      "accessibility": "role=\"search\" on the form. A real submit button with a name, never an unnamed magnifier.",
+      "responsive": "self — shrinks rather than pushing its neighbours out"
     },
     {
       "name": "segmented",
@@ -819,7 +863,8 @@
       "css": "dds/css/components-forms.css",
       "spec": "## Segmented control — `.dds-segmented`",
       "reference": "reference/components.html#segmented",
-      "accessibility": "Radio inputs: one tab stop, arrow keys. Selected changes fill AND weight."
+      "accessibility": "Radio inputs: one tab stop, arrow keys. Selected changes fill AND weight.",
+      "responsive": "none — nothing about it changes with width"
     },
     {
       "name": "sitefooter",
@@ -835,7 +880,8 @@
       "css": "dds/css/components-navigation.css",
       "spec": "## Site footer — `.dds-sitefooter`",
       "reference": "reference/navigation.html#sitefooter",
-      "accessibility": "Each group a named nav or a list under a heading."
+      "accessibility": "Each group a named nav or a list under a heading.",
+      "responsive": "container — dds-sitefooter (inline-size >= 40rem)"
     },
     {
       "name": "siteheader",
@@ -856,7 +902,8 @@
       "hooks": [
         "data-dds-nav-toggle"
       ],
-      "accessibility": "One nav, one DOM location. aria-expanded + aria-controls, not role=menu. hidden attribute."
+      "accessibility": "One nav, one DOM location. aria-expanded + aria-controls, not role=menu. hidden attribute.",
+      "responsive": "container — dds-siteheader (inline-size >= 48rem)"
     },
     {
       "name": "skeleton",
@@ -871,7 +918,8 @@
       "css": "dds/css/components.css",
       "spec": "## Skeleton — `.dds-skeleton`",
       "reference": "reference/components.html#progress",
-      "accessibility": "aria-hidden; the region carries aria-busy."
+      "accessibility": "aria-hidden; the region carries aria-busy.",
+      "responsive": "none — nothing about it changes with width"
     },
     {
       "name": "specs",
@@ -884,7 +932,8 @@
       "spec": "## Specs list — `.dds-specs`",
       "reference": "reference/content.html#specs",
       "native": "dl",
-      "accessibility": "A real dl. The leader dots are generated content, so they are not read aloud."
+      "accessibility": "A real dl. The leader dots are generated content, so they are not read aloud.",
+      "responsive": "self — shrinks rather than pushing its neighbours out"
     },
     {
       "name": "spinner",
@@ -896,7 +945,8 @@
       "css": "dds/css/components.css",
       "spec": "## Spinner — `.dds-spinner`",
       "reference": "reference/components.html#progress",
-      "accessibility": "aria-hidden. Pair with text in a role=status region. Non-moving fallback under reduced motion."
+      "accessibility": "aria-hidden. Pair with text in a role=status region. Non-moving fallback under reduced motion.",
+      "responsive": "none — nothing about it changes with width"
     },
     {
       "name": "stepper",
@@ -914,7 +964,8 @@
         "data-dds-stepper"
       ],
       "native": "input[type=number]",
-      "accessibility": "Buttons disable at the limits; the new value is announced."
+      "accessibility": "Buttons disable at the limits; the new value is announced.",
+      "responsive": "none — nothing about it changes with width"
     },
     {
       "name": "steps",
@@ -929,7 +980,8 @@
       "css": "dds/css/components-navigation.css",
       "spec": "## Step progress — `.dds-steps`",
       "reference": "reference/navigation.html#steps",
-      "accessibility": "Status in words. aria-current=step. Upcoming steps are never links."
+      "accessibility": "Status in words. aria-current=step. Upcoming steps are never links.",
+      "responsive": "container — dds-steps (inline-size >= 34rem)"
     },
     {
       "name": "switch",
@@ -942,7 +994,8 @@
       "css": "dds/css/components.css",
       "spec": "## Switch — `.dds-switch`",
       "reference": "reference/components.html#switch",
-      "accessibility": "role=\"switch\" over a real checkbox. Forced colours: border weight changes."
+      "accessibility": "role=\"switch\" over a real checkbox. Forced colours: border weight changes.",
+      "responsive": "none — nothing about it changes with width"
     },
     {
       "name": "table",
@@ -960,7 +1013,8 @@
       "spec": "## Table — `.dds-table`",
       "reference": "reference/components.html#table",
       "native": "table",
-      "accessibility": "th scope, a caption, and a focusable named wrapper for overflow."
+      "accessibility": "th scope, a caption, and a focusable named wrapper for overflow.",
+      "responsive": "self — the scroll region takes the overflow, so a wide table never widens the page"
     },
     {
       "name": "tabs",
@@ -978,7 +1032,8 @@
       "hooks": [
         "data-dds-tabs"
       ],
-      "accessibility": "One tab stop, arrow keys, Home/End. aria-selected + hidden are the state."
+      "accessibility": "One tab stop, arrow keys, Home/End. aria-selected + hidden are the state.",
+      "responsive": "self — wraps when it runs out of room"
     },
     {
       "name": "teaser",
@@ -994,7 +1049,8 @@
       "css": "dds/css/components-content.css",
       "spec": "## Teaser — `.dds-teaser`",
       "reference": "reference/content.html#teaser",
-      "accessibility": "Link wraps the heading text; the card grows the hit area."
+      "accessibility": "Link wraps the heading text; the card grows the hit area.",
+      "responsive": "none — nothing about it changes with width"
     },
     {
       "name": "theme-toggle",
@@ -1014,7 +1070,8 @@
       ],
       "spec": "## Theme toggle — `.dds-theme-toggle`",
       "reference": "reference/components.html#theme-toggle",
-      "accessibility": "An action button: the label and accessible name describe the NEXT state, so there is NO aria-pressed. Combining a changing name with aria-pressed double-encodes the state. Both icons are in the markup; CSS chooses. Wording — label, accessible name and announcement alike — follows the nearest [lang]; data-dds-theme-toggle takes no value, and one left over from when it named a language is warned about and ignored."
+      "accessibility": "An action button: the label and accessible name describe the NEXT state, so there is NO aria-pressed. Combining a changing name with aria-pressed double-encodes the state. Both icons are in the markup; CSS chooses. Wording — label, accessible name and announcement alike — follows the nearest [lang]; data-dds-theme-toggle takes no value, and one left over from when it named a language is warned about and ignored.",
+      "responsive": "self — shrinks rather than pushing its neighbours out"
     },
     {
       "name": "toast",
@@ -1033,7 +1090,8 @@
       "spec": "## Toast — `DDS.toast()`",
       "reference": "reference/components.html#toast",
       "js": "dds/js/components.js",
-      "accessibility": "role=status region. Timer pauses on hover and focus. duration 0 stays."
+      "accessibility": "role=status region. Timer pauses on hover and focus. duration 0 stays.",
+      "responsive": "none — nothing about it changes with width"
     },
     {
       "name": "toc",
@@ -1051,7 +1109,8 @@
       "hooks": [
         "data-dds-toc"
       ],
-      "accessibility": "IntersectionObserver. aria-current=\"location\", not \"page\"."
+      "accessibility": "IntersectionObserver. aria-current=\"location\", not \"page\".",
+      "responsive": "self — the reading mark exists only where the list is sticky, so on a phone it does not claim one"
     },
     {
       "name": "toolbar",
@@ -1065,7 +1124,8 @@
       "css": "dds/css/components-navigation.css",
       "spec": "## Filter bar — `.dds-filterbar` · Toolbar — `.dds-toolbar`",
       "reference": "reference/navigation.html#toolbar",
-      "accessibility": "role=toolbar only when there are enough controls to justify it."
+      "accessibility": "role=toolbar only when there are enough controls to justify it.",
+      "responsive": "self — wraps when it runs out of room"
     },
     {
       "name": "tooltip",
@@ -1078,7 +1138,8 @@
       "spec": "## Tooltip — `.dds-tooltip`",
       "reference": "reference/components.html#tooltip",
       "native": "popover",
-      "accessibility": "popover gives the WCAG 1.4.13 dismiss behaviour."
+      "accessibility": "popover gives the WCAG 1.4.13 dismiss behaviour.",
+      "responsive": "none — nothing about it changes with width"
     },
     {
       "name": "topbar",
@@ -1095,7 +1156,8 @@
       "css": "dds/css/components-navigation.css",
       "spec": "## App topbar — `.dds-topbar`",
       "reference": "reference/navigation.html#topbar",
-      "accessibility": "The context title is a real heading, so the outline reflects where the user is."
+      "accessibility": "The context title is a real heading, so the outline reflects where the user is.",
+      "responsive": "container — dds-topbar (inline-size < 34rem)"
     },
     {
       "name": "upload",
@@ -1118,7 +1180,8 @@
         "data-dds-upload"
       ],
       "native": "input[type=file]",
-      "accessibility": "accept must match the prose. Drag and drop is additive (WCAG 2.5.7)."
+      "accessibility": "accept must match the prose. Drag and drop is additive (WCAG 2.5.7).",
+      "responsive": "self — shrinks rather than pushing its neighbours out"
     }
   ],
   "patterns": [
@@ -1144,7 +1207,8 @@
         "data-dds-combobox",
         "data-dds-combobox-items"
       ],
-      "accessibility": "Focus stays in the input; aria-activedescendant marks the active option. Two-stage Escape. Debounced announcements. AbortController."
+      "accessibility": "Focus stays in the input; aria-activedescendant marks the active option. Two-stage Escape. Debounced announcements. AbortController.",
+      "responsive": "none — nothing about it changes with width"
     },
     {
       "name": "address-search",
@@ -1164,7 +1228,8 @@
         "data-dds-address-field",
         "data-dds-address-combobox"
       ],
-      "accessibility": "Fields always present and editable. Street+number one field. Secondary line never auto-filled. autocomplete on every field. Filling is announced."
+      "accessibility": "Fields always present and editable. Street+number one field. Secondary line never auto-filled. autocomplete on every field. Filling is announced.",
+      "responsive": "container — dds-address (inline-size > 26rem)"
     },
     {
       "name": "form",
@@ -1179,7 +1244,8 @@
       ],
       "css": "dds/css/patterns.css",
       "spec": "## Form validation — `data-dds-validate`",
-      "reference": "reference/patterns.html#validation"
+      "reference": "reference/patterns.html#validation",
+      "responsive": "self — wraps when it runs out of room"
     },
     {
       "name": "form-validation",
@@ -1202,7 +1268,8 @@
         "data-dds-validate",
         "data-dds-error-summary"
       ],
-      "accessibility": "Errors on submit only, then on blur. Summary at the top, focus moves to it, entries link to fields, wording matches."
+      "accessibility": "Errors on submit only, then on blur. Summary at the top, focus moves to it, entries link to fields, wording matches.",
+      "responsive": "none — nothing about it changes with width"
     },
     {
       "name": "results",
@@ -1217,7 +1284,8 @@
       "css": "dds/css/patterns.css",
       "spec": "## Search and results — `.dds-results`",
       "reference": "reference/patterns.html#results",
-      "accessibility": "aria-busy while loading; count announced politely. Failed is worded differently from nothing found."
+      "accessibility": "aria-busy while loading; count announced politely. Failed is worded differently from nothing found.",
+      "responsive": "none — nothing about it changes with width"
     },
     {
       "name": "empty",
@@ -1231,7 +1299,8 @@
       "css": "dds/css/patterns.css",
       "spec": "## Empty state — `.dds-empty`",
       "reference": "reference/patterns.html#results",
-      "accessibility": "Nothing yet and nothing found are different messages. Never a bare \"No data\"."
+      "accessibility": "Nothing yet and nothing found are different messages. Never a bare \"No data\".",
+      "responsive": "none — nothing about it changes with width"
     },
     {
       "name": "conditional-fields",
@@ -1247,7 +1316,8 @@
       "hooks": [
         "data-dds-reveal"
       ],
-      "accessibility": "hidden attribute, not CSS. aria-expanded + aria-controls. Focus is NOT moved in."
+      "accessibility": "hidden attribute, not CSS. aria-expanded + aria-controls. Focus is NOT moved in.",
+      "responsive": "none — nothing about it changes with width"
     },
     {
       "name": "wizard",
@@ -1271,7 +1341,8 @@
         "data-dds-wizard-next",
         "data-dds-wizard-back"
       ],
-      "accessibility": "Back never discards input. Hidden steps disabled so they cannot block submit. Focus to the new heading, announced."
+      "accessibility": "Back never discards input. Hidden steps disabled so they cannot block submit. Focus to the new heading, announced.",
+      "responsive": "self — wraps when it runs out of room"
     },
     {
       "name": "review",
@@ -1286,7 +1357,8 @@
       "css": "dds/css/patterns-flows.css",
       "spec": "## Review — `.dds-review`",
       "reference": "reference/patterns.html#wizard",
-      "accessibility": "Every submitted value shown. Each Change control names what it changes."
+      "accessibility": "Every submitted value shown. Each Change control names what it changes.",
+      "responsive": "self — wraps when it runs out of room"
     },
     {
       "name": "derived-output",
@@ -1305,7 +1377,8 @@
         "data-dds-derived",
         "data-dds-derived-input"
       ],
-      "accessibility": "Output as a dl, aria-live polite. Incomplete is not an error. Cleared when input changes."
+      "accessibility": "Output as a dl, aria-live polite. Incomplete is not an error. Cleared when input changes.",
+      "responsive": "self — the label column is a share of the row and wraps beyond it"
     },
     {
       "name": "auth",
@@ -1327,7 +1400,8 @@
         "data-dds-password-repeat",
         "data-dds-password-match"
       ],
-      "accessibility": "WCAG 2.2 3.3.8 Accessible Authentication. `autocomplete=\"new-password\"` on BOTH password fields, so a manager can generate and save; `off` on either one disables the manager rather than the autofill. Never block paste. One field for a code, never six boxes. The reset code is alphanumeric with `inputmode=\"text\"` — a numeric keypad cannot type letters. A mismatch is reported once the confirmation is at least as long as the first entry or the field is left, via `role=\"status\"`, and the text is only rewritten when it changes so it is not repeated per keystroke. Never a clickable reset link in the email: a bearer credential in an inbox is forwarded, pre-fetched by mail scanners, and lands the user in a different browser. Identical response and timing whether or not an account exists."
+      "accessibility": "WCAG 2.2 3.3.8 Accessible Authentication. `autocomplete=\"new-password\"` on BOTH password fields, so a manager can generate and save; `off` on either one disables the manager rather than the autofill. Never block paste. One field for a code, never six boxes. The reset code is alphanumeric with `inputmode=\"text\"` — a numeric keypad cannot type letters. A mismatch is reported once the confirmation is at least as long as the first entry or the field is left, via `role=\"status\"`, and the text is only rewritten when it changes so it is not repeated per keystroke. Never a clickable reset link in the email: a bearer credential in an inbox is forwarded, pre-fetched by mail scanners, and lands the user in a different browser. Identical response and timing whether or not an account exists.",
+      "responsive": "none — nothing about it changes with width"
     },
     {
       "name": "filtering",
@@ -1342,7 +1416,8 @@
       "css": "dds/css/patterns-flows.css",
       "spec": "## Filtering — `.dds-filtering`",
       "reference": "reference/patterns.html#filtering",
-      "accessibility": "Applied filters always visible as chips. Count announced. Filter state in the URL is the product's job — DDS renders and announces it, and does not navigate."
+      "accessibility": "Applied filters always visible as chips. Count announced. Filter state in the URL is the product's job — DDS renders and announces it, and does not navigate.",
+      "responsive": "container — dds-filtering (inline-size >= 52rem)"
     },
     {
       "name": "upload-flow",
@@ -1357,7 +1432,8 @@
       "css": "dds/css/patterns-flows.css",
       "spec": "## Upload flow — `.dds-uploadflow`",
       "reference": "reference/patterns.html#results",
-      "accessibility": "A rejection says why and what to do. One failure does not discard the others."
+      "accessibility": "A rejection says why and what to do. One failure does not discard the others.",
+      "responsive": "none — nothing about it changes with width"
     }
   ]
 }
