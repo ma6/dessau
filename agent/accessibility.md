@@ -305,6 +305,36 @@ node scripts/sync-icons.mjs --check
 
 An automated pass is a floor, not a result.
 
+**Not automatable, and not yours either.** Two of the items above are on that list
+a second time, for a different reason: you cannot settle them by trying harder.
+
+- Whether an announcement is *useful* — at that moment, in that flow.
+- Whether the interface is usable with a screen reader.
+
+Both were walked with VoiceOver before v0.1 (#4) by somebody who can see the
+screen. That found a real defect — German text read in an English voice, #44 —
+and it could not have found either of these, because knowing what you just clicked
+makes a late announcement sound sensible, knowing what a control is makes a thin
+name sound adequate, and having no daily reference makes verbosity sound like
+thoroughness.
+
+So the state of this repository, stated exactly:
+
+> Reasoned against WCAG 2.2 AA throughout, with contrast, roles, labels, focus
+> order and announcement presence gated by script, and one listening pass by a
+> sighted developer. **Not validated with screen reader users.**
+
+That sentence is what Dessau is allowed to claim. It is a real position and not an
+apology — most design systems asserting AA have done less and say more. What it is
+not is conformance-by-use, and the difference is the whole of #4. Do not
+compress it in a README, and do not let a closed ticket be read as the stronger
+claim.
+
+Closing the gap takes one person who works this way, for half an hour, on the
+reference. Nothing else substitutes: not more checks, not a second screen reader,
+not another sighted listener. If that becomes possible, `docs/screenreader-walkthrough.md`
+is the script and its §7 and §9 are where to start.
+
 ---
 
 ## Manual pass
