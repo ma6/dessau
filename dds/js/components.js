@@ -12,7 +12,7 @@
  * (`<details name>`), no disclosure toggle (`<details>`), no focus trap
  * (`showModal()`), and no validation engine (constraint validation API).
  *
- * Contents: dialog opener · tabs · toast · copy-to-clipboard
+ * Contents: dialog opener · tabs · toast · copy-to-clipboard · table
  */
 (function (global) {
   'use strict';
@@ -395,5 +395,137 @@
         }
       );
     });
+  });
+
+  /* =========================================================================
+     Table — the scroll region, and knowing there is more of it
+     =========================================================================
+     Markup, unchanged and still the contract:
+
+       <div class="dds-table-wrap" role="region" aria-labelledby="cap" tabindex="0">
+         <table class="dds-table"><caption id="cap">…</caption>…</table>
+       </div>
+
+     Two things are added here, and neither is what makes a table work.
+
+     1. A missing wrapper is built. The wrapper is documented as not optional and
+        it is still the markup a product should write — but "not optional" was
+        enforced by nothing, and twelve of the fourteen tables in this
+        repository's own reference had no wrapper on the day this was written.
+        A rule that lives only in a comment holds until the first hurry. So the
+        rule is now checked (scripts/check-reference.mjs, for this repository)
+        AND repaired at runtime (here, for everyone else).
+
+        Before this runs, an unwrapped table overflows — but since the layout
+        primitives stopped amplifying it (#79), it overflows ITSELF rather than
+        widening the page around it. That is the difference between one awkward
+        table and a page laid out three times too wide.
+
+     2. The reader is told when content continues past an edge. On a phone there
+        is no scrollbar until a finger moves, so a table that scrolls and a table
+        that is cut off look exactly alike — and "cut off" is what a reader
+        assumes, because it is the more common defect. `data-dds-scroll` carries
+        `start`, `end`, both or neither, and the CSS draws a shadow at those
+        edges.
+
+     Why an attribute and a listener rather than pure CSS: the background-layer
+     trick paints BEHIND the table, so a header row or a zebra stripe hides it,
+     and `container-type: scroll-state` is Chromium-only — which is precisely
+     the engine where the problem is least visible. This is behaviour the
+     platform does not yet provide portably, which is the bar for putting it in
+     JavaScript at all.
+     ========================================================================= */
+
+  /** Does this element sit inside something that is only for screen readers? */
+  function isVisuallyHidden(element) {
+    return !!element.closest('.dds-sr-only, .dds-visually-hidden, [hidden]');
+  }
+
+  /**
+   * The wrapper, built to the documented contract.
+   *
+   * Named from the caption, because a table's caption IS its name and a region
+   * without one is announced as "region" — a landmark that tells you nothing is
+   * worse than the tab stop it costs.
+   */
+  function wrapTable(table) {
+    var wrap = document.createElement('div');
+    wrap.className = 'dds-table-wrap';
+    wrap.setAttribute('tabindex', '0');
+
+    var caption = table.querySelector('caption');
+    if (caption) {
+      if (!caption.id) caption.id = DDS.utils.uniqueId('dds-table-caption');
+      wrap.setAttribute('role', 'region');
+      wrap.setAttribute('aria-labelledby', caption.id);
+    }
+    // No caption: no name, so no landmark either. `role="region"` without an
+    // accessible name is dropped by screen readers anyway, and claiming one is
+    // worse than not claiming it. The region still scrolls and is still
+    // focusable, which is what keeps the content reachable.
+
+    table.parentNode.insertBefore(wrap, table);
+    wrap.appendChild(table);
+    return wrap;
+  }
+
+  DDS.register('table', 'table.dds-table', function (table) {
+    // A table that is deliberately off-screen — the data behind a chart — is
+    // never scrolled and must not gain a visible frame or a tab stop.
+    if (isVisuallyHidden(table)) return;
+
+    var wrap = table.parentElement;
+    if (!wrap || !wrap.classList.contains('dds-table-wrap')) {
+      wrap = wrapTable(table);
+    }
+
+    /* The shadows cannot live on the scroll container itself: its own
+       background paints behind the table, and anything absolutely positioned
+       inside a scroller scrolls away with the content. So the frame is a second,
+       non-scrolling box around it — the same frame/inner split the container
+       queries use elsewhere in DDS, for the same structural reason. */
+    var frame = wrap.parentElement;
+    if (!frame || !frame.classList.contains('dds-table-frame')) {
+      frame = document.createElement('div');
+      frame.className = 'dds-table-frame';
+      wrap.parentNode.insertBefore(frame, wrap);
+      frame.appendChild(wrap);
+    }
+
+    function update() {
+      /* `scrollLeft` is negative in a right-to-left scroller and positive in a
+         left-to-right one, so the distance travelled is its magnitude either
+         way. Reading it as a signed number is the classic RTL bug here. */
+      var travelled = Math.abs(wrap.scrollLeft);
+      var remaining = wrap.scrollWidth - wrap.clientWidth - travelled;
+
+      // A pixel of tolerance: fractional layout sizes mean an unscrollable
+      // region routinely reports a remainder of 0.5px, which would leave a
+      // shadow permanently on and make it mean nothing.
+      var edges = [];
+      if (travelled > 1) edges.push('start');
+      if (remaining > 1) edges.push('end');
+
+      if (edges.length) {
+        frame.setAttribute('data-dds-scroll', edges.join(' '));
+      } else {
+        frame.removeAttribute('data-dds-scroll');
+      }
+    }
+
+    wrap.addEventListener('scroll', update, { passive: true });
+
+    /* Width changes with no scroll event: the window resizes, a column's content
+       loads, a container query reshapes something above. `ResizeObserver` sees
+       all three; a resize listener sees only the first. */
+    if (typeof ResizeObserver === 'function') {
+      var observer = new ResizeObserver(update);
+      observer.observe(wrap);
+      observer.observe(table);
+    } else {
+      global.addEventListener('resize', DDS.utils.debounce(update, 100));
+    }
+
+    update();
   });
 })(typeof window !== 'undefined' ? window : globalThis);

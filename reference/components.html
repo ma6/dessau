@@ -14,7 +14,7 @@
 <link rel="preload" href="assets/fonts/Inter-Variable-latin-ext.woff2" as="font"
       type="font/woff2" crossorigin>
 <link rel="stylesheet" href="assets/fonts.css?v=713f2669">
-<link rel="stylesheet" href="../dds/dds.css?v=08ae4c06">
+<link rel="stylesheet" href="../dds/dds.css?v=c24e7775">
 <link rel="stylesheet" href="assets/reference.css?v=dab6a253">
 </head>
 <body>
@@ -1348,7 +1348,27 @@
             A real table with real <code class="dds-code">&lt;th scope&gt;</code>.
             The wrapper is not optional: an overflowing table needs a scroll region
             that is focusable and named, or the content past the edge is
-            unreachable without a mouse.
+            unreachable without a mouse — and the table sets the width of the page
+            for everything else on it.
+          </p>
+          <p class="dds-text-sm dds-text-subtle dds-measure-default dds-mbs-sm">
+            Two mechanisms keep that true, because a rule in a comment does not.
+            <code class="dds-code">scripts/check-reference.mjs</code> fails on a
+            table here that is not directly inside
+            <code class="dds-code">.dds-table-wrap</code>, and the
+            <code class="dds-code">table</code> enhancement builds the wrapper at
+            runtime for one that has none. Twelve of the fourteen tables in this
+            reference had no wrapper before that existed — eight of them inside a
+            <code class="dds-code">dds-scroll</code> class that no stylesheet
+            declares, which reviews as careful markup and does nothing at all.
+          </p>
+          <p class="dds-text-sm dds-text-subtle dds-measure-default dds-mbs-sm">
+            The enhancement also draws a shadow at whichever edge has more content
+            beyond it. On a phone there is no scrollbar until a finger moves, so a
+            table that scrolls and a table that is cut off look identical, and
+            “cut off” is what a reader assumes. Without JavaScript there is no
+            shadow: the table still scrolls, the region is still focusable and
+            still named. The cue is the enhancement; the access is not.
           </p>
         </div>
 
@@ -1723,7 +1743,7 @@
 
 <script src="../dds/js/dds.js?v=7edeca8b" defer></script>
 <script src="../dds/js/format.js?v=8f2e10f1" defer></script>
-<script src="../dds/js/components.js?v=814b1a57" defer></script>
+<script src="../dds/js/components.js?v=ab781959" defer></script>
 <script src="../dds/js/components-navigation.js?v=af452c49" defer></script>
 <script src="../dds/js/components-forms.js?v=495e1989" defer></script>
 <script src="assets/reference.js?v=3fa781aa" defer></script>

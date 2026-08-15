@@ -637,6 +637,83 @@ for (const [path, page] of pages) {
   }
 }
 
+/* ------------------- 12. every visible table is in a real scroll region */
+
+/**
+ * A table is the one component that routinely cannot become narrower than the
+ * screen, so `.dds-table-wrap` is documented as not optional: `overflow-x`, a tab
+ * stop, and a name, or the columns past the edge are unreachable without a mouse
+ * and the table sets the width of the page for everything else.
+ *
+ * "Not optional" was enforced by nothing. On the day this check was written,
+ * twelve of the fourteen tables in this reference had no wrapper — and eight of
+ * those were inside `<div class="dds-scroll">`, a class that is declared in no
+ * stylesheet at all. That is the worst version of the failure: the markup looks
+ * like somebody thought about it, reviews as correct, and does nothing whatsoever.
+ * `check-css.mjs` could not see it either, because it reads stylesheets and the
+ * mistake was in the markup.
+ *
+ * Visually hidden tables are exempt and must stay exempt: the data table behind a
+ * chart is never rendered, never scrolled, and giving it a visible frame and a tab
+ * stop would be a defect rather than a fix.
+ */
+const TABLE_WRAP_CLASS = 'dds-table-wrap';
+
+for (const [path, page] of pages) {
+  const source = page.source;
+
+  for (const match of source.matchAll(/<table\b[^>]*>/g)) {
+    const openTag = match[0];
+    const line = source.slice(0, match.index).split('\n').length;
+
+    // The screen-reader-only table behind a chart or a figure.
+    if (/\bdds-(sr-only|visually-hidden)\b/.test(openTag)) continue;
+
+    /* The nearest preceding element start tag. A table's scroll region is its
+       PARENT — an ancestor further up would scroll the surrounding prose with it,
+       which is the layout bug rather than the fix. */
+    const before = source.slice(0, match.index);
+    const parentTag = before.match(/<(\w+)\b[^>]*>\s*$/);
+
+    if (!parentTag || !parentTag[0].includes(TABLE_WRAP_CLASS)) {
+      report(
+        `${path}:${line}: <table> is not directly inside .${TABLE_WRAP_CLASS} — ` +
+          `it will widen the page instead of scrolling, and the columns past the ` +
+          `edge cannot be reached without a mouse`
+      );
+      continue;
+    }
+
+    const wrapper = parentTag[0];
+    if (!/\btabindex="0"/.test(wrapper)) {
+      report(
+        `${path}:${line}: the .${TABLE_WRAP_CLASS} around this table has no ` +
+          `tabindex="0" — a scroll region without a tab stop cannot be scrolled ` +
+          `by keyboard (WCAG 2.1.1)`
+      );
+    }
+
+    const named = /\baria-labelledby="([^"]+)"/.exec(wrapper) || /\baria-label="/.exec(wrapper);
+    if (/\brole="region"/.test(wrapper) && !named) {
+      report(
+        `${path}:${line}: the .${TABLE_WRAP_CLASS} around this table claims ` +
+          `role="region" with no accessible name — an unnamed region is dropped ` +
+          `by screen readers, so the tab stop is spent on nothing`
+      );
+    }
+
+    if (named && named[1]) {
+      const ids = new Set([...source.matchAll(/\sid="([^"]+)"/g)].map((m) => m[1]));
+      if (!ids.has(named[1])) {
+        report(
+          `${path}:${line}: the table's region is named by #${named[1]}, which is ` +
+            `not an id on the page — the name resolves to nothing`
+        );
+      }
+    }
+  }
+}
+
 /* --------------------------- 11. the generated blocks are not stale */
 
 /**

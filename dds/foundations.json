@@ -1066,6 +1066,12 @@
           "--dds-color-overlay-control-border": {
             "reference": "rgb(255 255 255 / 0.35)",
             "light": "rgb(255 255 255 / 0.35)"
+          },
+          "--dds-color-scroll-edge": {
+            "reference": "rgb(19 19 19 / 0.2)",
+            "light": "rgb(19 19 19 / 0.2)",
+            "dark": "rgb(0 0 0 / 0.55)",
+            "darkReference": "rgb(0 0 0 / 0.55)"
           }
         },
         "focus": {
@@ -1118,6 +1124,6 @@
   "counts": {
     "palette": 166,
     "semantic": 0,
-    "darkOverrides": 60
+    "darkOverrides": 61
   }
 }

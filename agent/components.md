@@ -377,7 +377,27 @@ by cell, which is the entire point of tabular data.
 ```
 
 An overflowing table needs a scroll region that is **focusable** (`tabindex="0"`)
-and **named**, or content past the edge is unreachable without a mouse.
+and **named**, or content past the edge is unreachable without a mouse — and
+without it the table sets the width of the page for everything else on it.
+
+**Two mechanisms keep that true, because a rule in a comment does not.**
+`scripts/check-reference.mjs` fails on a table in this repository that is not
+directly inside `.dds-table-wrap`, with a tab stop and a name. And the `table`
+enhancement builds the wrapper at runtime for a table that has none, so a product
+that forgets still gets the region. Twelve of the fourteen tables here had no
+wrapper before that existed, eight of them inside a `dds-scroll` class that no
+stylesheet declares.
+
+**The enhancement also adds the edge shadow.** It wraps the region in
+`.dds-table-frame` and sets `data-dds-scroll="start end"` for whichever edge has
+content beyond it. On a phone there is no scrollbar until a finger moves, so a
+table that scrolls and a table that is cut off look identical. Without
+JavaScript there is no shadow — the table still scrolls, the region is still
+focusable and still named. The cue is the enhancement; the access is not.
+
+A table with **no caption** gets a focusable scroll region and no `role="region"`.
+An unnamed region is dropped by screen readers anyway, and claiming a landmark
+that announces nothing is worse than not claiming one.
 
 **Variants:** `-zebra` · `-interactive` (row hover) · `-sticky` (sticky head).
 `.dds-table-numeric` on a cell right-aligns and makes digits tabular, so a column

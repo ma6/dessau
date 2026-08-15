@@ -216,6 +216,21 @@
   --dds-color-overlay-control-hover: rgb(0 0 0 / 0.75);
   --dds-color-overlay-control-border: rgb(255 255 255 / 0.35);
 
+  /* ------------------------------------------------------- scrollable edge */
+  /* The mark at the edge of a scrollable region — the table's frame — saying
+     that the content continues past it. A soft shadow rather than a rule,
+     because it has to read as "there is more underneath here" and a rule reads
+     as "this is where it ends".
+
+     Theme-dependent, unlike the overlay above, and for the reason given there in
+     reverse: this one lies on a KNOWN surface, and the black that reads as depth
+     on white reads as nothing at all on near-black.
+
+     It is never the only cue. The scrollbar, the focus ring and the region's
+     accessible name each say the same thing, which is what lets it be dropped
+     entirely under forced colours. */
+  --dds-color-scroll-edge: rgb(19 19 19 / 0.2);
+
   /* -------------------------------------------------------------- elevation */
   --dds-elevation-sm: var(--dds-shadow-sm);
   --dds-elevation-md: var(--dds-shadow-md);
@@ -326,6 +341,11 @@
 
   --dds-color-accent: var(--dds-color-accent-1);
   --dds-color-accent-subtle: var(--dds-color-accent-1-subtle);
+
+  /* Blacker and stronger than in light mode: the surface it lies on is already
+     near-black, so the light-mode value would be invisible — the same reason the
+     elevation shadows below are overridden rather than reused. */
+  --dds-color-scroll-edge: rgb(0 0 0 / 0.55);
 
   --dds-elevation-sm: var(--dds-shadow-sm-dark);
   --dds-elevation-md: var(--dds-shadow-md-dark);

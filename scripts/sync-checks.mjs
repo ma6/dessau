@@ -170,9 +170,9 @@ const inline = (text) =>
     .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
 
 const table = `${START}
-          <div class="dds-scroll">
+          <div class="dds-table-wrap" role="region" aria-labelledby="checks-run-cap" tabindex="0">
             <table class="dds-table dds-text-sm">
-              <caption class="dds-visually-hidden">
+              <caption class="dds-visually-hidden" id="checks-run-cap">
                 Every check run by npm run check, and what each one catches
               </caption>
               <thead>

@@ -1176,6 +1176,74 @@
     overscroll-behavior-x: contain;
     border: var(--dds-border-thin) solid var(--dds-color-border-subtle);
     border-radius: var(--dds-radius-md);
+    /* The table decides its own width inside here; the region must not be
+       widened by it, or the whole point is lost. */
+    max-inline-size: 100%;
+  }
+
+  /* The frame around the scroll region — added by the enhancement, not written
+     by hand.
+     ----------------------------------------------------------------------
+     It exists because neither edge shadow can live on the scroller itself: a
+     background paints behind the table (a header row or a zebra stripe hides
+     it), and an absolutely positioned child of a scroll container scrolls away
+     with the content. A non-scrolling parent is the only place the marks can
+     stay still.
+
+     Without JavaScript there is no frame and no shadow. The table still scrolls,
+     the region is still focusable and still named — the cue is the enhancement,
+     the access is not. */
+  .dds-table-frame {
+    position: relative;
+  }
+
+  .dds-table-frame::before,
+  .dds-table-frame::after {
+    content: "";
+    position: absolute;
+    inset-block: var(--dds-border-thin);
+    inline-size: var(--dds-space-md);
+    z-index: var(--dds-z-raised);
+
+    opacity: 0;
+    transition: opacity var(--dds-duration-fast) var(--dds-ease-standard);
+    /* The mark is a hint over the data. It must never take a click meant for a
+       row, and it is never the only way to know: the scrollbar, the focus ring
+       and the region's name all say the same thing. */
+    pointer-events: none;
+  }
+
+  .dds-table-frame::before {
+    inset-inline-start: var(--dds-border-thin);
+    background-image: linear-gradient(
+      to right,
+      var(--dds-color-scroll-edge),
+      transparent
+    );
+  }
+
+  .dds-table-frame::after {
+    inset-inline-end: var(--dds-border-thin);
+    background-image: linear-gradient(
+      to left,
+      var(--dds-color-scroll-edge),
+      transparent
+    );
+  }
+
+  .dds-table-frame[data-dds-scroll~="start"]::before,
+  .dds-table-frame[data-dds-scroll~="end"]::after {
+    opacity: 1;
+  }
+
+  /* Forced colours replaces the palette on purpose, and a gradient is exactly
+     the kind of decoration it is replacing. The scrollbar and the focus ring
+     remain. */
+  @media (forced-colors: active) {
+    .dds-table-frame::before,
+    .dds-table-frame::after {
+      display: none;
+    }
   }
 
   .dds-table-wrap:focus-visible {

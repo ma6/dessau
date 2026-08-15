@@ -143,9 +143,9 @@ const namedFromCss = [
 ].map((m) => ({ name: m[1], pixels: parseFloat(m[2]) * 16 }));
 
 const table = `${START}
-          <div class="dds-scroll dds-mbs-sm">
+          <div class="dds-table-wrap dds-mbs-sm" role="region" aria-labelledby="breakpoints-in-use-cap" tabindex="0">
             <table class="dds-table dds-text-sm">
-              <caption class="dds-visually-hidden">
+              <caption class="dds-visually-hidden" id="breakpoints-in-use-cap">
                 Every width used in a container or media query, generated from the stylesheets
               </caption>
               <thead>
