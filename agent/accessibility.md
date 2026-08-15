@@ -35,6 +35,42 @@ Exempt: disabled controls, pure decoration, logotypes. `--dds-color-border-subtl
 is deliberately below 3:1 because it separates content that layout already
 separates.
 
+#### Selected, current and checked states
+
+A state that says *you are here* or *this one is chosen* needs a cue that is
+still there when the hue is gone. The house rule, from the sweep in #33:
+
+> **An edge, a rail or a filled marker — and it clears 3:1 against what it sits
+> next to.** A tinted fill and a heavier font are supporting cues. Neither is
+> allowed to be the only one.
+
+Two ways this goes wrong, both found in components whose comments claimed three
+cues:
+
+- **A tint is not an indicator.** `--dds-color-surface-selected` measures
+  **1.10:1** against the surface behind it in light mode and **1.01:1** in dark.
+  At 1.01:1 it is not a faint cue, it is the same colour. Anything that looks
+  like a fill has to be measured before it is counted.
+- **A colour change can carry no lightness at all.** The selected label against
+  its ground and the unselected label against its ground measured 8.08:1 and
+  8.13:1 — a difference of pure hue. Greyscale is the test, and WCAG luminance
+  is hue-blind, so `check-contrast.mjs` arithmetic *is* the greyscale test.
+
+The idiom, so a new component does not invent a fourth one: reserve the edge on
+every item as `transparent` and colour it in on the current one. Nothing moves
+when the state changes, and the reserve is what makes that true.
+
+```css
+.thing            { border-inline-start: var(--dds-border-thick) solid transparent; }
+.thing[aria-current="page"] { border-inline-start-color: var(--dds-color-action-primary); }
+```
+
+Logical properties, so the rail is on the reading edge in both directions.
+
+Where a component's shape suits a different edge the edge changes, not the rule:
+the pagination link takes a full border, the step marker fills, and the primary
+navigation swaps its rail for an underline once it becomes a row.
+
 ### Structure and semantics
 
 | Check | Criterion |

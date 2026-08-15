@@ -117,6 +117,9 @@
     font-weight: var(--dds-font-weight-medium);
     color: var(--dds-color-text-subtle);
     text-decoration: none;
+    /* Reserved on every item so the current one does not shift the row. Logical,
+       so the rail sits on the reading edge in either direction. */
+    border-inline-start: var(--dds-border-thick) solid transparent;
     border-radius: var(--dds-radius-sm);
   }
 
@@ -126,10 +129,20 @@
     text-decoration: none;
   }
 
-  /* Current page: colour, weight AND a marker rule. Three cues. */
+  /* Current page: a rail, colour, a fill AND weight.
+
+     The comment here used to claim a marker rule as one of three cues, and one
+     existed — but only in the inline layout below, where it is an underline.
+     Stacked behind the disclosure there was no marker at all, and the fill it
+     was leaning on measures 1.10:1 in light and 1.01:1 in dark against the
+     surface it sits on. 1.01:1 is not a faint cue, it is the same colour.
+
+     So the rail is the cue that does the work, and the fill is decoration that
+     happens to help. */
   .dds-primary-nav a[aria-current="page"] {
     color: var(--dds-color-text-link);
     background-color: var(--dds-color-surface-selected);
+    border-inline-start-color: var(--dds-color-action-primary);
     font-weight: var(--dds-font-weight-semibold);
   }
 
@@ -163,8 +176,11 @@
 
     .dds-primary-nav a[aria-current="page"] {
       background-color: transparent;
-      /* An underline replaces the fill, so the marker survives the row layout. */
+      /* An underline replaces the fill, so the marker survives the row layout.
+         And it replaces the rail rather than joining it: two markers on one item
+         reads as two different states. */
       box-shadow: inset 0 -2px 0 0 var(--dds-color-action-primary);
+      border-inline-start-color: transparent;
       border-radius: 0;
     }
 
@@ -1059,6 +1075,8 @@
     font-size: var(--dds-font-size-sm);
     color: var(--dds-color-text-subtle);
     text-decoration: none;
+    /* Reserved on every item — see `.dds-primary-nav a`. */
+    border-inline-start: var(--dds-border-thick) solid transparent;
     border-radius: var(--dds-radius-sm);
   }
 
@@ -1068,10 +1086,12 @@
     text-decoration: none;
   }
 
-  /* Current page: fill, colour AND weight. Three cues, because "where am I" is
-     essential orientation. */
+  /* Current page: a rail, a fill, colour AND weight. "Where am I" is essential
+     orientation, so the rail is there for when the other three are not — the
+     fill measures 1.14:1 against this panel's surface in dark mode. */
   .dds-contentnav a[aria-current="page"] {
     background-color: var(--dds-color-surface-selected);
+    border-inline-start-color: var(--dds-color-action-primary);
     color: var(--dds-color-text-link);
     font-weight: var(--dds-font-weight-semibold);
   }
@@ -1181,6 +1201,8 @@
     font-weight: var(--dds-font-weight-medium);
     color: var(--dds-color-text-subtle);
     text-decoration: none;
+    /* Reserved on every item — see `.dds-primary-nav a`. */
+    border-inline-start: var(--dds-border-thick) solid transparent;
     border-radius: var(--dds-radius-sm);
   }
 
@@ -1190,8 +1212,12 @@
     text-decoration: none;
   }
 
+  /* Current area: a rail, a fill, colour AND weight. The fill is 1.01:1 against
+     the surface behind it in dark mode — the same colour, to a rounding error —
+     so the rail is what says which area you are in. */
   .dds-appnav a[aria-current="page"] {
     background-color: var(--dds-color-surface-selected);
+    border-inline-start-color: var(--dds-color-action-primary);
     color: var(--dds-color-text-link);
     font-weight: var(--dds-font-weight-semibold);
   }
