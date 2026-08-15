@@ -357,10 +357,10 @@ times, by whoever built each one.
 
 /* Dessau's default — softened. */
 :root {
-  --dds-radius-sm: 0.25rem;   /*  4px — chips, small controls, inline marks */
-  --dds-radius-md: 0.5rem;    /*  8px — buttons, fields, menus */
-  --dds-radius-lg: 0.875rem;  /* 14px — cards, dialogs, panels */
-  --dds-radius-pill: 999rem;  /*        badges, tags, toggles */
+  --dds-radius-sm: 0.25rem;   /*  4px — leaves, and text fields */
+  --dds-radius-md: 0.5rem;    /*  8px — buttons, and anything holding a leaf */
+  --dds-radius-lg: 0.875rem;  /* 14px — outermost containers */
+  --dds-radius-pill: 999rem;  /*        a detachable token, or a track */
 }
 
 /* Round — consumer, friendly, marketing-adjacent. */
@@ -375,19 +375,62 @@ times, by whoever built each one.
 `--dds-radius-circle: 50%` is geometry, not taste — avatars and the progress ring
 are circles in every one of these. Leave it.
 
+### Which step does a given component get?
+
+You do not answer this per component. You answer it once, with a rule, and the
+assignment falls out — which is the whole reason the ramp is a decision and not
+forty decisions.
+
+**The rule is containment, not identity.** Ask what the element holds and what
+holds it, never what it is called. The inner radius is always smaller than the
+outer one.
+
+The number comes from the concentric relation: **inner ≈ outer − padding**. A card
+at 14px with 8px of padding wants a child at about 6px, so it takes the 4px step
+if the child is a leaf and the 8px step if the child is itself a container. This
+is why a card at 14px holding a field at 8px looks intentional and the same card
+holding a field at 14px looks like a mistake — the corners are no longer
+concentric and the eye reads the gap as uneven.
+
+Applied to Dessau, that produces this. Every entry read out of the stylesheets:
+
+| Step | What it means | Where it lands |
+| --- | --- | --- |
+| `lg` 14px | Outermost container, sits on the page | `card`, `dialog`, `cta`, `empty`, `upload-zone` |
+| `md` 8px | Holds `sm` things — or stands alone as a pressable object | `menu`, `combobox-list`, `segmented`, `toast`, `notice`, `disclosure`, `table-wrap`, `choice-card`, **`button`** |
+| `sm` 4px | A leaf, and every text field | `menu-item`, `combobox-option`, `segmented-option`, `upload-item`, `badge`, `kbd`, `tooltip`, `skeleton`, **`select`**, **`search`**, **`password`**, **`stepper`**, **`input-group`** |
+| `pill` | Not a size. "A detachable token, or a track" | `chip`, `badge-count`, `switch-track`, `progress` |
+| `circle` | Geometry, never taste | `avatar`, `spinner`, `step-marker`, `donut` |
+
+The nesting pairs are where the rule becomes visible rather than asserted:
+`menu` md → `menu-item` sm. `segmented` md → `segmented-option` sm.
+`combobox-list` md → `combobox-option` sm. Each time, the container takes the step
+above its contents.
+
+**Button `md`, text field `sm` — the one pair containment does not settle.** Both
+are controls, both are the same height, and they differ anyway. A field's corner
+sits beside text on a baseline and a caret at the left edge, so a larger radius
+pushes the optical inset away from the text inset and the field reads as lopsided.
+Fields are also grouped — `.dds-search > button` carries `border-radius: 0`
+precisely because the outer group's corner has already been spent. A button has
+neither problem, and it is the most-seen corner in the interface.
+
+So: **if you are going to judge your ramp by one element, judge it by the button.**
+It is the signature value, and `md` is the step it lives on.
+
 **On `--dds-radius-pill`.** It is the loudest value in the set and it is doing
 more than rounding. A pill reads as a *token* — something small, complete and
-detachable, like a tag you could pick up. That is right for a badge and wrong for
-a button, which is why Dessau uses it for the first and not the second. Setting
-`pill` to `0` in a square system is a real decision: your badges become
-rectangles, and the system gets quieter and more technical in a way people notice
-without being able to say why.
+detachable, like a tag you could pick up — or as a *track*, something a value
+travels along. That is why it goes to `chip` and `badge-count` but not to
+`.dds-badge`, which is `sm`: a badge is a label on the thing it describes, not a
+thing in itself. Setting `pill` to `0` in a square system is a real decision: your
+chips become rectangles, and the system gets quieter and more technical in a way
+people notice without being able to say why.
 
-**The trap.** Radius interacts with border width and with nesting. A 2px border
-inside a 4px radius reads as a smudge at the corner; a card at 14px containing a
-field at 8px looks intentional, and the same card containing a field at 14px
-looks like a mistake. Keep the inner radius smaller than the outer one, and check
-one nested case before committing to the ramp.
+**The trap.** Radius interacts with border width as well as with nesting. A 2px
+border inside a 4px radius reads as a smudge at the corner. Check one nested case
+and one bordered case before committing to the ramp — a field inside a card, and
+whatever you give `--dds-border-thick` to.
 
 ---
 

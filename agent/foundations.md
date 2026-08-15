@@ -356,7 +356,18 @@ the utilities cannot reach is a step half the system cannot use.
 
 `--dds-radius-none` · `sm` (4px) · `md` (8px) · `lg` (14px) · `pill` · `circle`
 
-`sm` for things inside other things (inputs, buttons); `md` for containers.
+**The step follows containment, not the component's name.** `sm` is a leaf —
+`menu-item`, `combobox-option`, `badge`, `kbd` — and every text field (`select`,
+`search`, `password`, `stepper`, `input-group`). `md` holds `sm` things
+(`menu`, `combobox-list`, `segmented`, `toast`, `notice`, `table-wrap`) or stands
+alone as a pressable object, which is where `button` sits. `lg` is an outermost
+container: `card`, `dialog`, `cta`, `upload-zone`. The inner radius is always
+smaller than the outer, at roughly `outer − padding`.
+
+`pill` and `circle` are not sizes. `pill` means a detachable token or a track —
+`chip`, `badge-count`, `switch-track`, `progress`. `circle` is geometry: `avatar`,
+`spinner`, `step-marker`, `donut`. Reasoning and the button-versus-field case:
+`recipes/derive-a-design-system.md` §3.
 
 `--dds-border-thin` (1px) · `--dds-border-thick` (2px)
 
