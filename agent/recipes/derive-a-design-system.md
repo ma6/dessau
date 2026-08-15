@@ -3,6 +3,15 @@
 Before a product is wired up, it needs to know what it looks like. This is the
 hour that decides that.
 
+**Which recipe you want after this one depends on what you are building.** If the
+answer is a product, it is `new-product.md` and the override model below is the
+right instrument. If the answer is a **design system of your own** — one that ships
+to a client and works without Dessau — it is
+[`derive-a-standalone-system.md`](derive-a-standalone-system.md), and the override
+model below is *not*: a derived system substitutes the foundation rather than
+layering over it, because it cannot hand its consumers a dependency on Dessau. The
+six decisions are the same either way; only where the answers go differs.
+
 `new-product.md` is the next step and it is about plumbing — submodule, shell,
 sprite, locale. This one is about form, and it comes first for a reason: pull
 Dessau in without doing it and you have not chosen neutrality, you have chosen

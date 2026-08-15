@@ -1309,3 +1309,135 @@ it is the evidence this decision rests on.
 `fixed`, which would show up as the scroll test failing on one project and not the
 others. The fix would then be per-engine and belongs behind a feature query, not in
 a blanket swap back — reverting to `absolute` would restore both flip defects.
+
+---
+
+## 036 — Dessau is a base for several derived design systems, by token substitution
+
+**Decision.** The primary consumer of Dessau is not a product. It is a **derived
+design system** — one per client — which must work without Dessau, and which is
+itself consumed by products. A derived system supplies its own `primitives.css` and
+`semantic.css` and inherits the rest, rather than overriding Dessau from a layer
+above:
+
+```
+client-ds/
+  libs/dessau/        submodule, pinned, untouched
+  tokens/             this system's primitives + semantic
+  client-ds.css       the layer declaration and 12 imports:
+                      two of its own, ten of Dessau's
+  dist/client-ds.css  one file, one value per token, no Dessau at runtime
+```
+
+The `dds-` namespace stays. Products remain a supported consumer, one level
+further down.
+
+**Why substitution rather than overriding.** A derived system cannot ship "Dessau
+plus a diff", because its consumers would then depend on Dessau. Overriding also
+produces two values for every token it touches — Dessau's, with the derived value
+on top — which a client sees in devtools and which grows the artefact by the size
+of everything replaced.
+
+The mechanism was already there and nothing pointed at it. `dds/dds.css` is a
+`@layer` declaration and twelve `@import`s, and the first two are the foundation:
+`primitives.css` and `semantic.css` under `layer(dds.foundation)`. Everything after
+them declares its own layer internally and is imported plainly. **The layer
+architecture already separates the values from the system**, so swapping the first
+two is a supported operation rather than a workaround. It is Bootstrap's
+`_variables.scss` substitution without a preprocessor, and — unlike a fork — it
+keeps updates as submodule bumps.
+
+**Why the namespace stays `dds-`.** Renaming per client forks the agent context per
+client: 957 `dds-` occurrences in `agent/`, 237 in `scripts/`, plus `index.json`,
+every recipe and every check. Five clients would mean five diverging copies of the
+thing that makes Dessau a base rather than a template somebody copied. Two derived
+systems can only collide if one product loads both, and none will. Bootstrap made
+the same call and it was right: everybody's Bootstrap was `.btn`, and the
+differentiation lived in the values.
+
+**What it costs.**
+
+*Ambiguity in the wild.* A client's developer sees `.dds-card` and cannot search
+for it. The class names carry a namespace whose documentation they do not have, and
+that is the derived system's job to supply — which is why it owes its own
+reference and its own `index.json` rather than pointing at Dessau's.
+
+*Every gate has to be repointed.* `check-contrast.mjs` and
+`check-accent-separation.mjs` read `dds/css/*` by hardcoded path. A derived system
+that runs them unchanged gets a green tick for Dessau's palette while its own is
+unmeasured. This was already true for accents and is now general.
+
+*Dessau inherits an obligation it did not have.* One product could be broken and
+fixed. Several derived systems cannot, which is what 037 is for.
+
+**Reversal condition.** A single derived system that needs a different namespace
+badly enough to justify maintaining its own agent context — a client whose own
+design system is already called something with a `dds` prefix, say. That is a
+reason; taste is not.
+
+---
+
+## 037 — What a derived system may rely on, and what it may not
+
+**Decision.** Dessau's public surface is a contract. A change to anything on the
+first list obliges every derived system; nothing on the second is a promise.
+
+**Contract**
+
+- Class names — `.dds-siteheader`, `.dds-button`
+- Markup structure and the ARIA that belongs to it
+- Token names — `--dds-color-accent-2`, `--dds-space-md`
+- The `data-dds-*` behaviour hooks
+- The cascade layer names and their order
+- **Which step of a ramp a component takes** — the assignment, not the value
+
+**Implementation**
+
+- The concrete value behind any token
+- Internal selectors, and how a component is assembled inside its own markup
+- Anything in `reference/`, which is a product consuming the foundation, not part
+  of it
+- Anything in `docs/`
+
+**Why a list rather than a version scheme.** Pinning by commit is enough for one
+product: you bump when you choose and test once. For a base carrying several
+derived systems the question is no longer "did this break me" but "which of my five
+does this oblige me to revisit", and a version number cannot answer that — only a
+statement of what was promised can. Semver, release branches, deprecation windows
+and migration tooling are all process, and a foundation that carries process makes
+every consumer inherit it (023).
+
+This is the failure that ended Bootstrap's theme ecosystem. Nothing said which
+parts were promises, so everything was treated as one, and every release could
+break anybody.
+
+**The two entries that were argued about**, recorded because the arguments will
+recur:
+
+*Layer names are contract.* An unlayered override beating every DDS layer is the
+whole consumer-facing guarantee, so the names cannot move. They are also contract
+by duplication: a derived system's entry file restates the `@layer` declaration, so
+a rename breaks it directly rather than subtly.
+
+*Ramp assignment is contract; ramp values are not.* "A button takes `md`" is a rule
+a derived system relies on when it sets its own radius ramp — if Dessau moved the
+button to `lg`, every derived system's proportions would change without any of them
+touching a value. That the `md` step is `0.5rem` is not a promise; a derived system
+is expected to change it. #52 documented the assignment as a rule somebody can rely
+on, and this entry makes that reliance real rather than incidental.
+
+**When the contract has to change anyway**, because it will: it changes in a commit
+that says so in its subject, with the migration written in the message rather than
+inferred from the diff. There is no deprecation window, because there is no release
+train to hold one — a derived system is pinned and updates when it chooses. What it
+is owed is not delay, it is being told.
+
+**What it costs.** A contract is a constraint on Dessau, not only a service to its
+consumers. Renaming a class for clarity, restructuring a component's markup to
+simplify it, or moving a component to a different radius step were all free before
+this entry and are not any more.
+
+**Untested.** No derived system exists yet, so no part of this list has been
+checked against one. It is derived from how the system is built rather than from
+experience of maintaining several, and the first real derived system is what will
+show which line is in the wrong place.

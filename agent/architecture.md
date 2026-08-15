@@ -269,6 +269,41 @@ All zero-dependency, Node stdlib only. Run them before claiming anything is done
 
 ---
 
+## Two kinds of consumer
+
+**A derived design system** is the primary one: a system built on Dessau, one per
+client, which must work *without* Dessau and which is itself consumed by products.
+It substitutes the foundation — its own `primitives.css` and `semantic.css`,
+Dessau's other ten imports — rather than overriding from a layer above, because it
+cannot ship "Dessau plus a diff" to consumers who must not depend on Dessau.
+Procedure: `recipes/derive-a-standalone-system.md`. Reasoning: DECISIONS 036.
+
+**A product** is the other, one level further down, consuming either Dessau
+directly or a derived system. It overrides, unlayered, from above. That is the
+model the rest of this section describes.
+
+Both keep the `dds-` namespace. Renaming per derived system would fork the agent
+context per system, which is what turns a base into a template somebody copied.
+
+### What a consumer may rely on
+
+The public surface is a contract, because a base carrying several derived systems
+cannot answer "did this break me" one consumer at a time. Full list and reasoning
+in DECISIONS 037; in short:
+
+**Contract** — class names, markup structure and its ARIA, token names, the
+`data-dds-*` hooks, the cascade layer names and their order, and *which step of a
+ramp a component takes*.
+
+**Implementation** — the concrete value behind any token, internal selectors, how a
+component is assembled inside its own markup, and everything in `reference/` and
+`docs/`.
+
+The contract may still change; what a consumer is owed is not delay but being told,
+in a commit that says so in its subject with the migration in its message.
+
+---
+
 ## How a product consumes Dessau
 
 What is shared is the **CSS and token layer plus reference markup including
