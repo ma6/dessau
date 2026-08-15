@@ -1,19 +1,28 @@
 # Dessau
 
-> **Foundations for digital products**
+> **A base for design systems, and for the products built on them**
 
-A reusable foundation for building digital products: the principles that do not
-change, the design foundations everything is measured against, a small set of
-components, the patterns that solve recurring tasks — and structured context so a
-coding agent can use all of it correctly without rediscovering the rules.
+A reusable foundation: the principles that do not change, the design foundations
+everything is measured against, a small set of components, the patterns that solve
+recurring tasks — and structured context so a coding agent can use all of it
+correctly without rediscovering the rules.
 
 **DDS** — the Dessau Design System — is the UI layer inside Dessau. `dds` is the
 implementation namespace throughout: `.dds-button`,
 `--dds-color-action-primary`, `data-dds-dialog-open`, `window.DDS`.
 
 ```
-Principles → Foundations → Components → Patterns → Products
+Principles → Foundations → Components → Patterns → Derived systems → Products
 ```
+
+**The layer before products is what Dessau is primarily for.** A *derived design
+system* is built on Dessau, works **without** Dessau, and is itself consumed by
+products — one per client, roughly what a Bootstrap theme was. It supplies its own
+`primitives.css` and `semantic.css` and inherits the other ten imports, so its
+consumers get one value per token and no dependency on this repository.
+
+A product consuming Dessau directly is supported, and is the second case rather
+than the first.
 
 ---
 
@@ -111,9 +120,34 @@ serve the pages for the same reason.
 
 ---
 
+## Which are you building?
+
+Two answers, and they take different routes. Both start with the same hour.
+
+**Everybody: [`agent/recipes/derive-a-design-system.md`](agent/recipes/derive-a-design-system.md)
+first.** Six decisions — colour, type, roundness, density, depth, motion. Skip it
+and you have not chosen neutrality; you have taken Dessau's taste complete and
+unexamined, and roundness in particular is close to unchangeable by the time there
+are forty components.
+
+| You are building | Then |
+| --- | --- |
+| **A design system** that ships to a client and works without Dessau | [`recipes/derive-a-standalone-system.md`](agent/recipes/derive-a-standalone-system.md) — substitute the foundation, own your reference, repoint the gates |
+| **A product**, on Dessau or on a derived system | *Start a new project*, below |
+
+The difference is not scale. A derived system **substitutes** the foundation,
+because it cannot hand its own consumers a dependency on Dessau. A product
+**overrides**, unlayered, from above. Reading the product route and applying it to
+a system produces something that only works while Dessau is present, which is the
+one thing a client deliverable may not do. See
+[`agent/architecture.md`](agent/architecture.md) → Two kinds of consumer.
+
+---
+
 ## Start a new project
 
-Seven steps. No build step, no dependencies, no framework.
+For the **product** case. Seven steps. No build step, no dependencies, no
+framework.
 
 ### Or hand it to an agent
 

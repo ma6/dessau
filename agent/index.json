@@ -13,8 +13,10 @@
     "foundations",
     "components",
     "patterns",
+    "derivedSystems",
     "products"
   ],
+  "$layersComment": "`derivedSystems` is the layer Dessau exists for: a design system built on Dessau, working without it, consumed by products — one per client. It substitutes the foundation (its own primitives.css and semantic.css, Dessau's other ten imports) rather than overriding from a layer above. A product consuming Dessau directly is the second case. See agent/architecture.md and DECISIONS 036, 037.",
   "context": {
     "principles": "agent/principles.md",
     "architecture": "agent/architecture.md",

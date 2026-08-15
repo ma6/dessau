@@ -10,12 +10,18 @@ before making changes.
 
 ## 1. What Dessau is
 
-A foundation, not a component catalogue. Five layers, each depending only on the
+A foundation, not a component catalogue. Six layers, each depending only on the
 ones before it:
 
 ```
-Principles → Foundations → Components → Patterns → Products
+Principles → Foundations → Components → Patterns → Derived systems → Products
 ```
+
+**The layer before products is the one Dessau is primarily for.** A derived design
+system is built on Dessau, works *without* it, and is itself consumed by products —
+one per client. It substitutes the foundation rather than overriding it. A product
+consuming Dessau directly is supported and is the second case, not the first. See
+`agent/architecture.md` → Two kinds of consumer, and DECISIONS 036.
 
 **DDS** (Dessau Design System) is the UI layer inside Dessau. `dds` is the
 implementation namespace everywhere: `.dds-button`, `--dds-color-action-primary`,

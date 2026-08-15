@@ -5,6 +5,15 @@
 > repository**. It is the sibling of
 > [`consumer-AGENTS.template.md`](consumer-AGENTS.template.md): that one is copied
 > into the product as a file, this one is pasted into the agent as a message.
+>
+> **This is the product case, which is the second of two.** If what is being stood
+> up is a *derived design system* — one that ships to a client and works without
+> Dessau — this prompt is the wrong one: it sets up an override on top of a
+> submodule, and a derived system substitutes the foundation instead. There is no
+> prompt for that case yet; the recipe is
+> [`recipes/derive-a-standalone-system.md`](recipes/derive-a-standalone-system.md),
+> and writing a prompt for it before that recipe has been executed once would be
+> inventing rather than documenting (#55).
 
 It points at the recipes rather than repeating them. A prompt that restates a
 recipe is a second copy that drifts, and a drifted prompt is worse than none — it
