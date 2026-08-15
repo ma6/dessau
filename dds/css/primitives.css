@@ -311,7 +311,14 @@
      A HARD LIMITATION, stated because it surprises people: CSS cannot use a
      custom property in a media or container query condition.
 
-         @media (min-width: var(--dds-breakpoint-tablet))   /* does NOT work */
+         @media (min-width: var(--dds-breakpoint-tablet))
+         ^ does NOT work, in any browser
+
+     (That example cannot be written with a comment marker beside it. CSS
+     comments do not nest, so an inner marker closes this one early and the prose
+     after it is parsed as CSS — which is exactly what happened here, and it cost
+     `--dds-breakpoint-phone` its declaration. `scripts/check-css.mjs` now fails
+     on a stray closing marker.)
 
      The query condition is evaluated before custom properties are resolved. So
      these values are documentation and a single place to read the numbers from —

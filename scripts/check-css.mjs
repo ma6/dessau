@@ -155,6 +155,38 @@ for (const [file, css] of stripped) {
   }
 }
 
+/* ------------------------------- 1a. a comment that closed early */
+
+/**
+ * A stray `*​/` outside a comment, which means a comment closed where it was not
+ * meant to and the prose after it is being parsed as CSS.
+ *
+ * This is not hypothetical and it is not cosmetic. Editing a comment above
+ * `.dds-toolbar-group` left a paragraph between two `*​/` markers; the browser
+ * read it as the beginning of a selector, and CSS error recovery discards
+ * everything up to and including the NEXT block — so the rule below the comment
+ * was dropped in full. The stylesheet still parsed, the page still rendered, and
+ * one component silently lost its styling.
+ *
+ * Nothing else here could see it. Every other check in this file runs on the
+ * comment-stripped text, where the damage looks like ordinary CSS.
+ *
+ * The test is simple because the failure is: after stripping every well-formed
+ * comment, a `*​/` that survives had no opening partner.
+ */
+for (const [file, css] of stripped) {
+  const stray = css.indexOf('*/');
+  if (stray !== -1) {
+    report(
+      file,
+      lineOf(css, stray),
+      'unbalanced-comment',
+      'a */ with no opening /* — the comment above it closed early, and everything ' +
+        'from there to the end of the next rule is being parsed as CSS and discarded'
+    );
+  }
+}
+
 /* ------------------------ 2. primitive colours outside the foundation layer */
 
 const FOUNDATION_FILES = new Set(['primitives.css', 'semantic.css']);

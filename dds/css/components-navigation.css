@@ -893,7 +893,8 @@
      line with a vertical rule and nothing to its left to be separated from.
 
      At the end of a line the rule reads as "the row continues below", which is
-     what has actually happened. */
+     what has actually happened.
+
      `:has(+ …)` rather than `:not(:last-child)`: a toolbar ends with a spacer, an
      overflow button and its menu, so "last child" is not "last group" and the
      final group would have drawn a rule against the empty space after it. This

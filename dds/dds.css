@@ -83,7 +83,7 @@
 
 /* Foundations first: everything downstream reads these custom properties.
    Primitives before semantics, because the semantic layer points at them. */
-@import url("./css/primitives.css?v=f837f51d") layer(dds.foundation);
+@import url("./css/primitives.css?v=53894c63") layer(dds.foundation);
 @import url("./css/semantic.css?v=9d6cc699") layer(dds.foundation);
 
 /* Element defaults and the shared floor (focus, motion, forced colours). */
@@ -100,7 +100,7 @@
    for the reader, not for the cascade. */
 @import url("./css/components.css?v=78c71700");
 @import url("./css/components-forms.css?v=8c4581e6");
-@import url("./css/components-navigation.css?v=47ca4843");
+@import url("./css/components-navigation.css?v=dd7ec5d6");
 @import url("./css/components-content.css?v=5828d4cc");
 
 /* Compositions that solve a user task. */
