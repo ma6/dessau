@@ -14,7 +14,7 @@
 <link rel="preload" href="assets/fonts/Inter-Variable.ttf" as="font"
       type="font/ttf" crossorigin>
 <link rel="stylesheet" href="assets/fonts.css?v=395fbad1">
-<link rel="stylesheet" href="../dds/dds.css?v=94ce3735">
+<link rel="stylesheet" href="../dds/dds.css?v=77df4b4d">
 <link rel="stylesheet" href="assets/reference.css?v=c6855308">
 </head>
 <body>
@@ -504,14 +504,70 @@
           <div>
             <h3>Accent</h3>
             <p class="dds-text-sm dds-text-subtle dds-measure-default dds-mbs-2xs dds-mbe-md">
-              Decorative only. Never a status, never an action, never body text on
-              a light surface. It exists so illustration and editorial emphasis
-              have somewhere to go that is not the action colour.
+              Five hues, decorative only. An accent tells one category from
+              another — a chart series, a tag, an avatar. It never says “this
+              succeeded” and never says “you can act on this”: those are the
+              status and action colours, and they are the ones a reader has
+              learnt. Two of the five share a ramp with a status hue, which is why
+              that rule is written down rather than assumed.
             </p>
             <div class="ref-swatches"
                  data-ref-swatch-on="--dds-color-surface-default"
                  data-ref-swatch-min="3"
-                 data-ref-swatches='["--dds-color-accent","--dds-color-accent-subtle"]'></div>
+                 data-ref-swatches='["--dds-color-accent-clay","--dds-color-accent-magenta","--dds-color-accent-cyan","--dds-color-accent-green","--dds-color-accent-violet"]'></div>
+
+            <p class="dds-text-sm dds-text-muted dds-mbs-md dds-mbe-xs">
+              And the tint each one pairs with. No badge here on purpose: every
+              accent sits on a different tint, so the number that matters is the
+              accent’s own label on its own tint — which is what the specimen
+              below actually renders.
+            </p>
+            <div class="ref-swatches"
+                 data-ref-swatches='["--dds-color-accent-clay-subtle","--dds-color-accent-magenta-subtle","--dds-color-accent-cyan-subtle","--dds-color-accent-green-subtle","--dds-color-accent-violet-subtle"]'></div>
+
+            <div class="ref-specimen dds-mbs-md">
+              <p class="ref-specimen-label">
+                <code class="dds-code">data-dds-accent</code> on the element, and
+                every component that reads the accent follows
+              </p>
+              <div class="dds-cluster dds-cluster-sm" data-ref-accent-specimen>
+                <span class="dds-cluster dds-cluster-2xs" data-dds-accent="clay">
+                  <span class="dds-avatar dds-avatar-sm" aria-hidden="true">Aa</span>
+                  <code class="dds-code">clay</code>
+                </span>
+                <span class="dds-cluster dds-cluster-2xs" data-dds-accent="magenta">
+                  <span class="dds-avatar dds-avatar-sm" aria-hidden="true">Aa</span>
+                  <code class="dds-code">magenta</code>
+                </span>
+                <span class="dds-cluster dds-cluster-2xs" data-dds-accent="cyan">
+                  <span class="dds-avatar dds-avatar-sm" aria-hidden="true">Aa</span>
+                  <code class="dds-code">cyan</code>
+                </span>
+                <span class="dds-cluster dds-cluster-2xs" data-dds-accent="green">
+                  <span class="dds-avatar dds-avatar-sm" aria-hidden="true">Aa</span>
+                  <code class="dds-code">green</code>
+                </span>
+                <span class="dds-cluster dds-cluster-2xs" data-dds-accent="violet">
+                  <span class="dds-avatar dds-avatar-sm" aria-hidden="true">Aa</span>
+                  <code class="dds-code">violet</code>
+                </span>
+              </div>
+              <pre class="ref-code dds-mbs-sm" tabindex="0" role="region"
+                   aria-label="Selecting an accent"><code>&lt;html data-dds-accent="magenta"&gt;                        a product's own accent
+
+&lt;span class="dds-avatar" data-dds-accent="cyan"&gt;…      one category among several
+&lt;div class="dds-chart-bar" data-dds-accent="green"&gt;</code></pre>
+            </div>
+
+            <p class="ref-note">
+              <svg class="dds-icon" aria-hidden="true"><use href="#dds-icon-info"/></svg>
+              The hue name is the whole API. There are no
+              <code class="dds-code">accent-1</code> …
+              <code class="dds-code">accent-5</code> aliases, because a second name
+              for the same colour has to be kept in step with the first, and
+              <code class="dds-code">data-dds-accent="3"</code> cannot be reviewed
+              without a lookup table.
+            </p>
           </div>
 
           <!-- both themes at once -->
