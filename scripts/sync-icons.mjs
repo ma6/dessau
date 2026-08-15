@@ -37,7 +37,7 @@
  *
  */
 
-import { readFile, writeFile, readdir } from 'node:fs/promises';
+import { readFile, writeFile, readdir, access } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
 import { dirname, join, relative, resolve } from 'node:path';
 
@@ -64,6 +64,26 @@ const TARGET = dirArgument
 const START_MARKER = '<!-- DDS_ICON_SPRITE:START';
 const END_MARKER = '<!-- DDS_ICON_SPRITE:END -->';
 
+/** Vendored Dessau checkouts that were walked past, for the run's report. */
+const vendored = [];
+
+/**
+ * Is this directory a Dessau checkout in its own right?
+ *
+ * Detected by what a checkout always has rather than by where a product happened
+ * to put it: `libs/dessau`, `vendor/dessau` and `third_party/dds` are all real
+ * conventions and none of them is guaranteed.
+ */
+async function isDessauCheckout(directory) {
+  try {
+    await access(join(directory, 'dds', 'dds.css'));
+    await access(join(directory, 'agent', 'index.json'));
+    return true;
+  } catch {
+    return false;
+  }
+}
+
 /** Recursively find HTML files, skipping anything ignored or generated. */
 async function findHtmlFiles(directory) {
   const skip = new Set(['node_modules', '.git', 'src', 'dist']);
@@ -75,6 +95,23 @@ async function findHtmlFiles(directory) {
       if (entry.name.startsWith('.') || skip.has(entry.name)) continue;
       const path = join(current, entry.name);
       if (entry.isDirectory()) {
+        /**
+         * Never walk into a vendored copy of Dessau.
+         *
+         * Running this from a product with `--dir=.` used to descend into
+         * `libs/dessau` and rewrite Dessau's own reference pages with the
+         * product's icon set — a build step writing into its own pinned
+         * dependency, which is the one thing a pinned dependency exists to
+         * prevent. It only stayed invisible because the sprites happened to
+         * match.
+         *
+         * Checked per directory rather than by name: `libs/dessau`,
+         * `vendor/dessau` and `third_party/dds` are all real conventions.
+         */
+        if (path !== directory && (await isDessauCheckout(path))) {
+          vendored.push(relative(directory, path) || path);
+          continue;
+        }
         await walk(path);
       } else if (entry.name.endsWith('.html')) {
         found.push(path);
@@ -162,6 +199,15 @@ for (const file of htmlFiles) {
 }
 
 const problems = stale + brokenReferences;
+
+/* Said out loud, because "it skipped some files" is exactly the kind of quiet
+   helpfulness that becomes a mystery later. */
+if (vendored.length) {
+  console.log(
+    `\n  Left alone (a Dessau checkout of its own, not this product's pages):`
+  );
+  for (const path of vendored) console.log(`    ${path}`);
+}
 
 console.log(
   `\n${htmlFiles.length} HTML files scanned in ${relative(process.cwd(), TARGET) || '.'}, ` +
