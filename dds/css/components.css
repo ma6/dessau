@@ -1641,15 +1641,19 @@
   /* CSS anchor positioning where it exists, so the tooltip tracks its trigger
      with no JS and no scroll listener.
 
-     No `position-anchor` and no anchor name: a popover invoked through
-     `popovertarget` gets its invoker as its *implicit* anchor, so `anchor()`
-     resolves against the right element automatically. That matters — naming
-     anchors would mean a unique name per tooltip instance, which is exactly the
-     kind of bookkeeping that goes wrong on the tenth one.
+     No anchor name: a popover invoked through `popovertarget` gets its invoker as
+     its *implicit* anchor, so `anchor()` resolves against the right element with
+     nothing named. That matters — naming anchors would mean a unique name per
+     tooltip instance, which is exactly the kind of bookkeeping that goes wrong on
+     the tenth one.
+
+     `position-anchor: auto` is not optional, though. The initial value computes to
+     `normal`, which means no default anchor at all, and a bare `anchor()` then has
+     nothing to resolve against (#48). See `.dds-menu` for the measurements.
 
      Progressive: without support the tooltip still renders in the top layer,
-     positioned by the UA default. */
-  @supports (anchor-name: --dds-probe) {
+     centred by the rule above. */
+  @supports (anchor-name: --dds-probe) and (position-anchor: auto) {
     .dds-tooltip {
       position: absolute;
       /* Release the centring insets before anchoring one edge: an
@@ -1657,10 +1661,10 @@
       inset: auto;
       margin: 0;
 
-      /* The fallback argument, for an engine that has anchor positioning but
-         does not give a popover its invoker as an implicit anchor. Without it
-         the inset is invalid at computed-value time and the tooltip lands in the
-         corner of the screen. See `.dds-menu` for the long version. */
+      position-anchor: auto;
+      /* The fallback argument, for an engine that parses all of this and still
+         does not resolve an implicit anchor. Without it the inset is invalid at
+         computed-value time and the tooltip lands in the corner of the screen. */
       inset-block-end: anchor(top, 45%);
       justify-self: anchor-center;
       margin-block-end: var(--dds-space-2xs);

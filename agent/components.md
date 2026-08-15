@@ -476,7 +476,8 @@ Unavailable on touch, easy to miss, and it disappears.
 Built on `popover` with `popovertarget`, which supplies the dismiss behaviour
 WCAG 2.2 1.4.13 requires (Escape, click outside) and top-layer rendering. Anchor
 positioning is used where supported, via the **implicit** anchor — no anchor name,
-so there is no per-instance bookkeeping.
+so there is no per-instance bookkeeping. Same three requirements as the menu above,
+including `position-anchor: auto`.
 
 ---
 
@@ -848,12 +849,26 @@ Items are `<button>` or `<a>` in a list, **not** `role="menu"`/`menuitem`. That
 role switches assistive technology into application mode and changes what keys do;
 it is for a desktop application menu bar, not a dropdown of links.
 
-Placement is CSS anchor positioning against the **implicit** anchor, behind
-`@supports`, and the `@supports` block must release `inset` before anchoring an
-edge — the UA gives a popover `position: fixed; inset: 0; margin: auto`, and half
-of that trio left in place puts the menu in a corner of the screen rather than
-under its button. Without anchor positioning the menu is centred, which is the
-same UA default stated explicitly.
+Placement is CSS anchor positioning against the **implicit** anchor — the invoker
+of the popover, so nothing is named and no consumer has to invent a unique
+`anchor-name` per menu. Three things are load-bearing and each one, left out, puts
+the menu in a corner of the screen (#48):
+
+- **`position-anchor: auto`.** The implicit anchor exists but is not the default;
+  `position-anchor` computes to `normal`, which is *no* anchor, and a bare
+  `anchor()` then resolves against nothing.
+- **Releasing `inset` first.** The UA gives a popover
+  `position: fixed; inset: 0; margin: auto`. Anchoring one edge while `inset: 0`
+  survives over-constrains the box, and an over-constrained box drops the anchored
+  edge, not the zero.
+- **A fallback inside each `anchor()`.** `@supports` can ask whether these
+  properties parse; it cannot ask whether the engine resolves an implicit anchor.
+  Where it does not, a bare `anchor()` is invalid at computed-value time, every
+  inset computes to `auto`, and a top-layer box with no insets sits at the origin
+  of the viewport.
+
+Without anchor positioning at all the menu is centred — the UA default, stated
+explicitly rather than half-inherited.
 
 ## Filter bar — `.dds-filterbar` · Toolbar — `.dds-toolbar`
 

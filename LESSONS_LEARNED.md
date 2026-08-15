@@ -622,3 +622,67 @@ deciding to tidy it away is a second, larger version of the same mistake.
 work — it would need to know which files this session wrote, which is exactly the
 fact git does not have. Some rules have no check behind them and have to be
 instructions that are actually followed. `AGENTS.md` §6 carries this one.
+
+---
+
+## `@supports` answers a different question than the one the code depends on
+
+The user menu opened in the top-left corner of the screen. The CSS behind it read
+like a careful piece of progressive enhancement:
+
+```css
+@supports (anchor-name: --dds-probe) {
+  .dds-menu {
+    inset-block-start: anchor(bottom);
+    inset-inline-end: anchor(right);
+  }
+}
+```
+
+Three separate defects were stacked in those five lines, and each one alone put
+the menu in the same corner — which is why fixing the first two changed nothing
+visible and looked, from the outside, like no progress at all.
+
+1. **The UA stylesheet was half-overridden.** A popover gets
+   `position: fixed; inset: 0; margin: auto` — three declarations that only mean
+   "centred" together. The component took `position: absolute; margin: 0` and left
+   `inset: 0` standing, and a `max-content` box with four zero insets and no auto
+   margin collapses into the start corner.
+2. **Releasing `inset` was necessary and made it worse.** With `inset: auto` the
+   box has nothing holding it if `anchor()` fails — and a failing `anchor()` is
+   invalid at computed-value time, so every inset computes to `auto` and a
+   top-layer element sits at the origin of the viewport. Same corner, new reason.
+3. **The real defect.** `position-anchor` computes to `normal`, meaning *no*
+   anchor. A popover invoked through `popovertarget` does have an implicit anchor,
+   but nothing reaches for it until `position-anchor: auto` says so. The comment
+   in the file asserted the opposite, in confident prose, for months.
+
+The `@supports` condition is where the mistake became invisible.
+`(anchor-name: --dds-probe)` asks *does this engine implement anchor positioning*.
+What the rule actually needed was *does this engine resolve the implicit anchor of
+a popover's invoker* — a narrower question, with no `@supports` syntax to ask it,
+and the answer was no even in a current Chrome.
+
+**Do:** in an `@supports` condition, name the property the rule cannot work
+without — `(anchor-name: --x) and (position-anchor: auto)` — rather than the
+nearest recognisable feature. A condition that is broader than the dependency is a
+claim the code cannot keep.
+
+**Do:** give `anchor()` a fallback: `anchor(bottom, 35%)`. Where `@supports`
+cannot express the dependency, the fallback is the only thing standing between a
+missing anchor and a box at coordinate zero. It is not a placement anyone designs;
+it is the difference between degraded and unusable.
+
+**And the part that cost the most time:** the first two fixes were reasoned from
+the specification and shipped without being seen. The reasoning was sound and the
+result was still wrong, because a fourth thing was also wrong. What ended it was a
+throwaway page that opened the popover through a real invoker click and printed the
+computed insets and both rectangles — the numbers matched the fallback percentages
+to the pixel, which no amount of reading the spec would have revealed. When
+placement is wrong, measure the box; do not deduce it.
+
+**A trap inside the measuring:** the first version of that probe opened the popover
+with `showPopover()`. There is no invoker on that path and therefore no implicit
+anchor, so it reproduced the symptom for a reason that had nothing to do with the
+bug and nearly sent the fix towards WebKit. A probe has to exercise the real entry
+point, or it is measuring itself.

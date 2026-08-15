@@ -44,8 +44,15 @@ const COMPONENTS = '/reference/components.html';
 
 const VIEWPORT = { width: 1280, height: 900 };
 
-/** Whether the engine under test implements CSS anchor positioning. */
-const supportsAnchor = (page) => page.evaluate(() => CSS.supports('anchor-name: --dds-probe'));
+/**
+ * The same condition the stylesheet gates on, deliberately duplicated. Testing
+ * only `anchor-name` would skip on an engine the CSS does not skip on, which is
+ * the direction that hides a failure rather than reporting it.
+ */
+const supportsAnchor = (page) =>
+  page.evaluate(
+    () => CSS.supports('anchor-name: --dds-probe') && CSS.supports('position-anchor: auto')
+  );
 
 /** The invoker and the popover it opens, measured after the popover is open. */
 async function openAndMeasure(page, id) {
@@ -111,8 +118,16 @@ for (const { name, id } of [
     expect(box.top).toBeGreaterThanOrEqual(anchor.bottom - 1);
     expect(box.top - anchor.bottom, 'detached from the button it belongs to').toBeLessThan(16);
 
-    // Trailing edges aligned: the menu grows inward from the button, not across
-    // the header. A pixel of slack for subpixel layout.
+    /**
+     * Trailing edges aligned: the menu grows inward from the button, not across
+     * the header. A pixel of slack for subpixel layout.
+     *
+     * This is the assertion that separates "anchored" from "sitting on the
+     * fallback percentage in `anchor(right, 35%)`". The fallback can land under
+     * the button by coincidence of a given layout — it did, on the page that was
+     * first used to diagnose this — so a test that only checked the vertical gap
+     * would have called the broken state correct.
+     */
     expect(Math.abs(box.right - anchor.right)).toBeLessThan(2);
   });
 }

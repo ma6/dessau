@@ -643,30 +643,38 @@
     box-shadow: var(--dds-elevation-lg);
   }
 
-  /* Anchor to the invoker. A popover opened via `popovertarget` gets its invoker
-     as an implicit anchor, so no anchor name is needed — which matters, because
-     naming would mean a unique name per menu instance.
+  /* Anchor to the invoker. A popover opened through `popovertarget` does get its
+     invoker as an implicit anchor, so no `anchor-name` is needed here — and that
+     matters, because naming would mean a unique name per menu instance and a
+     design system cannot hand every consumer that bookkeeping.
+
+     But the implicit anchor has to be ASKED FOR. `position-anchor` computes to
+     `normal` — no default anchor — and a bare `anchor()` then has nothing to
+     resolve against. `auto` is the value that means "the implicit anchor", and
+     leaving it out is what put this menu in the corner of the screen (#48).
+     Measured, not assumed: with the initial value the menu sat on its fallback
+     percentages; with `position-anchor: auto` it sat under its button with the
+     trailing edges flush.
 
      `inset: auto` first: the two anchored insets below only place the menu if the
      other two are released. Left at 0 the box is over-constrained, and an
      over-constrained box drops the anchored edge, not the zero.
 
-     Each `anchor()` carries a fallback, and that second argument is the whole
-     safety net. `@supports (anchor-name: …)` answers "does this engine have
-     anchor positioning", which is not the same question as "does this engine
-     give a popover its invoker as an implicit anchor" — and there is no
-     `@supports` test for the second one. Where the anchor does not resolve and
-     no fallback is given, the declaration is invalid at computed-value time,
-     every inset computes to `auto`, and a top-layer box with no insets at all
-     lands in the corner of the screen. The percentages are not a layout anyone
-     wants; they are a box that is on screen and readable rather than one that is
-     wedged against the edge. */
-  @supports (anchor-name: --dds-probe) {
+     Each `anchor()` still carries a fallback, and that second argument is the net
+     under the whole arrangement. The `@supports` condition can only ask whether
+     these properties PARSE; whether the engine actually resolves an implicit
+     anchor is not something any condition can ask. Where it does not, a bare
+     `anchor()` is invalid at computed-value time, every inset computes to `auto`,
+     and a top-layer box with no insets lands at the origin of the viewport. The
+     percentages are not a layout anyone would design — they are the guarantee
+     that the menu is on screen and readable instead of wedged into the corner. */
+  @supports (anchor-name: --dds-probe) and (position-anchor: auto) {
     .dds-menu {
       position: absolute;
       inset: auto;
       margin: 0;
 
+      position-anchor: auto;
       inset-block-start: anchor(bottom, 35%);
       inset-inline-end: anchor(right, 35%);
       margin-block-start: var(--dds-space-3xs);
