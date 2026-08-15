@@ -241,6 +241,13 @@ faithful over HTTP.
   deleting it is not the fix.
 - **Keep documentation in the same commit as the change.** A component whose
   specification lags behind its code is a component nobody can trust.
+- **`agent/<topic>.md` and `reference/<topic>.html` are one thing in two forms.**
+  Change the prose in one and change it in the other, in the same commit. The
+  rendered page says so in its own footer — "the same material, written for an
+  agent, is in …" — and nothing checks it: `check-reference.mjs` verifies
+  components, anchors, tokens and assets, not sentences. Two changes to
+  `agent/architecture.md` shipped without their rendered half before this was
+  written down, and the page that calls itself the proof was the stale one.
 - **Record reasoning, not just outcomes.** `DECISIONS.md` for architecture,
   `LESSONS_LEARNED.md` for experience. Both explain *why*.
 - **File a GitHub Issue** for worthwhile work outside the current task — without
