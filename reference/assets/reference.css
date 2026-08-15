@@ -702,7 +702,11 @@
   font-family: var(--dds-font-mono);
   font-size: var(--dds-font-size-2xs);
   color: var(--dds-color-text-default);
-  min-inline-size: 14rem;
+  /* 14rem is 224px of a 320px screen, before the value and the state have had
+     any. `min()` lets the name take a line of its own instead — the row already
+     wraps, so the rest follows underneath. Same treatment as `.ref-ruler-name`
+     one specimen above. */
+  min-inline-size: min(14rem, 100%);
 }
 
 .ref-breakpoint-value {

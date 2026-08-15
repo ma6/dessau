@@ -941,10 +941,16 @@
     gap: var(--dds-space-xs);
   }
 
+  /* Options on one line where they fit, and on two where they do not.
+     ----------------------------------------------------------------------
+     `grid-auto-flow: column` with `max-content` columns cannot wrap by
+     definition: three or four options stayed on one line at every width and
+     took the page with them. Flex says the same thing about intent — put these
+     side by side — and adds the answer for when there is no room. */
   .dds-fieldgroup-options-inline {
-    grid-auto-flow: column;
-    grid-auto-columns: max-content;
-    gap: var(--dds-space-md);
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--dds-space-xs) var(--dds-space-md);
   }
 
   /* ==========================================================================

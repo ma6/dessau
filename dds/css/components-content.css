@@ -225,8 +225,16 @@
 
   /* Two columns: label and value side by side. Grid rather than float, so a
      multi-line value keeps its label aligned to the top. */
+  /* `fit-content(40%)`, not `minmax(8rem, max-content)`.
+     ----------------------------------------------------------------------
+     A `max-content` column is as wide as its longest term, so one long label —
+     a compound noun, an identifier — made the pair wider than a phone and,
+     through the track it sat in, the page with it. `fit-content(40%)` gives the
+     term whatever it needs up to 40% of the container and makes it wrap after
+     that. The value keeps the rest. No threshold and no query: the limit is
+     proportional, so it holds at every width. */
   .dds-keyvalue-columns {
-    grid-template-columns: minmax(8rem, max-content) 1fr;
+    grid-template-columns: fit-content(40%) 1fr;
     align-items: baseline;
   }
 
@@ -525,9 +533,12 @@
     gap: var(--dds-space-xs);
   }
 
+  /* Same reasoning as `.dds-keyvalue-columns`: the label is capped at a share of
+     the row and wraps beyond it, rather than being as wide as its longest word.
+     The value stays `max-content` — it is a number and a unit. */
   .dds-chart-row {
     display: grid;
-    grid-template-columns: minmax(6rem, max-content) 1fr max-content;
+    grid-template-columns: fit-content(35%) 1fr max-content;
     align-items: center;
     gap: var(--dds-space-sm);
     font-size: var(--dds-font-size-sm);

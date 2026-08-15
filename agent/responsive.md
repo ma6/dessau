@@ -94,6 +94,28 @@ What the guard does *not* do is make the wide thing fit. It makes it overflow
 itself, and what it does about that is its own decision: scroll it (the table's
 named scroll region), wrap it, or let it clip.
 
+### A label column is a share, not a width
+
+The same failure in miniature: a two-column pairing written as
+
+```css
+grid-template-columns: minmax(8rem, max-content) 1fr;   /* as wide as the longest term */
+grid-template-columns: fit-content(40%) 1fr;            /* up to two fifths, then it wraps */
+```
+
+`max-content` means "as wide as the longest word in it", which for a label column
+is a promise nobody can keep on a phone — one compound noun and the row is wider
+than the screen. `fit-content(<percentage>)` gives the column what it needs up to
+a share of the container and makes it wrap after that.
+
+A proportion rather than a threshold, so there is no query, nothing to state a
+reason for, and nothing that stops being true at some width nobody tested.
+`.dds-keyvalue-columns`, `.dds-chart-row` and `.dds-derived-output` all use it.
+
+And a row of controls laid out with `grid-auto-flow: column` cannot wrap **by
+definition**. If they should sit side by side and drop to a second line when they
+run out of room, that is `display: flex; flex-wrap: wrap`.
+
 ### When a media query IS correct
 
 For the **page shell**, and for anything that genuinely depends on the device

@@ -706,7 +706,10 @@
 
     inline-size: max-content;
     min-inline-size: 12rem;
-    max-inline-size: 20rem;
+    /* 20rem is 320px, which is the whole of the narrowest supported screen. The
+       menu is `position: fixed`, so nothing else constrains it — it would sit
+       edge to edge with no margin at all. */
+    max-inline-size: min(20rem, calc(100vw - 2 * var(--dds-space-md)));
     padding: var(--dds-space-3xs);
 
     background-color: var(--dds-color-surface-raised);
