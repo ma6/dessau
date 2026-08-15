@@ -448,3 +448,47 @@ been said at all.
 **Do:** anything reading a custom property from script waits for `load`, or checks
 the value and falls back to waiting. Shipping a concatenated stylesheet instead of
 an `@import` chain removes the problem rather than working around it.
+
+---
+
+## An author `display` silently defeats the UA's `[hidden]`
+
+The inline icon sprite is `<svg hidden aria-hidden data-dds-icons>` at the top of
+every page. It rendered anyway, as an empty 300×150 box, pushing every page down
+by 150px, on every page of the reference, for as long as the media reset has
+existed:
+
+```css
+:where(img, picture, video, canvas, svg, iframe) {
+  display: block;
+  max-inline-size: 100%;
+}
+```
+
+The UA stylesheet's `[hidden] { display: none }` is in the **user-agent origin**.
+Origin is resolved before specificity, so any author declaration beats it — and
+`:where()` scoring zero is irrelevant, because that contest never reaches
+specificity. Writing the reset in `:where()` to keep it weak against *author*
+rules does nothing to keep it weak against the UA.
+
+Every property of the failure is one this repository has a rule against:
+
+- The markup is right. `hidden` is there, `aria-hidden` is there, the sprite is
+  current and complete.
+- Nothing failed. No console error, no missing icon, no check red. The page just
+  started 150px lower.
+- No script could have found it. `check-icons.mjs` verifies the sprite is present
+  and up to date, which it was. It is a cascade-origin interaction and is only
+  true once a page is rendered.
+- Both CI engines agreed, because both were correct.
+
+It was found by somebody looking at a page and asking whether the black bar above
+the header was intentional.
+
+**Do:** restate `[hidden]` after any reset that sets `display` on elements that
+might carry it, at zero specificity so it undoes that reset and nothing else, and
+exclude `hidden="until-found"` — that value is deliberately not `display: none`.
+
+**And:** a reset written in `:where()` is weak against author rules only. Against
+the UA stylesheet it is as strong as any other author declaration, which is the
+whole point of `:where()` being about specificity rather than about origin.

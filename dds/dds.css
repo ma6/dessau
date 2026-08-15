@@ -87,7 +87,7 @@
 @import url("./css/semantic.css?v=2f48f7b6") layer(dds.foundation);
 
 /* Element defaults and the shared floor (focus, motion, forced colours). */
-@import url("./css/base.css?v=cdbf6641");
+@import url("./css/base.css?v=0a797c58");
 
 /* Type utilities and the reading measure. */
 @import url("./css/typography.css?v=31f7bcf8");

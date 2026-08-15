@@ -159,6 +159,31 @@
     max-inline-size: 100%;
   }
 
+  /* `hidden` means hidden, including for everything listed above.
+
+     The UA stylesheet hides `[hidden]` with `display: none`, and that
+     declaration lives in the user-agent origin — which an author declaration
+     beats whatever its specificity, because origin is resolved first and
+     `:where()` scoring zero does not enter into it. So the rule above quietly
+     un-hid every hidden media element in the system.
+
+     The one that mattered was the inline icon sprite: `<svg hidden>` at the top
+     of every page, laid out at the replaced-element default of 300x150 as an
+     empty block, pushing the whole page down by 150px. Nothing failed, nothing
+     logged, no icon went missing, and both engines in CI agreed — because both
+     were right. It took somebody looking at a page and asking what the black bar
+     was for.
+
+     `until-found` is excluded: it is deliberately not `display: none`, because
+     the browser has to be able to find and reveal that content.
+
+     Zero specificity, deliberately. This undoes the reset above and nothing
+     else: a component that sets its own `display` outranks it and keeps its own
+     `[hidden]` rule, which several already have and still need. */
+  :where([hidden]:not([hidden="until-found"])) {
+    display: none;
+  }
+
   :where(img, video) {
     /* Preserve intrinsic proportions when only one dimension is constrained. */
     block-size: auto;
