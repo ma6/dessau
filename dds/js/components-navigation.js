@@ -471,9 +471,22 @@
      * function set on other elements: `inert` on the content and the scroll lock
      * would both survive, leaving a page that looks normal and cannot be scrolled
      * or clicked.
+     *
+     * Observed on the FRAME, not on the window. This is a container-query
+     * component — `isWide()` measures the frame precisely so that it behaves
+     * correctly in a narrow column of a wide window — and a `resize` listener
+     * answers a different question. Every way the container can widen without the
+     * window changing size was therefore missed: a sidebar closing, a
+     * `<details>` opening beside it, a grid track resolving, and the reference's
+     * own width switcher, which sets an inline size on a stage and fires nothing.
+     *
+     * That is the catastrophic case reached by clicking a button in the
+     * documentation.
      */
     var wasWide = isWide();
-    window.addEventListener('resize', function () {
+    var frame = layout.closest('.dds-contentnav-frame') || layout;
+
+    new ResizeObserver(function () {
       var wide = isWide();
       if (wide === wasWide) return;
       wasWide = wide;
@@ -486,7 +499,7 @@
         if (content) content.inert = false;
         document.documentElement.classList.remove('dds-scroll-locked');
       }
-    });
+    }).observe(frame);
   });
 
 })(typeof window !== 'undefined' ? window : globalThis);
