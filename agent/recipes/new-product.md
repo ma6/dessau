@@ -20,8 +20,26 @@ Git submodule, pinned:
 git submodule add https://github.com/ma6/dessau.git libs/dessau
 ```
 
-Or copy `dds/` in. Either way **pinned and local** — never loaded at runtime from a
-shared URL. See `agent/architecture.md` → Distribution.
+Either way **pinned and local** — never loaded at runtime from a shared URL. See
+`agent/architecture.md` → Distribution.
+
+**Or copy `dds/` in**, and know what that costs. Only `dds/` is needed *at
+runtime*; three directories are not runtime and are not optional either:
+
+| Directory | Needed for |
+| --- | --- |
+| `agent/` | The `AGENTS.md` you copy into the product opens with "Read first: `[PATH]/AGENTS.md`, then `[PATH]/agent/index.json`" |
+| `scripts/` | `sync-icons.mjs`, which inlines the icon sprite — step 3 |
+| `reference/` | The rendered proof the same template tells an agent to serve and look at |
+
+A copied `dds/` therefore leaves the product's own `AGENTS.md` pointing at three
+things that are not there, and nothing announces it — the icon step is the only
+part that fails out loud, with *command not found*.
+
+**For a derived design system the copy is not a trade-off, it is the wrong tool**:
+there the scripts are its verification, `index.json` is what its own consumers
+query, and the reference is what it forks its own from. See
+`agent/recipes/derive-a-standalone-system.md`.
 
 Two things a first checkout runs into, both of which cost time and neither of
 which is obvious from the step above:
@@ -80,6 +98,30 @@ which is obvious from the step above:
 </html>
 ```
 
+### Load only the behaviour you use
+
+Every component renders correctly with **CSS alone**. These add behaviour the
+platform does not provide — the shell above loads the first three.
+
+| Script | Gives you |
+| --- | --- |
+| `js/dds.js` | **Required by all the others.** `register` / `enhance` / `announce` / `theme` |
+| `js/format.js` | `DDS.format` — numbers, dates, currency, file sizes |
+| `js/components.js` | Dialog opener, tabs, `DDS.toast()`, copy-to-clipboard |
+| `js/components-forms.js` | Number stepper, file upload, character count, password reveal |
+| `js/components-navigation.js` | Header disclosure, table of contents |
+| `js/components-content.js` | Lightbox, consent embed |
+| `js/patterns/combobox.js` | Autocomplete |
+| `js/patterns/address-search.js` | Address search — **needs `combobox.js`** |
+| `js/patterns/form-validation.js` | Accessible validation and error summary |
+| `js/patterns/conditional-fields.js` | Fields revealed by an earlier answer |
+| `js/patterns/wizard.js` | Multi-step form |
+| `js/patterns/derived-output.js` | A read-only value resolved from input |
+| `js/patterns/auth.js` | Confirming a new password against its repeat |
+
+All `defer`, all in that order. Adding markup later? `DDS.enhance(element)` — that
+is the whole integration for dynamic content.
+
 ## 3. Inline the icon sprite
 
 ```bash
@@ -103,6 +145,24 @@ writing into its own pinned dependency, which is the one thing pinning exists to
 prevent. It stayed invisible for as long as the two sprites happened to match.
 
 Re-run it whenever Dessau is updated.
+
+### Your first component
+
+```html
+<div class="dds-field">
+  <label class="dds-label" for="email">
+    E-Mail-Adresse <span class="dds-label-note">(erforderlich)</span>
+  </label>
+  <input class="dds-input" id="email" name="email" type="email"
+         autocomplete="email" required aria-describedby="email-hint">
+  <p class="dds-hint" id="email-hint">Nur zur Bestätigung der Anfrage.</p>
+</div>
+```
+
+That is the whole contract: a visible label, the right `autocomplete`, required
+stated in words, and the hint referenced from the control. Copy the rest from
+`libs/dessau/reference/` — every component there has a **Show markup** block with
+its real, current markup.
 
 ## 4. Set the locale
 
@@ -130,12 +190,24 @@ will invent a second button style, use raw hex values and write its own ARIA.
 
 ## 7. Before shipping
 
-- `python3 -m http.server` and check **both themes**.
-- Keyboard only, mouse unplugged.
+- `python3 -m http.server` and check **both themes**. Dark is where colour mistakes
+  hide.
+- Keyboard only, mouse unplugged. Everything reachable, focus always visible.
 - 320px wide and 400% zoom.
+- **Disable JavaScript.** Forms must still submit.
 - A screen-reader pass over one complete flow —
   `docs/screenreader-walkthrough.md` is the script.
 - Walk `agent/definition-of-done.md`.
+
+## 8. Updating Dessau later
+
+```bash
+git submodule update --remote libs/dessau
+node libs/dessau/scripts/sync-icons.mjs --dir=.   # the sprite may have changed
+```
+
+A deliberate, separate step: bump, test, commit. **Never part of an unrelated
+feature commit.**
 
 ---
 

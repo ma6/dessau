@@ -7,7 +7,7 @@ Where things belong, and how to decide.
 ## The layer model
 
 ```
-Principles  →  Foundations  →  Components  →  Patterns  →  Products
+Principles → Foundations → Components → Patterns → Derived systems → Products
 ```
 
 Each layer depends **only** on the ones before it. Nothing downstream introduces
@@ -24,6 +24,7 @@ anything in one place.
 | Foundations | Primitive + semantic values | Know about components |
 | Components | Reusable building blocks | Invent a value; know a task |
 | Patterns | Compositions solving a task | Invent a value or a component |
+| Derived systems | Their own foundation, Dessau's everything else | Depend on Dessau at runtime |
 | Products | Actual pages and flows | Redefine a `.dds-*` rule |
 
 ---
@@ -386,6 +387,40 @@ dependency:
 The upgrade path is therefore always: bump the pinned version → test the product →
 commit. A version update is a **deliberate, separate step**, never a side effect of
 an unrelated feature commit.
+
+---
+
+### Where a consumer gets the built stylesheet
+
+Three ways, all equivalent, in the order most projects should try them:
+
+1. **Link the layer files directly**, or link `dds/dds.css` and let its `@import`s
+   fetch them. Works today, no build, no release. One caveat, and it is real:
+   an `@import`ed sheet has not necessarily applied by `DOMContentLoaded`, so a
+   script reading `--dds-*` back out of the computed style can get an empty
+   string. Wait for `load`, or use one of the other two.
+2. **A tagged release**, which carries `dds.css` and `dds.min.css` as attached
+   assets. Built from the tag's own source by
+   `.github/workflows/release.yml` — versioned,
+   immutable, and not in the tree.
+3. **Run `node scripts/bundle.mjs` yourself** and ship the output from your own
+   pipeline.
+
+`dist/` is git-ignored and stays that way: a committed minified file is a second
+copy of the truth that eventually becomes a wrong copy
+(`DECISIONS.md` 023 and 030).
+
+There is no JavaScript bundle. The scripts are separate files a page includes as
+it needs them — `dds.js` plus whichever components and patterns it uses — so
+there is no single order to concatenate them in, and a page using two patterns
+should not download seventeen.
+
+The `?v=<hash>` on every `<link>` and `<script>` is generated, never typed. It is
+the content hash of the file being referenced, so a change to a stylesheet reaches
+a reader who already has the old one — including the eleven layer files behind
+`dds/dds.css`, whose `@import`s are stamped for the same reason. It only works if
+the HTML itself is served with a short cache lifetime; the assets are what this
+makes safe to cache hard. Reasoning: `DECISIONS.md` 026.
 
 ---
 

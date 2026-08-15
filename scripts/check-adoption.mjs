@@ -8,10 +8,10 @@
  * Why this gate exists
  * -----------------------------------------------------------------------------
  *
- * `README.md` describes seven steps to start a project and
- * `agent/recipes/new-product.md` describes the same thing for an agent. Both had
- * been written and neither had been executed by anybody who did not already know
- * the answers (#5).
+ * `agent/recipes/new-product.md` describes how to start a product, and the README
+ * routes to it. The recipe had been written and never executed by anybody who did
+ * not already know the answers (#5) — and the README carried a second, drifted
+ * copy of it until #63.
  *
  * Walking them found what a walk finds: a step that was missing rather than
  * wrong, and a table row that had quietly stopped being true —
@@ -24,7 +24,7 @@
  * the half of it that is mechanical is a check:
  *
  *   1. every repository path the documentation names exists;
- *   2. the README's script table and `dds/js/` agree — in both directions.
+ *   2. the recipe's script table and `dds/js/` agree — in both directions.
  *
  * The second one is the interesting half. A script listed and absent is a broken
  * instruction; a script present and unlisted is a capability nobody knows they
@@ -37,8 +37,8 @@
  *
  * Zero dependencies, Node stdlib only. Exit code 1 on any finding.
  * @catches A path named in the README or in `agent/` that does not exist, and a
- *   script in `dds/js/` that the README's behaviour table has stopped agreeing
- *   with in either direction.
+ *   script in `dds/js/` that the behaviour table in `new-product.md` has stopped
+ *   agreeing with in either direction.
  *
  */
 
@@ -178,20 +178,27 @@ for (const doc of await docs()) {
   }
 }
 
-/* ------------- 2. the README's behaviour table and dds/js agree, both ways */
+/* --------- 2. the recipe's behaviour table and dds/js agree, both ways */
 
-const readme = await readFile(join(ROOT, 'README.md'), 'utf8');
+/**
+ * The table lived in `README.md` until the README became an overview and the
+ * seven steps went back to the one file that owns them. The comment below
+ * anticipated exactly this move, so it was repointed rather than deleted.
+ */
+const BEHAVIOUR_TABLE = 'agent/recipes/new-product.md';
+
+const recipe = await readFile(join(ROOT, BEHAVIOUR_TABLE), 'utf8');
 
 /** Table rows of the shape: | `js/patterns/wizard.js` | what it gives you | */
 const listed = new Set(
-  [...readme.matchAll(/^\|\s*`(js\/[\w./-]+\.js)`\s*\|/gm)].map((m) => `dds/${m[1]}`)
+  [...recipe.matchAll(/^\|\s*`(js\/[\w./-]+\.js)`\s*\|/gm)].map((m) => `dds/${m[1]}`)
 );
 
 if (listed.size === 0) {
   report(
-    "README.md: the behaviour table has no rows this check can read. It looks for " +
-      '`| `js/…` |` — if the table moved or changed shape, this check is now blind ' +
-      'and needs updating rather than deleting.'
+    `${BEHAVIOUR_TABLE}: the behaviour table has no rows this check can read. It ` +
+      'looks for `| `js/…` |` — if the table moved or changed shape, this check is ' +
+      'now blind and needs updating rather than deleting.'
   );
 }
 
@@ -226,7 +233,7 @@ const shipped = await scriptsInDdsJs();
 for (const path of shipped) {
   if (listed.has(path) || NOT_IN_TABLE.has(path)) continue;
   report(
-    `README.md: \`dds/js/\` ships ${path}, which the behaviour table does not ` +
+    `${BEHAVIOUR_TABLE}: \`dds/js/\` ships ${path}, which the behaviour table does not ` +
       `list — a capability nobody is told they have. Add a row, or add it to ` +
       `NOT_IN_TABLE in this script with the reason a product never loads it.`
   );
@@ -234,7 +241,7 @@ for (const path of shipped) {
 
 for (const path of listed) {
   if (shipped.includes(path)) continue;
-  report(`README.md: the behaviour table lists ${path}, which does not exist`);
+  report(`${BEHAVIOUR_TABLE}: the behaviour table lists ${path}, which does not exist`);
 }
 
 for (const [path, reason] of NOT_IN_TABLE) {
