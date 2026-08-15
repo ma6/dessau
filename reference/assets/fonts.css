@@ -16,8 +16,10 @@
    The recipe, as actually applied here
    -----------------------------------------------------------------------------
 
-   1. VARIABLE fonts. One file per family covers every weight, so three files
-      replace what would otherwise be nine or more.
+   1. VARIABLE fonts, as WOFF2. One file per family covers every weight, so three
+      files replace what would otherwise be nine or more, and WOFF2 is the only
+      format worth serving — every browser that supports variable fonts supports
+      it, and nothing else comes close on size.
 
    2. SELF-HOSTED, never a third-party CDN. A CDN reference leaks every reader's
       IP address to another party and puts a third-party connection on the
@@ -31,23 +33,35 @@
       are not reduced to a single family here — a failed font request must
       degrade, not blank the page.
 
-   5. `unicode-range` limited to Latin and Latin Extended-A/-B. That covers every
-      Latin-script language in Europe. The browser downloads a face only if the
-      page actually uses characters in the declared range.
+   5. SUBSET to Latin and Latin Extended-A/-B, and `unicode-range` declaring the
+      same. That covers every Latin-script language in Europe. The two do
+      different jobs: the subset decides what is in the file, the `unicode-range`
+      lets the browser skip the request entirely for a page that needs none of it.
 
    6. The OFL notice travels with the files (`OFL-*.txt` in this directory). The
       licence requires it, and "we linked to it" is not the same thing.
 
    -----------------------------------------------------------------------------
-   Honest note about the format
+   How these files were produced
    -----------------------------------------------------------------------------
 
-   These are TTF, not WOFF2, because that is what Google Fonts publishes in its
-   source repository and converting requires tooling Dessau deliberately does not
-   depend on. WOFF2 would be roughly 60% smaller and is what a production product
-   should ship — see docs/typography.md. For a documentation site behind a normal
-   HTTP server with compression, TTF is acceptable; for a customer-facing product
-   it is not, and pretending otherwise would make this a bad example.
+   The Google Fonts source repository publishes TTF. One command per face, run by
+   hand — the tooling is not a dependency of this repository and is not needed to
+   use it:
+
+     pyftsubset Inter-Variable.ttf \
+       --output-file=Inter-Variable-latin-ext.woff2 --flavor=woff2 \
+       --unicodes="U+0000-00FF,U+0100-024F,U+2000-206F,U+20A0-20BF,U+2122,U+2212" \
+       --layout-features+="tnum,pnum,lnum,onum,zero,frac,cv05,ss03"
+
+   1200 kB of TTF became 194 kB of WOFF2, and the variable axes survive intact.
+
+   The `--layout-features` list is the part that is easy to get wrong. A subsetter
+   keeps a default set of OpenType features and drops the rest, and `tnum`, `cv05`
+   and `ss03` are not in that default set — but DDS uses all three (see
+   `typography.css` and `base.css`). Dropped, the tables lose their tabular
+   figures and nothing anywhere reports an error. Whatever a stylesheet asks for
+   by name has to be named here too.
    ============================================================================= */
 
 /* The Latin coverage this project needs: Basic Latin, Latin-1 Supplement,
@@ -57,7 +71,7 @@
 /* --------------------------------------------------------------- body / UI */
 @font-face {
   font-family: "Inter";
-  src: url("fonts/Inter-Variable.ttf") format("truetype-variations");
+  src: url("fonts/Inter-Variable-latin-ext.woff2") format("woff2");
   /* The whole axis, because it is one variable file. */
   font-weight: 100 900;
   font-style: normal;
@@ -68,7 +82,7 @@
 /* ------------------------------------------------------------------ display */
 @font-face {
   font-family: "Space Grotesk";
-  src: url("fonts/SpaceGrotesk-Variable.ttf") format("truetype-variations");
+  src: url("fonts/SpaceGrotesk-Variable-latin-ext.woff2") format("woff2");
   font-weight: 300 700;
   font-style: normal;
   font-display: swap;
@@ -78,7 +92,7 @@
 /* --------------------------------------------------------------- monospace */
 @font-face {
   font-family: "JetBrains Mono";
-  src: url("fonts/JetBrainsMono-Variable.ttf") format("truetype-variations");
+  src: url("fonts/JetBrainsMono-Variable-latin-ext.woff2") format("woff2");
   font-weight: 100 800;
   font-style: normal;
   font-display: swap;

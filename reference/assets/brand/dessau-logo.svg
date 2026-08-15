@@ -39,7 +39,8 @@
 
   An SVG used as an image gets no fonts from the document, so a text element
   would render in Inter only on machines that already have Inter. Outlines are
-  fixed. Extracted from reference/assets/fonts/Inter-Variable.ttf by instancing
+  fixed. Extracted from the unsubset Inter-Variable.ttf as published by
+  github.com/google/fonts — not from the subset WOFF2 this site now serves — by instancing
   the wght axis (gvar deltas, IUP for the points a tuple does not list, and the
   phantom points for the advance widths), verified by instancing at the default
   weight and diffing against the static outline.

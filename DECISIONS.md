@@ -1082,6 +1082,18 @@ recipe as a decision the product makes, and would be a default in the file.
 **Cost.** Self-hosting stays six manual steps. A product that gets one of them
 wrong finds out from its own network tab rather than from us.
 
+**Amended by #23 — a fourth way it goes wrong, and the worst of the four.** A
+subsetter keeps a default set of OpenType features and drops the rest, and
+`tnum`, `cv05` and `ss03` are not in that default set although DDS asks for all
+three by name. Dropped, tabular figures stop aligning and no tool anywhere
+reports it: the font loads, the network tab is clean, and the page is subtly
+wrong. Unlike the other three, this one is invisible in the network tab — which
+is the only place the paragraph above expects a product to catch its mistakes.
+It is now written into the recipe in `docs/typography.md` and beside the
+commands in `reference/assets/fonts.css`. It does not change the answer, because
+a shipped `fonts.css` could not have prevented it either — the feature list
+belongs to the subsetting step, not to the declaration.
+
 **Reversal condition.** Evidence rather than anticipation: a product that
 followed the recipe and still got it wrong. The first fix would then be a clearer
 recipe, and the file only if that failed too.

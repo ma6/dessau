@@ -11,9 +11,9 @@
 <meta name="color-scheme" content="dark light">
 <link rel="icon" href="assets/brand/dessau-icon.svg" type="image/svg+xml">
 <script src="../dds/js/theme-init.js?v=eb2c6b3a"></script>
-<link rel="preload" href="assets/fonts/Inter-Variable.ttf" as="font"
-      type="font/ttf" crossorigin>
-<link rel="stylesheet" href="assets/fonts.css?v=395fbad1">
+<link rel="preload" href="assets/fonts/Inter-Variable-latin-ext.woff2" as="font"
+      type="font/woff2" crossorigin>
+<link rel="stylesheet" href="assets/fonts.css?v=713f2669">
 <link rel="stylesheet" href="../dds/dds.css?v=0e36725a">
 <link rel="stylesheet" href="assets/reference.css?v=c6855308">
 </head>
@@ -720,33 +720,35 @@
                   <tbody>
                     <tr>
                       <th scope="row">Inter</th>
-                      <td class="dds-code">Inter-Variable.ttf</td>
+                      <td class="dds-code">Inter-Variable-latin-ext.woff2</td>
                       <td><code class="dds-code">wght 100–900</code>, <code class="dds-code">opsz</code></td>
-                      <td class="dds-table-numeric">856 kB</td>
+                      <td class="dds-table-numeric">117 kB</td>
                     </tr>
                     <tr>
                       <th scope="row">Space Grotesk</th>
-                      <td class="dds-code">SpaceGrotesk-Variable.ttf</td>
+                      <td class="dds-code">SpaceGrotesk-Variable-latin-ext.woff2</td>
                       <td><code class="dds-code">wght 300–700</code></td>
-                      <td class="dds-table-numeric">133 kB</td>
+                      <td class="dds-table-numeric">30 kB</td>
                     </tr>
                     <tr>
                       <th scope="row">JetBrains Mono</th>
-                      <td class="dds-code">JetBrainsMono-Variable.ttf</td>
+                      <td class="dds-code">JetBrainsMono-Variable-latin-ext.woff2</td>
                       <td><code class="dds-code">wght 100–800</code></td>
-                      <td class="dds-table-numeric">183 kB</td>
+                      <td class="dds-table-numeric">42 kB</td>
                     </tr>
                   </tbody>
                 </table>
               </div>
               <p class="ref-note">
-                <svg class="dds-icon" aria-hidden="true"><use href="#dds-icon-warning"/></svg>
-                <strong>These are TTF, not WOFF2</strong> — because that is what the
-                Google Fonts source repository publishes, and converting needs
-                tooling Dessau deliberately does not depend on. WOFF2 is roughly 60%
-                smaller and is what a <em>product</em> should ship. Stating that
-                rather than quietly shipping the larger format is the difference
-                between a worked example and a bad one.
+                <svg class="dds-icon" aria-hidden="true"><use href="#dds-icon-info"/></svg>
+                <strong>1200 kB became 194 kB.</strong> The Google Fonts source
+                repository publishes TTF covering every script the family supports;
+                these are subset to Latin and Latin Extended-A/-B and converted to
+                WOFF2, one <code class="dds-code">pyftsubset</code> command per face,
+                run by hand. That tooling is not a dependency of Dessau and is not
+                needed to use it &mdash; the commands are in
+                <code class="dds-code">reference/assets/fonts.css</code>, next to the
+                one flag that is easy to get wrong.
               </p>
             </div>
 

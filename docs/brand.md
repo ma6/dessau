@@ -117,10 +117,11 @@ tracking inside the word — that letterfit is the typeface's.
 **Outlines, not live text.** An SVG used as an image gets no fonts from the
 document, so a `<text>` element would render in Inter only on machines that
 already have Inter. The outlines were produced by instancing the variable font
-directly from `reference/assets/fonts/Inter-Variable.ttf` — `gvar` deltas, IUP
-for the points a tuple does not list, and the phantom points for the advance
-widths — and the instancer was checked by running it at the default weight and
-diffing the result against the static outline.
+directly — `gvar` deltas, IUP for the points a tuple does not list, and the
+phantom points for the advance widths — and the instancer was checked by running
+it at the default weight and diffing the result against the static outline. The
+source was the unsubset `Inter-Variable.ttf` as published by
+`github.com/google/fonts`, not the subset WOFF2 the reference site now serves.
 
 ---
 

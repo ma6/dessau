@@ -153,9 +153,7 @@ IP address to another party and adds a connection on the critical path.
 
    **Convert to WOFF2.** The Google Fonts repository publishes TTF, which is
    roughly 60% larger. `woff2_compress`, or `fonttools` with the `woff2` extra,
-   does it in one command. The reference site here ships TTF and says so, because
-   converting needs tooling Dessau deliberately does not depend on — a product with
-   any build step at all should not copy that compromise.
+   does it in one command.
 
 2. **Subset them.** Latin plus Latin Extended-A and -B covers every
    Latin-script language in Europe — German, French, Turkish, Polish, Czech,
@@ -164,12 +162,34 @@ IP address to another party and adds a connection on the critical path.
    German-only product: it costs almost nothing to keep and means another
    language later needs no font rebuild.
 
+   `fonttools` does both steps at once, and the reference site in this repository
+   is the worked example — three faces, 1200 kB of TTF down to 194 kB:
+
+   ```bash
+   pyftsubset Inter-Variable.ttf \
+     --output-file=Inter-Variable-latin-ext.woff2 --flavor=woff2 \
+     --unicodes="U+0000-00FF,U+0100-024F,U+2000-206F,U+20A0-20BF,U+2122,U+2212" \
+     --layout-features+="tnum,pnum,lnum,onum,zero,frac,cv05,ss03"
+   ```
+
+   **Name every OpenType feature your stylesheets ask for.** A subsetter keeps a
+   default set and silently drops the rest, and `tnum`, `cv05` and `ss03` are not
+   in the default set — DDS uses all three. Lose them and tabular figures stop
+   aligning, with no error anywhere. This is the step that gets forgotten, because
+   the font still loads and still looks nearly right.
+
+   The tooling runs once, by hand. It is not a dependency of Dessau, and nothing
+   in this repository needs it installed.
+
 3. **Declare them**, in a stylesheet loaded before `dds.css`:
 
    ```css
    @font-face {
      font-family: "Inter";
-     src: url("/fonts/Inter-Variable-latin-ext.woff2") format("woff2-variations");
+     /* Plain `woff2`, not `woff2-variations`: that string is from a superseded
+        draft, and a format hint a browser does not recognise makes it skip the
+        source entirely rather than fall back. */
+     src: url("/fonts/Inter-Variable-latin-ext.woff2") format("woff2");
      /* The whole range, because it is one variable file. */
      font-weight: 100 900;
      font-style: normal;
