@@ -341,6 +341,7 @@
           <div class="ref-specimen">
             <p class="ref-specimen-label">Live — searching example data</p>
 
+            <div data-ref-bp>
             <div class="dds-address-search" data-dds-address-search
                  data-dds-address-provider="referenceAddressProvider">
 
@@ -411,6 +412,16 @@
               <span class="dds-nowrap">“1000”</span> or
               <span class="dds-nowrap">“Königsallee”</span>. Search by street,
               postcode or city — people search by whichever part they remember.
+            </p>
+            </div>
+            <p class="ref-note">
+              <svg class="dds-icon" aria-hidden="true"><use href="#dds-icon-info"/></svg>
+              <strong>Above 26rem of its own width</strong> the postcode and the
+              town sit side by side; below it they stack. The threshold comes from
+              the fields, not from a device: it is the width at which a five-digit
+              postcode and a town name stop fitting on one line together. The
+              component is its own container — it styles only descendants, so it
+              needs no frame element.
             </p>
           </div>
 
@@ -1411,6 +1422,7 @@
         </div>
 
         <div class="ref-specimen">
+          <div data-ref-bp>
           <div class="dds-filtering">
             <div class="dds-filtering-frame">
               <div class="dds-filtering-split">
@@ -1481,6 +1493,7 @@
                 </div>
               </div>
             </div>
+          </div>
           </div>
           <p class="ref-note">
             <svg class="dds-icon" aria-hidden="true"><use href="#dds-icon-info"/></svg>

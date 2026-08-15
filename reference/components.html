@@ -1418,6 +1418,18 @@
           </p>
         </div>
 
+          <p class="ref-note">
+            <svg class="dds-icon" aria-hidden="true"><use href="#dds-icon-info"/></svg>
+            <strong>One variant depends on the device rather than on space:</strong>
+            <code class="dds-code">.dds-dialog-sheet</code> anchors to the bottom
+            edge below 30rem of <em>viewport</em>, because “reachable by a thumb” is
+            a property of the screen and not of the box the dialog was given. It is
+            therefore the one case a width switcher cannot show: the switcher
+            narrows a stage, and a media query reads the window. Resize the browser
+            to see it, or open the bottom sheet on a phone.
+          </p>
+
+
         <div class="ref-specimen">
           <div class="dds-cluster dds-cluster-sm">
             <button type="button" class="dds-button dds-button-secondary" data-dds-dialog-open="demo-dialog">

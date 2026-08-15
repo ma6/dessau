@@ -331,6 +331,17 @@ It only works on components that respond to their container. A component using
 visibly do nothing. That is the practical enforcement of the rule at the top of
 this file.
 
+**Both halves are checked.** `scripts/check-reference.mjs` reads every width
+query out of the stylesheets, maps the classes inside it back to their index
+entry, and fails when that entry's section has no `.ref-note` — or, for a
+container query, no `data-ref-bp` around its specimen. The two cases differ on
+purpose: a viewport media query needs the note and cannot use the switcher, and
+saying so is what the note is for. `.dds-dialog-sheet` is the one component in
+that position.
+
+It is read from the CSS rather than from a list, so a component that gains a
+query is caught the same day rather than when somebody remembers to look.
+
 ---
 
 ## What to verify

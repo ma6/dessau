@@ -637,6 +637,86 @@ for (const [path, page] of pages) {
   }
 }
 
+/* --------------- 13. width-dependent behaviour can be seen without a phone */
+
+/**
+ * A component that changes shape by width gets a width switcher around its
+ * specimen and a note saying what it does.
+ *
+ * `agent/responsive.md` calls the switcher the most useful documentation tool in
+ * the system, and gives the reason: without it nobody looks at the narrow state —
+ * not the person building the component, not the person reviewing it, and not a
+ * tool. On the day this check was written, `data-ref-bp` appeared six times in a
+ * reference holding 229 specimens.
+ *
+ * The two kinds of width-dependence are checked differently, and the difference
+ * is the point:
+ *
+ *   - **A container query** reads the stage the switcher narrows, so the switcher
+ *     demonstrates it. Both are required.
+ *   - **A viewport media query** reads the window, which the switcher does not
+ *     change — the buttons would visibly do nothing. Only the note is required,
+ *     and it is the note that should say so.
+ *
+ * Read from the stylesheets rather than from a list, so a component that gains a
+ * query is caught the same day rather than when somebody remembers.
+ */
+const queryClasses = { container: new Set(), media: new Set() };
+
+for (const match of cssCode.matchAll(/@(container|media)([^{]*)\{/g)) {
+  const [, kind, condition] = match;
+  if (!/inline-size|min-width|max-width|width\s*[<>]/.test(condition)) continue;
+
+  // Walk to the matching brace: the block may contain nested rules.
+  let depth = 1;
+  let i = match.index + match[0].length;
+  while (depth > 0 && i < cssCode.length) {
+    if (cssCode[i] === '{') depth += 1;
+    else if (cssCode[i] === '}') depth -= 1;
+    i += 1;
+  }
+
+  for (const rule of cssCode.slice(match.index + match[0].length, i).matchAll(/\.(dds-[\w-]+)/g)) {
+    queryClasses[kind].add(`.${rule[1]}`);
+  }
+}
+
+/** The markup of one section of a reference page, by anchor. */
+function sectionSource(pagePath, anchor) {
+  const page = pages.get(pagePath);
+  if (!page) return null;
+  const at = page.source.indexOf(`id="${anchor}"`);
+  if (at === -1) return null;
+  const end = page.source.indexOf('</section>', at);
+  return page.source.slice(at, end === -1 ? undefined : end);
+}
+
+for (const entry of entries) {
+  const classes = entry.classes || [];
+  const byContainer = classes.some((name) => queryClasses.container.has(name));
+  const byViewport = classes.some((name) => queryClasses.media.has(name));
+  if (!byContainer && !byViewport) continue;
+
+  const [pagePath, anchor] = entry.reference.split('#');
+  const section = sectionSource(pagePath, anchor);
+  if (!section) continue; // the anchor check above already reports this
+
+  if (!/\bref-note\b/.test(section)) {
+    report(
+      `${entry.kind} "${entry.name}": changes shape by width and its section has no ` +
+        `.ref-note saying what it does — the narrow state is then documented nowhere`
+    );
+  }
+
+  if (byContainer && !/\bdata-ref-bp\b/.test(section)) {
+    report(
+      `${entry.kind} "${entry.name}": responds to its container but its specimen has ` +
+        `no width switcher (data-ref-bp), so nobody can see the narrow state without ` +
+        `resizing a window`
+    );
+  }
+}
+
 /* ------------------- 12. every visible table is in a real scroll region */
 
 /**
