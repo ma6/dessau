@@ -14,7 +14,7 @@
 <link rel="preload" href="assets/fonts/Inter-Variable-latin-ext.woff2" as="font"
       type="font/woff2" crossorigin>
 <link rel="stylesheet" href="assets/fonts.css?v=713f2669">
-<link rel="stylesheet" href="../dds/dds.css?v=66998a3e">
+<link rel="stylesheet" href="../dds/dds.css?v=d49721e2">
 <link rel="stylesheet" href="assets/reference.css?v=c6855308">
 </head>
 <body>
@@ -559,18 +559,37 @@
 &lt;div class="dds-chart-bar" data-dds-accent="4"&gt;</code></pre>
             </div>
 
+            <div class="ref-specimen dds-mbs-md">
+              <p class="ref-specimen-label">
+                A product names the slots itself, in its own unlayered stylesheet
+              </p>
+              <pre class="ref-code" tabindex="0" role="region"
+                   aria-label="Naming the accent slots in a product"><code>/* product.css — loaded last, unlayered */
+
+[data-dds-accent="finance"] {                        a category, named for what it is
+  --dds-color-accent:        var(--dds-color-accent-2);
+  --dds-color-accent-subtle: var(--dds-color-accent-2-subtle);
+}
+
+[data-dds-accent="cyan"] {                           and a hue name is fine HERE
+  --dds-color-accent:        var(--dds-color-accent-3);
+  --dds-color-accent-subtle: var(--dds-color-accent-3-subtle);
+}</code></pre>
+            </div>
+
             <p class="ref-note">
               <svg class="dds-icon" aria-hidden="true"><use href="#dds-icon-info"/></svg>
-              A product names these itself. The number is deliberately meaningless,
-              because the meaning is not Dessau’s to hold — what a category
-              <em>is</em> lives one layer up. Declare
-              <code class="dds-code">[data-dds-accent="finance"]</code> in your own
-              unlayered stylesheet, point it at
-              <code class="dds-code">--dds-color-accent-2</code>, and never write a
-              bare number again. Hue names were the API until a derived system
-              replaced a ramp and left <code class="dds-code">clay</code> rendering
-              grey; a number cannot go stale, and the name that can is one the
-              product owns.
+              <strong>Why the second one is allowed and Dessau’s was not.</strong>
+              It is the same name — but in your stylesheet you own the ramp
+              <em>and</em> the name, so they move in one commit, by one person, in
+              one file. Dessau could not promise that: it owned the name while the
+              ramp was yours to replace, so a slot called <code class="dds-code">clay</code>
+              went on saying clay after you had made it grey. The rename was never
+              “hue names are bad” — it was that a hue name belongs to whoever can
+              keep it true. If
+              you re-tune your own ramp later, <code class="dds-code">cyan</code>
+              goes stale too. That is now a problem you can see and fix, which is
+              the whole difference.
             </p>
           </div>
 

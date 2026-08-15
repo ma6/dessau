@@ -132,7 +132,18 @@ template:
   --dds-color-accent:        var(--dds-color-accent-2);
   --dds-color-accent-subtle: var(--dds-color-accent-2-subtle);
 }
+
+[data-dds-accent="cyan"] {          /* naming one after its hue is fine here */
+  --dds-color-accent:        var(--dds-color-accent-3);
+  --dds-color-accent-subtle: var(--dds-color-accent-3-subtle);
+}
 ```
+
+The second one is not a contradiction of the paragraph below. In *your* stylesheet
+the ramp and the name move together — one file, one commit, one owner — which is
+exactly the promise Dessau could not make while the ramp was yours to replace. The
+staleness comes back only if you re-tune your own ramp and leave the alias, and
+then it is a line you can grep for in your own repository.
 
 **If you only need one brand accent** and no categories at all, skip the slots
 and repoint the two tokens in force, per theme:

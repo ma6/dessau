@@ -848,6 +848,13 @@ Items are `<button>` or `<a>` in a list, **not** `role="menu"`/`menuitem`. That
 role switches assistive technology into application mode and changes what keys do;
 it is for a desktop application menu bar, not a dropdown of links.
 
+Placement is CSS anchor positioning against the **implicit** anchor, behind
+`@supports`, and the `@supports` block must release `inset` before anchoring an
+edge — the UA gives a popover `position: fixed; inset: 0; margin: auto`, and half
+of that trio left in place puts the menu in a corner of the screen rather than
+under its button. Without anchor positioning the menu is centred, which is the
+same UA default stated explicitly.
+
 ## Filter bar — `.dds-filterbar` · Toolbar — `.dds-toolbar`
 
 Applied filters **must** be visible as removable chips. A short list with three

@@ -621,11 +621,20 @@
      application menu bar, not a dropdown of links, and using it here makes the
      control less familiar rather than more. */
   .dds-menu {
-    position: absolute;
+    /* Placement where anchor positioning is missing: centred in the viewport.
+       That is the UA default for a popover, restated here rather than inherited,
+       because the UA default is three declarations that only work together —
+       `position: fixed`, `inset: 0`, `margin: auto`. Taking two of them and
+       leaving `inset: 0` behind is how this menu ended up pinned to the top-left
+       corner of the screen (#48): a max-content box with all four insets at 0
+       and no auto margin collapses into the start corner. */
+    position: fixed;
+    inset: 0;
+    margin: auto;
+
     inline-size: max-content;
     min-inline-size: 12rem;
     max-inline-size: 20rem;
-    margin: 0;
     padding: var(--dds-space-3xs);
 
     background-color: var(--dds-color-surface-raised);
@@ -636,9 +645,17 @@
 
   /* Anchor to the invoker. A popover opened via `popovertarget` gets its invoker
      as an implicit anchor, so no anchor name is needed — which matters, because
-     naming would mean a unique name per menu instance. */
+     naming would mean a unique name per menu instance.
+
+     `inset: auto` first: the two anchored insets below only place the menu if the
+     other two are released. Left at 0 the box is over-constrained, and an
+     over-constrained box drops the anchored edge, not the zero. */
   @supports (anchor-name: --dds-probe) {
     .dds-menu {
+      position: absolute;
+      inset: auto;
+      margin: 0;
+
       inset-block-start: anchor(bottom);
       inset-inline-end: anchor(right);
       margin-block-start: var(--dds-space-3xs);

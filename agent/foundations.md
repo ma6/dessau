@@ -190,7 +190,19 @@ stylesheet:
   --dds-color-accent:        var(--dds-color-accent-2);
   --dds-color-accent-subtle: var(--dds-color-accent-2-subtle);
 }
+
+[data-dds-accent="cyan"] {          /* a hue name is fine here — see below */
+  --dds-color-accent:        var(--dds-color-accent-3);
+  --dds-color-accent-subtle: var(--dds-color-accent-3-subtle);
+}
 ```
+
+**A hue name in a product is allowed, and this is not a contradiction.** In the
+product's own stylesheet the ramp and the name move together — one file, one
+commit, one owner. Dessau could not promise that, because it held the name while
+the ramp was the product's to replace. Name a slot after its hue if that is what
+it is to you; just know that re-tuning your own ramp later makes it stale, and
+that this time you are the one who can see it.
 
 **Why not hue names.** They were the API — `clay`, `magenta`, `cyan`, `green`,
 `violet` — and they were wrong for the one reader this layer exists to serve. A

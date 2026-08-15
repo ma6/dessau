@@ -1617,10 +1617,17 @@
      dismiss behaviour (Escape, click outside) for free. */
   .dds-tooltip {
     /* `popover` renders in the top layer, so no z-index or overflow ancestor
-       can clip it. */
-    position: absolute;
+       can clip it.
+
+       Placement where anchor positioning is missing: centred in the viewport,
+       the UA default for a popover. It is restated here because those three
+       declarations only work together — keeping `inset: 0` while overriding
+       `margin` puts the tooltip in the top-left corner of the screen (#48). */
+    position: fixed;
+    inset: 0;
+    margin: auto;
+
     max-inline-size: 20rem;
-    margin: 0;
     padding: var(--dds-space-2xs) var(--dds-space-xs);
 
     font-size: var(--dds-font-size-sm);
@@ -1644,6 +1651,12 @@
      positioned by the UA default. */
   @supports (anchor-name: --dds-probe) {
     .dds-tooltip {
+      position: absolute;
+      /* Release the centring insets before anchoring one edge: an
+         over-constrained box drops the anchored edge and keeps the zero. */
+      inset: auto;
+      margin: 0;
+
       inset-block-end: anchor(top);
       justify-self: anchor-center;
       margin-block-end: var(--dds-space-2xs);
