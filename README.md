@@ -115,6 +115,67 @@ serve the pages for the same reason.
 
 Seven steps. No build step, no dependencies, no framework.
 
+### Or hand it to an agent
+
+If a coding agent is doing the setup, paste this into an **empty product
+repository**. It routes the agent through the recipes rather than repeating them,
+so it cannot go stale against them.
+
+```text
+This product uses Dessau as its design system.
+
+1. Add it as a submodule at libs/dessau:
+   git submodule add https://github.com/ma6/dessau.git libs/dessau
+
+2. Read, in this order, and treat them as authoritative over anything you
+   already believe about design systems:
+   - libs/dessau/AGENTS.md
+   - libs/dessau/agent/index.json
+   - libs/dessau/agent/recipes/derive-a-design-system.md
+   - libs/dessau/agent/recipes/new-product.md
+
+3. Work through derive-a-design-system.md FIRST. It is six decisions: colour,
+   type, roundness, density, depth, motion.
+
+   ASK ME each one. Do not answer them yourself and do not take the defaults
+   silently. They are decisions about this product, not facts you can look up —
+   and roundness in particular is close to unchangeable once there are forty
+   components. Tell me what the default is and what it would cost to change it,
+   then wait.
+
+   Write my answers into this repository's DECISIONS.md: the decision, why, what
+   it cost, and what would have to be true for it to be wrong. Say explicitly
+   which of the six I took the default for.
+
+4. Then follow new-product.md end to end.
+
+5. Copy libs/dessau/agent/consumer-AGENTS.template.md into this repository as
+   AGENTS.md, fill in every [PLACEHOLDER], and point CLAUDE.md at it — one
+   instruction set, never two divergent copies.
+
+Two things you will not discover on your own, and both fail silently:
+
+- The pages must be SERVED, not opened as file://. The paths are absolute
+  (/libs/dessau/…), so a file:// origin resolves them against the disk root and
+  loads no stylesheet, no script, and reports no error.
+  python3 -m http.server 8000 --bind 127.0.0.1
+
+- The icon sprite must be INLINED into each document:
+  node libs/dessau/scripts/sync-icons.mjs --dir=.
+  An external <use href="icons.svg#…"> breaks currentColor silently — the icon
+  renders, in black, in both themes.
+
+Before you tell me it is done:
+  node libs/dessau/scripts/sync-icons.mjs --dir=. --check
+  and walk libs/dessau/agent/definition-of-done.md.
+
+Build nothing that agent/index.json already lists. If something is close but not
+right, say so and ask — a second button style is a defect, not a variant.
+```
+
+Then the seven steps below are what the agent is actually doing, and what you are
+checking it against.
+
 ### 1. Bring Dessau in
 
 Pinned and local — never loaded at runtime from a shared URL, so a change here can
@@ -353,6 +414,17 @@ The test applied to all of it:
 
 > **What does an agent need in order to build a new product correctly with Dessau,
 > without rediscovering its rules?**
+
+The sentence that starts that is in
+[Start a new project → Or hand it to an agent](#or-hand-it-to-an-agent) — a
+copy-pasteable prompt for an empty product repository. It points at the recipes
+instead of restating them, and it makes the agent **ask** the six design decisions
+rather than answer them, because an agent that answers them has not chosen
+neutrality; it has chosen Dessau's taste and presented it as a decision.
+
+It has not itself been executed against a real product — see
+[`agent/consumer-AGENTS.template.md`](agent/consumer-AGENTS.template.md), which
+says the same about itself.
 
 ---
 
