@@ -317,18 +317,30 @@
             <ul>
               <li><a href="#button">Button</a></li>
               <li><a href="#field">Field</a></li>
-              <li><a href="#choice">Checkbox, radio and switch</a></li>
-              <li><a href="#controls">Stepper, segmented control and upload</a></li>
+              <li><a href="#password">Password field</a></li>
+              <li><a href="#choice">Checkbox and radio</a></li>
+              <li><a href="#switch">Switch</a></li>
+              <li><a href="#stepper">Number stepper</a></li>
+              <li><a href="#segmented">Segmented control</a></li>
+              <li><a href="#upload">File upload</a></li>
+              <li><a href="#range">Range and character count</a></li>
+              <li><a href="#date-field">Date field</a></li>
               <li><a href="#theme-toggle">Theme toggle</a></li>
-              <li><a href="#badge">Badge and card</a></li>
+              <li><a href="#badge">Badge</a></li>
+              <li><a href="#card">Card</a></li>
               <li><a href="#notice">Notice</a></li>
               <li><a href="#dialog">Dialog</a></li>
               <li><a href="#table">Table</a></li>
-              <li><a href="#tabs">Tabs and disclosure</a></li>
+              <li><a href="#tabs">Tabs</a></li>
+              <li><a href="#disclosure">Disclosure</a></li>
               <li><a href="#accordion">Accordion</a></li>
-              <li><a href="#smaller">Date, search, kbd and divider</a></li>
-              <li><a href="#overlays">Tooltip and bottom sheet</a></li>
-              <li><a href="#feedback">Feedback and loading</a></li>
+              <li><a href="#search">Search field</a></li>
+              <li><a href="#kbd">Keyboard keys</a></li>
+              <li><a href="#divider">Divider</a></li>
+              <li><a href="#tooltip">Tooltip</a></li>
+              <li><a href="#sheet">Bottom sheet</a></li>
+              <li><a href="#toast">Toast</a></li>
+              <li><a href="#progress">Progress, spinner and skeleton</a></li>
             </ul>
             <!-- REF_TOC:END -->
           </nav>
@@ -596,6 +608,19 @@
             </div>
           </div>
 
+          </div>
+      </section>
+
+      <!-- ============================================================ password -->
+      <section class="ref-section" id="password">
+        <div class="ref-section-head">
+          <h2>Password field</h2>
+            <p class="dds-text-subtle dds-measure-default dds-mbs-xs">
+              A text field with a reveal toggle. Masked by default, and never masked in a way that stops a password manager working.
+            </p>
+        </div>
+
+        <div class="dds-stack dds-stack-lg">
           <div class="ref-specimen">
             <p class="ref-specimen-label">Password — the reveal toggle is not optional</p>
             <div class="ref-matrix">
@@ -703,7 +728,7 @@
       <!-- ================================================= choice and switch -->
       <section class="ref-section" id="choice">
         <div class="ref-section-head">
-          <h2>Checkbox, radio and switch</h2>
+          <h2>Checkbox and radio</h2>
           <p class="dds-text-subtle dds-measure-default dds-mbs-xs">
             Native inputs, laid out — not replaced.
             <code class="dds-code">accent-color</code> tints them, which is all
@@ -785,6 +810,19 @@
             </fieldset>
           </div>
 
+          </div>
+      </section>
+
+      <!-- ============================================================ switch -->
+      <section class="ref-section" id="switch">
+        <div class="ref-section-head">
+          <h2>Switch</h2>
+            <p class="dds-text-subtle dds-measure-default dds-mbs-xs">
+              For a setting that takes effect the moment it is changed. Anything that needs a Save button is a checkbox.
+            </p>
+        </div>
+
+        <div class="dds-stack dds-stack-lg">
           <div class="ref-specimen">
             <p class="ref-specimen-label">Switch — for a setting that takes effect immediately</p>
             <div class="dds-stack dds-stack-xs">
@@ -813,9 +851,9 @@
       </section>
 
       <!-- ==================================================== form controls -->
-      <section class="ref-section" id="controls">
+      <section class="ref-section" id="stepper">
         <div class="ref-section-head">
-          <h2>Stepper, segmented control and upload</h2>
+          <h2>Number stepper</h2>
           <p class="dds-text-subtle dds-measure-default dds-mbs-xs">
             Three places where the native element genuinely is not enough on its
             own — and three where it is still the control underneath.
@@ -853,6 +891,19 @@
             </p>
           </div>
 
+          </div>
+      </section>
+
+      <!-- ============================================================ segmented -->
+      <section class="ref-section" id="segmented">
+        <div class="ref-section-head">
+          <h2>Segmented control</h2>
+            <p class="dds-text-subtle dds-measure-default dds-mbs-xs">
+              Two to five mutually exclusive options, all visible at once. Built from radios, so the keyboard behaviour is the platform's.
+            </p>
+        </div>
+
+        <div class="dds-stack dds-stack-lg">
           <div class="ref-specimen" data-ref-code>
             <p class="ref-specimen-label">Segmented control</p>
             <fieldset class="dds-segmented">
@@ -878,6 +929,19 @@
             </p>
           </div>
 
+          </div>
+      </section>
+
+      <!-- ============================================================ upload -->
+      <section class="ref-section" id="upload">
+        <div class="ref-section-head">
+          <h2>File upload</h2>
+            <p class="dds-text-subtle dds-measure-default dds-mbs-xs">
+              A real file input, styled. What it accepts and how large a file may be is said before the dialog opens, not after.
+            </p>
+        </div>
+
+        <div class="dds-stack dds-stack-lg">
           <div class="ref-specimen" data-ref-code>
             <p class="ref-specimen-label">File upload</p>
             <div class="dds-upload" data-dds-upload data-dds-upload-max-bytes="10485760" lang="de">
@@ -914,6 +978,19 @@
             </p>
           </div>
 
+          </div>
+      </section>
+
+      <!-- ============================================================ range -->
+      <section class="ref-section" id="range">
+        <div class="ref-section-head">
+          <h2>Range and character count</h2>
+            <p class="dds-text-subtle dds-measure-default dds-mbs-xs">
+              A slider for a value whose exactness does not matter, and a live count for a limited field.
+            </p>
+        </div>
+
+        <div class="dds-stack dds-stack-lg">
           <div class="ref-specimen" data-ref-code>
             <p class="ref-specimen-label">Range and character count</p>
             <div class="dds-stack dds-stack-md" style="max-inline-size: 26rem">
@@ -946,6 +1023,63 @@
               The character count updates visibly on every keystroke but is
               announced only when it starts to matter, debounced. A live region
               reading a number after every character is unusable.
+            </p>
+          </div>
+
+          </div>
+      </section>
+
+      <!-- ============================================================ date-field -->
+      <section class="ref-section" id="date-field">
+        <div class="ref-section-head">
+          <h2>Date field</h2>
+            <p class="dds-text-subtle dds-measure-default dds-mbs-xs">
+              The native date control, and a range built from two of them. The expected format is stated in a hint, because the placeholder is the browser's and follows the locale.
+            </p>
+        </div>
+
+        <div class="dds-stack dds-stack-lg">
+          <div class="ref-specimen" data-ref-code>
+            <p class="ref-specimen-label">Date field — the native picker</p>
+            <div class="ref-matrix" lang="de">
+              <div class="dds-field">
+                <label class="dds-label" for="d-bday">
+                  Geburtsdatum <span class="dds-label-note">(erforderlich)</span>
+                </label>
+                <input class="dds-input" id="d-bday" name="bday" type="date"
+                       autocomplete="bday" required aria-describedby="d-bday-hint">
+                <p class="dds-hint" id="d-bday-hint">Format: TT.MM.JJJJ</p>
+              </div>
+
+              <div class="dds-field">
+                <label class="dds-label" for="d-start">Beginn</label>
+                <input class="dds-input" id="d-start" name="start" type="date"
+                       autocomplete="off" min="2026-01-01" aria-describedby="d-start-hint">
+                <p class="dds-hint" id="d-start-hint">Frühestens heute. Format: TT.MM.JJJJ</p>
+              </div>
+            </div>
+            <div class="dds-field dds-mbs-md" style="max-inline-size: 26rem" lang="de">
+              <span class="dds-label" id="d-range-label">Zeitraum</span>
+              <div class="dds-daterange" role="group" aria-labelledby="d-range-label">
+                <div class="dds-field">
+                  <label class="dds-label dds-text-sm" for="d-from">Von</label>
+                  <input class="dds-input" id="d-from" name="from" type="date">
+                </div>
+                <div class="dds-field">
+                  <label class="dds-label dds-text-sm" for="d-to">Bis</label>
+                  <input class="dds-input" id="d-to" name="to" type="date">
+                </div>
+              </div>
+            </div>
+            <p class="ref-note">
+              <svg class="dds-icon" aria-hidden="true"><use href="#dds-icon-warning"/></svg>
+              <strong>The <code class="dds-code">autocomplete</code> rule is easy to
+              get backwards.</strong> A date of birth takes
+              <code class="dds-code">bday</code> — WCAG 1.3.5 expects it, and it is
+              the field where autofill helps most. Only a <em>future</em> date takes
+              <code class="dds-code">off</code>, because there is nothing to fill.
+              Showing just the second case teaches people to copy <code
+              class="dds-code">off</code> onto a birthdate.
             </p>
           </div>
 
@@ -1133,7 +1267,7 @@
       <!-- =================================================== badge and card -->
       <section class="ref-section" id="badge">
         <div class="ref-section-head">
-          <h2>Badge and card</h2>
+          <h2>Badge</h2>
         </div>
 
         <div class="dds-stack dds-stack-lg">
@@ -1180,6 +1314,19 @@
             </p>
           </div>
 
+          </div>
+      </section>
+
+      <!-- ============================================================ card -->
+      <section class="ref-section" id="card">
+        <div class="ref-section-head">
+          <h2>Card</h2>
+            <p class="dds-text-subtle dds-measure-default dds-mbs-xs">
+              A container for one thing that can be summarised and acted on. It is not a layout: a card that holds unrelated content is a box.
+            </p>
+        </div>
+
+        <div class="dds-stack dds-stack-lg">
           <div class="ref-specimen ref-specimen-plain">
             <p class="ref-specimen-label">Card</p>
             <div class="dds-grid" style="--dds-grid-min: 15rem">
@@ -1423,7 +1570,7 @@
       <!-- ================================================ tabs & disclosure -->
       <section class="ref-section" id="tabs">
         <div class="ref-section-head">
-          <h2>Tabs and disclosure</h2>
+          <h2>Tabs</h2>
         </div>
 
         <div class="dds-stack dds-stack-lg">
@@ -1452,6 +1599,19 @@
             </p>
           </div>
 
+          </div>
+      </section>
+
+      <!-- ============================================================ disclosure -->
+      <section class="ref-section" id="disclosure">
+        <div class="ref-section-head">
+          <h2>Disclosure</h2>
+            <p class="dds-text-subtle dds-measure-default dds-mbs-xs">
+              One `&lt;details&gt;`, on its own. Open and close, keyboard operation and the expanded state come from the platform.
+            </p>
+        </div>
+
+        <div class="dds-stack dds-stack-lg">
           <div class="ref-specimen">
             <p class="ref-specimen-label">Disclosure — one, on its own, no JavaScript at all</p>
             <details class="dds-disclosure">
@@ -1536,63 +1696,19 @@
         </div>
       </section>
 
-      <!-- ============================================ date, search, kbd, divider -->
-      <section class="ref-section" id="smaller">
+            <!-- ============================================================ search -->
+      <section class="ref-section" id="search">
         <div class="ref-section-head">
-          <h2>Date, search, kbd and divider</h2>
-          <p class="dds-text-subtle dds-measure-default dds-mbs-xs">
-            Small components, each with one thing that is easy to get wrong.
-          </p>
+          <h2>Search field</h2>
+            <p class="dds-text-subtle dds-measure-default dds-mbs-xs">
+              An input and its submit as one unit, in a real form, so Enter submits and the browser offers previous searches.
+            </p>
         </div>
 
         <div class="dds-stack dds-stack-lg">
           <div class="ref-specimen" data-ref-code>
-            <p class="ref-specimen-label">Date field — the native picker</p>
-            <div class="ref-matrix" lang="de">
-              <div class="dds-field">
-                <label class="dds-label" for="d-bday">
-                  Geburtsdatum <span class="dds-label-note">(erforderlich)</span>
-                </label>
-                <input class="dds-input" id="d-bday" name="bday" type="date"
-                       autocomplete="bday" required aria-describedby="d-bday-hint">
-                <p class="dds-hint" id="d-bday-hint">Format: TT.MM.JJJJ</p>
-              </div>
-
-              <div class="dds-field">
-                <label class="dds-label" for="d-start">Beginn</label>
-                <input class="dds-input" id="d-start" name="start" type="date"
-                       autocomplete="off" min="2026-01-01" aria-describedby="d-start-hint">
-                <p class="dds-hint" id="d-start-hint">Frühestens heute. Format: TT.MM.JJJJ</p>
-              </div>
-            </div>
-            <div class="dds-field dds-mbs-md" style="max-inline-size: 26rem" lang="de">
-              <span class="dds-label" id="d-range-label">Zeitraum</span>
-              <div class="dds-daterange" role="group" aria-labelledby="d-range-label">
-                <div class="dds-field">
-                  <label class="dds-label dds-text-sm" for="d-from">Von</label>
-                  <input class="dds-input" id="d-from" name="from" type="date">
-                </div>
-                <div class="dds-field">
-                  <label class="dds-label dds-text-sm" for="d-to">Bis</label>
-                  <input class="dds-input" id="d-to" name="to" type="date">
-                </div>
-              </div>
-            </div>
-            <p class="ref-note">
-              <svg class="dds-icon" aria-hidden="true"><use href="#dds-icon-warning"/></svg>
-              <strong>The <code class="dds-code">autocomplete</code> rule is easy to
-              get backwards.</strong> A date of birth takes
-              <code class="dds-code">bday</code> — WCAG 1.3.5 expects it, and it is
-              the field where autofill helps most. Only a <em>future</em> date takes
-              <code class="dds-code">off</code>, because there is nothing to fill.
-              Showing just the second case teaches people to copy <code
-              class="dds-code">off</code> onto a birthdate.
-            </p>
-          </div>
-
-          <div class="ref-specimen" data-ref-code>
             <p class="ref-specimen-label">Search field — one unit, real submit</p>
-            <form class="dds-search" role="search" action="#smaller" method="get"
+            <form class="dds-search" role="search" action="#search" method="get"
                   style="max-inline-size: 26rem">
               <svg class="dds-icon" aria-hidden="true"><use href="#dds-icon-search"/></svg>
               <input id="s-q" name="q" type="search" aria-label="Projekte durchsuchen"
@@ -1609,6 +1725,19 @@
             </p>
           </div>
 
+          </div>
+      </section>
+
+      <!-- ============================================================ kbd -->
+      <section class="ref-section" id="kbd">
+        <div class="ref-section-head">
+          <h2>Keyboard keys</h2>
+            <p class="dds-text-subtle dds-measure-default dds-mbs-xs">
+              `&lt;kbd&gt;` for a key a reader is being asked to press — which is what makes it findable and translatable, unlike a styled span.
+            </p>
+        </div>
+
+        <div class="dds-stack dds-stack-lg">
           <div class="ref-specimen" data-ref-code>
             <p class="ref-specimen-label">Keyboard keys</p>
             <p class="dds-text-sm">
@@ -1619,6 +1748,19 @@
             </p>
           </div>
 
+          </div>
+      </section>
+
+      <!-- ============================================================ divider -->
+      <section class="ref-section" id="divider">
+        <div class="ref-section-head">
+          <h2>Divider</h2>
+            <p class="dds-text-subtle dds-measure-default dds-mbs-xs">
+              A rule between groups of content. Decorative by default, and a real separator only where the grouping is meaningful.
+            </p>
+        </div>
+
+        <div class="dds-stack dds-stack-lg">
           <div class="ref-specimen" data-ref-code>
             <p class="ref-specimen-label">Divider</p>
             <p class="dds-text-sm">Content above the rule.</p>
@@ -1636,9 +1778,9 @@
       </section>
 
       <!-- ================================================= tooltip and sheet -->
-      <section class="ref-section" id="overlays">
+      <section class="ref-section" id="tooltip">
         <div class="ref-section-head">
-          <h2>Tooltip and bottom sheet</h2>
+          <h2>Tooltip</h2>
         </div>
 
         <div class="dds-stack dds-stack-lg">
@@ -1665,6 +1807,19 @@
             </p>
           </div>
 
+          </div>
+      </section>
+
+      <!-- ============================================================ sheet -->
+      <section class="ref-section" id="sheet">
+        <div class="ref-section-head">
+          <h2>Bottom sheet</h2>
+            <p class="dds-text-subtle dds-measure-default dds-mbs-xs">
+              The same dialog, anchored to the bottom edge on a phone — the one place a viewport media query is right, because reachability by thumb is a property of the device.
+            </p>
+        </div>
+
+        <div class="dds-stack dds-stack-lg">
           <div class="ref-specimen" data-ref-code>
             <p class="ref-specimen-label">Bottom sheet — the same dialog, anchored low</p>
             <button type="button" class="dds-button dds-button-secondary"
@@ -1723,9 +1878,9 @@
 
 
       <!-- ================================================= feedback & icons -->
-      <section class="ref-section" id="feedback">
+      <section class="ref-section" id="toast">
         <div class="ref-section-head">
-          <h2>Feedback and loading</h2>
+          <h2>Toast</h2>
         </div>
 
         <div class="dds-stack dds-stack-lg">
@@ -1748,6 +1903,19 @@
             </p>
           </div>
 
+          </div>
+      </section>
+
+      <!-- ============================================================ progress -->
+      <section class="ref-section" id="progress">
+        <div class="ref-section-head">
+          <h2>Progress, spinner and skeleton</h2>
+            <p class="dds-text-subtle dds-measure-default dds-mbs-xs">
+              Three ways to say “this is taking a moment”, each for a different kind of wait.
+            </p>
+        </div>
+
+        <div class="dds-stack dds-stack-lg">
           <div class="ref-specimen">
             <p class="ref-specimen-label">Progress, spinner, skeleton</p>
             <div class="dds-stack dds-stack-md">

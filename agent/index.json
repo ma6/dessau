@@ -226,7 +226,7 @@
       ],
       "css": "dds/css/components.css",
       "spec": "## Card — `.dds-card`",
-      "reference": "reference/components.html#badge",
+      "reference": "reference/components.html#card",
       "accessibility": "Interactive card: link wraps the heading; .dds-card-target stretches the hit area."
     },
     {
@@ -238,7 +238,7 @@
       ],
       "css": "dds/css/components-forms.css",
       "spec": "## Character count — `.dds-charcount`",
-      "reference": "reference/components.html#controls",
+      "reference": "reference/components.html#range",
       "js": "dds/js/components-forms.js",
       "hooks": [
         "data-dds-charcount"
@@ -364,7 +364,7 @@
       ],
       "css": "dds/css/components-forms.css",
       "spec": "## Date field — `.dds-input[type=\"date\"]`",
-      "reference": "reference/components.html#controls",
+      "reference": "reference/components.html#date-field",
       "native": "input[type=date]",
       "accessibility": "autocomplete=\"bday\" for a date of birth; \"off\" only for a future date. Always give the expected format in a hint."
     },
@@ -402,7 +402,7 @@
       ],
       "css": "dds/css/components.css",
       "spec": "## Disclosure — `.dds-disclosure`",
-      "reference": "reference/components.html#tabs",
+      "reference": "reference/components.html#disclosure",
       "native": "details, summary",
       "accessibility": "No JavaScript. <details name> gives accordion behaviour."
     },
@@ -428,7 +428,7 @@
       ],
       "css": "dds/css/components.css",
       "spec": "## Kbd — `.dds-kbd` · Divider — `.dds-divider`",
-      "reference": "reference/components.html#feedback",
+      "reference": "reference/components.html#divider",
       "native": "hr"
     },
     {
@@ -587,7 +587,7 @@
         "dds/css/components.css"
       ],
       "spec": "## Icon — `.dds-icon`",
-      "reference": "reference/components.html#feedback",
+      "reference": "reference/foundations.html#icons",
       "accessibility": "Always aria-hidden. The sprite must be inlined per document."
     },
     {
@@ -599,7 +599,7 @@
       ],
       "css": "dds/css/components.css",
       "spec": "## Kbd — `.dds-kbd` · Divider — `.dds-divider`",
-      "reference": "reference/components.html#feedback",
+      "reference": "reference/components.html#kbd",
       "native": "kbd"
     },
     {
@@ -705,7 +705,7 @@
       ],
       "css": "dds/css/components-forms.css",
       "spec": "## Password — `.dds-password`",
-      "reference": "reference/components.html#field",
+      "reference": "reference/components.html#password",
       "js": "dds/js/components-forms.js",
       "native": "input[type=password]",
       "hooks": [
@@ -737,7 +737,7 @@
       ],
       "css": "dds/css/components.css",
       "spec": "## Progress — `.dds-progress`",
-      "reference": "reference/components.html#feedback",
+      "reference": "reference/components.html#progress",
       "native": "progress"
     },
     {
@@ -780,7 +780,7 @@
       ],
       "css": "dds/css/components-forms.css",
       "spec": "## Range — `.dds-range`",
-      "reference": "reference/components.html#controls",
+      "reference": "reference/components.html#range",
       "native": "input[type=range]",
       "accessibility": "Value always shown as text and announced."
     },
@@ -793,7 +793,7 @@
       ],
       "css": "dds/css/components-forms.css",
       "spec": "## Search field — `.dds-search`",
-      "reference": "reference/components.html#controls",
+      "reference": "reference/components.html#search",
       "native": "input[type=search]",
       "accessibility": "role=\"search\" on the form. A real submit button with a name, never an unnamed magnifier."
     },
@@ -807,7 +807,7 @@
       ],
       "css": "dds/css/components-forms.css",
       "spec": "## Segmented control — `.dds-segmented`",
-      "reference": "reference/components.html#controls",
+      "reference": "reference/components.html#segmented",
       "accessibility": "Radio inputs: one tab stop, arrow keys. Selected changes fill AND weight."
     },
     {
@@ -859,7 +859,7 @@
       ],
       "css": "dds/css/components.css",
       "spec": "## Skeleton — `.dds-skeleton`",
-      "reference": "reference/components.html#feedback",
+      "reference": "reference/components.html#progress",
       "accessibility": "aria-hidden; the region carries aria-busy."
     },
     {
@@ -884,7 +884,7 @@
       ],
       "css": "dds/css/components.css",
       "spec": "## Spinner — `.dds-spinner`",
-      "reference": "reference/components.html#feedback",
+      "reference": "reference/components.html#progress",
       "accessibility": "aria-hidden. Pair with text in a role=status region. Non-moving fallback under reduced motion."
     },
     {
@@ -897,7 +897,7 @@
       ],
       "css": "dds/css/components-forms.css",
       "spec": "## Stepper — `.dds-stepper`",
-      "reference": "reference/components.html#controls",
+      "reference": "reference/components.html#stepper",
       "js": "dds/js/components-forms.js",
       "hooks": [
         "data-dds-stepper"
@@ -930,7 +930,7 @@
       ],
       "css": "dds/css/components.css",
       "spec": "## Switch — `.dds-switch`",
-      "reference": "reference/components.html#choice",
+      "reference": "reference/components.html#switch",
       "accessibility": "role=\"switch\" over a real checkbox. Forced colours: border weight changes."
     },
     {
@@ -1002,7 +1002,7 @@
         "data-dds-theme-toggle"
       ],
       "spec": "## Theme toggle — `.dds-theme-toggle`",
-      "reference": "reference/components.html#controls",
+      "reference": "reference/components.html#theme-toggle",
       "accessibility": "An action button: the label and accessible name describe the NEXT state, so there is NO aria-pressed. Combining a changing name with aria-pressed double-encodes the state. Both icons are in the markup; CSS chooses. Wording — label, accessible name and announcement alike — follows the nearest [lang]; data-dds-theme-toggle takes no value, and one left over from when it named a language is warned about and ignored."
     },
     {
@@ -1020,7 +1020,7 @@
       ],
       "css": "dds/css/components.css",
       "spec": "## Toast — `DDS.toast()`",
-      "reference": "reference/components.html#feedback",
+      "reference": "reference/components.html#toast",
       "js": "dds/js/components.js",
       "accessibility": "role=status region. Timer pauses on hover and focus. duration 0 stays."
     },
@@ -1065,7 +1065,7 @@
       ],
       "css": "dds/css/components.css",
       "spec": "## Tooltip — `.dds-tooltip`",
-      "reference": "reference/components.html#feedback",
+      "reference": "reference/components.html#tooltip",
       "native": "popover",
       "accessibility": "popover gives the WCAG 1.4.13 dismiss behaviour."
     },
@@ -1101,7 +1101,7 @@
       ],
       "css": "dds/css/components-forms.css",
       "spec": "## Upload — `.dds-upload`",
-      "reference": "reference/components.html#controls",
+      "reference": "reference/components.html#upload",
       "js": "dds/js/components-forms.js",
       "hooks": [
         "data-dds-upload"
