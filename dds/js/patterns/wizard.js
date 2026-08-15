@@ -49,7 +49,63 @@
     return;
   }
 
+  /**
+   * Wizard wording.
+   *
+   * `position` and `change` are the same two numbers said twice — once as the
+   * visible line above the step, once as the announcement, which also carries
+   * the step's own heading. They are separate entries because they are separate
+   * sentences: the visible one is a label and the spoken one is what a
+   * screen-reader user gets instead of seeing the step change.
+   *
+   * `fallbackLabel` is only reached when a step has no heading, which is a
+   * markup defect. The announcement should still be a sentence.
+   */
+  var WORDING = {
+    en: {
+      position: function (current, total) {
+        return 'Step ' + current + ' of ' + total;
+      },
+      change: function (current, total, label) {
+        return 'Step ' + current + ' of ' + total + ': ' + label;
+      },
+      fallbackLabel: function (index) {
+        return 'Step ' + index;
+      },
+      problems: {
+        one: 'There is 1 problem on this step.',
+        other: 'There are {n} problems on this step.',
+      },
+      /* The indicator's status in words, so it does not depend on the marker's
+         colour (WCAG 1.4.1). These were the three literals nobody notices,
+         because they are visually hidden and only ever spoken. */
+      done: 'Completed',
+      currentStep: 'Current step',
+      todo: 'Not started',
+    },
+    de: {
+      position: function (current, total) {
+        return 'Schritt ' + current + ' von ' + total;
+      },
+      change: function (current, total, label) {
+        return 'Schritt ' + current + ' von ' + total + ': ' + label;
+      },
+      fallbackLabel: function (index) {
+        return 'Schritt ' + index;
+      },
+      problems: {
+        one: 'Es gibt 1 Problem in diesem Schritt.',
+        other: 'Es gibt {n} Probleme in diesem Schritt.',
+      },
+      done: 'Abgeschlossen',
+      currentStep: 'Aktueller Schritt',
+      todo: 'Noch nicht begonnen',
+    },
+  };
+
   DDS.register('wizard', '[data-dds-wizard]', function (root) {
+    var words = DDS.utils.wording(root, WORDING);
+
     var steps = Array.prototype.slice.call(root.querySelectorAll('[data-dds-wizard-step]'));
     if (steps.length < 2) return;
 
@@ -85,7 +141,7 @@
 
     function label(step, index) {
       var heading = step.querySelector('[data-dds-wizard-heading]');
-      return heading ? heading.textContent.trim() : 'Step ' + (index + 1);
+      return heading ? heading.textContent.trim() : words.fallbackLabel(index + 1);
     }
 
     function paintIndicator() {
@@ -109,7 +165,7 @@
         var status = item.querySelector('[data-dds-step-status]');
         if (status) {
           status.textContent =
-            index < current ? 'Completed' : index === current ? 'Current step' : 'Not started';
+            index < current ? words.done : index === current ? words.currentStep : words.todo;
         }
       });
     }
@@ -127,7 +183,7 @@
 
       var position = root.querySelector('[data-dds-wizard-position]');
       if (position) {
-        position.textContent = 'Step ' + (current + 1) + ' of ' + steps.length;
+        position.textContent = words.position(current + 1, steps.length);
       }
 
       if (!announce) return;
@@ -141,9 +197,7 @@
         heading.focus();
       }
 
-      DDS.announce(
-        'Step ' + (current + 1) + ' of ' + steps.length + ': ' + label(steps[current], current)
-      );
+      DDS.announce(words.change(current + 1, steps.length, label(steps[current], current)));
     }
 
     /* --- validation, current step only ---------------------------------- */
@@ -184,12 +238,9 @@
           DDS.formValidation.showError(field, DDS.formValidation.messageFor(field));
         });
         invalid[0].focus();
-        DDS.announce(
-          invalid.length === 1
-            ? 'There is 1 problem on this step.'
-            : 'There are ' + invalid.length + ' problems on this step.',
-          { assertive: true }
-        );
+        DDS.announce(DDS.utils.plural(root, invalid.length, words.problems), {
+          assertive: true,
+        });
       } else {
         invalid[0].reportValidity();
       }

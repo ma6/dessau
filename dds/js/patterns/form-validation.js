@@ -65,20 +65,62 @@
    * what to do, and a field can override any of them with
    * `data-dds-error-<constraint>`.
    */
-  var MESSAGES = {
-    valueMissing: 'Enter {label}',
-    typeMismatch: 'Enter {label} in the correct format',
-    typeMismatchEmail: 'Enter an email address, for example name@example.org',
-    typeMismatchUrl: 'Enter a full web address, starting with https://',
-    tooShort: '{label} must be at least {minlength} characters',
-    tooLong: '{label} must be {maxlength} characters or fewer',
-    rangeUnderflow: '{label} must be {min} or more',
-    rangeOverflow: '{label} must be {max} or less',
-    stepMismatch: '{label} is not an accepted value',
-    patternMismatch: 'Enter {label} in the correct format',
-    badInput: 'Enter {label} as a number',
-    default: 'Check {label}',
+  var WORDING = {
+    en: {
+      valueMissing: 'Enter {label}',
+      typeMismatch: 'Enter {label} in the correct format',
+      typeMismatchEmail: 'Enter an email address, for example name@example.org',
+      typeMismatchUrl: 'Enter a full web address, starting with https://',
+      tooShort: '{label} must be at least {minlength} characters',
+      tooLong: '{label} must be {maxlength} characters or fewer',
+      rangeUnderflow: '{label} must be {min} or more',
+      rangeOverflow: '{label} must be {max} or less',
+      stepMismatch: '{label} is not an accepted value',
+      patternMismatch: 'Enter {label} in the correct format',
+      badInput: 'Enter {label} as a number',
+      default: 'Check {label}',
+      /** Read before the message, for anyone who gets neither the colour nor the icon. */
+      errorPrefix: 'Error: ',
+      /** The summary heading. No full stop: it is a heading, not a sentence. */
+      summary: { one: 'There is 1 problem with this form', other: 'There are {n} problems with this form' },
+      /** The same count spoken. A full stop, because it is read aloud as a sentence. */
+      summaryAnnouncement: {
+        one: 'There is 1 problem with this form.',
+        other: 'There are {n} problems with this form.',
+      },
+    },
+    de: {
+      valueMissing: '{label} eingeben',
+      typeMismatch: '{label} im richtigen Format eingeben',
+      typeMismatchEmail: 'E-Mail-Adresse eingeben, zum Beispiel name@example.org',
+      typeMismatchUrl: 'Vollständige Webadresse eingeben, beginnend mit https://',
+      tooShort: '{label} muss mindestens {minlength} Zeichen lang sein',
+      tooLong: '{label} darf höchstens {maxlength} Zeichen lang sein',
+      rangeUnderflow: '{label} muss {min} oder mehr sein',
+      rangeOverflow: '{label} darf höchstens {max} sein',
+      stepMismatch: '{label} ist kein zulässiger Wert',
+      patternMismatch: '{label} im richtigen Format eingeben',
+      badInput: '{label} als Zahl eingeben',
+      default: '{label} prüfen',
+      errorPrefix: 'Fehler: ',
+      summary: { one: 'Es gibt 1 Problem in diesem Formular', other: 'Es gibt {n} Probleme in diesem Formular' },
+      summaryAnnouncement: {
+        one: 'Es gibt 1 Problem in diesem Formular.',
+        other: 'Es gibt {n} Probleme in diesem Formular.',
+      },
+    },
   };
+
+  /**
+   * The English table, kept as `DDS.formValidation.messages` was.
+   *
+   * Exported for the same reason it always was — a product reading the default
+   * for one constraint to write a variation of it — and it is English because
+   * that is the fallback every other language falls back to. A caller wanting
+   * the wording actually in use for a field asks `messageFor(field)`, which
+   * resolves the language the field sits in.
+   */
+  var MESSAGES = WORDING.en;
 
   /** The visible label text for a control, used inside messages. */
   function labelFor(field) {
@@ -105,10 +147,14 @@
   function messageFor(field) {
     var validity = field.validity;
     var label = labelFor(field);
+    /* The FIELD's language, not the form's. A form may hold a part in another
+       language and has to say so anyway (WCAG 3.1.2), and a field inside that
+       part is spoken in it — so the error about it is too. */
+    var words = DDS.utils.wording(field, WORDING);
 
     function resolve(key) {
       var custom = field.getAttribute('data-dds-error-' + key.toLowerCase());
-      var template = custom || MESSAGES[key] || MESSAGES.default;
+      var template = custom || words[key] || words.default;
       return template
         .replace('{label}', label)
         .replace('{minlength}', field.getAttribute('minlength') || '')
@@ -244,7 +290,7 @@
     // The word "Error" for anyone who does not perceive the colour or the icon.
     var prefix = document.createElement('span');
     prefix.className = 'dds-sr-only';
-    prefix.textContent = 'Error: ';
+    prefix.textContent = DDS.utils.wording(field, WORDING).errorPrefix;
     element.appendChild(prefix);
 
     var text = document.createElement('span');
@@ -357,10 +403,11 @@
     heading.appendChild(icon);
 
     var headingText = document.createElement('span');
-    headingText.textContent =
-      problems.length === 1
-        ? 'There is 1 problem with this form'
-        : 'There are ' + problems.length + ' problems with this form';
+    headingText.textContent = DDS.utils.plural(
+      form,
+      problems.length,
+      DDS.utils.wording(form, WORDING).summary
+    );
     heading.appendChild(headingText);
     summary.appendChild(heading);
 
@@ -451,9 +498,11 @@
       // Assertive: the user pressed submit and is waiting for the outcome, so
       // interrupting is correct here.
       DDS.announce(
-        problems.length === 1
-          ? 'There is 1 problem with this form.'
-          : 'There are ' + problems.length + ' problems with this form.',
+        DDS.utils.plural(
+          form,
+          problems.length,
+          DDS.utils.wording(form, WORDING).summaryAnnouncement
+        ),
         { assertive: true }
       );
     });
