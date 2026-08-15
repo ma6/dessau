@@ -125,6 +125,41 @@ test('the announcement is not half-translated', async ({ page }) => {
   );
 });
 
+test('a language with no table falls back to English, and plurals still work', async ({ page }) => {
+  await page.goto(COMPONENTS);
+
+  const answers = await page.evaluate(() => {
+    const scope = document.createElement('div');
+    scope.setAttribute('lang', 'fr');
+    document.body.appendChild(scope);
+
+    const table = { en: { hello: 'Hello' }, de: { hello: 'Hallo' } };
+    const forms = { one: '{n} thing', other: '{n} things' };
+
+    const result = {
+      // No `fr` entry: English rather than nothing. A control named in the wrong
+      // language still beats one with no name at all.
+      wording: window.DDS.utils.wording(scope, table).hello,
+      // The plural rule is still French's own, because that part needs no table.
+      pluralZero: window.DDS.utils.plural(scope, 0, forms),
+      pluralTwo: window.DDS.utils.plural(scope, 2, forms),
+    };
+
+    scope.remove();
+    return result;
+  });
+
+  expect(answers.wording).toBe('Hello');
+
+  /**
+   * French treats zero as singular and English does not, which is the whole
+   * argument for `Intl.PluralRules` in two strings: the same count, the same
+   * table, a different form — decided by the language and not by the code.
+   */
+  expect(answers.pluralZero).toBe('0 thing');
+  expect(answers.pluralTwo).toBe('2 things');
+});
+
 test('a component inside lang="de" writes German, without being configured', async ({ page }) => {
   await page.goto(COMPONENTS);
 
