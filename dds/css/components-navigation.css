@@ -1043,7 +1043,24 @@
     align-items: center;
     justify-content: space-between;
     gap: var(--dds-space-sm);
-    margin-block-end: var(--dds-space-sm);
+
+    /* Stays at the top while the list scrolls, so the corner the close is
+       supposed to always occupy is not empty exactly when the panel is longest.
+
+       The panel is a padded scroll container, and a sticky child of one has to
+       bleed into that padding or content scrolls up the gap either side of it.
+       Hence the negative margin out to the panel's edges and the matching
+       padding back in: the header's box reaches the edges, its content sits
+       where it did. The block-end padding is the gap to the first group, which
+       is why there is no block-end margin — a margin would scroll content into
+       a transparent strip below an opaque bar. */
+    position: sticky;
+    inset-block-start: 0;
+    z-index: 1;
+
+    margin: calc(-1 * var(--dds-space-md)) calc(-1 * var(--dds-space-md)) 0;
+    padding: var(--dds-space-md) var(--dds-space-md) var(--dds-space-sm);
+    background-color: var(--dds-color-surface-raised);
   }
 
   .dds-contentnav-title {
@@ -1185,6 +1202,20 @@
     .dds-contentnav-toggle,
     .dds-contentnav-scrim {
       display: none;
+    }
+
+    /* An ordinary row again. The column has no padding to bleed into and no
+       surface of its own, so every part of the sticky treatment is unwound
+       explicitly — a negative margin left behind here would pull the title out
+       of the column, and an opaque background would paint a panel-coloured
+       block onto the page. The close is gone at this width, so the header holds
+       only the title and the gap it used to get from its own padding comes back
+       as a margin. */
+    .dds-contentnav-header {
+      position: static;
+      margin: 0 0 var(--dds-space-sm);
+      padding: 0;
+      background-color: transparent;
     }
   }
 
