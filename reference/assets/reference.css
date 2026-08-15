@@ -392,11 +392,28 @@
   padding-block: var(--dds-space-2xl);
 }
 
+/* The footer carries more than one line on some pages — the reference landing page
+   states the licence and what is not offered — so it needs the rhythm of a block of
+   text rather than the padding of a single line.
+
+   `padding-block-end` is larger than the start on purpose: the border above already
+   separates the footer from the content, while below it there is nothing but the
+   end of the document, and a page that stops immediately under its last line reads
+   as cut off rather than finished. */
 .ref-footer {
   border-block-start: var(--dds-border-thin) solid var(--dds-color-border-subtle);
-  padding-block: var(--dds-space-lg);
+  padding-block-start: var(--dds-space-xl);
+  padding-block-end: var(--dds-space-2xl);
   color: var(--dds-color-text-muted);
   font-size: var(--dds-font-size-sm);
+}
+
+.ref-footer p + p {
+  margin-block-start: var(--dds-space-sm);
+}
+
+.ref-footer p {
+  max-inline-size: var(--dds-measure-wide);
 }
 
 /* ------------------------------------------------------------------ sections */
