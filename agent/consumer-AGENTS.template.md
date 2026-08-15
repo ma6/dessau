@@ -112,6 +112,48 @@ of an unrelated feature commit.
 git submodule update --remote [PATH]
 ```
 
+### This product keeps its own reference
+
+`[PATH]/reference/` shows what **Dessau** does. It cannot show what this product
+does, and it is never edited — it is a pinned dependency.
+
+So this product keeps a reference of its own, for the reason Dessau keeps one: a
+reference that has drifted is worse than no reference, because a missing page sends
+somebody to the code while a wrong page is simply believed.
+
+**What needs an entry here:**
+
+| The component is | Reference |
+| --- | --- |
+| Used unchanged | Dessau's. Do not copy it — a second copy is a second thing to keep true |
+| Retuned only through tokens or a few declarations | Dessau's, unless it now reads differently enough that somebody comparing would be misled |
+| **Built differently** — own structure, own markup | **This product's, rendered from this product's markup.** Dessau's page is explicitly *not* its reference |
+| Product-specific, no Dessau equivalent | This product's |
+
+**The third row is the one that goes wrong.** Navigation is the likely first case:
+a product that replaces the site header ships something Dessau's reference does not
+describe — and this file elsewhere tells you to go and look at that reference. Two
+answers, no way to rank them. Adding your own version is not enough; the reader has
+to be told which one this product ships.
+
+**A replaced component is therefore also a deviation**, and belongs in the list
+below. The two have to agree: anything in "Current deviations" that changes a
+component's structure needs an entry in this product's reference, and anything with
+an entry there for that reason is a deviation. If only one of them knows, the other
+is wrong.
+
+**Completeness is the union**, and neither half is complete alone: Dessau's
+reference for what is used unchanged, this product's for everything else.
+
+**On checking it.** Dessau gates this with `check-reference.mjs`, which verifies
+that every indexed component is *rendered* rather than merely mentioned — needed,
+because an earlier version checked only that the page existed, which every entry
+passed while twelve components had no demo anywhere. That script reads
+`agent/index.json`, so it is not repointable by changing a path or two the way
+`check-accent-separation.mjs` is: wanting the gate here means keeping an index in
+the same shape. Worth it or not is this product's call; going without it and
+knowing that is fine, and going without it and assuming you are covered is not.
+
 ### Where reasoning gets written down
 
 A response ends with the session. Anything that should outlive it goes in a file,
@@ -143,6 +185,10 @@ what, why, and whether it is temporary.
 Undocumented deviation is the thing that is not allowed. A documented one makes the
 divergence visible; an undocumented one just looks like a mistake nobody made on
 purpose.
+
+**A deviation that changes a component's structure also needs an entry in this
+product's reference** — see above. The two lists have to agree; if only one knows,
+the other is wrong.
 
 **Current deviations in this product:**
 

@@ -126,10 +126,19 @@ You are a design system now, so you owe what Dessau owes:
   this already exist?". Pointing them at Dessau's is wrong — it lists components in
   Dessau's values, not yours.
 - **Your own `AGENTS.md`**, and your own consumer template beneath it.
-- **Your own reference.** Every component you ship is rendered on it. You inherit
-  Dessau's rule here, not the softer product version: `check-reference.mjs` exists
-  because an earlier version verified that the reference *page* existed, which
-  every entry passed while twelve components had no demo anywhere.
+- **Your own reference.** Every component you ship is rendered on it, from your own
+  markup and in your own values. You inherit Dessau's rule rather than the softer
+  product version: `check-reference.mjs` exists because an earlier version verified
+  that the reference *page* existed, which every entry passed while twelve
+  components had no demo anywhere.
+
+  The rule for *what* goes in it is the same one your own consumers will follow,
+  and it is written once in `consumer-AGENTS.template.md` → "This product keeps its
+  own reference": used unchanged needs no entry, **built differently needs one, and
+  the upstream page is then explicitly not its reference.** At your level
+  "unchanged" is rare — you have replaced the whole foundation, so almost
+  everything reads differently and almost everything needs rendering. Assume you
+  are showing all of it until you can argue otherwise.
 - **A statement of what you promise**, in the shape of DECISIONS 037. Your
   consumers need to know what may change under them, and you now have Dessau's
   contract *and* whatever you added on top.
