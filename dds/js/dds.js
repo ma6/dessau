@@ -94,7 +94,7 @@
    * by language cannot be half in a table and half in the code.
    */
   function themeLabelsFor(button) {
-    return THEME_LABELS[language(button)] || THEME_LABELS.en;
+    return wording(button, THEME_LABELS);
   }
   var ENHANCED_FLAG = 'ddsEnhanced';
 
@@ -455,6 +455,76 @@
     return (declared || '').toLowerCase().split('-')[0];
   }
 
+  /**
+   * The wording table for the language of the place an element sits.
+   *
+   * Every string DDS writes into a page comes through here. A table is keyed by
+   * primary language subtag and always has an `en` entry, which is what an
+   * unrecognised language falls back to — a control named in the wrong language
+   * still beats one with no name at all.
+   *
+   *     var WORDING = {
+   *       en: { cleared: 'Search field cleared' },
+   *       de: { cleared: 'Suchfeld geleert' },
+   *     };
+   *     DDS.announce(DDS.utils.wording(input, WORDING).cleared);
+   *
+   * The table lives beside the behaviour that uses it, not in one central file.
+   * A message and the code that decides when to say it are read together, and
+   * separating them is how a table grows entries nothing uses and loses entries
+   * something needs.
+   *
+   * **Every string in a table varies together.** A label taken from the table and
+   * joined to a sentence written in the source is the defect this whole rule
+   * exists to prevent: the theme toggle announced "Dunkel — dark theme on" for
+   * exactly that reason (DECISIONS.md 028).
+   *
+   * @param {Element} element  Anything inside the region whose language applies.
+   * @param {object} table     Keyed by language subtag; `en` is required.
+   */
+  function wording(element, table) {
+    return table[language(element)] || table.en;
+  }
+
+  /**
+   * Choose a plural form for a count, in the language of the place.
+   *
+   *     plural(list, files.length, {
+   *       one: '1 file selected',
+   *       other: '{n} files selected',
+   *     })
+   *
+   * `Intl.PluralRules`, not a ternary on `n === 1`. English has two forms and so
+   * the ternary looks correct forever; the moment a third language arrives it is
+   * wrong in a way nobody who speaks English will notice. Russian has four
+   * categories, Polish three, Arabic six — and even among two-form languages the
+   * boundary is not always at one.
+   *
+   * A form the language does not have falls back to `other`, which every
+   * language has. `{n}` is replaced with the count formatted for that language,
+   * because a thousands separator is a localisation too.
+   *
+   * @param {Element} element
+   * @param {number} count
+   * @param {Record<string, string>} forms  Keys are CLDR categories: `one`,
+   *   `other`, and whichever of `zero`/`two`/`few`/`many` the language needs.
+   */
+  function plural(element, count, forms) {
+    var locale = language(element) || 'en';
+    var category = 'other';
+
+    try {
+      category = new Intl.PluralRules(locale).select(count);
+    } catch (error) {
+      /* An unrecognised locale. `other` is the safe category and the loop below
+         still produces a sentence, which is the point: a wrong plural form is a
+         far smaller failure than no message. */
+    }
+
+    var template = forms[category] || forms.other;
+    return template.replace('{n}', new Intl.NumberFormat(locale).format(count));
+  }
+
   /** Does the user want motion? Read at call time, not cached — it can change. */
   function prefersReducedMotion() {
     return Boolean(
@@ -505,6 +575,8 @@
       escapeHtml: escapeHtml,
       uniqueId: uniqueId,
       language: language,
+      wording: wording,
+      plural: plural,
     },
   };
 

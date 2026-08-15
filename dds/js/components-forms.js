@@ -114,13 +114,14 @@
   /**
    * The wording for one field, in the language of the place it sits.
    *
-   * `DDS.utils.language` is the single answer to "which language is this?" in the
-   * system, and it reads `lang` — see the note there for why nothing in DDS asks
-   * for the language a second time. English when the language is unrecognised: a
-   * button named in the wrong language still beats one with no name.
+   * `DDS.utils.wording` is the single answer to "which strings apply here?" in
+   * the system, and it resolves the language from `lang` — see the note there
+   * for why nothing in DDS asks for the language a second time. English when the
+   * language is unrecognised: a button named in the wrong language still beats
+   * one with no name.
    */
   function passwordLabels(element) {
-    return PASSWORD_LABELS[DDS.utils.language(element)] || PASSWORD_LABELS.en;
+    return DDS.utils.wording(element, PASSWORD_LABELS);
   }
 
   /**
