@@ -11,12 +11,33 @@ close control that announces "times", a live region that repeats itself, a
 heading level that makes the outline nonsense. Every one of those passes every
 check in this repository.
 
-This is the script for closing it. It is written to be worked through by a person
-with a screen reader, in one sitting per pattern, without needing to know how any
-of it is implemented.
+This is the script for closing it. It is written to be worked through in one
+sitting per pattern, without needing to know how any of it is implemented.
 
 **Issue:** #4. Findings go into `LESSONS_LEARNED.md` — that is the durable part,
 and it outlasts the fix.
+
+## Who is walking, and what that decides
+
+Two different people can work through this document and they do not get the same
+answer out of it. Which one you are changes what a clean run means, so decide it
+before starting rather than at the end.
+
+**A screen reader user** can answer everything below, including the question the
+whole exercise is about.
+
+**Somebody who can see the screen, switching VoiceOver on to listen** can answer
+less than it feels like at the time. That is not a lack of care. You know what you
+just clicked, so an announcement that arrives too late still makes sense; you know
+what the control is, so a thin name sounds adequate; you have no reference for how
+much talking is too much, so verbosity sounds like thoroughness. What you can hear
+is **silence**, **repetition**, and **a voice that is wrong for the words** —
+which is a real and useful reach, and one such defect (#44) is what the first pass
+actually found.
+
+If you are the second, the walk is worth doing and the result is *"nothing
+obviously broken"*. It is not *"this is good"*, and the difference matters when it
+gets written into an issue. Say which one you were, in the finding notes.
 
 ---
 
@@ -45,13 +66,25 @@ audible exactly at the switch.
 ### The three questions
 
 For every announcement, in this order. Most defects fail the second, and the
-second is the one no check can ask.
+second is the one no check can ask — and, as it turns out, the one a sighted
+listener cannot reliably ask either.
 
 1. **Was anything said?** Silence where something changed is the worst outcome.
+   *Anyone can answer this.*
 2. **Was it useful?** "Button", "times", "clickable" and a bare number are all
    technically announcements and none of them tells the user what happened.
+   *Partly answerable by anyone — a control that names no purpose is audible. The
+   rest of it, whether the announcement is useful at that moment in that flow,
+   needs somebody who works this way. Leave it unticked rather than guessing.*
 3. **Was it said once?** A live region that repeats on every keystroke is worse
    than one that says nothing — the user cannot get past it to the content.
+   *Anyone can answer this.*
+
+A fourth, which is not in the original three because nobody expected it and it is
+the one the first pass found: **was it said in the right voice?** German text read
+by an English voice is unmistakable even to someone who has never used a screen
+reader, and it is completely silent to everybody looking at the screen. Listen for
+it at every `lang="de"` boundary.
 
 ### How to record a finding
 
@@ -173,6 +206,11 @@ in a German voice.
 
 Cheap, and it catches the things nobody thinks to check.
 
+This section is the one part of the walk a sighted listener can complete on equal
+terms, because the rotor lists are *read*, not heard. An outline is either an
+outline or it is not, and that judgement does not depend on using a screen reader
+daily. If time runs out, this section and §7 are the two to have done.
+
 - [ ] Pull up the heading list. Does it read as an outline of the page, or as a
       list of fragments? A level that skips, or a heading used for size, shows up
       here immediately.
@@ -190,8 +228,19 @@ Cheap, and it catches the things nobody thinks to check.
    line with neither means it was not tried, and should say so.
 2. Findings that are defects: fix them, and add a `LESSONS_LEARNED.md` entry for
    any that would have been caught by a rule that does not exist yet.
-3. Findings that are not defects — a screen reader being verbose, a platform
-   difference nobody can act on — go in `DECISIONS.md` if they constrain anything
-   later, and are dropped otherwise.
-4. Close #4 with the list and what came of it. **Not before**: the issue's claim
+3. Findings that are not defects — a platform difference nobody can act on — go in
+   `DECISIONS.md` if they constrain anything later, and are dropped otherwise.
+   **"The screen reader was verbose" is not one of these unless a screen reader
+   user said so.** From anybody else it is an observation with no conclusion
+   attached, and writing it off is the one mistake this document can cause.
+4. Say who walked it. A clean run by a sighted listener is *"nothing obviously
+   broken"*, and it will be read as *"verified"* by everyone downstream unless the
+   sentence says otherwise.
+5. Close #4 with the list and what came of it. **Not before**: the issue's claim
    is that none of this has been heard, and that stays true until it has.
+
+Worth being plain about what remains after even a perfect run of this document. It
+establishes that the announcements exist, are not duplicated, and are in the right
+language. It does not establish that the reference is usable with a screen reader.
+That question is answered by one person using it for half an hour, and there is no
+document, check or second platform that substitutes for that.
