@@ -510,6 +510,33 @@
   font-size: var(--dds-font-size-2xs);
   color: var(--dds-color-text-muted);
   min-inline-size: 11rem;
+  white-space: nowrap;
+}
+
+/* The readout never wraps, and the bar gives up the width instead.
+   Left to wrap, it made the taller rows twice the height of the shorter ones,
+   and the stack's single gap then read as a scale of gaps growing down the
+   list — the ramp looked uneven, in a specimen whose whole job is to show an
+   even ramp. The bar is the specimen and the readout is the caption, so when
+   the row runs out of room it is the bar that shrinks. */
+.ref-ruler-readout {
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+/* On a phone the name and the readout together leave the bar almost nothing to
+   draw with, now that neither of them wraps. So below the tablet breakpoint the
+   name takes a line of its own and the bar gets the full width underneath it.
+   Every row is two lines instead of one — still the same height as its
+   neighbours, which is the point. */
+@media (max-width: 47.999rem) {
+  .ref-ruler {
+    flex-wrap: wrap;
+  }
+
+  .ref-ruler-name {
+    min-inline-size: 100%;
+  }
 }
 
 /* -------------------------------------------------------------------- layers */

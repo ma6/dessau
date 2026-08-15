@@ -229,7 +229,7 @@
       row.appendChild(bar);
 
       var readout = document.createElement('span');
-      readout.className = 'dds-text-2xs dds-text-muted';
+      readout.className = 'ref-ruler-readout dds-text-2xs dds-text-muted';
       // Resolved pixels alongside the authored rem, because the ramp is designed
       // in one and reasoned about in the other.
       var pixels = parseFloat(value) * (value.indexOf('rem') !== -1 ? 16 : 1);
