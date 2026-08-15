@@ -1518,3 +1518,13 @@ published — anybody who has a copy keeps their rights to it. What can change i
 licence on future work. A reason to consider that would be Dessau becoming
 commercially load-bearing in a way that a permissive licence undermines; wanting
 peace and quiet is not one, because that is what `CONTRIBUTING.md` is for.
+
+**Before this repository is made public**, one step remains that is easy to assume
+away. The history was rewritten once already (#67) to remove material that had been
+committed and later cleaned out of the working tree, and it was force-pushed. An
+unreferenced commit can stay reachable by its SHA on GitHub for some time after
+that — it is gone from every branch and from the local object store, but "gone from
+the default view" and "not fetchable" are different claims. Ask GitHub support to
+run a garbage collection before publication, and run
+`node scripts/audit-whitelabel.mjs` again on the day rather than trusting that it
+was clean on some earlier day.
