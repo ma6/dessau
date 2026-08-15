@@ -953,8 +953,16 @@
     display: flex;
     flex-direction: column;
     min-inline-size: 0;
-    /* Take the space so the actions sit at the far edge. */
+    /* Take the space so the actions sit at the far edge.
+
+       `flex-basis: 0` is what makes the title truncate instead of taking a row
+       of its own. A flex container breaks lines on each item's HYPOTHETICAL main
+       size, and with `flex-basis: auto` that is the max-content width of the
+       object name — so the context wrapped to its own line before shrinking was
+       ever considered, and the menu button sat alone on the first row with the
+       rest of it empty. Willing to be narrow, not merely able to be. */
     flex-grow: 1;
+    flex-basis: 0;
   }
 
   .dds-topbar-title {
@@ -978,7 +986,13 @@
     display: flex;
     align-items: center;
     gap: var(--dds-space-2xs);
+    /* Not squashed by a long title — that is what `flex-shrink: 0` is for here.
+       But unsquashable and unwrappable together means a row of three buttons is
+       simply wider than a phone and runs off it, which is what happened: giving
+       the actions their own row below solved the title's problem and not
+       theirs. They wrap among themselves instead. */
     flex-shrink: 0;
+    flex-wrap: wrap;
   }
 
   /* Below 34rem the actions drop onto their own row. That is the width at which a

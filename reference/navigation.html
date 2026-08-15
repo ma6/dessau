@@ -14,7 +14,7 @@
 <link rel="preload" href="assets/fonts/Inter-Variable-latin-ext.woff2" as="font"
       type="font/woff2" crossorigin>
 <link rel="stylesheet" href="assets/fonts.css?v=713f2669">
-<link rel="stylesheet" href="../dds/dds.css?v=b2899ed0">
+<link rel="stylesheet" href="../dds/dds.css?v=2aa7abd7">
 <link rel="stylesheet" href="assets/reference.css?v=dab6a253">
 </head>
 <body>
@@ -1028,6 +1028,17 @@
             push the actions off the screen. Truncation is only safe because the full
             name is also the page heading below — a topbar is the summary, never the
             only place the name appears.
+          </p>
+          <p class="dds-text-sm dds-text-subtle dds-mbs-xs">
+            <strong>Below 34rem of container width:</strong> the actions take a row
+            of their own and wrap among themselves; the menu button and the title
+            keep the first row. The title only truncates because
+            <code class="dds-code">.dds-topbar-context</code> has
+            <code class="dds-code">flex-basis: 0</code> — a flex container breaks
+            lines on each item's <em>hypothetical</em> size, so with
+            <code class="dds-code">auto</code> the context wrapped to its own line
+            at its full max-content width and shrinking was never considered. An
+            item has to be willing to be narrow, not merely able to be.
           </p>
           <p class="dds-text-sm dds-text-subtle dds-mbs-xs">
             The frame is <code class="dds-code">position: sticky</code> in the
