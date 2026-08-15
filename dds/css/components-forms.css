@@ -260,6 +260,9 @@
     color: var(--dds-color-text-subtle);
     white-space: nowrap;
 
+    /* Reserved on every option, so selecting one does not resize it. The
+       selected option is the only one that colours it in. */
+    border: var(--dds-border-thick) solid transparent;
     border-radius: var(--dds-radius-sm);
     cursor: pointer;
 
@@ -272,11 +275,25 @@
     color: var(--dds-color-text-default);
   }
 
-  /* Selected: a raised surface, the action colour AND a heavier weight. Three
-     cues, because "which view am I looking at" is essential orientation and a
-     tint alone is not enough. */
+  /* Selected: a border, a raised surface, the action colour AND a heavier
+     weight. "Which view am I looking at" is essential orientation, so it does
+     not rest on one cue — and of these four, only the border is load-bearing.
+
+     The other three were measured and found nearly worthless. The raised
+     surface is 1.1:1 against the track in both themes, where WCAG 1.4.11 asks
+     3:1 of a state indicator; in light mode the shadow was doing that work, and
+     in dark mode a black shadow on a near-black track does nothing at all. The
+     weight step is 500 to 600 at the small size. And the colour turned out to be
+     hue with no lightness in it: the selected label measured 8.08:1 against its
+     ground and the unselected one 8.13:1, so in greyscale the two states were
+     indistinguishable — WCAG 1.4.1.
+
+     A border is a different kind of cue: an edge exists where none did, which
+     survives the loss of hue, of shadow and of colour altogether. That is why
+     the forced-colours branch below already used one. */
   .dds-segmented-option:has(> input:checked) > span {
     background-color: var(--dds-color-surface-default);
+    border-color: var(--dds-color-action-primary);
     color: var(--dds-color-text-link);
     font-weight: var(--dds-font-weight-semibold);
     box-shadow: var(--dds-elevation-sm);
@@ -293,9 +310,12 @@
   }
 
   @media (forced-colors: active) {
-    /* The raised surface is stripped, so selection needs a border. */
+    /* The border is already there and already reserved; only its colour has to
+       become one the user's palette guarantees. Setting the whole border here
+       would re-declare a width that is now the same in every mode, and a width
+       declared twice is a width that can drift. */
     .dds-segmented-option:has(> input:checked) > span {
-      border: var(--dds-border-thick) solid Highlight;
+      border-color: Highlight;
     }
   }
 
