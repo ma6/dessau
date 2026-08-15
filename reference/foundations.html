@@ -14,8 +14,8 @@
 <link rel="preload" href="assets/fonts/Inter-Variable-latin-ext.woff2" as="font"
       type="font/woff2" crossorigin>
 <link rel="stylesheet" href="assets/fonts.css?v=713f2669">
-<link rel="stylesheet" href="../dds/dds.css?v=a7ae06b0">
-<link rel="stylesheet" href="assets/reference.css?v=d15b7452">
+<link rel="stylesheet" href="../dds/dds.css?v=08ae4c06">
+<link rel="stylesheet" href="assets/reference.css?v=dab6a253">
 </head>
 <body>
 <a class="dds-skip-link" href="#main">Skip to main content</a>
@@ -1214,6 +1214,28 @@
             <code class="dds-code">scripts/check-reference.mjs</code> compares the
             documented set against every width actually used in the CSS, which is
             what keeps the two from drifting apart.
+          </p>
+        </div>
+
+        <div class="ref-note dds-mbs-md">
+          <h3 class="dds-text-sm dds-weight-semibold">A track's minimum is its content, and that is how one wide thing widens a page</h3>
+          <p class="dds-text-sm dds-text-subtle dds-mbs-2xs">
+            A grid track sized <code class="dds-code">auto</code>, and any grid or
+            flex item, cannot be narrower than its own min-content. So a single
+            descendant that refuses to become narrow — a table without its scroll
+            region, a <code class="dds-code">max-content</code> column, a long
+            unbroken identifier — makes its track wider than the viewport, and
+            every sibling in that track is stretched to match.
+          </p>
+          <p class="dds-text-sm dds-text-subtle dds-mbs-xs">
+            That is what turns one local overflow into a page-wide symptom. The
+            grids inside compute their column count against a width the screen
+            does not have and put the later columns off-screen, so each of them
+            looks like a wrapping bug while wrapping exactly as written. Anything
+            laying children out in a track therefore constrains both:
+            <code class="dds-code">grid-template-columns: minmax(0, 1fr)</code> on
+            the track and <code class="dds-code">min-inline-size: 0</code> on the
+            items. Constraining only the track moves the inflation one level down.
           </p>
         </div>
 

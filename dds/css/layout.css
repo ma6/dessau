@@ -126,6 +126,22 @@
     grid-template-columns: repeat(auto-fit, minmax(min(var(--dds-grid-min), 100%), 1fr));
   }
 
+  /* A grid item's automatic minimum size is its CONTENT, not zero.
+     ----------------------------------------------------------------------
+     So an item holding something that cannot become narrow — a table, a long
+     identifier, a `max-content` column — is as wide as that thing, whatever the
+     track says, and it drags the layout out past the viewport with it. The
+     column count is then computed for a width the screen does not have, and
+     every item in the grid looks like it failed to wrap when the grid was
+     correct all along.
+
+     Zero here means such an item overflows itself instead of the page. What it
+     does about that overflow is the item's own business — scroll it, wrap it, or
+     let it clip — and that is the right place for the decision. */
+  .dds-grid > * {
+    min-inline-size: 0;
+  }
+
   /* A grid whose items should not stretch to the tallest row. */
   .dds-grid-top { align-items: start; }
 
@@ -150,6 +166,12 @@
   .dds-sidebar > .dds-sidebar-aside {
     flex-grow: 1;
     flex-basis: var(--dds-sidebar-width);
+    /* Same reasoning as `.dds-grid > *`: a flex item will not shrink below its
+       content either, so an aside holding one wide thing stops the line from
+       wrapping and pushes the main column off the screen instead. The wrap
+       threshold is unaffected — a line breaks on hypothetical sizes, which is
+       still `--dds-sidebar-width`. */
+    min-inline-size: 0;
   }
 
   .dds-sidebar > .dds-sidebar-main {

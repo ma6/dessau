@@ -60,6 +60,40 @@ The inner `min(<ideal>, 100%)` matters: without it a single item overflows a
 container narrower than the minimum, which is the classic failure of the
 `auto-fit` pattern at 320px.
 
+### A track's minimum is its content, and that is how one wide thing widens a page
+
+A grid track sized `auto`, and any grid or flex item, cannot be narrower than its
+own min-content. So a single descendant that refuses to become narrow — a table
+without its scroll region, a `max-content` column, a long unbroken identifier —
+makes its track wider than the viewport, and **every sibling in that track is
+stretched to match**.
+
+That is what turns one local overflow into a page-wide symptom. The grids inside
+then compute their column count against a width the screen does not have, put the
+later columns off-screen, and each look like a wrapping bug — while wrapping
+exactly as written. It was measured once at roughly three times the viewport on a
+phone, across eight sections that were all individually correct.
+
+**So anything that lays children out in a track constrains the track and the
+items:**
+
+```css
+.thing        { display: grid; grid-template-columns: minmax(0, 1fr); }
+.thing > *    { min-inline-size: 0; }
+```
+
+Both, not one. A grid item's automatic minimum is its content too, so
+constraining only the track moves the inflation one level down.
+
+`.dds-grid` and `.dds-sidebar` do this for you. A product writing its own grid or
+flex layout has to do it itself, and the symptom if it does not is never local to
+the element that caused it — which is why this is written down rather than left
+to be rediscovered.
+
+What the guard does *not* do is make the wide thing fit. It makes it overflow
+itself, and what it does about that is its own decision: scroll it (the table's
+named scroll region), wrap it, or let it clip.
+
 ### When a media query IS correct
 
 For the **page shell**, and for anything that genuinely depends on the device

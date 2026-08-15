@@ -1032,9 +1032,38 @@
    desynchronises on resize. Eight links are not worth that.
    ============================================================================= */
 
+/* The track is constrained at EVERY width, not only where there are two of them.
+   ----------------------------------------------------------------------------
+   `display: grid` with no template gives one implicit `auto` track, and an `auto`
+   track cannot be narrower than the min-content of what is in it. So a single
+   descendant that refuses to become narrow — a table without its scroll region, a
+   `max-content` column, a long unbroken identifier — made this track wider than
+   the phone, and `.ref-content` was stretched to match.
+
+   Everything inside then laid itself out against that inflated width. The colour
+   swatch grids computed several columns and put the later ones off-screen, which
+   read as a wrapping bug in a grid that was wrapping perfectly correctly: a
+   measured page on a phone was about three times the width of the screen, and
+   every section on it ended at the same right edge. One overflowing element, a
+   page-wide symptom, and eight components that each looked individually broken.
+
+   `minmax(0, 1fr)` on the track and `min-inline-size: 0` on the two items is the
+   pair that stops it — both are needed, because a grid item's own automatic
+   minimum is its content as well, so constraining only the track moves the
+   inflation one level down instead of ending it.
+
+   The consequence is deliberate: an element that is genuinely too wide now
+   overflows ITSELF and is the only thing that scrolls. Whether it scrolls
+   gracefully is that element's own responsibility — see the table's scroll
+   region. */
 .ref-layout {
   display: grid;
+  grid-template-columns: minmax(0, 1fr);
   gap: var(--dds-space-lg);
+}
+
+.ref-layout > * {
+  min-inline-size: 0;
 }
 
 .ref-aside {
