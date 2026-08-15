@@ -1,5 +1,5 @@
 /**
- * Dessau — selecting an accent resolves per hue, per theme and per subtree.
+ * Dessau — selecting an accent resolves per slot, per theme and per subtree.
  *
  *   npx playwright test tests/accent.spec.mjs
  *
@@ -11,14 +11,14 @@
  * `--dds-color-accent` at one of five theme-aware pairs. Everything that can go
  * wrong with it goes wrong silently.
  *
- *   - A typo in a hue name matches nothing, so the element keeps the default and
- *     renders as a perfectly good clay bar in a chart of five clay bars.
+ *   - A typo in a slot number matches nothing, so the element keeps the default
+ *     and renders as a perfectly good accent-1 bar in a chart of five of them.
  *   - The selection rules weigh the same as `:root` and `[data-theme="dark"]`.
  *     If they ever stop being last in the file, `<html data-theme="dark"
- *     data-dds-accent="…">` silently takes the theme block's clay instead — in
- *     one theme only, which is the half nobody screenshots.
- *   - The per-hue values are declared in both theme blocks. Drop one and the
- *     accent keeps the other theme's value: a light-mode magenta on a dark page,
+ *     data-dds-accent="…">` silently takes the theme block's accent 1 instead —
+ *     in one theme only, which is the half nobody screenshots.
+ *   - The per-slot values are declared in both theme blocks. Drop one and the
+ *     accent keeps the other theme's value: a light-mode accent on a dark page,
  *     which looks deliberate.
  *
  * `scripts/check-contrast.mjs` and `scripts/check-accent-separation.mjs` verify
@@ -34,7 +34,7 @@ import { test, expect } from '@playwright/test';
 
 const FOUNDATIONS = '/reference/foundations.html';
 
-const ACCENTS = ['clay', 'magenta', 'cyan', 'green', 'violet'];
+const ACCENTS = ['1', '2', '3', '4', '5'];
 
 /** Read a custom property as the browser resolves it for one element. */
 async function accentOn(locator) {
@@ -43,22 +43,22 @@ async function accentOn(locator) {
   );
 }
 
-const specimen = (page, hue) =>
-  page.locator(`[data-ref-accent-specimen] [data-dds-accent="${hue}"]`);
+const specimen = (page, slot) =>
+  page.locator(`[data-ref-accent-specimen] [data-dds-accent="${slot}"]`);
 
 test('all five accents resolve, and to five different colours', async ({ page }) => {
   await page.goto(FOUNDATIONS);
 
   const values = new Map();
-  for (const hue of ACCENTS) {
-    const value = await accentOn(specimen(page, hue));
-    expect(value, `data-dds-accent="${hue}" resolved to nothing`).not.toBe('');
-    values.set(hue, value);
+  for (const slot of ACCENTS) {
+    const value = await accentOn(specimen(page, slot));
+    expect(value, `data-dds-accent="${slot}" resolved to nothing`).not.toBe('');
+    values.set(slot, value);
   }
 
   /**
-   * Five names that all render as clay is the failure this catches: every
-   * contrast check still passes, and the chart still says nothing.
+   * Five slots that all render as the same colour is the failure this catches:
+   * every contrast check still passes, and the chart still says nothing.
    */
   expect(
     new Set(values.values()).size,
@@ -66,36 +66,36 @@ test('all five accents resolve, and to five different colours', async ({ page })
   ).toBe(ACCENTS.length);
 });
 
-test('an element with no attribute keeps the default accent, and it is clay', async ({ page }) => {
+test('an element with no attribute keeps the default accent, and it is accent 1', async ({ page }) => {
   await page.goto(FOUNDATIONS);
 
   const fromRoot = await page.locator('main').evaluate((element) =>
     getComputedStyle(element).getPropertyValue('--dds-color-accent').trim()
   );
-  const clay = await accentOn(specimen(page, 'clay'));
+  const first = await accentOn(specimen(page, '1'));
 
   expect(fromRoot).not.toBe('');
   expect(
     fromRoot,
-    'the default accent is not clay — something re-pointed --dds-color-accent'
-  ).toBe(clay);
+    'the default accent is not accent 1 — something re-pointed --dds-color-accent'
+  ).toBe(first);
 });
 
-for (const hue of ACCENTS) {
-  test(`the ${hue} accent takes its value from the theme in force`, async ({ page }) => {
+for (const slot of ACCENTS) {
+  test(`accent ${slot} takes its value from the theme in force`, async ({ page }) => {
     await page.goto(FOUNDATIONS);
 
     await page.evaluate(() => document.documentElement.setAttribute('data-theme', 'light'));
-    const inLight = await accentOn(specimen(page, hue));
+    const inLight = await accentOn(specimen(page, slot));
 
     await page.evaluate(() => document.documentElement.setAttribute('data-theme', 'dark'));
-    const inDark = await accentOn(specimen(page, hue));
+    const inDark = await accentOn(specimen(page, slot));
 
     expect(inLight).not.toBe('');
     expect(
       inLight,
-      `${hue} is the same colour in both themes — its dark value is missing, so it ` +
-        `keeps the light one on a dark page and looks deliberate`
+      `accent ${slot} is the same colour in both themes — its dark value is missing, so ` +
+        `it keeps the light one on a dark page and looks deliberate`
     ).not.toBe(inDark);
   });
 }
@@ -114,19 +114,19 @@ test('an accent and a forced theme hold together on the same element', async ({ 
     const panel = document.createElement('div');
     panel.id = 'accent-under-forced-theme';
     panel.setAttribute('data-theme', 'light');
-    panel.setAttribute('data-dds-accent', 'magenta');
+    panel.setAttribute('data-dds-accent', '2');
     document.body.appendChild(panel);
   });
 
   const forced = await page.locator('#accent-under-forced-theme').evaluate((element) =>
     getComputedStyle(element).getPropertyValue('--dds-color-accent').trim()
   );
-  const darkMagenta = await accentOn(specimen(page, 'magenta'));
+  const darkSecond = await accentOn(specimen(page, '2'));
 
   expect(forced).not.toBe('');
   expect(
     forced,
-    'the forced-light panel kept the dark magenta — the theme block did not win ' +
-      'back the per-hue value, or the selection rule did not win the accent'
-  ).not.toBe(darkMagenta);
+    'the forced-light panel kept the dark accent 2 — the theme block did not win ' +
+      'back the per-slot value, or the selection rule did not win the accent'
+  ).not.toBe(darkSecond);
 });

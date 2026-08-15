@@ -1102,6 +1102,12 @@ recipe, and the file only if that failed too.
 
 ## 033 — Five accents, selected by attribute, sharing two ramps with status
 
+> **Superseded in part by 034.** The set, the mechanism and the ramp sharing all
+> stand. The *names* do not: the hue names below were replaced by numbered slots,
+> because a slot is a pointer and a hue name in it goes stale the moment a derived
+> system replaces the ramp. Read 034 for what the API is now; this entry is kept
+> whole because its reasoning is what 034 had to answer.
+
 **Decision.** DDS ships five decorative accents — `clay`, `magenta`, `cyan`,
 `green`, `violet` — declared per theme as `--dds-color-accent-<hue>` and
 `--dds-color-accent-<hue>-subtle`. `data-dds-accent="<hue>"` on any element puts
@@ -1176,3 +1182,66 @@ than before rather than less.
 which a set stops being memorable and starts being a lookup, and the honest
 answer to a sixth is a product setting the two custom properties itself and
 owning the contrast result — not a sixth entry here.
+
+---
+
+## 034 — The accent slots are numbered, and the product supplies the names
+
+**Decision.** The five accents are `--dds-color-accent-1` … `-5`, with matching
+`-subtle` tints and `data-dds-accent="1"` … `"5"`. The hue names 033 chose —
+`clay`, `magenta`, `cyan`, `green`, `violet` — are gone, not aliased. Products
+name the slots themselves, in their own unlayered stylesheet:
+
+```css
+[data-dds-accent="finance"] {
+  --dds-color-accent:        var(--dds-color-accent-2);
+  --dds-color-accent-subtle: var(--dds-color-accent-2-subtle);
+}
+```
+
+No colour moved. Slot *n* is exactly the hue that used to hold that position.
+
+**Why.** 033 rejected `accent-1` … `accent-5` for two reasons, and the first of
+them is what broke: *a second name for one colour has to be kept in step with the
+first.* That was correct, and it was an argument against the names 033 shipped.
+`--dds-color-accent-clay: var(--dds-clay-600)` is a slot with no value of its own
+— the hue name is the second name, and it is the one that goes stale.
+
+It goes stale on a path Dessau actively recommends. `recipes/derive-a-design-system.md`
+tells a product to replace a primitive ramp when it wants to change the system's
+character. Do that to `--dds-clay-*` and `--dds-color-accent-clay` is grey, and
+`<span data-dds-accent="clay">Vertrag</span>` renders grey and goes on saying clay
+— in the markup, which is where a wrong name survives longest, because contrast
+checks, separation checks and the browser all resolve the pointer without ever
+reading the label. Dessau's own audits were green throughout the failure.
+
+033's second argument — `data-dds-accent="3"` cannot be reviewed without a lookup
+table, `"cyan"` can — holds only while the name is true. Once it is not, a hue
+name is *worse* than an ordinal: an ordinal makes no claim, and a stale hue name
+makes a false one that used to be true, which is the kind a reviewer trusts.
+
+**Why numbers rather than something semantic.** Because there is no semantics
+available at this layer, and pretending otherwise is how the hue names happened.
+A decorative accent's entire job is to say "this category is not that category";
+what the category *is* belongs to the product. `primary` … `quinary` was
+considered and rejected twice over — it collides with `--dds-color-action-primary`,
+and it asserts a rank that five peer categories do not have. So Dessau ships
+positions and the product supplies meaning, which puts the name that can go stale
+in the hands of the only party who can keep it true.
+
+**What it cost.** 033's reviewability argument was real and is now spent: an
+unaliased `data-dds-accent="3"` in a template *does* need a lookup. The mitigation
+is that a product is expected never to write one — the aliasing pattern is in
+`agent/foundations.md`, the reference page and the derive recipe — but "expected
+to" is weaker than "cannot", and a product that skips the alias has traded a name
+that could go wrong for a number that says nothing. That is the better failure,
+not a free one.
+
+Also spent: `clay` was the last trace in the semantic layer of the accent this set
+grew out of, and a few comments now explain a name the reader can no longer see.
+
+**Reversal condition.** A product-facing alias layer being asked for in Dessau
+itself — say `--dds-color-accent-brand` as a documented synonym for slot 1. That
+would be 033's argument returning with a name that cannot go stale, and it would
+deserve a hearing. A return to hue names would not, unless ramps stop being
+replaceable, which would cost more than this ever did.

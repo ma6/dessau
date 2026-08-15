@@ -959,77 +959,77 @@
             "reference": "var(--dds-stone-0)",
             "light": "#ffffff"
           },
-          "--dds-color-accent-clay": {
+          "--dds-color-accent-1": {
             "reference": "var(--dds-clay-600)",
             "light": "#9a4b2c",
             "dark": "#e5ab8a",
             "darkReference": "var(--dds-clay-300)"
           },
-          "--dds-color-accent-clay-subtle": {
+          "--dds-color-accent-1-subtle": {
             "reference": "var(--dds-clay-100)",
             "light": "#fae8de",
             "dark": "#482417",
             "darkReference": "var(--dds-clay-900)"
           },
-          "--dds-color-accent-magenta": {
+          "--dds-color-accent-2": {
             "reference": "var(--dds-magenta-600)",
             "light": "#a13170",
             "dark": "#f496c3",
             "darkReference": "var(--dds-magenta-300)"
           },
-          "--dds-color-accent-magenta-subtle": {
+          "--dds-color-accent-2-subtle": {
             "reference": "var(--dds-magenta-100)",
             "light": "#ffe0ee",
             "dark": "#4d1a35",
             "darkReference": "var(--dds-magenta-900)"
           },
-          "--dds-color-accent-cyan": {
+          "--dds-color-accent-3": {
             "reference": "var(--dds-cyan-600)",
             "light": "#14669e",
             "dark": "#7cbfea",
             "darkReference": "var(--dds-cyan-300)"
           },
-          "--dds-color-accent-cyan-subtle": {
+          "--dds-color-accent-3-subtle": {
             "reference": "var(--dds-cyan-100)",
             "light": "#d9edfa",
             "dark": "#0e344e",
             "darkReference": "var(--dds-cyan-900)"
           },
-          "--dds-color-accent-green": {
+          "--dds-color-accent-4": {
             "reference": "var(--dds-green-600)",
             "light": "#16724a",
             "dark": "#6bcf9d",
             "darkReference": "var(--dds-green-300)"
           },
-          "--dds-color-accent-green-subtle": {
+          "--dds-color-accent-4-subtle": {
             "reference": "var(--dds-green-100)",
             "light": "#d2f3e0",
             "dark": "#0c3423",
             "darkReference": "var(--dds-green-900)"
           },
-          "--dds-color-accent-violet": {
+          "--dds-color-accent-5": {
             "reference": "var(--dds-violet-600)",
             "light": "#7048b0",
             "dark": "#c2a6fd",
             "darkReference": "var(--dds-violet-300)"
           },
-          "--dds-color-accent-violet-subtle": {
+          "--dds-color-accent-5-subtle": {
             "reference": "var(--dds-violet-100)",
             "light": "#ede6ff",
             "dark": "#352453",
             "darkReference": "var(--dds-violet-900)"
           },
           "--dds-color-accent": {
-            "reference": "var(--dds-color-accent-clay)",
+            "reference": "var(--dds-color-accent-1)",
             "light": "#9a4b2c",
             "dark": "#e5ab8a",
-            "darkReference": "var(--dds-color-accent-clay)"
+            "darkReference": "var(--dds-color-accent-1)"
           },
           "--dds-color-accent-subtle": {
-            "reference": "var(--dds-color-accent-clay-subtle)",
+            "reference": "var(--dds-color-accent-1-subtle)",
             "light": "#fae8de",
             "dark": "#482417",
-            "darkReference": "var(--dds-color-accent-clay-subtle)"
+            "darkReference": "var(--dds-color-accent-1-subtle)"
           },
           "--dds-color-selection-bg": {
             "reference": "var(--dds-indigo-700)",

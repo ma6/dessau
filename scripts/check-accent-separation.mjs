@@ -46,8 +46,8 @@ import { dirname, join } from 'node:path';
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 const VERBOSE = process.argv.includes('--verbose');
 
-/** The accent set, in the order the reference lists it. */
-const ACCENTS = ['clay', 'magenta', 'cyan', 'green', 'violet'];
+/** The accent slots. Numbered, not named after their hues — see semantic.css. */
+const ACCENTS = [1, 2, 3, 4, 5];
 
 /**
  * The floor, in OKLab ΔE.
@@ -57,7 +57,7 @@ const ACCENTS = ['clay', 'magenta', 'cyan', 'green', 'violet'];
  * decoration and the other is an error. The accent set is held to nearly twice
  * that, because telling two of them apart is the entire job.
  *
- * The shipped set's worst pair is magenta against violet in dark mode, at 0.109.
+ * The shipped set's worst pair is accent 2 against accent 5 in dark mode, at 0.109.
  * The gap between that and this number is the room a future re-tune has before it
  * has taken something away.
  */
@@ -158,7 +158,7 @@ for (const theme of themes) {
 
   for (let i = 0; i < ACCENTS.length; i++) {
     for (let j = i + 1; j < ACCENTS.length; j++) {
-      const names = [ACCENTS[i], ACCENTS[j]].map((hue) => `--dds-color-accent-${hue}`);
+      const names = [ACCENTS[i], ACCENTS[j]].map((slot) => `--dds-color-accent-${slot}`);
 
       let a, b;
       try {
@@ -180,7 +180,7 @@ for (const theme of themes) {
       if (!ok || VERBOSE) {
         lines.push(
           `  ${ok ? 'pass' : 'FAIL'}  ΔE ${distance.toFixed(3)}  (min ${MINIMUM})  ` +
-          `${ACCENTS[i]} vs ${ACCENTS[j]}`
+          `accent ${ACCENTS[i]} vs accent ${ACCENTS[j]}`
         );
       }
     }

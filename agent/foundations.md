@@ -159,31 +159,47 @@ machine-checkable, because the effective background depends on the content
 behind. The mitigation is the strong variant — at 85% black, near-white text
 clears AA against anything underneath.
 
-**Accent** — five hues, and one of them in force.
+**Accent** — five numbered slots, and one of them in force.
 
 `--dds-color-accent` and `--dds-color-accent-subtle` are what a component reads:
-the accent *in force*. `--dds-color-accent-<hue>` and
-`--dds-color-accent-<hue>-subtle` are what it can be set to, for
-`clay` · `magenta` · `cyan` · `green` · `violet`. Each carries its own per-theme
-value — 600 on 100 in light, 300 on 900 in dark. With nothing selected, the accent
-is clay.
+the accent *in force*. `--dds-color-accent-<n>` and `--dds-color-accent-<n>-subtle`
+are what it can be set to, for `1` … `5`. Each carries its own per-theme value —
+600 on 100 in light, 300 on 900 in dark. With nothing selected, the accent is 1.
 
 **Selecting one is an attribute, on any element:**
 
 ```html
-<html data-dds-accent="magenta">                    a product's own accent
+<html data-dds-accent="2">                      a product's own accent
 
-<span class="dds-avatar" data-dds-accent="cyan">    one category among several
-<div class="dds-chart-bar" data-dds-accent="green">
+<span class="dds-avatar" data-dds-accent="3">   one category among several
+<div class="dds-chart-bar" data-dds-accent="4">
 ```
 
 One mechanism, both jobs. Every component that already reads the accent — the bar
 chart, the donut, the avatar, `.dds-quote-accented` — follows without a line of
 its own CSS, because all that changed is a custom property it inherits.
 
-**The hue name is the whole vocabulary.** There are no `accent-1` … `accent-5`
-aliases: a second name for one colour has to be kept in step with the first, and
-`data-dds-accent="3"` cannot be reviewed without a lookup table.
+**A product names these itself.** The number is deliberately meaningless, because
+the meaning is not Dessau's to hold: an accent says "this category is not that
+category", and what the category *is* — a department, a region, a product line —
+lives one layer up. Declare the vocabulary in the product's own unlayered
+stylesheet:
+
+```css
+[data-dds-accent="finance"] {
+  --dds-color-accent:        var(--dds-color-accent-2);
+  --dds-color-accent-subtle: var(--dds-color-accent-2-subtle);
+}
+```
+
+**Why not hue names.** They were the API — `clay`, `magenta`, `cyan`, `green`,
+`violet` — and they were wrong for the one reader this layer exists to serve. A
+slot is a pointer with no value of its own, so a hue in its name is a claim about
+a ramp `recipes/derive-a-design-system.md` actively invites a product to replace.
+Replace it and `--dds-color-accent-clay` is grey, `<span data-dds-accent="clay">`
+is grey, and nothing in the chain checks that the name still holds — least of all
+the markup, which is where a stale name survives longest. A number claims nothing
+and cannot go stale; the name that can is one the product wrote and owns.
 
 **Decorative only, and that is a rule rather than a description.** An accent
 distinguishes one category from another. It never says "this succeeded" and never
@@ -195,7 +211,7 @@ by colour alone.
 **One place the attribute does not reach.** An element carrying `data-theme`
 re-declares `--dds-color-accent` from its theme block, which overrides an accent
 inherited from an ancestor — so a forced-theme subtree inside a branded page falls
-back to clay. Custom properties are substituted where they are declared, not where
+back to accent 1. Custom properties are substituted where they are declared, not where
 they are used, and the theme block has to re-declare the accent for a forced theme
 to work at all. Put `data-dds-accent` on the same element as `data-theme` and both
 hold.

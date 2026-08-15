@@ -87,11 +87,12 @@ are not theme-dependent, so a single unlayered `:root` is right for those.
 ## 1. Colour
 
 **The questions.** What is your action colour? Is your neutral warm, cool or
-true? Do you need a decorative accent that is neither action nor status? Does
+true? How many decorative accents do you need, and what do *you* call them? Does
 dark mode ship?
 
-**The default.** Indigo action, a hue-free grey neutral, a muted terracotta
-accent, dark mode on. Four status hues you almost certainly should not touch.
+**The default.** Indigo action, a hue-free grey neutral, five decorative accents
+led by a muted terracotta, dark mode on. Four status hues you almost certainly
+should not touch.
 
 **Where it goes.** Primitive ramps, if you are changing the identity:
 
@@ -99,8 +100,8 @@ accent, dark mode on. Four status hues you almost certainly should not touch.
 | --- | --- | --- |
 | `--dds-indigo-*` | 50…950 | Every action, link, focus ring and selected state |
 | `--dds-stone-*` | 0, 50…950 (+850) | Every surface, text colour and border |
-| `--dds-clay-*` | 50…900 | The decorative accent, and nothing else |
-| `--dds-green/amber/red/cyan-*` | 50…900 | Success, warning, error, information |
+| `--dds-clay/magenta/violet-*` | 50…900 | Accent slots 1, 2 and 5 — decorative only |
+| `--dds-green/amber/red/cyan-*` | 50…900 | Success, warning, error, information — **and** accent slots 4 and 3 |
 
 A full ramp is eleven values and it has to stay monotonic — each step
 perceptibly lighter than the next, with no two steps that read the same. If you
@@ -110,7 +111,48 @@ inherited ones is not a ramp.
 **Leave the status hues alone** unless you have a reason better than taste. They
 are four unmistakably different hues on purpose, so status survives being read by
 somebody who sees hue differently — and the amber is olive-leaning specifically
-so it cannot be confused with the accent or the error red.
+so it cannot be confused with the accents or the error red. Note the last column
+above: two of the five accents *share* their ramp with a status hue. Repointing
+`--dds-green-*` because accent 4 should be teal also repaints every success
+message you have.
+
+### The five accents, and naming them yourself
+
+The accent set is five numbered slots — `--dds-color-accent-1` … `-5`, each with
+a `-subtle` tint, selected with `data-dds-accent="<n>"` on any element.
+
+The numbers are deliberately meaningless, and this is the one place in the recipe
+where the *product* is expected to add a name rather than change a value. What a
+category is — a department, a region, a product line — is yours, not Dessau's. So
+declare your vocabulary once, unlayered, and never write a bare number in a
+template:
+
+```css
+[data-dds-accent="finance"] {
+  --dds-color-accent:        var(--dds-color-accent-2);
+  --dds-color-accent-subtle: var(--dds-color-accent-2-subtle);
+}
+```
+
+**If you only need one brand accent** and no categories at all, skip the slots
+and repoint the two tokens in force, per theme:
+
+```css
+:root, [data-theme="light"] { --dds-color-accent: …; --dds-color-accent-subtle: …; }
+[data-theme="dark"]         { --dds-color-accent: …; --dds-color-accent-subtle: …; }
+```
+
+Know what that costs: unlayered beats every layer regardless of specificity, so
+those two declarations disable `data-dds-accent` entirely — including per-subtree
+selection, including in the bar chart and the donut. Right answer if you have no
+categorical colour; wrong one the day you add a chart.
+
+**Why the slots are numbered** is worth thirty seconds, because it is the trap
+this section used to walk you into. The slots were once named after their hues
+(`clay`, `magenta`, …). A slot is a pointer with no value of its own, so that name
+was a claim about a ramp this very recipe tells you to replace — and once you did,
+`--dds-color-accent-clay` was grey and `<span data-dds-accent="clay">` was grey,
+in your markup, where nothing checks it. See DECISIONS 033 and 034.
 
 **The trap.** Judge every colour at **both ends of the ramp**, in both themes.
 Dessau got this wrong in its own palette and shipped it: the neutral was warm on
@@ -366,6 +408,10 @@ Changing tokens does not change the obligations that come with them.
   either copy the script and point those two constants at your own file, or
   measure by hand every pair you touched. Do not skip this because a green tick
   appeared: it was measuring somebody else's palette.
+- **Accent separation.** `node scripts/check-accent-separation.mjs` has the same
+  hardcoded paths, and the same consequence: it will pass on Dessau's five while
+  yours are three shades of the same blue. Two accents nobody can tell apart make
+  a chart legend say nothing, and no contrast check will ever notice.
 - **Both themes, by eye.** `python3 -m http.server 8000`, then look at the
   product in light and dark. Dark is where colour mistakes hide.
 - **Greyscale.** Any state you introduced — selected, current, checked — must

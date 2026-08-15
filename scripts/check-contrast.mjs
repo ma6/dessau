@@ -174,18 +174,18 @@ const PAIRS = [
   /* Every one of the five accents, in both of its roles.
    *
    * `--dds-color-accent` above is only the one in force — checking it alone
-   * verifies clay and says nothing about the four an author can select with
+   * verifies accent 1 and says nothing about the four an author can select with
    * `data-dds-accent`. Four unchecked colours is four ways to ship a chart
    * nobody can read.
    *
    * The 4.5 pairs are not a stricter reading of "decorative". An avatar puts its
    * initials in the accent on the accent tint, and a tag does the same with its
    * label: that is real text, on a pair only this table can see coming. */
-  ...['clay', 'magenta', 'cyan', 'green', 'violet'].flatMap((hue) => [
-    { fg: `--dds-color-accent-${hue}`, bg: '--dds-color-surface-default', min: 3, role: `${hue} accent as graphical object` },
-    { fg: `--dds-color-accent-${hue}`, bg: '--dds-color-surface-page', min: 3, role: `${hue} accent on the page` },
-    { fg: `--dds-color-accent-${hue}`, bg: `--dds-color-accent-${hue}-subtle`, min: 4.5, role: `${hue} accent text on its own tint` },
-    { fg: '--dds-color-text-default', bg: `--dds-color-accent-${hue}-subtle`, min: 4.5, role: `body text on the ${hue} tint` },
+  ...[1, 2, 3, 4, 5].flatMap((n) => [
+    { fg: `--dds-color-accent-${n}`, bg: '--dds-color-surface-default', min: 3, role: `accent ${n} as graphical object` },
+    { fg: `--dds-color-accent-${n}`, bg: '--dds-color-surface-page', min: 3, role: `accent ${n} on the page` },
+    { fg: `--dds-color-accent-${n}`, bg: `--dds-color-accent-${n}-subtle`, min: 4.5, role: `accent ${n} text on its own tint` },
+    { fg: '--dds-color-text-default', bg: `--dds-color-accent-${n}-subtle`, min: 4.5, role: `body text on the accent ${n} tint` },
   ]),
 ];
 
