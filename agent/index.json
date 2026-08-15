@@ -30,7 +30,8 @@
     "recipes": "agent/recipes/",
     "deriveDesignSystem": "agent/recipes/derive-a-design-system.md",
     "overrideComponent": "agent/recipes/override-a-component.md",
-    "consumerTemplate": "agent/consumer-AGENTS.template.md"
+    "consumerTemplate": "agent/consumer-AGENTS.template.md",
+    "consumerInitPrompt": "agent/consumer-init.prompt.md"
   },
   "implementation": {
     "cssEntry": "dds/dds.css",

@@ -127,8 +127,36 @@ const PATH_IN_PROSE =
  */
 const ROOT_DOC_IN_PROSE = /`([A-Z][A-Z0-9_-]*\.md)`/g;
 
+/**
+ * The same paths, without backticks.
+ *
+ * `agent/consumer-init.prompt.md` is a block meant to be pasted into an agent, so
+ * its paths are bare by necessity — a prompt full of backticks is a prompt that
+ * reads as markup. That made it the one document whose paths matter most to a
+ * stranger and the one shape `PATH_IN_PROSE` cannot see, which was true for
+ * exactly as long as it took to notice.
+ *
+ * Still anchored to the directories Dessau has, for the reason the backticked
+ * pattern is: unanchored, this matches `orders/new.html` in every example and
+ * becomes a check somebody switches off.
+ */
+const PATH_UNQUOTED =
+  /(?:^|[\s(])(?:\/?libs\/dessau\/)((?:dds|agent|scripts|docs|reference|tests)\/[\w./-]+\.\w+)/gm;
+
+const UNQUOTED_PATHS_IN = new Set(['agent/consumer-init.prompt.md']);
+
 for (const doc of await docs()) {
   const source = await readFile(join(ROOT, doc), 'utf8');
+
+  if (UNQUOTED_PATHS_IN.has(doc)) {
+    for (const [, path] of source.matchAll(PATH_UNQUOTED)) {
+      if (NOT_OURS.has(path)) continue;
+      if (/[*<>…]/.test(path)) continue;
+      if (await exists(path)) continue;
+
+      report(`${doc}: names \`${path}\`, which does not exist`);
+    }
+  }
 
   for (const [, path] of source.matchAll(PATH_IN_PROSE)) {
     if (NOT_OURS.has(path)) continue;
