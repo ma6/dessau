@@ -73,8 +73,18 @@ light-mode value is usually the one that was reasoned about.
 
 ### Commits
 
-Committing is pre-authorised in this repository: commit after each completed step
-without asking. `git push` is not — ask first.
+Committing and pushing are both pre-authorised in this repository: commit after
+each completed step and push it, without asking. One maintainer, direct on `main`,
+no review gate — the same reasoning `AGENTS.md` gives for not inventing process.
+
+Two things follow from pushing without being asked, and they are the price of it:
+
+- **Push what you verified, not what happens to be in the branch.** `git push`
+  carries every unpushed commit, including ones somebody else left sitting there.
+  Check `git status -sb` first and say in the summary what actually went up.
+- **A `Closes #42` trailer takes effect on arrival.** The issue closes the moment
+  the commit reaches `main`, so walk the acceptance criteria before the push, not
+  after it.
 
 Every commit subject starts with the ticket, in brackets:
 
