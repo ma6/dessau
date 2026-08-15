@@ -93,7 +93,9 @@ Icons need one extra step: the sprite from `[PATH]/dds/icons/icons.svg` must be
 - **No Web Components / Custom Elements.** A deliberate Dessau decision; do not
   introduce them here either.
 - **Light and dark both work.** Dark comes free once semantic values are used, so
-  skipping it is a deliberate decision to record — not a silent omission.
+  skipping it is a deliberate decision — and it goes in `DECISIONS.md` with its
+  reversal condition, not into a commit message and not nowhere. A silent omission
+  reads as an oversight forever.
 - **Formats via `DDS.format`.** German by default: `1.234,56 €`, `01.08.2026`,
   `14:30 Uhr`. Never `parseFloat` on a formatted number.
 - **A placeholder is never a label. Required is stated in words.**
@@ -109,6 +111,29 @@ of an unrelated feature commit.
 ```bash
 git submodule update --remote [PATH]
 ```
+
+### Where reasoning gets written down
+
+A response ends with the session. Anything that should outlive it goes in a file,
+and there are three, with different jobs. Pick by **what kind of thing it is**, not
+by which file you happen to have open.
+
+| Kind of thing | Goes in | Shape |
+| --- | --- | --- |
+| A standing rule, or a deviation from Dessau | **this file** | The rule, and the reason it holds |
+| A choice that had alternatives | `[PATH TO PRODUCT DECISIONS.md, e.g. DECISIONS.md]` | Decision · why · what it cost · reversal condition |
+| Something Dessau itself should absorb | an issue in this product's tracker | See "Reporting back" |
+
+**The test for `DECISIONS.md` is whether somebody could reasonably undo it.** "We
+use Sie" is a decision — the alternative was real, and a future reader who does not
+know why will mix in a Du. "The button is 8px" is not; it comes from the radius
+ramp and the ramp is the decision. Write the section that would stop a future
+reader from reverting the change as pointless — **why** is the part that decays,
+because six months on the choice is obvious from the code and the reason is not.
+
+**Write it in the same commit as the change.** Documentation that lags behind its
+code is documentation nobody can trust, and "I will write it up after" is the
+sentence that produces a product whose reasoning is only recoverable from diffs.
 
 ### Deliberate deviation
 
@@ -126,10 +151,19 @@ purpose.
 ### Reporting back
 
 If you build something here that other Dessau consumers would plausibly want — a
-new pattern, a missing value, a genuine gap — **say so explicitly** in your
-response: *"Candidate for Dessau, because …"*. Do not leave it silently
-product-local. Moving it in is a decision for the maintainer, not an automatic
-step.
+new pattern, a missing value, a genuine gap — do two things:
+
+1. **Say so explicitly** in your response: *"Candidate for Dessau, because …"*.
+2. **File it in this product's tracker**, so it survives the session. Name what was
+   built, why it looks general rather than product-specific, and what it would take
+   to move it.
+
+The first alone is not enough. A candidate mentioned only in a response is a
+candidate nobody will find, and the person who could act on it is usually not the
+person reading that response.
+
+Do not leave it silently product-local, and do not move it into Dessau yourself.
+That is a decision for Dessau's maintainer, not an automatic step.
 
 ### Before calling a UI change done
 
@@ -142,6 +176,8 @@ step.
 6. No new console errors.
 7. Screen-reader pass on anything with announcements or focus management.
 8. Walk `[PATH]/agent/definition-of-done.md`.
+9. Anything decided along the way is written down — see "Where reasoning gets
+   written down", and in the same commit as the change.
 
 ---
 
