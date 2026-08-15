@@ -290,11 +290,31 @@
     display: flex;
     align-items: center;
     gap: var(--dds-space-2xs);
+    /* A long name is allowed to wrap inside its own item rather than push the
+       trail past the edge. Without this the flex item's automatic minimum is its
+       longest word. */
+    min-inline-size: 0;
   }
 
   /* Decorative separator, invisible to assistive technology by virtue of being
-     generated content. */
-  .dds-breadcrumb li + li::before {
+     generated content.
+
+     On the item BEFORE the gap, not the one after it — and that is the whole
+     narrow-width behaviour of this component.
+     ----------------------------------------------------------------------
+     A breadcrumb wraps: on a phone a four-level trail is two or three lines, and
+     that is correct. Drawn as `li + li::before`, the chevron belongs to the item
+     that follows it, so a wrapped line OPENED with a chevron pointing at
+     nothing — "› Drainage survey" under the line it came from.
+
+     Moved to the trailing edge of the preceding item, the mark that ends up at a
+     line break is at the END of the line, where a chevron means "continues" and
+     reads correctly. Within a line nothing changes but a couple of pixels.
+
+     The same inversion is applied to the toolbar's group rule, for the same
+     reason. Anything that separates two things has to sit on the side that
+     survives the break. */
+  .dds-breadcrumb li:not(:last-child)::after {
     content: "";
     inline-size: 0.4em;
     block-size: 0.4em;
@@ -326,17 +346,69 @@
     display: flex;
     flex-wrap: wrap;
     align-items: center;
+    justify-content: center;
     gap: var(--dds-space-2xs);
+
+    /* Its own container, so the narrow form below can be asked for by the space
+       this control was given rather than by the size of the window. No frame
+       element is needed: the query targets the list inside, not this element. */
+    container-type: inline-size;
+    container-name: dds-pagination;
   }
 
   .dds-pagination ul {
     display: flex;
     flex-wrap: wrap;
     align-items: center;
+    justify-content: center;
     gap: var(--dds-space-3xs);
     list-style: none;
     margin: 0;
     padding: 0;
+  }
+
+  /* Narrow: the numbers become a strip that scrolls, and Previous and Next stay
+     with them.
+     ----------------------------------------------------------------------
+     Wrapping is what a row of controls normally should do, and here it produced
+     the one arrangement that is worse than either alternative: "Previous" alone
+     on the first line, then the numbers and "Next" on the second. The pair that
+     means "move one page" was split across two lines, and the result read as
+     three controls rather than one.
+
+     So below this width the list stops wrapping and scrolls instead. Every page
+     that was reachable before is still reachable — nothing is hidden behind a
+     "more" control and no page is dropped, which is the rule about narrow screens
+     getting the same capability, not less.
+
+     It needs no tab stop of its own, unlike the table's scroll region: every
+     child here is a link, and focusing a link scrolls it into view. The keyboard
+     path is the links themselves. A partially visible number at the edge is also
+     its own affordance — a cut-off "1" says there is more of the row.
+
+     28rem is where Previous and Next, at their real label widths, stop leaving
+     room for more than two numbers between them. Below that the wrap was certain
+     rather than possible. */
+  @container dds-pagination (inline-size < 28rem) {
+    .dds-pagination ul {
+      flex-wrap: nowrap;
+      overflow-x: auto;
+      overscroll-behavior-x: contain;
+
+      /* Take the space the two controls leave, and no more. `min-inline-size: 0`
+         is what allows it to be less than the numbers it contains — without it
+         the strip is as wide as its content and pushes Next off the line, which
+         is the original defect wearing a different hat. */
+      flex: 1 1 0;
+      min-inline-size: 0;
+
+      /* Land on whole numbers rather than halfway through one. */
+      scroll-snap-type: x proximity;
+    }
+
+    .dds-pagination ul > li {
+      scroll-snap-align: center;
+    }
   }
 
   .dds-pagination-link {
@@ -814,9 +886,22 @@
     gap: var(--dds-space-3xs);
   }
 
-  .dds-toolbar-group + .dds-toolbar-group {
-    padding-inline-start: var(--dds-space-xs);
-    border-inline-start: var(--dds-border-thin) solid var(--dds-color-border-subtle);
+  /* The rule goes on the trailing edge of the group before the break, not the
+     leading edge of the one after it — the same inversion as the breadcrumb
+     chevron, and for the same reason. A toolbar wraps on a phone, and drawn as
+     `+ .dds-toolbar-group { border-inline-start }` the second group began the new
+     line with a vertical rule and nothing to its left to be separated from.
+
+     At the end of a line the rule reads as "the row continues below", which is
+     what has actually happened. */
+     `:has(+ …)` rather than `:not(:last-child)`: a toolbar ends with a spacer, an
+     overflow button and its menu, so "last child" is not "last group" and the
+     final group would have drawn a rule against the empty space after it. This
+     is the same relationship the old `+` selector expressed, read from the other
+     end. */
+  .dds-toolbar-group:has(+ .dds-toolbar-group) {
+    padding-inline-end: var(--dds-space-xs);
+    border-inline-end: var(--dds-border-thin) solid var(--dds-color-border-subtle);
   }
 
   .dds-toolbar-spacer {

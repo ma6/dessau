@@ -49,6 +49,18 @@
         ]
       },
       {
+        "width": "28rem",
+        "pixels": 448,
+        "containerQueries": 1,
+        "mediaQueries": 0,
+        "containers": [
+          "dds-pagination"
+        ],
+        "files": [
+          "dds/css/components-navigation.css"
+        ]
+      },
+      {
         "width": "30rem",
         "pixels": 480,
         "containerQueries": 0,

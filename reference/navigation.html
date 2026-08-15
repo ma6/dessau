@@ -14,7 +14,7 @@
 <link rel="preload" href="assets/fonts/Inter-Variable-latin-ext.woff2" as="font"
       type="font/woff2" crossorigin>
 <link rel="stylesheet" href="assets/fonts.css?v=713f2669">
-<link rel="stylesheet" href="../dds/dds.css?v=c24e7775">
+<link rel="stylesheet" href="../dds/dds.css?v=fb623eff">
 <link rel="stylesheet" href="assets/reference.css?v=dab6a253">
 </head>
 <body>
@@ -454,6 +454,7 @@
 
         <div class="dds-stack dds-stack-lg">
           <div class="ref-specimen" data-ref-code>
+            <div data-ref-bp>
             <nav class="dds-breadcrumb" aria-label="Breadcrumb">
               <ol>
                 <li><a href="#breadcrumb">Projects</a></li>
@@ -462,6 +463,7 @@
                 <li><span aria-current="page">Drainage survey</span></li>
               </ol>
             </nav>
+            </div>
             <p class="ref-note">
               <svg class="dds-icon" aria-hidden="true"><use href="#dds-icon-info"/></svg>
               The separator is a CSS pseudo-element, so it is not in the
@@ -469,9 +471,18 @@
               item. The last entry is not a link: linking a page to itself is a
               dead control.
             </p>
+            <p class="ref-note">
+              <svg class="dds-icon" aria-hidden="true"><use href="#dds-icon-info"/></svg>
+              <strong>Narrow:</strong> the trail wraps, and the chevron sits on
+              the trailing edge of the item before the gap rather than the leading
+              edge of the one after it. Drawn the other way round, a wrapped line
+              opened with a chevron pointing at nothing. At the end of a line the
+              same mark reads as “continues”.
+            </p>
           </div>
 
           <div class="ref-specimen" data-ref-code>
+            <div data-ref-bp>
             <nav class="dds-pagination" aria-label="Pagination">
               <a class="dds-button dds-button-secondary dds-button-sm" href="#breadcrumb">
                 <svg class="dds-icon" aria-hidden="true"><use href="#dds-icon-chevron-left"/></svg>
@@ -492,11 +503,22 @@
                 <svg class="dds-icon" aria-hidden="true"><use href="#dds-icon-chevron-right"/></svg>
               </a>
             </nav>
+            </div>
             <p class="ref-note">
               <svg class="dds-icon" aria-hidden="true"><use href="#dds-icon-info"/></svg>
               Real links with real <code class="dds-code">href</code>s, so a page
               is bookmarkable, shareable and openable in a new tab. Each name says
               where it goes — “Page 3”, not “3”.
+            </p>
+            <p class="ref-note">
+              <svg class="dds-icon" aria-hidden="true"><use href="#dds-icon-info"/></svg>
+              <strong>Below 28rem of container width:</strong> the numbers stop
+              wrapping and scroll instead, so Previous and Next stay on the line
+              with them. Wrapping put “Previous” alone on the first line and read
+              as three controls rather than one. No page is dropped and nothing
+              hides behind a “more” control — the strip needs no tab stop of its
+              own because every child in it is a link, and focusing a link scrolls
+              it into view.
             </p>
           </div>
         </div>
@@ -559,6 +581,7 @@
 
         <div class="dds-stack dds-stack-lg">
           <div class="ref-specimen" data-ref-code>
+            <div data-ref-bp>
             <div class="dds-toolbar">
               <div class="dds-toolbar-group">
                 <button type="button" class="dds-button dds-button-subtle dds-button-sm">
@@ -607,12 +630,22 @@
                 </ul>
               </div>
             </div>
+            </div>
             <p class="ref-note">
               <svg class="dds-icon" aria-hidden="true"><use href="#dds-icon-info"/></svg>
               The menu is a <code class="dds-code">popover</code> invoked by
               <code class="dds-code">popovertarget</code> — no JavaScript. Light
               dismiss, Escape, top-layer rendering and focus return all come from
               the platform.
+            </p>
+            <p class="ref-note">
+              <svg class="dds-icon" aria-hidden="true"><use href="#dds-icon-info"/></svg>
+              <strong>Narrow:</strong> the row wraps, and the rule between groups
+              sits on the trailing edge of the group before the gap. On the leading
+              edge of the one after it, a wrapped group began the new line with a
+              vertical rule separating it from nothing. Groups keep their spacing
+              either way, so the grouping survives the break even where the rule
+              does not fall between two groups on one line.
             </p>
           </div>
 
