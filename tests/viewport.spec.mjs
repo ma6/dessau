@@ -80,6 +80,10 @@ const findOverflow = () => {
   const scrolls = (style) => /(auto|scroll|hidden|clip)/.test(style.overflowX);
 
   const offenders = [];
+  /* What the two filters above took out. When the page overflows and the
+     filters have left nothing to report, the cause is in here — and which
+     filter hid it is the answer. */
+  const skipped = [];
 
   for (const element of document.body.querySelectorAll('*')) {
     const rect = element.getBoundingClientRect();
@@ -92,7 +96,10 @@ const findOverflow = () => {
     const style = getComputedStyle(element);
     // Off-screen by design: the visually-hidden recipe, and anything a
     // transform has parked outside the viewport on purpose.
-    if (style.position === 'absolute' && rect.width <= 2) continue;
+    if (style.position === 'absolute' && rect.width <= 2) {
+      skipped.push({ element, why: 'absolutely positioned and 1px wide' });
+      continue;
+    }
 
     // Inside something that contains its own overflow — a table's scroll region
     // is the documented exception, not a finding.
@@ -105,7 +112,10 @@ const findOverflow = () => {
       }
       ancestor = ancestor.parentElement;
     }
-    if (contained) continue;
+    if (contained) {
+      skipped.push({ element, why: 'inside something that scrolls or clips' });
+      continue;
+    }
 
     offenders.push(element);
   }
@@ -146,6 +156,7 @@ const findOverflow = () => {
     offenders: outermost.slice(0, 8).map(describe),
     offenderCount: outermost.length,
     widest,
+    skipped: skipped.slice(0, 8).map(({ element, why }) => `${describe(element)}  [${why}]`),
   };
 };
 
@@ -208,13 +219,16 @@ for (const viewport of VIEWPORTS) {
           result.offenderCount
             ? `${result.offenderCount} element(s) exceed the ${result.viewport}px viewport:\n` +
               result.offenders.map((line) => `    ${line}`).join('\n')
-            : 'the page scrolls sideways and no single element is over the edge, ' +
-              'so the cause is inside something that clips or scrolls. The widest ' +
-              'boxes on the page:\n' +
+            : 'the page scrolls sideways and no element survived the filters. ' +
+              'The widest boxes:\n' +
               (result.widest.length
                 ? result.widest.map((line) => `    ${line}`).join('\n')
-                : '    (none wider than the viewport — look for a track with no ' +
-                  'constraint, #79)')
+                : '    (none wider than the viewport)') +
+              '\n  Over the edge but filtered out:\n' +
+              (result.skipped.length
+                ? result.skipped.map((line) => `    ${line}`).join('\n')
+                : '    (nothing — so the overflow is not from an element box at all: ' +
+                  'a pseudo-element, a margin, or the top layer)')
         ).toBeLessThanOrEqual(1);
       });
     }

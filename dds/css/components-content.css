@@ -1123,12 +1123,6 @@
     padding-block: var(--dds-space-xs);
   }
 
-  /* And the value may become narrower than its longest word, so that word can
-     break (`overflow-wrap` in base.css) instead of setting the row's width. */
-  .dds-specs dd {
-    min-inline-size: 0;
-  }
-
   .dds-specs > div + div {
     border-block-start: var(--dds-border-thin) solid var(--dds-color-border-subtle);
   }
@@ -1163,7 +1157,19 @@
     margin: 0;
     text-align: end;
     font-weight: var(--dds-font-weight-medium);
-    flex-shrink: 0;
+    /* The value shrinks and wraps rather than holding its full width.
+       ------------------------------------------------------------------
+       It used to carry `flex-shrink: 0` — protecting it from the dotted leader,
+       which grows to fill. With the label protected too, the row had no item
+       that could give, so a long value made it wider than the screen and there
+       was nothing to be done about it. `Stahlbetonskelett mit Vorhangfassade`
+       against `Bruttogeschossfläche` is the specimen that showed it.
+
+       Nothing is lost on a wide row: shrinking only happens once a line
+       overflows, and on a wide row the leader has taken the slack already.
+       `min-inline-size: 0` is what lets the value go below its longest word, so
+       the word breaks (`overflow-wrap`, base.css) instead of setting the width. */
+    min-inline-size: 0;
   }
 
   /* ==========================================================================
