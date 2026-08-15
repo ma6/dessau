@@ -36,7 +36,7 @@ starts to mean "you can act on this".
 
 | Family | Character | Role |
 | --- | --- | --- |
-| `stone` | Warm-tinted grey | Every neutral surface, text and border |
+| `stone` | True grey, no hue | Every neutral surface, text and border |
 | `indigo` | Blue-violet | The single interactive hue |
 | `clay` | Muted terracotta | Decorative accent only |
 | `green` | Green | Success |
@@ -47,10 +47,12 @@ starts to mean "you can act on this".
 Steps run `50` (lightest) to `950` (darkest), plus `--dds-stone-0` (pure white)
 and `--dds-stone-850`.
 
-Why warm neutrals: long-form reading and dense forms sit on these surfaces all
-day, and a slight warmth reads as paper rather than as screen. It also keeps grey
-clearly distinct from the cool action colour, so a grey surface never looks like a
-faded blue one.
+Why a true grey: the neutrals used to be warm-tinted, on the argument that a
+slight warmth reads as paper rather than as screen. That holds at the light end
+of the ramp and nowhere else — at the lightness of the dark-mode surfaces there
+is no white point in view to judge the tint against, so the warmth reads as
+brown. The ramp is now hue-free at every step, and each value has the identical
+relative luminance to the warm one it replaced. See DECISIONS.md 031.
 
 Why indigo rather than a cyan-blue: it must not be confusable with the
 informational status hue. "This is information" and "this is a button" have to

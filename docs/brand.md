@@ -194,8 +194,8 @@ from its bottom edge, which is where this logo's baseline already is.
 beside it and no document to inherit from:
 
 ```text
-light scheme   #201e1a   stone-950 ink
-dark scheme    #f4f2ee   stone-100 paper
+light scheme   #1e1e1e   stone-900 ink
+dark scheme    #f2f2f2   stone-100 paper
 ```
 
 switched with `prefers-color-scheme` inside the file, on a **scoped class** — not

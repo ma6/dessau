@@ -21,8 +21,8 @@
   colour scheme. The class is scoped rather than styling :root, so that
   inlining this file into a page cannot reach out and restyle the page.
 
-      light scheme   #201e1a   the stone-950 ink
-      dark scheme    #f4f2ee   the stone-100 paper
+      light scheme   #1e1e1e   the stone-900 ink
+      dark scheme    #f2f2f2   the stone-100 paper
 
   If a browser ignores the media query, the light value applies. That is the
   right way round: most tab strips are light, and the failure is then invisible
@@ -51,9 +51,9 @@
      role="img" aria-labelledby="dessau-icon-title">
   <title id="dessau-icon-title">Dessau</title>
   <style>
-    .dessau-glyph { fill: #201e1a; }
+    .dessau-glyph { fill: #1e1e1e; }
     @media (prefers-color-scheme: dark) {
-      .dessau-glyph { fill: #f4f2ee; }
+      .dessau-glyph { fill: #f2f2f2; }
     }
   </style>
   <g class="dessau-glyph" transform="translate(17.1 14)">

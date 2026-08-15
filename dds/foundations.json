@@ -132,40 +132,40 @@
             "value": "#ffffff"
           },
           "--dds-stone-50": {
-            "value": "#fbfaf8"
+            "value": "#fafafa"
           },
           "--dds-stone-100": {
-            "value": "#f4f2ee"
+            "value": "#f2f2f2"
           },
           "--dds-stone-200": {
-            "value": "#e8e5df"
+            "value": "#e5e5e5"
           },
           "--dds-stone-300": {
-            "value": "#d5d1c9"
+            "value": "#d1d1d1"
           },
           "--dds-stone-400": {
-            "value": "#b1aba1"
+            "value": "#acacac"
           },
           "--dds-stone-500": {
-            "value": "#8a8377"
+            "value": "#848484"
           },
           "--dds-stone-600": {
-            "value": "#6a645a"
+            "value": "#656565"
           },
           "--dds-stone-700": {
-            "value": "#514c44"
+            "value": "#4d4d4d"
           },
           "--dds-stone-800": {
-            "value": "#3a3630"
+            "value": "#363636"
           },
           "--dds-stone-850": {
-            "value": "#2b2823"
+            "value": "#282828"
           },
           "--dds-stone-900": {
-            "value": "#201e1a"
+            "value": "#1e1e1e"
           },
           "--dds-stone-950": {
-            "value": "#151310"
+            "value": "#131313"
           },
           "--dds-indigo-50": {
             "value": "#f2f3fd"
@@ -526,13 +526,13 @@
             "value": "none"
           },
           "--dds-shadow-sm": {
-            "value": "0 1px 2px rgb(21 19 16 / 0.06), 0 1px 1px rgb(21 19 16 / 0.04)"
+            "value": "0 1px 2px rgb(19 19 19 / 0.06), 0 1px 1px rgb(19 19 19 / 0.04)"
           },
           "--dds-shadow-md": {
-            "value": "0 4px 8px -2px rgb(21 19 16 / 0.08), 0 2px 3px -1px rgb(21 19 16 / 0.05)"
+            "value": "0 4px 8px -2px rgb(19 19 19 / 0.08), 0 2px 3px -1px rgb(19 19 19 / 0.05)"
           },
           "--dds-shadow-lg": {
-            "value": "0 12px 20px -6px rgb(21 19 16 / 0.12), 0 4px 8px -3px rgb(21 19 16 / 0.06)"
+            "value": "0 12px 20px -6px rgb(19 19 19 / 0.12), 0 4px 8px -3px rgb(19 19 19 / 0.06)"
           },
           "--dds-shadow-sm-dark": {
             "value": "0 1px 2px rgb(0 0 0 / 0.4)"
@@ -601,38 +601,38 @@
         "color": {
           "--dds-color-surface-page": {
             "reference": "var(--dds-stone-50)",
-            "light": "#fbfaf8",
-            "dark": "#151310",
+            "light": "#fafafa",
+            "dark": "#131313",
             "darkReference": "var(--dds-stone-950)"
           },
           "--dds-color-surface-default": {
             "reference": "var(--dds-stone-0)",
             "light": "#ffffff",
-            "dark": "#201e1a",
+            "dark": "#1e1e1e",
             "darkReference": "var(--dds-stone-900)"
           },
           "--dds-color-surface-raised": {
             "reference": "var(--dds-stone-0)",
             "light": "#ffffff",
-            "dark": "#2b2823",
+            "dark": "#282828",
             "darkReference": "var(--dds-stone-850)"
           },
           "--dds-color-surface-sunken": {
             "reference": "var(--dds-stone-100)",
-            "light": "#f4f2ee",
-            "dark": "#151310",
+            "light": "#f2f2f2",
+            "dark": "#131313",
             "darkReference": "var(--dds-stone-950)"
           },
           "--dds-color-surface-hover": {
             "reference": "var(--dds-stone-100)",
-            "light": "#f4f2ee",
-            "dark": "#3a3630",
+            "light": "#f2f2f2",
+            "dark": "#363636",
             "darkReference": "var(--dds-stone-800)"
           },
           "--dds-color-surface-active": {
             "reference": "var(--dds-stone-200)",
-            "light": "#e8e5df",
-            "dark": "#514c44",
+            "light": "#e5e5e5",
+            "dark": "#4d4d4d",
             "darkReference": "var(--dds-stone-700)"
           },
           "--dds-color-surface-selected": {
@@ -643,8 +643,8 @@
           },
           "--dds-color-surface-disabled": {
             "reference": "var(--dds-stone-100)",
-            "light": "#f4f2ee",
-            "dark": "#2b2823",
+            "light": "#f2f2f2",
+            "dark": "#282828",
             "darkReference": "var(--dds-stone-850)"
           },
           "--dds-color-surface-success": {
@@ -673,31 +673,31 @@
           },
           "--dds-color-text-default": {
             "reference": "var(--dds-stone-900)",
-            "light": "#201e1a",
-            "dark": "#f4f2ee",
+            "light": "#1e1e1e",
+            "dark": "#f2f2f2",
             "darkReference": "var(--dds-stone-100)"
           },
           "--dds-color-text-subtle": {
             "reference": "var(--dds-stone-700)",
-            "light": "#514c44",
-            "dark": "#d5d1c9",
+            "light": "#4d4d4d",
+            "dark": "#d1d1d1",
             "darkReference": "var(--dds-stone-300)"
           },
           "--dds-color-text-muted": {
             "reference": "var(--dds-stone-600)",
-            "light": "#6a645a",
-            "dark": "#b1aba1",
+            "light": "#656565",
+            "dark": "#acacac",
             "darkReference": "var(--dds-stone-400)"
           },
           "--dds-color-text-inverse": {
             "reference": "var(--dds-stone-50)",
-            "light": "#fbfaf8",
-            "dark": "#201e1a",
+            "light": "#fafafa",
+            "dark": "#1e1e1e",
             "darkReference": "var(--dds-stone-900)"
           },
           "--dds-color-text-disabled": {
             "reference": "var(--dds-stone-500)",
-            "light": "#8a8377",
+            "light": "#848484",
             "darkReference": "var(--dds-stone-500)"
           },
           "--dds-color-text-link": {
@@ -810,31 +810,31 @@
           },
           "--dds-color-action-disabled": {
             "reference": "var(--dds-stone-200)",
-            "light": "#e8e5df",
-            "dark": "#3a3630",
+            "light": "#e5e5e5",
+            "dark": "#363636",
             "darkReference": "var(--dds-stone-800)"
           },
           "--dds-color-border-subtle": {
             "reference": "var(--dds-stone-200)",
-            "light": "#e8e5df",
-            "dark": "#3a3630",
+            "light": "#e5e5e5",
+            "dark": "#363636",
             "darkReference": "var(--dds-stone-800)"
           },
           "--dds-color-border-default": {
             "reference": "var(--dds-stone-500)",
-            "light": "#8a8377",
+            "light": "#848484",
             "darkReference": "var(--dds-stone-500)"
           },
           "--dds-color-border-strong": {
             "reference": "var(--dds-stone-700)",
-            "light": "#514c44",
-            "dark": "#d5d1c9",
+            "light": "#4d4d4d",
+            "dark": "#d1d1d1",
             "darkReference": "var(--dds-stone-300)"
           },
           "--dds-color-border-field": {
             "reference": "var(--dds-stone-600)",
-            "light": "#6a645a",
-            "dark": "#b1aba1",
+            "light": "#656565",
+            "dark": "#acacac",
             "darkReference": "var(--dds-stone-400)"
           },
           "--dds-color-border-success": {
@@ -933,7 +933,7 @@
           },
           "--dds-color-on-overlay-muted": {
             "reference": "var(--dds-stone-200)",
-            "light": "#e8e5df"
+            "light": "#e5e5e5"
           },
           "--dds-color-overlay-control": {
             "reference": "rgb(0 0 0 / 0.5)",
@@ -961,19 +961,19 @@
         "elevation": {
           "--dds-elevation-sm": {
             "reference": "var(--dds-shadow-sm)",
-            "light": "0 1px 2px rgb(21 19 16 / 0.06), 0 1px 1px rgb(21 19 16 / 0.04)",
+            "light": "0 1px 2px rgb(19 19 19 / 0.06), 0 1px 1px rgb(19 19 19 / 0.04)",
             "dark": "0 1px 2px rgb(0 0 0 / 0.4)",
             "darkReference": "var(--dds-shadow-sm-dark)"
           },
           "--dds-elevation-md": {
             "reference": "var(--dds-shadow-md)",
-            "light": "0 4px 8px -2px rgb(21 19 16 / 0.08), 0 2px 3px -1px rgb(21 19 16 / 0.05)",
+            "light": "0 4px 8px -2px rgb(19 19 19 / 0.08), 0 2px 3px -1px rgb(19 19 19 / 0.05)",
             "dark": "0 4px 8px -2px rgb(0 0 0 / 0.5), 0 2px 3px -1px rgb(0 0 0 / 0.4)",
             "darkReference": "var(--dds-shadow-md-dark)"
           },
           "--dds-elevation-lg": {
             "reference": "var(--dds-shadow-lg)",
-            "light": "0 12px 20px -6px rgb(21 19 16 / 0.12), 0 4px 8px -3px rgb(21 19 16 / 0.06)",
+            "light": "0 12px 20px -6px rgb(19 19 19 / 0.12), 0 4px 8px -3px rgb(19 19 19 / 0.06)",
             "dark": "0 14px 24px -8px rgb(0 0 0 / 0.6), 0 4px 8px -3px rgb(0 0 0 / 0.45)",
             "darkReference": "var(--dds-shadow-lg-dark)"
           }

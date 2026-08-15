@@ -83,7 +83,7 @@
 
 /* Foundations first: everything downstream reads these custom properties.
    Primitives before semantics, because the semantic layer points at them. */
-@import url("./css/primitives.css?v=db001cd4") layer(dds.foundation);
+@import url("./css/primitives.css?v=29444fdd") layer(dds.foundation);
 @import url("./css/semantic.css?v=2f48f7b6") layer(dds.foundation);
 
 /* Element defaults and the shared floor (focus, motion, forced colours). */

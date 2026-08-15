@@ -17,26 +17,32 @@
 
 :root {
   /* ---------------------------------------------------------------------------
-     Neutral — "stone". A warm-tinted grey.
+     Neutral — "stone". A true grey: no hue at all, at any step.
 
-     Warm rather than blue-grey on purpose: long-form reading and dense forms
-     sit on these surfaces all day, and a slight warmth reads as paper rather
-     than as screen. It also keeps the neutral clearly distinct from the cool
-     action colour, so a grey surface never looks like a faded blue one.
+     It used to be warm-tinted, on the argument that a slight warmth reads as
+     paper rather than as screen. That argument was made at the light end of the
+     ramp, where it is true. At the dark end the same hue at 19–34% lightness has
+     no white point nearby to be judged against — the whole field is the tint —
+     and it reads as brown. Dark mode inherited a decision that had only ever
+     been looked at in light mode. See DECISIONS.md.
+
+     Every step is the grey with the *identical* relative luminance to the warm
+     value it replaced, so no contrast pair in the system moved. It is the same
+     ramp with the hue removed, not a new one.
      --------------------------------------------------------------------------- */
   --dds-stone-0:   #ffffff;
-  --dds-stone-50:  #fbfaf8;
-  --dds-stone-100: #f4f2ee;
-  --dds-stone-200: #e8e5df;
-  --dds-stone-300: #d5d1c9;
-  --dds-stone-400: #b1aba1;
-  --dds-stone-500: #8a8377;
-  --dds-stone-600: #6a645a;
-  --dds-stone-700: #514c44;
-  --dds-stone-800: #3a3630;
-  --dds-stone-850: #2b2823;
-  --dds-stone-900: #201e1a;
-  --dds-stone-950: #151310;
+  --dds-stone-50:  #fafafa;
+  --dds-stone-100: #f2f2f2;
+  --dds-stone-200: #e5e5e5;
+  --dds-stone-300: #d1d1d1;
+  --dds-stone-400: #acacac;
+  --dds-stone-500: #848484;
+  --dds-stone-600: #656565;
+  --dds-stone-700: #4d4d4d;
+  --dds-stone-800: #363636;
+  --dds-stone-850: #282828;
+  --dds-stone-900: #1e1e1e;
+  --dds-stone-950: #131313;
 
   /* ---------------------------------------------------------------------------
      Action — "indigo". The single interactive hue.
@@ -270,9 +276,9 @@
      reads as height on white reads as dirt on near-black.
      --------------------------------------------------------------------------- */
   --dds-shadow-none: none;
-  --dds-shadow-sm: 0 1px 2px rgb(21 19 16 / 0.06), 0 1px 1px rgb(21 19 16 / 0.04);
-  --dds-shadow-md: 0 4px 8px -2px rgb(21 19 16 / 0.08), 0 2px 3px -1px rgb(21 19 16 / 0.05);
-  --dds-shadow-lg: 0 12px 20px -6px rgb(21 19 16 / 0.12), 0 4px 8px -3px rgb(21 19 16 / 0.06);
+  --dds-shadow-sm: 0 1px 2px rgb(19 19 19 / 0.06), 0 1px 1px rgb(19 19 19 / 0.04);
+  --dds-shadow-md: 0 4px 8px -2px rgb(19 19 19 / 0.08), 0 2px 3px -1px rgb(19 19 19 / 0.05);
+  --dds-shadow-lg: 0 12px 20px -6px rgb(19 19 19 / 0.12), 0 4px 8px -3px rgb(19 19 19 / 0.06);
 
   /* Dark-mode equivalents, kept here so both variants of a value live together. */
   --dds-shadow-sm-dark: 0 1px 2px rgb(0 0 0 / 0.4);

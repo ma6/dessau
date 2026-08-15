@@ -597,7 +597,7 @@ the header was before. `class="dds-sr-only"` in the markup would have hidden the
 word unconditionally and left a brandless header wherever the mask is unsupported.
 
 **The favicon is the one exception, and it is not a loophole.** A tab strip has no
-text to inherit from, so `dessau-icon.svg` states `#201e1a` and `#f4f2ee` and
+text to inherit from, so `dessau-icon.svg` states `#1e1e1e` and `#f2f2f2` and
 switches them on `prefers-color-scheme`, in a scoped class rather than on `:root`
 so the file cannot restyle a page it is inlined into. Anything *inside* a page uses
 the mark instead, which follows the site's own theme even when that disagrees with
@@ -925,3 +925,60 @@ an empty string when the sheets arrive that way (see LESSONS_LEARNED.md).
 
 **Reversal condition.** Releases becoming frequent enough that building on each
 tag is slower than the alternative. Nothing about that is in prospect.
+
+---
+
+## 031 — The neutral is a true grey, in both themes
+
+**Supersedes** the warm neutral, which was never written down here — it lived as
+a comment in `primitives.css` and so was reversible by anybody who found it
+inconvenient, which is exactly what this file exists to prevent. Recording it now,
+in the entry that reverses it.
+
+**Decision.** `--dds-stone-*` carries no hue at any step, in light and in dark.
+Every value is the grey with the **identical relative luminance** to the warm one
+it replaced, so no contrast pair in the system moved.
+
+```text
+stone-50   #fbfaf8 → #fafafa      stone-700  #514c44 → #4d4d4d
+stone-100  #f4f2ee → #f2f2f2      stone-800  #3a3630 → #363636
+stone-200  #e8e5df → #e5e5e5      stone-850  #2b2823 → #282828
+stone-300  #d5d1c9 → #d1d1d1      stone-900  #201e1a → #1e1e1e
+stone-400  #b1aba1 → #acacac      stone-950  #151310 → #131313
+stone-500  #8a8377 → #848484
+stone-600  #6a645a → #656565      shadow ink rgb(21 19 16) → rgb(19 19 19)
+```
+
+**Why.** The old argument was that a slight warmth reads as paper rather than as
+screen, for long-form reading and dense forms. That argument is sound *at the
+light end of the ramp*, and it was only ever made there.
+
+The ramp was hue 78–85° throughout — yellow-brown — at a chroma of up to 0.020.
+At L 86–99% that is paper. At L 19–34%, which is every surface in dark mode, there
+is no white point anywhere in view to judge the tint against: the whole field *is*
+the tint, and it reads as brown. Dark mode had inherited a decision that had only
+ever been looked at in light mode, which is the failure mode `CLAUDE.md` warns
+about for colour work and this repository still walked into.
+
+**Why identical luminance.** Contrast ratios are computed from relative luminance
+and nothing else, so holding luminance fixed makes every one of the 148 pairs
+unchanged **by construction** rather than by re-testing and hoping. It also makes
+the change honestly reversible: it is the same ramp with the hue removed, not a
+new ramp with new decisions folded in.
+
+**What did not change.** The accent stays clay — a muted terracotta is still the
+right decorative counterweight, and "Bauhaus" here means material honesty rather
+than red/yellow/blue geometry (see the comment on the ramp). Indigo still owns
+action, the four status hues are untouched, and the overlays were already pure
+black. The only other warm values in the system were the shadow ink and the two
+literals in `dessau-icon.svg`, and both follow the ramp.
+
+**Cost.** Light mode loses the paper warmth that was deliberate and defensible.
+That is the trade the maintainer chose when the alternative — warm in light,
+neutral in dark — would have meant the neutral was two different decisions
+depending on the theme, and one of them undocumented.
+
+**Reversal condition.** Someone establishes, by looking at both themes rather
+than at one, that the warmth was worth more than the neutrality. It would then be
+warm at the light end only, with the dark end explicitly exempted — and written
+down here, not in a comment.
