@@ -430,8 +430,40 @@ Behaviour: `dds/js/components.js`.
 `<details>` / `<summary>`. Open/close, keyboard operation and the expanded state
 exposed to assistive technology all come from the platform. **No JavaScript.**
 
-`.dds-accordion` stacks several. The `name` attribute on `<details>` makes a set
-behave as an accordion — only one open at a time — with no script at all.
+Several of these stacked is an accordion — see below.
+
+---
+
+## Accordion — `.dds-accordion`
+
+**For:** a stack of disclosures sharing one border box — a set of questions, a
+list of optional sections.
+**Not for:** content that must be findable by in-page search, or that a reader
+needs to see all of at once. Hidden text is unread text.
+
+Built from `.dds-disclosure`, so it is `<details>` / `<summary>` and **no
+JavaScript**, including the part everyone writes a listener for:
+
+```html
+<div class="dds-accordion">
+  <details class="dds-disclosure" name="faq">
+    <summary>How is a budget figure calculated?
+      <svg class="dds-icon dds-disclosure-marker" aria-hidden="true"><use href="#dds-icon-chevron-down"/></svg>
+    </summary>
+    <div class="dds-disclosure-content">…</div>
+  </details>
+  <details class="dds-disclosure" name="faq">…</details>
+</div>
+```
+
+**One attribute decides the behaviour.** A shared `name` makes the set exclusive —
+opening one closes the other, done by the browser. Leave `name` off and several
+can be open at once.
+
+Neither is the default answer. Exclusive is tidier and takes a choice away from
+the reader: use it when the items are alternatives, and leave it off when someone
+may reasonably want two of them open — specifications being compared, steps
+referred back to while working.
 
 ---
 

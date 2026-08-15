@@ -61,7 +61,10 @@
     "alternative": "en-GB",
     "formatter": "DDS.format",
     "wording": {
-      "languages": ["en", "de"],
+      "languages": [
+        "en",
+        "de"
+      ],
       "resolvedFrom": "the nearest [lang], via DDS.utils.language()",
       "fallback": "en",
       "lookup": "DDS.utils.wording(element, TABLE)",
@@ -395,14 +398,26 @@
       "classes": [
         ".dds-disclosure",
         ".dds-disclosure-content",
-        ".dds-disclosure-marker",
-        ".dds-accordion"
+        ".dds-disclosure-marker"
       ],
       "css": "dds/css/components.css",
       "spec": "## Disclosure — `.dds-disclosure`",
       "reference": "reference/components.html#tabs",
       "native": "details, summary",
       "accessibility": "No JavaScript. <details name> gives accordion behaviour."
+    },
+    {
+      "name": "accordion",
+      "purpose": "A stack of disclosures sharing one border box.",
+      "notFor": "Content that must be findable by in-page search, or seen all at once.",
+      "classes": [
+        ".dds-accordion"
+      ],
+      "css": "dds/css/components.css",
+      "spec": "## Accordion — `.dds-accordion`",
+      "reference": "reference/components.html#accordion",
+      "native": "details, summary",
+      "accessibility": "No JavaScript. A shared <details name> makes the set exclusive; omit it and several may be open."
     },
     {
       "name": "divider",

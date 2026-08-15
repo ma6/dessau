@@ -325,6 +325,7 @@
               <li><a href="#dialog">Dialog</a></li>
               <li><a href="#table">Table</a></li>
               <li><a href="#tabs">Tabs and disclosure</a></li>
+              <li><a href="#accordion">Accordion</a></li>
               <li><a href="#smaller">Date, search, kbd and divider</a></li>
               <li><a href="#overlays">Tooltip and bottom sheet</a></li>
               <li><a href="#feedback">Feedback and loading</a></li>
@@ -1452,7 +1453,40 @@
           </div>
 
           <div class="ref-specimen">
-            <p class="ref-specimen-label">Disclosure — no JavaScript at all</p>
+            <p class="ref-specimen-label">Disclosure — one, on its own, no JavaScript at all</p>
+            <details class="dds-disclosure">
+              <summary>
+                What counts as a committed contract?
+                <svg class="dds-icon dds-disclosure-marker" aria-hidden="true"><use href="#dds-icon-chevron-down"/></svg>
+              </summary>
+              <div class="dds-disclosure-content">
+                <p class="dds-text-sm">One that has been signed. A tender that has been issued but not awarded is not committed.</p>
+              </div>
+            </details>
+            <p class="dds-text-sm dds-text-muted dds-mbs-md dds-measure-default">
+              Open and close, keyboard operation and the expanded state exposed to
+              assistive technology all come from
+              <code class="dds-code">&lt;details&gt;</code>. Several of these
+              stacked, sharing one border box, is the accordion below.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================================================================ accordion -->
+      <section class="ref-section" id="accordion">
+        <div class="ref-section-head">
+          <h2>Accordion</h2>
+          <p class="dds-text-subtle dds-measure-default dds-mbs-xs">
+            A stack of disclosures sharing one border box. Whether only one may be
+            open at a time is decided by one attribute, and neither answer needs a
+            line of JavaScript.
+          </p>
+        </div>
+
+        <div class="dds-stack dds-stack-lg">
+          <div class="ref-specimen">
+            <p class="ref-specimen-label">Accordion — one open at a time, from <code class="dds-code">name</code></p>
             <div class="dds-accordion">
               <details class="dds-disclosure" name="ref-accordion" open>
                 <summary>
@@ -1482,10 +1516,21 @@
                 </div>
               </details>
             </div>
-            <p class="dds-text-sm dds-text-muted dds-mbs-md dds-measure-default">
-              The accordion behaviour — only one open at a time — comes from the
+            <p class="ref-note">
+              <svg class="dds-icon" aria-hidden="true"><use href="#dds-icon-info"/></svg>
+              The exclusive behaviour comes from the
               <code class="dds-code">name</code> attribute on
-              <code class="dds-code">&lt;details&gt;</code>. No script is involved.
+              <code class="dds-code">&lt;details&gt;</code>, shared by every item in
+              the set. No script is involved, and closing the open item when
+              another is opened is the browser's job rather than a listener's.
+            </p>
+            <p class="dds-text-sm dds-text-muted dds-mbs-md dds-measure-default">
+              <strong>Leave <code class="dds-code">name</code> off</strong> when
+              the reader may want two answers side by side — a set of specifications
+              being compared, or steps referred back to while working. Use it when
+              the items are alternatives and an open one would only be in the way.
+              One open at a time is the tidier default and the more annoying one:
+              it takes away a choice the reader might have wanted.
             </p>
           </div>
         </div>
