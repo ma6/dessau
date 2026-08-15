@@ -1031,3 +1031,37 @@ this entry is the reasoning that principle states in one line.
 **Reversal condition.** A second regular contributor, or parallel agent runs
 becoming the normal way of working rather than the exception. Either would make
 the concurrency real, and case 1 would stop being a special case.
+
+---
+
+## 032 — No optional `@font-face` layer; the recipe is the deliverable
+
+**Decision.** DDS does not ship `dds/css/fonts.css`, or any other optional layer
+that declares faces. A product that wants the full identity follows the
+self-hosting recipe in `docs/typography.md` by hand. Extends 009, which
+established that DDS ships no font binaries.
+
+**Why the question was open.** A recipe gets followed slightly wrong, and the
+three ways it goes wrong are each a real defect that is not obvious from the
+result: a missing `format()` hint, `font-display` omitted, a preload without
+`crossorigin`. A linkable file would make those unmissable.
+
+**Why the answer is still no.** All three are already written out in the recipe,
+each with its reason attached, precisely because they are the three that go
+wrong. A file that protects against mistakes the instructions already prevent
+buys very little — and costs a second declaration of the same thing, needing to
+stay in step with the reference site's own `fonts.css`, in exchange for saving
+one `<link>`.
+
+The larger reason is the one 023 already gives for what Dessau leaves out: an
+optional layer is an opinion the foundation cannot verify. DDS does not know
+which faces a product has licensed, which subset it needs, what its delivery
+constraints are, or where it keeps its files. Every one of those is in the
+recipe as a decision the product makes, and would be a default in the file.
+
+**Cost.** Self-hosting stays six manual steps. A product that gets one of them
+wrong finds out from its own network tab rather than from us.
+
+**Reversal condition.** Evidence rather than anticipation: a product that
+followed the recipe and still got it wrong. The first fix would then be a clearer
+recipe, and the file only if that failed too.

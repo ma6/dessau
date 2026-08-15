@@ -248,6 +248,30 @@ Worth doing for a content-heavy product; unnecessary for an internal tool.
 
 ---
 
+## There is no `dds/css/fonts.css`, and there will not be
+
+The step above is a recipe rather than a file a product can link, and that was
+decided rather than left undone (#26, DECISIONS 032).
+
+The case for shipping an optional `@font-face` layer was that a recipe gets
+followed slightly wrong in ways that are real defects and none of them obvious: a
+missing `format()` hint, `font-display` omitted, a preload without `crossorigin`.
+That case does not survive reading the recipe — all three are written out above,
+each with the reason attached, because those are exactly the three that go wrong.
+Shipping a file to protect against mistakes the instructions already prevent buys
+very little.
+
+What it would cost is a second declaration of the same thing, needing to stay in
+step with the reference site's own `fonts.css`, for a saving of one `<link>`. And
+a foundation that starts shipping optional layers has started shipping opinions
+it cannot verify: DDS does not know which faces a product licensed, which subset
+it needs, or where it puts its files.
+
+So the recipe is the answer. If it turns out to be followed wrong in practice,
+the fix is a clearer recipe first.
+
+---
+
 ## Revisiting this
 
 Reasons that would justify reopening the decision:
