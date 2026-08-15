@@ -1004,7 +1004,17 @@
     inline-size: min(20rem, 85%);
     overflow-y: auto;
     overscroll-behavior: contain;
-    padding: var(--dds-space-md);
+
+    /* No inline padding, and none at the block start: the children carry their
+       own. A scroll container with padding and a full-width sticky child inside
+       it are in direct conflict — the child has to reach the edges the padding
+       is holding it away from, and paying that back with negative margins makes
+       the header's resting position depend on exactly where the browser puts the
+       sticky constraint edge. It does not put it where the arithmetic assumed,
+       and the header sat on top of the first group. Removing the padding removes
+       the question: the header's natural position is the top of the content, so
+       sticking it there can hold it in place and nothing else. */
+    padding-block: 0 var(--dds-space-md);
 
     background-color: var(--dds-color-surface-raised);
     border-inline-end: var(--dds-border-thin) solid var(--dds-color-border-default);
@@ -1047,18 +1057,16 @@
     /* Stays at the top while the list scrolls, so the corner the close is
        supposed to always occupy is not empty exactly when the panel is longest.
 
-       The panel is a padded scroll container, and a sticky child of one has to
-       bleed into that padding or content scrolls up the gap either side of it.
-       Hence the negative margin out to the panel's edges and the matching
-       padding back in: the header's box reaches the edges, its content sits
-       where it did. The block-end padding is the gap to the first group, which
-       is why there is no block-end margin — a margin would scroll content into
-       a transparent strip below an opaque bar. */
+       No margins, negative or otherwise. The panel gives up its own padding so
+       that this element's normal-flow position is already the top of the
+       scrollable content and already the full width — which is the only way the
+       resting layout does not depend on where the browser resolves the sticky
+       edge. The block-end padding is the gap to the first group; a margin there
+       would let content scroll into a transparent strip below an opaque bar. */
     position: sticky;
     inset-block-start: 0;
     z-index: 1;
 
-    margin: calc(-1 * var(--dds-space-md)) calc(-1 * var(--dds-space-md)) 0;
     padding: var(--dds-space-md) var(--dds-space-md) var(--dds-space-sm);
     background-color: var(--dds-color-surface-raised);
 
@@ -1080,7 +1088,16 @@
 
   /* A group. `<strong>` for the heading rather than a heading level, because the
      document's heading outline belongs to the content, not to the navigation
-     beside it — injecting h3s here would corrupt it. */
+     beside it — injecting h3s here would corrupt it.
+
+     The inline padding is the panel's, carried by the group instead of by the
+     panel, so the sticky header above can reach the panel's edges without any
+     negative margin. The separator below therefore runs edge to edge, like the
+     header's own. */
+  .dds-contentnav-group {
+    padding-inline: var(--dds-space-md);
+  }
+
   .dds-contentnav-group + .dds-contentnav-group {
     margin-block-start: var(--dds-space-md);
     padding-block-start: var(--dds-space-md);
@@ -1211,20 +1228,25 @@
       display: none;
     }
 
-    /* An ordinary row again. The column has no padding to bleed into and no
-       surface of its own, so every part of the sticky treatment is unwound
-       explicitly — a negative margin left behind here would pull the title out
-       of the column, and an opaque background would paint a panel-coloured
-       block onto the page. The close is gone at this width, so the header holds
-       only the title and the gap it used to get from its own padding comes back
-       as a margin. */
+    /* An ordinary row again. The column has no surface of its own, so every part
+       of the sticky treatment is unwound explicitly rather than left to be
+       overridden by accident: an opaque background would paint a panel-coloured
+       block onto the page, and the edge has nothing to explain when nothing
+       scrolls under it. The close is gone at this width, so the header holds
+       only the title, and the gap it got from its own padding comes back as a
+       margin. */
     .dds-contentnav-header {
       position: static;
-      margin: 0 0 var(--dds-space-sm);
+      margin-block-end: var(--dds-space-sm);
       padding: 0;
       background-color: transparent;
-      /* Nothing scrolls under it here, so the edge has nothing to explain. */
       border-block-end: 0;
+    }
+
+    /* The panel's inline padding was handed to the groups; the column has none
+       to hand over, so it is taken back. */
+    .dds-contentnav-group {
+      padding-inline: 0;
     }
   }
 
