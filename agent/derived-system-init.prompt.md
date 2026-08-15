@@ -32,7 +32,7 @@ broken on purpose and seen to fail.
 **Not executed.** Nobody has pasted this into an agent, and no derived system
 exists. Its paths are gated by `scripts/check-adoption.mjs`; that they exist is not
 the same claim as that an agent given this produces a working system. Tracked with
-the recipe's own gap as #55.
+the recipe's own gap as #72.
 
 ---
 

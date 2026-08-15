@@ -164,8 +164,8 @@ Stated for the reason `new-product.md` states it: "these instructions have never
 been run" was silently true of that one for long enough to be worth never letting
 it be true silently again (#5).
 
-**Not executed.** No derived system exists. Every path, count and file structure in
-this file was read out of the source rather than recalled — the twelve imports, the
+**Not executed (#72).** No derived system exists. Every path, count and file
+structure in this file was read out of the source rather than recalled — the twelve imports, the
 two foundation lines, the hardcoded paths in the check scripts — but nobody has
 stood one up and found what this leaves out. Steps 4 and 5 are the ones most likely
 to be wrong, because they are where a derived system stops resembling a product and
