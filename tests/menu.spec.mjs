@@ -74,11 +74,34 @@ async function openAndMeasure(page, id) {
   const popover = page.locator(`#${id}`);
   await expect(popover).toBeVisible();
 
-  return popover.evaluate((element, target) => {
+  const measured = await popover.evaluate((element, target) => {
     const box = element.getBoundingClientRect();
     const anchor = document.querySelector(`[popovertarget="${target}"]`).getBoundingClientRect();
-    return { box: box.toJSON(), anchor: anchor.toJSON() };
+    const style = getComputedStyle(element);
+
+    return {
+      box: box.toJSON(),
+      anchor: anchor.toJSON(),
+      /**
+       * Carried so that a failure reports what the cascade decided, not only where
+       * the box ended up. "285 is not >= 497" is a number; "the inset computed to
+       * `auto` and this engine rejects `anchor()` in a logical inset property" is
+       * the bug.
+       */
+      computed: {
+        position: style.position,
+        inset: [style.top, style.right, style.bottom, style.left].join(' '),
+        positionAnchor: style.positionAnchor ?? '(unreadable)',
+      },
+      supports: {
+        logical: CSS.supports('inset-block-start: anchor(bottom)'),
+        physical: CSS.supports('top: anchor(bottom)'),
+        tryFallbacks: CSS.supports('position-try-fallbacks: flip-block'),
+      },
+    };
   }, id);
+
+  return { ...measured, detail: JSON.stringify(measured, null, 2) };
 }
 
 for (const { name, url, id } of [
@@ -118,7 +141,7 @@ for (const { name, id } of [
 
     test.skip(!(await supportsAnchor(page)), 'no CSS anchor positioning in this engine');
 
-    const { box, anchor } = await openAndMeasure(page, id);
+    const { box, anchor, detail } = await openAndMeasure(page, id);
 
     /**
      * Below the button, by the gap the component asks for and not much more.
@@ -127,8 +150,10 @@ for (const { name, id } of [
      * half a viewport of space below it, "below" is the case under test rather
      * than a coin toss between two correct behaviours.
      */
-    expect(box.top).toBeGreaterThanOrEqual(anchor.bottom - 1);
-    expect(box.top - anchor.bottom, 'detached from the button it belongs to').toBeLessThan(16);
+    expect(box.top, `not below its invoker\n${detail}`).toBeGreaterThanOrEqual(anchor.bottom - 1);
+    expect(box.top - anchor.bottom, `detached from the button it belongs to\n${detail}`).toBeLessThan(
+      16
+    );
 
     /**
      * Trailing edges aligned: the menu grows inward from the button, not across
@@ -140,7 +165,7 @@ for (const { name, id } of [
      * first used to diagnose this — so a test that only checked the vertical gap
      * would have called the broken state correct.
      */
-    expect(Math.abs(box.right - anchor.right)).toBeLessThan(2);
+    expect(Math.abs(box.right - anchor.right), `trailing edges not flush\n${detail}`).toBeLessThan(2);
   });
 }
 
@@ -150,10 +175,12 @@ test('the tooltip sits above its trigger', async ({ page }) => {
 
   test.skip(!(await supportsAnchor(page)), 'no CSS anchor positioning in this engine');
 
-  const { box, anchor } = await openAndMeasure(page, 'tip-retention');
+  const { box, anchor, detail } = await openAndMeasure(page, 'tip-retention');
 
-  expect(box.bottom).toBeLessThanOrEqual(anchor.top + 1);
-  expect(anchor.top - box.bottom, 'detached from the control it explains').toBeLessThan(16);
+  expect(box.bottom, `not above its trigger\n${detail}`).toBeLessThanOrEqual(anchor.top + 1);
+  expect(anchor.top - box.bottom, `detached from the control it explains\n${detail}`).toBeLessThan(
+    16
+  );
 
   // Centred on the trigger — `justify-self: anchor-center`, which is the whole
   // reason the inline insets have to stay `auto`.
