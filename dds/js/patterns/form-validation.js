@@ -519,11 +519,23 @@
     });
   });
 
-  // Exposed so application code can drive the same presentation for a
-  // server-side or asynchronous error.
+  /**
+   * Exposed so application code can drive the same presentation for a
+   * server-side or asynchronous error.
+   *
+   * `messageFor` is part of that surface for a reason worth stating: anything
+   * that validates a field itself and then calls `showError` has to get the
+   * message from somewhere, and the obvious somewhere — `field.validationMessage`
+   * — is the wrong one twice over. It is the browser's wording, which is written
+   * to be safe rather than useful ("Please match the requested format" tells the
+   * user nothing), and it is in the browser's UI language rather than the page's.
+   * The wizard did exactly that, so one form spoke with two voices depending on
+   * which control the user pressed.
+   */
   DDS.formValidation = {
     showError: showError,
     clearError: clearError,
+    messageFor: messageFor,
     renderSummary: renderSummary,
     hideSummary: hideSummary,
     messages: MESSAGES,

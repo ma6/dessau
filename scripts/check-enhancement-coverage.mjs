@@ -102,7 +102,6 @@ const KNOWN_GAPS = new Map([
   ['stepper', 'increment, decrement, clamping, and the announcement'],
   ['conditional-fields', 'fields appearing and disappearing, and what that does to validity'],
   ['derived-output', 'the computed value appearing, and being announced once'],
-  ['wizard', 'step change, and whether validation sets the programmatic state — #9'],
   ['password-confirm', 'the match/mismatch state, separate from the reveal toggle'],
 ]);
 

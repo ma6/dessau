@@ -167,7 +167,21 @@
       if (DDS.formValidation) {
         invalid.forEach(function (field) {
           if (!field.id) field.id = DDS.utils.uniqueId('dds-field');
-          DDS.formValidation.showError(field, field.validationMessage);
+          /**
+           * `messageFor`, not `field.validationMessage`.
+           *
+           * The native message is the browser's own wording in the browser's own
+           * UI language, so the same empty required field said one thing on a
+           * step and something else on the form around it — and said it in
+           * English on a German page, or the reverse, depending on the machine.
+           *
+           * It is also not guaranteed to be a sentence at all. An empty
+           * `validationMessage` puts an empty error element on the page:
+           * `aria-invalid` is set, `aria-errormessage` points at it, and there is
+           * nothing to announce. Visibly there is a red line with no text in it,
+           * which is the shape of the WebKit-only failure in #9.
+           */
+          DDS.formValidation.showError(field, DDS.formValidation.messageFor(field));
         });
         invalid[0].focus();
         DDS.announce(
