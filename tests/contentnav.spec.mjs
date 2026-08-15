@@ -36,17 +36,41 @@ import { test, expect } from '@playwright/test';
 
 const NAVIGATION = '/reference/navigation.html';
 
-/** Below the 64rem container threshold, so the nav is a panel. */
-const NARROW = { width: 800, height: 900 };
-
 const layout = (page) => page.locator('[data-dds-contentnav]');
 const toggle = (page) => layout(page).locator('[data-dds-contentnav-toggle]');
 const nav = (page) => layout(page).locator('.dds-contentnav');
 const content = (page) => layout(page).locator('[data-dds-contentnav-content]');
 
+/**
+ * Set the width of the container the component measures, leaving the window
+ * alone.
+ *
+ * The widths are the container's, not the viewport's, and the first version of
+ * this file confused the two: it grew the window to 1400px and expected the
+ * panel to become a column. The reference's content column is capped well below
+ * that, so the frame never reached 64rem and the component was right to stay a
+ * panel. Driving the container directly removes a whole class of test that fails
+ * for a reason that has nothing to do with the component.
+ *
+ * A window resize reaches the same code through the same observer — the frame is
+ * what is watched, and the window only matters insofar as it changes the frame.
+ */
+async function setContainerWidth(page, width) {
+  await page.evaluate((value) => {
+    document.querySelector('.dds-contentnav-frame').closest('.ref-bp-stage').style.inlineSize =
+      value;
+  }, width);
+}
+
+/** Below 64rem, so the nav is a panel. */
+const PANEL = '640px';
+/** Above it, so the nav is a static column and the toggle is gone. */
+const COLUMN = '1200px';
+
 async function openPanel(page) {
-  await page.setViewportSize(NARROW);
+  await page.setViewportSize({ width: 1400, height: 900 });
   await page.goto(NAVIGATION);
+  await setContainerWidth(page, PANEL);
   await toggle(page).click();
   await expect(toggle(page)).toHaveAttribute('aria-expanded', 'true');
 }
@@ -71,8 +95,9 @@ test('opening the panel makes the content genuinely unavailable', async ({ page 
 test('inert removes the content from the tab order, it does not merely cover it', async ({
   page,
 }) => {
-  await page.setViewportSize(NARROW);
+  await page.setViewportSize({ width: 1400, height: 900 });
   await page.goto(NAVIGATION);
+  await setContainerWidth(page, PANEL);
 
   const probe = page.locator('[data-ref-inert-probe]');
 
@@ -133,7 +158,7 @@ test('growing past the threshold while open clears inert and the scroll lock', a
   await openPanel(page);
 
   // Wide enough that the container query turns the panel back into a column.
-  await page.setViewportSize({ width: 1400, height: 900 });
+  await setContainerWidth(page, COLUMN);
 
   /**
    * The CSS makes the nav visible again on its own. What it cannot undo is the
@@ -156,9 +181,7 @@ test('it is the container that decides, not the window', async ({ page }) => {
    * The demo sits in the reference's width switcher, so this is the same thing a
    * reader does by clicking one of its buttons.
    */
-  await page.evaluate(() => {
-    document.querySelector('.ref-bp-stage').style.inlineSize = '600px';
-  });
+  await setContainerWidth(page, PANEL);
 
   await expect(toggle(page)).toBeVisible();
   await toggle(page).click();
@@ -170,9 +193,7 @@ test('it is the container that decides, not the window', async ({ page }) => {
    * survived the container becoming a column, leaving the page inert and locked
    * with nothing on screen to explain it.
    */
-  await page.evaluate(() => {
-    document.querySelector('.ref-bp-stage').style.inlineSize = '100%';
-  });
+  await setContainerWidth(page, COLUMN);
 
   await expect(content(page)).not.toHaveAttribute('inert', '');
   await expect(page.locator('html')).not.toHaveClass(/dds-scroll-locked/);
