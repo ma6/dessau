@@ -207,6 +207,27 @@ A table of strings per language lives beside the behaviour that uses them, and
 **every** string in it varies together. A label from the table joined to a
 sentence written in the code is how one announcement ends up half-translated.
 
+This is now universal rather than aspirational: every string DDS writes comes
+from such a table, in `en` and `de`, resolved by `DDS.utils.wording(element,
+TABLE)`. Adding a third language is a data change and nothing else — that is the
+property the tables exist to have, so keep it.
+
+Three rules follow from the tables being complete phrases:
+
+- **An entry that contains a value is a function**, not a prefix the caller
+  prepends. `'Remove ' + name` cannot be German, where the verb goes last. If the
+  code decides where the value sits in the sentence, the sentence is only
+  translated as far as its nouns.
+- **A count goes through `DDS.utils.plural`**, never `n === 1 ? … : …`. English
+  and German agree about where the boundary is, which is exactly why the ternary
+  survives review — it is correct in both languages anybody here checks. Russian
+  has four categories.
+- **Resolve from the element the words are about.** An error message reads the
+  FIELD's language, not the form's: a form may hold a part in another language
+  and has to say so anyway (WCAG 3.1.2), so the field inside it is spoken in that
+  language and the error about it must be too. Only something genuinely raised
+  about the page as a whole — a toast — reads `documentElement`.
+
 ---
 
 ## HTML

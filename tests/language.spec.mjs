@@ -15,7 +15,7 @@
  * So the assertions are on the two places that decide it: the language resolver
  * itself, and the two controls that use it. See DECISIONS.md 028.
  *
- * @covers theme-toggle
+ * @covers theme-toggle, upload
  *
  */
 
@@ -123,6 +123,85 @@ test('the announcement is not half-translated', async ({ page }) => {
   expect(await live.textContent(), 'the announcement still contains English').not.toMatch(
     /theme on/
   );
+});
+
+test('a component inside lang="de" writes German, without being configured', async ({ page }) => {
+  await page.goto(COMPONENTS);
+
+  /**
+   * The upload demo is `lang="de"` on the component itself. Nothing tells the
+   * script which language to use — it reads the nearest `[lang]`, which is the
+   * whole rule (DECISIONS.md 028).
+   *
+   * A file is attached rather than clicking the picker, because a native file
+   * dialog cannot be driven from a test. What the enhancement sees is the same
+   * either way: a `change` event and a populated `FileList`.
+   */
+  await page.locator('#upload').setInputFiles({
+    name: 'antrag.pdf',
+    mimeType: 'application/pdf',
+    buffer: Buffer.from('%PDF-1.4 test'),
+  });
+
+  const list = page.locator('[data-dds-upload-list]');
+  await expect(list).toContainText('antrag.pdf');
+
+  const live = page.locator('div.dds-sr-only[aria-live="polite"][aria-atomic="true"]');
+  await expect(live).toHaveText(/Datei ausgewählt/);
+
+  /**
+   * The remove button's name, which is the case a concatenated string cannot
+   * get right: English puts the verb first and German puts it last.
+   */
+  await expect(list.locator('.dds-upload-item-remove')).toContainText('antrag.pdf entfernen');
+});
+
+test('the plural form is chosen by the language, not by appending an s', async ({ page }) => {
+  await page.goto(COMPONENTS);
+
+  await page.locator('#upload').setInputFiles([
+    { name: 'eins.pdf', mimeType: 'application/pdf', buffer: Buffer.from('%PDF-1.4 a') },
+    { name: 'zwei.pdf', mimeType: 'application/pdf', buffer: Buffer.from('%PDF-1.4 b') },
+  ]);
+
+  const live = page.locator('div.dds-sr-only[aria-live="polite"][aria-atomic="true"]');
+
+  /**
+   * "2 Dateien ausgewählt", not "2 Datei ausgewählts". German and English happen
+   * to agree about where the boundary is, which is exactly why a ternary on
+   * `n === 1` survives review — it is right in both languages anybody checks.
+   * `Intl.PluralRules` is what makes the third language a data change.
+   */
+  await expect(live).toHaveText(/2 Dateien ausgewählt/);
+});
+
+test('a German field inside an English form is explained in German', async ({ page }) => {
+  await page.goto('/reference/patterns.html');
+
+  /**
+   * WCAG 3.1.2 Language of Parts, applied to an error message. The form is
+   * English; if one field declares itself German, the message about that field
+   * is German too — because it is read out by the voice that field's `lang`
+   * selected. Resolving the form's language instead would produce German text in
+   * an English voice, which is the failure the whole rule exists to prevent.
+   */
+  const message = await page.evaluate(() => {
+    const scope = document.createElement('div');
+    scope.setAttribute('lang', 'de');
+    scope.innerHTML =
+      '<div class="dds-field"><label for="lang-probe">Geburtsdatum</label>' +
+      '<input id="lang-probe" class="dds-input" required data-dds-label="Ihr Geburtsdatum"></div>';
+    document.body.appendChild(scope);
+
+    const field = scope.querySelector('input');
+    field.checkValidity();
+    const text = window.DDS.formValidation.messageFor(field);
+
+    scope.remove();
+    return text;
+  });
+
+  expect(message).toBe('Ihr Geburtsdatum eingeben');
 });
 
 test('every German passage in the reference declares itself', async ({ page }) => {

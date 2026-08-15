@@ -242,6 +242,15 @@
    * @param {{ kind?: 'success'|'warning'|'error'|'info', duration?: number }} [options]
    * @returns {HTMLElement} the toast, so a caller can dismiss it early.
    */
+  /**
+   * Toast wording. One string: the message itself comes from the caller, which
+   * is the application, which knows its own language.
+   */
+  var TOAST_WORDING = {
+    en: { dismiss: 'Dismiss message' },
+    de: { dismiss: 'Meldung schließen' },
+  };
+
   function toast(message, options) {
     var opts = options || {};
     var kind = TOAST_ICONS[opts.kind] ? opts.kind : 'info';
@@ -273,7 +282,14 @@
     var close = document.createElement('button');
     close.type = 'button';
     close.className = 'dds-toast-close';
-    close.setAttribute('aria-label', 'Dismiss message');
+    /* The toast region is appended to `<body>` and so has no language of its
+       own. `documentElement` is the right answer here and only here: a toast is
+       raised by the application about the page as a whole, not from inside a
+       region that might be in another language. */
+    close.setAttribute(
+      'aria-label',
+      DDS.utils.wording(document.documentElement, TOAST_WORDING).dismiss
+    );
     var closeIcon = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
     closeIcon.setAttribute('class', 'dds-icon');
     closeIcon.setAttribute('aria-hidden', 'true');

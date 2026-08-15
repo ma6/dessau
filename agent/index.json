@@ -52,7 +52,15 @@
   "locale": {
     "default": "de-DE",
     "alternative": "en-GB",
-    "formatter": "DDS.format"
+    "formatter": "DDS.format",
+    "wording": {
+      "languages": ["en", "de"],
+      "resolvedFrom": "the nearest [lang], via DDS.utils.language()",
+      "fallback": "en",
+      "lookup": "DDS.utils.wording(element, TABLE)",
+      "plurals": "DDS.utils.plural(element, count, forms), backed by Intl.PluralRules",
+      "note": "Tables live beside the behaviour that uses them. Adding a language is a data change; see DECISIONS.md 028."
+    }
   },
   "accessibilityBaseline": "WCAG 2.2 AA",
   "verify": [

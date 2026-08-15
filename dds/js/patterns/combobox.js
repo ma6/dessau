@@ -85,6 +85,10 @@
       error: 'Search is unavailable. You can still type the value yourself.',
       minLength: 'Keep typing to see suggestions',
       cleared: 'Search field cleared',
+      /* Last resort for the listbox's name, when the page labelled neither the
+         input nor the list. Reached only by markup that is already wrong, which
+         is why it is not in `messages`: overriding it would paper over that. */
+      listLabel: 'Suggestions',
       counts: {
         one: '1 suggestion. Use the up and down arrow keys to review, Enter to choose.',
         other: '{n} suggestions. Use the up and down arrow keys to review, Enter to choose.',
@@ -101,6 +105,7 @@
       error: 'Die Suche ist nicht verfügbar. Sie können den Wert selbst eintragen.',
       minLength: 'Weiter tippen für Vorschläge',
       cleared: 'Suchfeld geleert',
+      listLabel: 'Vorschläge',
       counts: {
         one: '1 Vorschlag. Mit den Pfeiltasten nach oben und unten durchgehen, mit der Eingabetaste auswählen.',
         other:
@@ -174,7 +179,7 @@
         if (!label.id) label.id = DDS.utils.uniqueId('dds-combobox-label');
         list.setAttribute('aria-labelledby', label.id);
       } else {
-        list.setAttribute('aria-label', 'Suggestions');
+        list.setAttribute('aria-label', DDS.utils.wording(root, WORDING).listLabel);
       }
     }
 

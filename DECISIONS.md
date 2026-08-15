@@ -827,3 +827,33 @@ rather than a silent change.
 **Reversal condition.** A case where the language of a control genuinely differs
 from the language of its surroundings and cannot be expressed with `lang`. None
 is known; `lang` on the control itself covers the ones that have come up.
+
+**Extended (#20).** The rule now applies to every string DDS writes, not to the
+two controls that happened to prompt it. `DDS.utils.wording(element, table)` is
+the lookup and `DDS.utils.plural(element, count, forms)` is the part that could
+not be a table alone.
+
+Three things were decided while making it universal, and each is a place where
+the obvious implementation is wrong:
+
+- **An entry containing a value is a function.** `'Remove ' + name` cannot be
+  German — the verb goes last there — so a caller that decides where the value
+  sits has only translated the nouns. The table owns the whole phrase, word order
+  included.
+- **`Intl.PluralRules`, never `n === 1`.** English and German agree about where
+  the boundary falls, which is precisely why the ternary passes review: it is
+  correct in both languages anybody in this repository checks. Russian has four
+  categories and Arabic six. The point of the tables is that a third language is
+  a data change, and a ternary quietly is not.
+- **The element the words are about decides, not the component root.** An error
+  message resolves from the FIELD. A form may hold a part in another language and
+  has to declare it anyway (WCAG 3.1.2), so that field is spoken in that language
+  and the error about it has to be too. Only a toast reads `documentElement`,
+  because it is raised by the application about the page rather than from inside
+  a region.
+
+**Kept.** `DDS.formValidation.messages` still exists and is still English: it is
+the table every unrecognised language falls back to. `data-dds-error-<constraint>`,
+`data-dds-label` and the `messages` option all still beat the table, and
+`messages.resultCount` still works even though the default behind it became a
+plural rule — an option contract does not break because its default improved.
