@@ -10,6 +10,31 @@
 > ARIA, and rebuild a pattern that already exists. Every one of those is expensive
 > to find later and free to prevent now.
 
+## How far this template has actually been executed
+
+Stated for the same reason `recipes/new-product.md` states it: "these instructions
+have never been run" was silently true of that recipe for long enough to be worth
+never letting it be true silently again (#5).
+
+**Not executed.** Nobody has copied this file into a product repository and watched
+an agent work from it. Every line below is a claim about behaviour in a repository
+that is not this one, and no check reaches it — `check-adoption.mjs` gates the
+mechanical half of `new-product.md`, and nothing gates this at all. A script can
+confirm that a path named here exists; it cannot confirm that an agent reading
+this behaves differently from one that did not, which is the only thing this file
+is for.
+
+**What executing it would mean**, so the gap is not mistaken for a smaller one: a
+separate repository with Dessau as a submodule, an agent given this file as its
+only Dessau context, and one real UI task. Not a demo page in this repository —
+that consumes Dessau by relative path, so it would test neither the submodule nor
+the absolute `/libs/dessau/…` paths nor the sprite landing in a foreign tree, and
+it would duplicate `reference/`, which is already verified.
+
+Until somebody does that, treat the rules below as reasoned rather than tested.
+They are read out of the implementation, not recalled — but that is a different
+claim. Tracked as #55; when it is executed, this section says what was found.
+
 ---
 
 # AGENTS.md — [PRODUCT NAME]
