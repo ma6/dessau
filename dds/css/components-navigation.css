@@ -1061,13 +1061,19 @@
        that this element's normal-flow position is already the top of the
        scrollable content and already the full width — which is the only way the
        resting layout does not depend on where the browser resolves the sticky
-       edge. The block-end padding is the gap to the first group; a margin there
-       would let content scroll into a transparent strip below an opaque bar. */
+       edge.
+
+       The gap to the first group is a margin and the gap to the line above it is
+       padding, one on each side of the border, so the rule sits between two equal
+       spaces instead of hard against the content below it. The margin is outside
+       the sticky box on purpose: scrolling content rises into it, meets the line
+       and disappears behind the bar, which is the whole effect. */
     position: sticky;
     inset-block-start: 0;
     z-index: 1;
 
     padding: var(--dds-space-md) var(--dds-space-md) var(--dds-space-sm);
+    margin-block-end: var(--dds-space-sm);
     background-color: var(--dds-color-surface-raised);
 
     /* The edge the clipping happens at. Without it a group title scrolling
@@ -1233,11 +1239,10 @@
        overridden by accident: an opaque background would paint a panel-coloured
        block onto the page, and the edge has nothing to explain when nothing
        scrolls under it. The close is gone at this width, so the header holds
-       only the title, and the gap it got from its own padding comes back as a
-       margin. */
+       only the title. The margin below it is the one thing that carries over
+       unchanged, so it is not restated. */
     .dds-contentnav-header {
       position: static;
-      margin-block-end: var(--dds-space-sm);
       padding: 0;
       background-color: transparent;
       border-block-end: 0;
