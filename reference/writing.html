@@ -499,14 +499,22 @@
         </div>
 
         <div class="ref-specimen">
-          <div class="dds-cluster dds-cluster-sm" role="group" aria-labelledby="locale-switch-label">
-            <span class="dds-text-sm dds-weight-medium" id="locale-switch-label">Locale</span>
-            <div class="dds-segmented" data-ref-locale-switch>
-              <button type="button" class="dds-segmented-option" data-ref-locale="de-DE"
-                      aria-pressed="true">Deutsch</button>
-              <button type="button" class="dds-segmented-option" data-ref-locale="en-GB"
-                      aria-pressed="false">English</button>
-            </div>
+          <div class="dds-cluster dds-cluster-sm">
+            <!-- Visible for sighted readers, hidden from the accessibility tree: the
+                 fieldset's legend already names the group with the same word, and
+                 announcing "Locale" twice in a row says nothing the first one didn't. -->
+            <span class="dds-text-sm dds-weight-medium" aria-hidden="true">Locale</span>
+            <fieldset class="dds-segmented" data-ref-locale-switch>
+              <legend class="dds-sr-only">Locale</legend>
+              <label class="dds-segmented-option">
+                <input type="radio" name="ref-locale" value="de-DE" data-ref-locale="de-DE" checked>
+                <span>Deutsch</span>
+              </label>
+              <label class="dds-segmented-option">
+                <input type="radio" name="ref-locale" value="en-GB" data-ref-locale="en-GB">
+                <span>English</span>
+              </label>
+            </fieldset>
           </div>
 
           <div class="dds-scroll dds-mbs-md">

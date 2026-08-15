@@ -408,15 +408,15 @@
      ========================================================================= */
   function wireLocaleSwitch(group) {
     /* `renderAll` runs again on every theme change, so wiring has to happen once.
-       Without this each theme toggle would add another click listener and one press
+       Without this each theme toggle would add another change listener and one press
        would switch the locale twice — which is invisible, because switching twice to
        the same value looks like switching once. */
     if (group.hasAttribute('data-ref-locale-bound')) return;
 
-    var buttons = Array.prototype.slice.call(
-      group.querySelectorAll('[data-ref-locale]')
+    var inputs = Array.prototype.slice.call(
+      group.querySelectorAll('input[data-ref-locale]')
     );
-    if (!buttons.length || !DDS || !DDS.format) return;
+    if (!inputs.length || !DDS || !DDS.format) return;
 
     group.setAttribute('data-ref-locale-bound', '');
 
@@ -427,12 +427,9 @@
       DDS.format.setLocale(locale, CURRENCY[locale]);
       DDS.format.refresh();
 
-      buttons.forEach(function (button) {
-        var active = button.getAttribute('data-ref-locale') === locale;
-        // `aria-pressed` rather than a class: the state is what the control reports,
-        // and a screen reader gets it from the attribute either way.
-        button.setAttribute('aria-pressed', String(active));
-      });
+      // Nothing to write back: the segmented control is a radio group, so the
+      // browser owns which option is checked and both the styling and the
+      // announcement read it from there.
 
       // The table changed under the reader; say so once, politely.
       if (DDS.announce) {
@@ -444,9 +441,12 @@
       }
     }
 
-    buttons.forEach(function (button) {
-      button.addEventListener('click', function () {
-        select(button.getAttribute('data-ref-locale'));
+    /* `change`, not `click`: arrow keys move the selection in a radio group
+       without a click ever happening, and that is half of why this control is
+       built on radios. */
+    inputs.forEach(function (input) {
+      input.addEventListener('change', function () {
+        if (input.checked) select(input.getAttribute('data-ref-locale'));
       });
     });
   }
