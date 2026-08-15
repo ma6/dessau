@@ -360,10 +360,26 @@
 /* ------------------------------------------------------------------ sections */
 .ref-section {
   padding-block-end: var(--dds-space-2xl);
-  /* Long reference pages have many sections that are off-screen; skip the
-     rendering work for those until they are approached. */
-  content-visibility: auto;
-  contain-intrinsic-size: auto 30rem;
+  /* No `content-visibility: auto` here, and the reason is worth keeping.
+
+     It was here, on every section of every reference page, to skip the rendering
+     work for the ones off-screen. It also broke the pages on WebKit in two ways
+     that took a browser to see:
+
+       - a click on a control far down the page landed on nothing. Sections above
+         it take their real height only as they are approached, so the page grows
+         while the pointer is being aimed. Three unrelated demos — the wizard, a
+         theme toggle, a password field — all failed the same way (#9).
+       - `getComputedStyle(el).getPropertyValue('--dds-color-…')` returned an
+         empty string for anything inside a skipped section, so the foundations
+         page reported thirty of its own tokens as undeclared.
+
+     Both are consequences of the containment, not bugs in the components. The
+     saving was never measured and the reference pages are not long enough to
+     need it, so the trade is one-sided.
+
+     `.dds-defer-render` still offers this to a product that has measured a
+     reason — opt-in, and with the cost written down in agent/responsive.md. */
 }
 
 .ref-section-head {

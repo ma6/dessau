@@ -74,11 +74,26 @@ test('#9 probe: what the wizard sees on this engine', async ({ page }, testInfo)
 
   // Reload, then the real one: scrolled to, hit-tested, dispatched at a point.
   await page.reload();
+
+  // Record what the click actually reaches. "Nothing" and "the wrong element"
+  // are different diagnoses and the first run could not tell them apart.
+  await page.evaluate(() => {
+    window.__hit = null;
+    document.addEventListener(
+      'click',
+      (event) => {
+        window.__hit = event.target.outerHTML.slice(0, 120);
+      },
+      true
+    );
+  });
+
   await page.locator('[data-dds-wizard-next]').first().click();
 
   const afterReal = await page.evaluate(() => {
     const name = document.querySelector('#w-name');
     return {
+      whatTheClickHit: window.__hit,
       ariaInvalid: name.getAttribute('aria-invalid'),
       ariaErrormessage: name.getAttribute('aria-errormessage'),
       focused: document.activeElement ? document.activeElement.id : null,
