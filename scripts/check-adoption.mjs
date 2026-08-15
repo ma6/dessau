@@ -90,6 +90,10 @@ const NOT_OURS = new Map([
   ['dist/dds.css', 'built artefact; dist/ is git-ignored (DECISIONS 023, 030)'],
   ['dist/dds.min.css', 'built artefact; dist/ is git-ignored'],
   ['agent/consumer-AGENTS.template.md', 'exists — kept here so the name is checked below'],
+  [
+    'SCREAMING_SNAKE.md',
+    'agent/conventions.md names the file-naming convention, not a file',
+  ],
 ]);
 
 /* ------------------------- 1. every path the documentation names exists */
@@ -106,6 +110,23 @@ const NOT_OURS = new Map([
 const PATH_IN_PROSE =
   /`(?:\/?libs\/dessau\/)?((?:dds|agent|scripts|docs|reference|tests)\/[\w./-]+\.\w+)`/g;
 
+/**
+ * Root documents, which use SCREAMING_SNAKE by convention — `DECISIONS.md`,
+ * `LESSONS_LEARNED.md`, `README.md`.
+ *
+ * A second pattern rather than a wider first one, because "any word ending in
+ * `.md`" matches a product's own files in every example that mentions one.
+ *
+ * This half exists because it was needed within an hour of the first half being
+ * written. `ISSUES-TO-CREATE.md` is git-ignored on purpose — its own header says
+ * to delete it once the issues exist — and it was deleted, correctly, leaving a
+ * recipe pointing at a file that had never been in the repository and was now
+ * not on disk either. A committed document may not depend on an uncommitted one:
+ * it reads as a broken link to everybody except the person whose working copy
+ * still has it.
+ */
+const ROOT_DOC_IN_PROSE = /`([A-Z][A-Z0-9_-]*\.md)`/g;
+
 for (const doc of await docs()) {
   const source = await readFile(join(ROOT, doc), 'utf8');
 
@@ -116,6 +137,16 @@ for (const doc of await docs()) {
     if (await exists(path)) continue;
 
     report(`${doc}: names \`${path}\`, which does not exist`);
+  }
+
+  for (const [, name] of source.matchAll(ROOT_DOC_IN_PROSE)) {
+    if (NOT_OURS.has(name)) continue;
+    if (await exists(name)) continue;
+    report(
+      `${doc}: names \`${name}\`, which does not exist. A committed document ` +
+        `cannot point at one that is git-ignored or deleted — it reads as a ` +
+        `broken link to everybody whose working copy does not happen to have it.`
+    );
   }
 }
 

@@ -152,5 +152,6 @@ A check can tell you the recipe points at things that exist; it cannot tell you
 the recipe is followable.
 
 The honest test for that is one real product, built by somebody who did not write
-this. Nothing here substitutes for it — see `ISSUES-TO-CREATE.md` item 11, which
-calls it the highest-value item on the list and is right.
+this, with everything that turns out to be wrong or missing written back into
+this file. Nothing here substitutes for it. A foundation nobody has built on is a
+foundation whose every integration claim is still a hypothesis.
