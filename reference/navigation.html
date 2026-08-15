@@ -802,10 +802,22 @@
             </div>
             <div class="dds-sidebar-main">
               <p class="dds-text-sm dds-text-subtle">
-                Highlighting uses an <code class="dds-code">IntersectionObserver</code>
-                rather than a scroll listener: the observer reports only when a
-                threshold is actually crossed, instead of running a callback on
-                every scroll frame. Scroll this page and watch the marker follow.
+                The reading position is measured against a line a quarter of the
+                way down the viewport, not reported by an
+                <code class="dds-code">IntersectionObserver</code>. A band answers
+                “what is inside it”, and at the bottom of a page nothing is — so
+                the last entry could never activate. Scroll this page and watch the
+                marker follow.
+              </p>
+              <p class="dds-text-sm dds-text-subtle dds-mbs-sm">
+                <strong>It marks a section only where this list is visible while
+                that section scrolls past</strong> — where it, or an ancestor, is
+                sticky. A list that scrolls away with the content can only be seen
+                in one state: whatever was current when it was last on screen,
+                which is always the first entry. That reads as a selection, and
+                announced it claims a reading position that never changes. On a
+                phone, where the contents list above sits in the flow, no entry is
+                marked at all.
               </p>
               <p class="dds-text-sm dds-text-subtle dds-mbs-sm">
                 Without JavaScript the list is a set of working anchor links. Only
@@ -1271,7 +1283,7 @@
 <script src="../dds/js/dds.js?v=7edeca8b" defer></script>
 <script src="../dds/js/format.js?v=8f2e10f1" defer></script>
 <script src="../dds/js/components.js?v=4e01264d" defer></script>
-<script src="../dds/js/components-navigation.js?v=af452c49" defer></script>
+<script src="../dds/js/components-navigation.js?v=4c1d8063" defer></script>
 <script src="assets/reference.js?v=dacbae09" defer></script>
 <script src="assets/reference-tools.js?v=455058e2" defer></script>
 </body>

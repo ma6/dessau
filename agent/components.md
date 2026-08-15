@@ -825,9 +825,24 @@ never covers a field that has just been focused (WCAG 2.2 2.4.11).
 
 ## Table of contents — `.dds-toc`
 
-`IntersectionObserver`, not a scroll listener. The active entry is
-`aria-current="location"` — **not `"page"`**: the user has not navigated anywhere,
-the reading position moved.
+The active entry is `aria-current="location"` — **not `"page"`**: the user has not
+navigated anywhere, the reading position moved.
+
+**It marks a section only where the list is visible while that section scrolls
+past** — that is, where the list or an ancestor is `position: sticky` or `fixed`.
+A list that scrolls away with the content can only ever be seen in one state:
+whatever was current when it was last on screen, which is always the first entry.
+That reads as a selection rather than a position, and announced it states a
+reading position that never changes. The component asks its own computed
+position, not a width, so a product that makes the list sticky at some other
+width — or never — gets the right behaviour without configuring anything.
+
+**Not an `IntersectionObserver`.** A band answers "what is inside this band", and
+at the bottom of a page nothing is, so the last entry could never activate. The
+position is measured geometrically instead, against a reading line a quarter of
+the way down, plus a `ResizeObserver` — because a page using
+`content-visibility: auto` keeps growing after the last scroll event has been
+handled. The reasoning in full is in the source and in `agent/responsive.md`.
 
 ## Content navigation — `.dds-contentnav`
 

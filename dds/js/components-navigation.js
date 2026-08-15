@@ -156,6 +156,39 @@
       });
     }
 
+    function clear() {
+      links.forEach(function (candidate) {
+        candidate.removeAttribute('aria-current');
+      });
+    }
+
+    /**
+     * Is this list in view while the sections it points at scroll past?
+     * ------------------------------------------------------------------------
+     * Only then does "where you are" mean anything. On a phone the reference's
+     * list is not sticky: it sits above the content and scrolls away with it, so
+     * the mark is only ever seen in one state — whatever was current when the
+     * list was last on screen, which is always the first entry. It reads as a
+     * selection rather than a position, and `aria-current="location"` states a
+     * reading position that, on that screen, never changes.
+     *
+     * The question is asked of the ELEMENT rather than of the viewport: a
+     * product may make its list sticky at another width, or never, or put it in
+     * a scrolling panel of its own. Reading the computed position answers for
+     * all of those without anybody configuring anything — and a width would
+     * answer only for this one page shell.
+     *
+     * `fixed` counts too: a list in a fixed sidebar is as visible as a sticky
+     * one, which is the property that matters here.
+     */
+    function tracks() {
+      for (var node = toc; node && node !== document.body; node = node.parentElement) {
+        var position = getComputedStyle(node).position;
+        if (position === 'sticky' || position === 'fixed') return true;
+      }
+      return false;
+    }
+
     /**
      * Which section is being read, answered geometrically.
      * ------------------------------------------------------------------------
@@ -207,6 +240,15 @@
     }
 
     function update() {
+      /* A list that scrolls away with its content cannot report a reading
+         position, so it does not claim one. Re-asked on every update rather than
+         once at setup: the answer changes when the window crosses the width at
+         which the shell makes the list sticky. */
+      if (!tracks()) {
+        clear();
+        return;
+      }
+
       /**
        * At the end of the page, the last section is the answer regardless of geometry.
        *

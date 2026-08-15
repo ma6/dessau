@@ -157,3 +157,57 @@ test('the highlight always names exactly one section', async ({ page }) => {
     ).toHaveCount(1);
   }
 });
+
+/**
+ * The narrow state, which is the one nobody had looked at.
+ *
+ * Below the reference shell's two-column threshold the list is not sticky: it
+ * sits above the content and scrolls away with it, so a reader never sees the
+ * mark move. What they see is whatever was current when the list was last on
+ * screen — always the first entry — and it reads as a selection. Announced, it
+ * states a reading position that on that screen never changes.
+ *
+ * The component decides this from its own computed position rather than from a
+ * width, so this test asserts the behaviour a phone produces, not the mechanism.
+ */
+test('on a phone, where the list scrolls away, no entry claims to be current', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto('/reference/patterns.html');
+
+  const toc = page.locator('[data-dds-toc]').first();
+  await expect(toc).toBeVisible();
+
+  // The list is genuinely not sticky here — otherwise this asserts nothing.
+  const sticky = await toc.evaluate((element) => {
+    for (let node = element; node && node !== document.body; node = node.parentElement) {
+      const position = getComputedStyle(node).position;
+      if (position === 'sticky' || position === 'fixed') return true;
+    }
+    return false;
+  });
+  expect(sticky, 'the list is sticky at this width, so this test proves nothing').toBe(false);
+
+  for (const fraction of [0, 0.5, 1]) {
+    await page.evaluate((f) => {
+      const max = document.documentElement.scrollHeight - window.innerHeight;
+      window.scrollTo({ top: Math.round(max * f), behavior: 'instant' });
+    }, fraction);
+
+    await expect(
+      toc.locator('[aria-current]'),
+      `at ${fraction * 100}% down a phone-sized page, an entry is marked as the ` +
+        `reading position — but the list has not been on screen since the top`
+    ).toHaveCount(0);
+  }
+});
+
+/** And the wide state still works, decided the same way. */
+test('where the list is sticky, it still tracks', async ({ page }) => {
+  await page.setViewportSize({ width: 1280, height: 900 });
+  await page.goto('/reference/patterns.html');
+
+  const toc = page.locator('[data-dds-toc]').first();
+  await page.evaluate(() => window.scrollTo({ top: 900, behavior: 'instant' }));
+
+  await expect(toc.locator('[aria-current="location"]')).toHaveCount(1);
+});
