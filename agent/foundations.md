@@ -159,12 +159,20 @@ machine-checkable, because the effective background depends on the content
 behind. The mitigation is the strong variant — at 85% black, near-white text
 clears AA against anything underneath.
 
-**Accent** — five numbered slots, and one of them in force.
+**Accent** — five numbered slots ship, and one of them is in force.
 
 `--dds-color-accent` and `--dds-color-accent-subtle` are what a component reads:
 the accent *in force*. `--dds-color-accent-<n>` and `--dds-color-accent-<n>-subtle`
 are what it can be set to, for `1` … `5`. Each carries its own per-theme value —
 600 on 100 in light, 300 on 900 in dark. With nothing selected, the accent is 1.
+
+**Five is what DDS ships, not a ceiling.** No component knows the count: they read
+the two tokens in force and nothing validates the attribute. A product needing
+seven categories declares slots 6 and 7 itself, per theme, with its selection
+rules below its theme blocks — `recipes/derive-a-design-system.md` has the shape
+and the two silent failures. Five is where Dessau stops because its accents are
+also its brand accent and must stay memorable, and because its hue circle is
+already spent on action and status. A chart-only palette has neither constraint.
 
 **Selecting one is an attribute, on any element:**
 

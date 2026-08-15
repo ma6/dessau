@@ -165,6 +165,75 @@ was a claim about a ramp this very recipe tells you to replace — and once you 
 `--dds-color-accent-clay` was grey and `<span data-dds-accent="clay">` was grey,
 in your markup, where nothing checks it. See DECISIONS 033 and 034.
 
+### If you need more than five
+
+You are not held to five, and nothing in DDS is. Components read
+`--dds-color-accent` and `--dds-color-accent-subtle` and have no idea where the
+value came from — there is no registry, no count, no validation of the attribute.
+DECISIONS 033 anticipated this: the honest answer to a sixth accent is a product
+declaring it and owning the result, rather than a sixth entry in Dessau.
+
+**Five is Dessau's number for two reasons, and you may share neither.**
+
+The first is that Dessau's accents are dual-purpose. The same mechanism is a
+brand accent on `<html>` and one category on a chart bar, and a brand accent has
+to be *memorable* — which is where a set stops working long before it stops being
+distinguishable. A categorical palette that only ever appears in charts carries no
+such requirement, because the mapping lives in a legend or a label rather than in
+the reader's head. Palettes of eight or twelve are ordinary for that job.
+
+The second is that Dessau shares its hue circle with meaning. Indigo is "you can
+act on this"; four hues are status; two of the five accents already sit on status
+ramps. A product's own chart palette does not have to leave those angles alone,
+and gets a wider circle to spend.
+
+**Adding a slot.** Mirror the shape DDS uses, because both ways of getting it
+wrong are silent:
+
+```css
+/* 1. The slot itself — a per-theme PAIR, not one value. */
+:root, [data-theme="light"] {
+  --dds-color-accent-6:        #0f766e;
+  --dds-color-accent-6-subtle: #ccfbf1;
+}
+[data-theme="dark"] {
+  --dds-color-accent-6:        #5eead4;
+  --dds-color-accent-6-subtle: #0c2f2b;
+}
+
+/* 2. The selection rule — and it MUST come after your theme blocks. */
+[data-dds-accent="logistics"] {
+  --dds-color-accent:        var(--dds-color-accent-6);
+  --dds-color-accent-subtle: var(--dds-color-accent-6-subtle);
+}
+```
+
+*One value instead of a pair* keeps its light colour on a dark page, at whatever
+contrast that lands on, and looks deliberate. *The selection rule above your theme
+blocks* loses to them: both are unlayered and both weigh (0,1,0), so source order
+decides, and `<html data-theme="dark" data-dds-accent="logistics">` silently takes
+the theme value instead. That is the same ordering constraint `semantic.css`
+documents for its own five — you are reproducing it, so put your selection rules
+last in the file.
+
+**The real limit is not the count, it is legend matching.** Past roughly eight
+categories, matching a colour in a chart to an entry in a legend stops being
+reliable however well separated the colours are. The answer to that is direct
+labelling at the mark, not a smaller palette. Seven directly labelled categories
+are fine; five that force a reader's eye back and forth to a legend are not.
+
+**What you must measure, because nothing else will.** Copy
+`scripts/check-accent-separation.mjs` into your own repository and repoint the two
+`readFile` paths at your stylesheet. Contrast has the same hardcoded-path problem
+and is covered above, but separation is the one that bites here: seven colours in
+a circle with indigo and four status hues cut out of it is precisely the case
+where two of them converge. The shipped five already sit at ΔE 0.109 at their
+closest, against a floor of 0.07. That headroom is what you are spending.
+
+**And keep the brand accent on one slot.** If you extend the set for charts,
+decide separately which slot is the product's identity. A brand accent that is
+also "category 4 of 7" is a brand accent nobody will recognise as one.
+
 **The trap.** Judge every colour at **both ends of the ramp**, in both themes.
 Dessau got this wrong in its own palette and shipped it: the neutral was warm on
 the argument that warmth reads as paper, which is true at 90% lightness and false
