@@ -116,6 +116,24 @@ And a row of controls laid out with `grid-auto-flow: column` cannot wrap **by
 definition**. If they should sit side by side and drop to a second line when they
 run out of room, that is `display: flex; flex-wrap: wrap`.
 
+### The reference shell's own three, and what a tablet gets
+
+The reference site is a page shell, so its thresholds are viewport media queries
+and that is correct. They are stated as a set in `reference/assets/reference.css`
+rather than three numbers with three local reasons:
+
+| Width | Decides |
+| --- | --- |
+| `47.999rem` | the brand's sub-line goes, or the theme toggle wraps to a line of its own at the left (#16) |
+| `63.999rem` | the navigation panel may be collapsed — the mirror of the rule below |
+| `64rem` | two columns: sticky contents beside the text, navigation inline |
+
+**A tablet in portrait gets the phone shell**, deliberately. At 834px a 15rem
+contents column leaves about 590px of text, which is wide enough to read and
+narrow enough that the sticky column feels like it is taking room from the
+reading. Nothing is hidden by that choice: the navigation is one disclosure away
+and the contents list sits above the text instead of beside it.
+
 ### When a media query IS correct
 
 For the **page shell**, and for anything that genuinely depends on the device

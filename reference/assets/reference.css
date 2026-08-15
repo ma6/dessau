@@ -281,6 +281,38 @@
   align-items: center;
 }
 
+/* The shell's three thresholds, and what each one decides.
+   ----------------------------------------------------------------------------
+   These are the reference site's own, not DDS's — a page shell is the one place a
+   viewport media query is right, because the shell IS the window. Written down
+   together because they were three numbers in three files with three local
+   reasons, and the question they answer as a set — what does a tablet in portrait
+   get? — had no answer anywhere.
+
+     47.999rem  the brand's sub-line goes. Below it the header row cannot hold
+                brand, sub-line, disclosure and theme toggle without wrapping the
+                toggle onto a line of its own, at the left, where nobody looks for
+                it (#16).
+
+     63.999rem  the navigation panel may be collapsed. This is the mirror of the
+                rule below and exists only so the panel can be reopened where the
+                toggle that reopens it exists.
+
+     64rem      two columns: the contents list becomes a sticky side column and
+                the navigation goes inline. The same number for both so the header
+                and the content change shape at the same moment rather than one at
+                a time.
+
+   **A tablet in portrait (834px) therefore gets the phone shell**, and that is a
+   decision rather than an oversight: at 834px a 15rem contents column leaves the
+   text about 590px, which is wider than the comfortable measure only by enough to
+   make the sticky column feel like it is taking room from the reading. The
+   two-column layout starts where a sidebar plus a full measure genuinely fits.
+
+   What a tablet does NOT get is a phone's content: nothing is hidden, the
+   navigation is one disclosure away, and the contents list is above the text
+   instead of beside it. */
+
 /* Only where the toggle exists to reopen it. */
 @media (max-width: 63.999rem) {
   .ref-nav-panel[hidden] {
