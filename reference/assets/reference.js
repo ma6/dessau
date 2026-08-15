@@ -464,8 +464,37 @@
     scope.querySelectorAll('[data-ref-locale-switch]').forEach(wireLocaleSwitch);
   }
 
+  /**
+   * Run once the stylesheets that declare the tokens have actually applied.
+   *
+   * Everything on this page that draws a swatch or a ruler reads a custom
+   * property back out of the computed style, and a custom property is readable
+   * only after the sheet declaring it has applied. `dds.css` reaches its layer
+   * files with `@import`, which the browser can only discover after parsing
+   * `dds.css` itself — so a deferred script can genuinely run before a single
+   * `--dds-*` exists.
+   *
+   * Chromium happened to have them by `DOMContentLoaded`. WebKit did not, and
+   * the foundations page reported fifty of its own tokens as undeclared, in the
+   * page whose entire job is to show that they are declared. Neither engine is
+   * wrong: nothing in the specification says an imported sheet has applied by
+   * then.
+   *
+   * So render when the values are there, and wait for `load` when they are not
+   * — `load` waits for every stylesheet, imported ones included. If they are
+   * still missing then, the renderers say so, which is the real failure and
+   * worth reporting.
+   */
+  function whenTokensResolve(run) {
+    if (tokenValue('--dds-color-surface-default')) return run();
+    if (document.readyState === 'complete') return run();
+    window.addEventListener('load', run, { once: true });
+  }
+
   function init() {
-    renderAll(document);
+    whenTokensResolve(function () {
+      renderAll(document);
+    });
 
     // Contrast badges are theme-dependent, so they are recomputed on every
     // theme change rather than being calculated once at load.

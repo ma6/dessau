@@ -38,12 +38,23 @@
    source navigable with no build step, and because the files are small and
    cache well.
 
+   There is a second cost, and it is easier to be caught by: an imported sheet is
+   not guaranteed to have applied by `DOMContentLoaded`. A deferred script that
+   reads a token back —
+   `getComputedStyle(el).getPropertyValue('--dds-color-text-default')` — can
+   therefore get an empty string, which is a valid value for almost every
+   property and so fails silently. It happened on the reference's own foundations
+   page, on WebKit only, while Chromium had the values in time. Anything reading
+   a custom property from script should wait for `load`, or check the value and
+   fall back to waiting.
+
    For production, either:
      - run `node scripts/bundle.mjs` and ship the generated `dds.min.css`, or
      - link the layer files directly from your own HTML in the order below, or
      - concatenate them in whatever pipeline you already have.
 
-   All three are equivalent. Nothing here depends on being imported.
+   All three are equivalent, and all three remove the timing problem above.
+   Nothing here depends on being imported.
 
    -----------------------------------------------------------------------------
    The `?v=` on every import
