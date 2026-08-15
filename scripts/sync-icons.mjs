@@ -156,6 +156,7 @@ let updated = 0;
 let stale = 0;
 let missingMarkers = 0;
 let brokenReferences = 0;
+let malformed = 0;
 
 for (const file of htmlFiles) {
   const source = await readFile(file, 'utf8');
@@ -169,6 +170,29 @@ for (const file of htmlFiles) {
     // rather than guessing where to put one.
     console.warn(`  no sprite markers: ${shortPath}`);
     missingMarkers++;
+    continue;
+  }
+
+  /* A malformed block, which this script used to carry forever rather than
+     report. `indexOf` finds the FIRST end marker and everything from it is kept
+     verbatim — so a second end marker is copied through on every run, the output
+     equals the input, and `--check` calls the page current. Two pages carried a
+     duplicated end marker for exactly that reason.
+
+     An ambiguous block is worse than a stale one: stale is a known state with a
+     fix, ambiguous means any future change to how the block is located has to
+     guess which marker was meant. */
+  const starts = source.split(START_MARKER).length - 1;
+  const ends = source.split(END_MARKER).length - 1;
+
+  if (starts > 1 || ends > 1 || endIndex < startIndex) {
+    console.error(
+      `  ERROR ${shortPath}: malformed sprite block — ` +
+        `${starts} start marker(s), ${ends} end marker(s)` +
+        (endIndex < startIndex ? ', end before start' : '') +
+        '. Fix the markers by hand; this script will not guess which one was meant.'
+    );
+    malformed++;
     continue;
   }
 
@@ -198,7 +222,7 @@ for (const file of htmlFiles) {
   }
 }
 
-const problems = stale + brokenReferences;
+const problems = stale + brokenReferences + malformed;
 
 /* Said out loud, because "it skipped some files" is exactly the kind of quiet
    helpfulness that becomes a mystery later. */
@@ -218,7 +242,8 @@ console.log(
         : ` ${stale} STALE.`
       : ` ${updated} updated.`) +
     (missingMarkers ? ` ${missingMarkers} without markers.` : '') +
-    (brokenReferences ? ` ${brokenReferences} BROKEN icon references.` : '')
+    (brokenReferences ? ` ${brokenReferences} BROKEN icon references.` : '') +
+    (malformed ? ` ${malformed} MALFORMED sprite block(s).` : '')
 );
 
 process.exit(problems === 0 ? 0 : 1);
