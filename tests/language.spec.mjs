@@ -68,15 +68,29 @@ test('the announcement is not half-translated', async ({ page }) => {
   await german.click();
 
   /**
+   * DDS's own live region, not any polite region on the page.
+   *
+   * `[aria-live="polite"]` alone also matches the character-count demo, which is a
+   * component's own status element — the first version of this test asked for
+   * both and failed on the ambiguity. The one DDS creates is the visually hidden,
+   * atomic one it appends to the body (see `getLiveRegion` in dds.js).
+   */
+  const live = page.locator('div.dds-sr-only[aria-live="polite"][aria-atomic="true"]');
+
+  /**
    * This is the defect the rule was hiding: the label came from the table and the
    * sentence after it was written in English in the source, so a German page
    * announced "Dunkel — dark theme on". A string that varies by language cannot
    * be half in a table and half in the code.
+   *
+   * The positive assertion goes first and does the waiting — the region is filled
+   * after a double `requestAnimationFrame`, and a bare "does not contain English"
+   * would be satisfied by an empty region that has not been written to yet.
    */
-  const announced = await page.locator('[aria-live="polite"]').textContent();
-
-  expect(announced).toMatch(/Design/);
-  expect(announced, 'the announcement still contains English').not.toMatch(/theme on/);
+  await expect(live).toHaveText(/Design/);
+  expect(await live.textContent(), 'the announcement still contains English').not.toMatch(
+    /theme on/
+  );
 });
 
 test('every German passage in the reference declares itself', async ({ page }) => {
