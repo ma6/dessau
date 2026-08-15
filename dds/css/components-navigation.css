@@ -286,6 +286,17 @@
     font-size: var(--dds-font-size-sm);
   }
 
+  /* 1.5rem is 24px: the WCAG 2.2 2.5.8 minimum, measured at 320px and found at
+     22px. A breadcrumb link is not exempt as an inline target — it is one of a
+     row of links, not a word inside a sentence, and the spacing exemption does
+     not apply either because the links sit a few pixels apart. */
+  .dds-breadcrumb a,
+  .dds-breadcrumb [aria-current="page"] {
+    display: inline-flex;
+    align-items: center;
+    min-block-size: 1.5rem;
+  }
+
   .dds-breadcrumb li {
     display: flex;
     align-items: center;

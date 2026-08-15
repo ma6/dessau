@@ -234,7 +234,10 @@
      that. The value keeps the rest. No threshold and no query: the limit is
      proportional, so it holds at every width. */
   .dds-keyvalue-columns {
-    grid-template-columns: fit-content(40%) 1fr;
+    /* `minmax(0, 1fr)`, not `1fr`: a bare `1fr` is `minmax(auto, 1fr)`, and `auto`
+       cannot go below the value's longest word — so the column the label was
+       capped for could still push the pair past the edge. */
+    grid-template-columns: fit-content(40%) minmax(0, 1fr);
     align-items: baseline;
   }
 
@@ -538,7 +541,7 @@
      The value stays `max-content` — it is a number and a unit. */
   .dds-chart-row {
     display: grid;
-    grid-template-columns: fit-content(35%) 1fr max-content;
+    grid-template-columns: fit-content(35%) minmax(0, 1fr) max-content;
     align-items: center;
     gap: var(--dds-space-sm);
     font-size: var(--dds-font-size-sm);
@@ -1104,11 +1107,26 @@
     flex-direction: column;
   }
 
+  /* The row wraps rather than overflowing.
+     ----------------------------------------------------------------------
+     `dt` keeps `flex-shrink: 0` so a long value cannot squeeze the label —
+     which was right, and on its own was how the row became wider than a phone:
+     an unsqueezable label plus a value that will not shrink below its longest
+     word is a row with no way to fit. Wrapping puts the value under its label
+     instead, which is what a narrow screen has room for. Measured at 320px, the
+     German compound nouns in the specimen made this row 117px too wide. */
   .dds-specs > div {
     display: flex;
+    flex-wrap: wrap;
     align-items: baseline;
     gap: var(--dds-space-xs);
     padding-block: var(--dds-space-xs);
+  }
+
+  /* And the value may become narrower than its longest word, so that word can
+     break (`overflow-wrap` in base.css) instead of setting the row's width. */
+  .dds-specs dd {
+    min-inline-size: 0;
   }
 
   .dds-specs > div + div {

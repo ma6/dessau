@@ -121,18 +121,31 @@ const findOverflow = () => {
     const classes = element.className
       ? `.${String(element.className).trim().split(/\s+/).slice(0, 3).join('.')}`
       : '';
+    const text = (element.textContent || '').trim().replace(/\s+/g, ' ').slice(0, 40);
     return (
       `${element.tagName.toLowerCase()}${id}${classes} — ` +
       `${Math.round(rect.width)}px wide, right edge at ${Math.round(rect.right)} ` +
-      `of ${viewport}`
+      `of ${viewport}${text ? ` — "${text}"` : ''}`
     );
   };
+
+  /* When the page scrolls sideways and nothing is over the edge, the cause is
+     inside something that clips or scrolls — so the element responsible is
+     invisible to the test above. Reporting the widest boxes on the page gives
+     the next person somewhere to start instead of a bare number. */
+  const widest = [...document.body.querySelectorAll('*')]
+    .map((element) => ({ element, rect: element.getBoundingClientRect() }))
+    .filter(({ rect }) => rect.width > viewport)
+    .sort((a, b) => b.rect.width - a.rect.width)
+    .slice(0, 6)
+    .map(({ element }) => describe(element));
 
   return {
     pageOverflow: document.documentElement.scrollWidth - viewport,
     viewport,
     offenders: outermost.slice(0, 8).map(describe),
     offenderCount: outermost.length,
+    widest,
   };
 };
 
@@ -150,6 +163,14 @@ const findSmallTargets = () => {
 
     const style = getComputedStyle(element);
     if (style.visibility === 'hidden') continue;
+
+    /* The visually-hidden recipe: a 1×1 clipped box with a visible label or
+       button in front of it. The file input is the case that found this — it is
+       `.dds-sr-only` by design, and the control a finger actually lands on is
+       the label. Measuring the hidden box reports a 1×1 target that no pointer
+       will ever be asked to hit. */
+    if (element.closest('.dds-sr-only, .dds-visually-hidden')) continue;
+    if (style.clipPath && style.clipPath !== 'none' && rect.width <= 2) continue;
 
     /* An exception the success criterion itself makes: a control in a sentence
        is sized by the text it is part of, and enlarging it would break the line
@@ -187,8 +208,13 @@ for (const viewport of VIEWPORTS) {
           result.offenderCount
             ? `${result.offenderCount} element(s) exceed the ${result.viewport}px viewport:\n` +
               result.offenders.map((line) => `    ${line}`).join('\n')
-            : 'the page scrolls sideways with no single element over the edge — ' +
-              'look for a grid or flex track with no constraint (#79)'
+            : 'the page scrolls sideways and no single element is over the edge, ' +
+              'so the cause is inside something that clips or scrolls. The widest ' +
+              'boxes on the page:\n' +
+              (result.widest.length
+                ? result.widest.map((line) => `    ${line}`).join('\n')
+                : '    (none wider than the viewport — look for a track with no ' +
+                  'constraint, #79)')
         ).toBeLessThanOrEqual(1);
       });
     }

@@ -637,6 +637,37 @@ for (const [path, page] of pages) {
   }
 }
 
+/* -------------------------------- 14. no id appears twice on a page */
+
+/**
+ * A duplicate `id` is invalid HTML, and the way it fails is worse than invalid:
+ * everything that resolves an id takes the FIRST match and silently ignores the
+ * rest. `aria-labelledby` names the wrong element, `href="#x"` jumps to the
+ * wrong place, `<label for>` labels nothing.
+ *
+ * Written after splitting the components page into one section per component
+ * created `<section id="upload">` on a page that already had
+ * `<input id="upload">`. Nothing here noticed. Nine browser tests fell over it
+ * instead — they were looking for the input and found a section — which is a
+ * slow and confusing way to learn about a two-character mistake.
+ */
+for (const [path, page] of pages) {
+  const seen = new Map();
+
+  for (const match of page.source.matchAll(/\sid="([^"]+)"/g)) {
+    const id = match[1];
+    const line = page.source.slice(0, match.index).split('\n').length;
+    if (seen.has(id)) {
+      report(
+        `${path}:${line}: id="${id}" is already used on line ${seen.get(id)} — ` +
+          `everything that resolves an id takes the first match and ignores this one`
+      );
+    } else {
+      seen.set(id, line);
+    }
+  }
+}
+
 /* --------------- 13. width-dependent behaviour can be seen without a phone */
 
 /**

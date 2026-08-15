@@ -1174,7 +1174,7 @@
       ],
       "css": "dds/css/components-forms.css",
       "spec": "## Upload — `.dds-upload`",
-      "reference": "reference/components.html#upload",
+      "reference": "reference/components.html#file-upload",
       "js": "dds/js/components-forms.js",
       "hooks": [
         "data-dds-upload"

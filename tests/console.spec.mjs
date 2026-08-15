@@ -121,7 +121,21 @@ for (const path of PAGES) {
      */
     const failedRequests = [];
     page.on('requestfailed', (request) => {
-      failedRequests.push(`${request.failure()?.errorText ?? 'failed'} ${request.url()}`);
+      const reason = request.failure()?.errorText ?? 'failed';
+
+      /* An ABORTED request is not a request that never arrived — it is one that
+         stopped being wanted. The root `index.html` is a meta-refresh redirect,
+         so a favicon still in flight when the navigation happens is cancelled by
+         the browser, and Firefox reports that as `NS_BINDING_ABORTED`. Counting
+         it as a failure made a page that works exactly as designed fail on one
+         engine, intermittently, depending on which of two requests won a race.
+
+         `check-reference.mjs` verifies that every referenced asset exists on
+         disk, so a genuinely missing file is still caught — by the check that
+         can be sure. */
+      if (/ABORTED/i.test(reason)) return;
+
+      failedRequests.push(`${reason} ${request.url()}`);
     });
 
     const response = await page.goto(path, { waitUntil: 'load' });

@@ -125,7 +125,7 @@
     display: grid;
     /* Capped and wrapping rather than as wide as the longest label — see
        `.dds-keyvalue-columns`, which had the same defect for the same reason. */
-    grid-template-columns: fit-content(40%) 1fr;
+    grid-template-columns: fit-content(40%) minmax(0, 1fr);
     gap: var(--dds-space-2xs) var(--dds-space-md);
     align-items: baseline;
 
