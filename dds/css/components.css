@@ -96,10 +96,25 @@
     font-size: var(--dds-button-font-size);
     font-weight: var(--dds-font-weight-medium);
     line-height: var(--dds-line-height-snug);
-    /* A button label is a label, never a paragraph. */
+    /* A button label is a label, never a paragraph — but a label that does not
+       fit has to go somewhere, and `white-space: nowrap` sent it over the edge
+       of the page.
+       ------------------------------------------------------------------
+       Measured on `patterns.html` at 320px: an upload row's cancel button was
+       69px wide with 197px of label in it, and the 128px of overflow was the
+       page's, because nothing between the button and the document clips. No
+       element's box was outside the viewport, so it was invisible to every
+       measurement that looks at boxes — the label is inline text, and inline
+       text sticking out of a `nowrap` box is not a box.
+
+       So a label wraps when there is no room for it, which costs a second line
+       inside the button and keeps the page intact. `balance` makes the break
+       land somewhere sensible rather than after the first word. Short labels
+       are unaffected: they never run out of room, which is what made `nowrap`
+       look harmless for as long as it did. DECISIONS 039. */
     text-align: center;
     text-decoration: none;
-    white-space: nowrap;
+    text-wrap: balance;
 
     border: var(--dds-border-thin) solid transparent;
     border-radius: var(--dds-radius-md);

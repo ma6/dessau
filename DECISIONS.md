@@ -1528,3 +1528,52 @@ the default view" and "not fetchable" are different claims. Ask GitHub support t
 run a garbage collection before publication, and run
 `node scripts/audit-whitelabel.mjs` again on the day rather than trusting that it
 was clean on some earlier day.
+
+---
+
+## 039 — A button label wraps rather than leaving the page
+
+**Decision.** `.dds-button` no longer sets `white-space: nowrap`. A label that
+does not fit its button wraps onto a second line, with `text-wrap: balance` so
+the break lands sensibly.
+
+**What it cost to find.** `tests/viewport.spec.mjs` reported `patterns.html` as
+73px too wide at 320px with **no element over the edge**, and said so for three
+runs while the diagnostic was sharpened twice. The cause was an upload row's
+cancel button, 69px wide, holding 197px of label. Inline text sticking out of a
+`nowrap` box is not a box, so every measurement that looks at element rectangles
+— which is every one anybody reaches for first — was blind to it. What found it
+was asking a different question: which is the deepest element whose scrollable
+area exceeds its client area.
+
+**Why wrapping rather than the alternatives.**
+
+- *Keep `nowrap` and clip with an ellipsis.* The full name would survive in the
+  accessible name, so it is defensible, and it renders "Übertr…" in a 69px box.
+  A verb the user cannot read is not a control they can use.
+- *Keep `nowrap` and require short labels.* That is a rule enforced by nobody
+  against content that arrives from a product, in a language the system does not
+  choose. German compound nouns and a filename in a label are ordinary, not
+  exotic — both were in this repository's own demo.
+- *Cap the button at `max-inline-size: 100%`.* It caps the box and not the text.
+  The overflow is the label, not the button.
+
+**What it costs.** A two-word label in a very narrow container may now take two
+lines where it previously took one and overflowed. That is the trade, and it is
+the right way round: a taller button is a layout that still works, and a label
+over the page edge is a WCAG 1.4.10 failure for the whole page.
+
+**The general lesson, which is bigger than the button.** `nowrap` moves a
+component's overflow from its own box to the page, and does it invisibly. Any
+`white-space: nowrap` on something that carries content — as opposed to a
+readout or a unit, which are short by construction — deserves the same question:
+what happens when this does not fit?
+
+**The other thirteen were surveyed rather than left.** `.dds-upload-item-name`
+clips with an ellipsis, and says why in its own comment. `.dds-input-group-affix`
+(a unit), `.dds-upload-item-size` (a file size), `.dds-kbd` (a key) and the
+badge are short by construction. `.dds-table thead th` is inside the scroll
+region the table now always has. `.dds-segmented-option` is the one that could
+grow a long label from a product, and it is left as it is deliberately: a
+segmented control with a wrapping option is a different control, and the
+constraint that its options are short is part of what the component is for.
