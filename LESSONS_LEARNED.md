@@ -391,3 +391,60 @@ never tested.
 **Do:** `[#42] feat(patterns): …`. The bracket puts a non-comment character first,
 the ticket still leads the subject, and the conventional type and scope stay where
 every parser expects them.
+
+---
+
+## Behaviour that differs per page with identical code points at the page
+
+`content-visibility: auto` was on every section of every reference page. It cost
+four attempts at a table of contents and then three more defects, all of which
+looked like component bugs and none of which were.
+
+An off-screen section is laid out at an estimated height and takes its real height
+only as it approaches the viewport. The page therefore keeps growing *after* the
+last scroll event has been handled, because the growth is a layout change and not
+a scroll. Three things follow, and only the first is the one anybody expects:
+
+- **Positional logic reads stale geometry.** The table of contents got this wrong
+  in three separate mechanisms — an `IntersectionObserver` band, an end-of-document
+  sentinel, a geometric reading line — each working on some pages and failing on
+  others with the component unchanged.
+- **A click can land on nothing.** On WebKit, three unrelated controls far down a
+  long page did nothing when clicked: a wizard's Continue button, a theme toggle, a
+  password field. The sections above them took their real heights while the pointer
+  was being aimed. Chromium's estimates differ, so it happened on one engine only,
+  and all three components were correct.
+- **A custom property reads as an empty string.** `getPropertyValue('--dds-color-…')`
+  returns `''` inside a skipped section, and an empty string is a valid value for
+  almost every property — so the foundations page reported fifty of its own tokens
+  as undeclared and painted nothing, silently.
+
+**The diagnostic is the durable part:** when the same code behaves differently on
+different pages, stop reading the component and start looking at the page. The
+variable is how tall it is and where the thing sits in it.
+
+**Do:** treat `content-visibility` as opt-in with a measured reason
+(`.dds-defer-render`), pair anything positional with a `ResizeObserver`, and check
+a second engine whenever it is in play. It was removed from the reference
+entirely: the saving had never been measured.
+
+---
+
+## An imported stylesheet has not applied by `DOMContentLoaded`
+
+`dds.css` reaches its layer files with `@import`, so the browser discovers them
+only after parsing `dds.css` itself. A deferred script runs before that finishes.
+
+`reference.js` draws every colour swatch by reading a token back out of the
+computed style, at `DOMContentLoaded`. On Chromium the values were there. On
+WebKit they were not, so the page whose entire job is to show that fifty tokens
+are declared reported all fifty as undeclared. Neither engine is wrong — nothing
+in the specification says an imported sheet has applied by then.
+
+It failed loudly only because those renderers had already been written to refuse
+an empty string. Everywhere else, `''` is a valid value and nothing would have
+been said at all.
+
+**Do:** anything reading a custom property from script waits for `load`, or checks
+the value and falls back to waiting. Shipping a concatenated stylesheet instead of
+an `@import` chain removes the problem rather than working around it.

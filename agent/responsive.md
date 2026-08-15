@@ -167,6 +167,68 @@ must be neutral there — by leaving the rule out, not by resetting it.
 
 ---
 
+## `content-visibility: auto` changes what "the page" is
+
+`.dds-defer-render` sets `content-visibility: auto` with a `contain-intrinsic-size`
+estimate. It skips the rendering work for sections that are off-screen, which on a
+long page is a real saving — and it is opt-in, because it has a consequence that is
+not obvious from the declaration and is not local to the element it is on.
+
+**An off-screen section is laid out at its estimated height and takes its real
+height only as it approaches the viewport.** So the page grows while you scroll
+towards its end — and it keeps growing *after* the last scroll event has been
+handled, because the growth is a layout change, not a scroll.
+
+Everything below follows from that one sentence.
+
+### Anything positional needs a `ResizeObserver`, not only a scroll listener
+
+A component that answers "where am I?" by listening to `scroll` is answering it
+against a page that is still changing size. The table of contents got this wrong
+three times in three different mechanisms — an `IntersectionObserver` band, a
+sentinel at the end of the document, then a geometric reading line — each of which
+worked on some pages and failed on others while the component was identical.
+
+`scrollTo(scrollHeight)` does not reliably reach the bottom either, for the same
+reason: the value read is already stale. That affects tests and "jump to end"
+controls alike.
+
+### A click can land on nothing
+
+This is the expensive one, and it is not about scrolling arithmetic at all.
+
+The reference pages had `content-visibility: auto` on every section. On WebKit,
+clicking a control far down a page did nothing: the sections above it took their
+real heights while the pointer was being aimed, and the button was no longer where
+it had been measured to be. Three unrelated demos failed identically — a wizard's
+Continue button, a theme toggle, a password field — and the components were all
+correct. Chromium's size estimates differ, so it happened on one engine only.
+
+### A custom property can read as an empty string
+
+`getComputedStyle(el).getPropertyValue('--dds-color-…')` returns `''` for an
+element inside a skipped section. An empty string is a valid value for almost
+every property, so this fails silently: the swatch paints nothing and reads as
+"this token is transparent" rather than "this token was not readable".
+
+### The diagnostic
+
+**Behaviour that differs per page while the code is identical points at the page
+content, not at the component logic.** That is the tell. A component that works on
+`components.html` and fails on `foundations.html`, with nothing about the component
+between them, is being affected by how tall the page is and where the thing sits in
+it.
+
+### Before reaching for it
+
+Measure first. The reference pages carried it on every section and the saving was
+never measured; it cost three WebKit-only defects and was removed. It is right for
+a genuinely long page with heavy sections, and it is overhead everywhere else. It
+is also wrong where in-page search must find text in a section nobody has scrolled
+to yet.
+
+---
+
 ## Documenting the behaviour
 
 **A component with width-dependent behaviour gets a sentence describing it**, in a
@@ -208,6 +270,8 @@ this file.
 6. **Text spacing overrides** do not break the layout (WCAG 1.4.12).
 7. **Both orientations** (WCAG 1.3.4).
 8. **Touch targets** still ≥ 24px at the narrowest width (WCAG 2.5.8).
+9. **On a second engine**, if anything on the page uses `content-visibility` —
+   size estimates differ per engine, and so does everything that depends on them.
 
 ```bash
 python3 -m http.server 8000 --bind 127.0.0.1
