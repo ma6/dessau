@@ -1032,12 +1032,26 @@
       visibility 0s var(--dds-duration-slow);
   }
 
+  /* The title and the dismiss on one line, dismiss at the trailing edge. Exactly
+     `.dds-dialog-header`, and deliberately so: a panel over the page and a dialog
+     over the page are the same kind of surface, dismissed the same way and by the
+     same key, so they are dismissed from the same corner. The close used to sit
+     on a line of its own below the title, which spent a whole row of a panel that
+     is at most 20rem wide and holds a scrolling list. */
+  .dds-contentnav-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--dds-space-sm);
+    margin-block-end: var(--dds-space-sm);
+  }
+
   .dds-contentnav-title {
     font-family: var(--dds-font-body);
     font-size: var(--dds-font-size-sm);
     font-weight: var(--dds-font-weight-semibold);
     color: var(--dds-color-text-muted);
-    margin-block-end: var(--dds-space-xs);
+    margin: 0;
   }
 
   /* A group. `<strong>` for the heading rather than a heading level, because the
@@ -1116,8 +1130,16 @@
     pointer-events: auto;
   }
 
+  /* Stays a labelled button rather than becoming a bare ×. The corner is the
+     convention; the word is the affordance, and giving up the second to get the
+     first would be a poor trade in a panel this narrow — it fits.
+
+     It keeps its place in the DOM after the title and before the groups, so it is
+     still the panel's first tab stop and reading order still matches visual
+     order. The corner comes from the header's layout, not from `order` or from
+     absolute positioning, for exactly that reason. */
   .dds-contentnav-close {
-    margin-block-end: var(--dds-space-sm);
+    flex-shrink: 0;
   }
 
   /* --- wide: a static column --------------------------------------------- */

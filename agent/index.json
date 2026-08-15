@@ -296,6 +296,7 @@
         ".dds-contentnav-frame",
         ".dds-contentnav-group",
         ".dds-contentnav-group-title",
+        ".dds-contentnav-header",
         ".dds-contentnav-layout",
         ".dds-contentnav-scrim",
         ".dds-contentnav-title",

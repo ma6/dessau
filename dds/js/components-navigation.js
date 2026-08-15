@@ -302,8 +302,10 @@
                    aria-expanded="false" aria-controls="help-nav">…</button>
            <div class="dds-contentnav-scrim" data-dds-contentnav-scrim></div>
            <nav class="dds-contentnav" id="help-nav" aria-labelledby="help-nav-title">
-             <p class="dds-contentnav-title" id="help-nav-title">…</p>
-             <button class="dds-contentnav-close …" data-dds-contentnav-close>…</button>
+             <div class="dds-contentnav-header">
+               <p class="dds-contentnav-title" id="help-nav-title">…</p>
+               <button class="dds-contentnav-close …" data-dds-contentnav-close>…</button>
+             </div>
              …
            </nav>
            <div data-dds-contentnav-content>… the page content …</div>
