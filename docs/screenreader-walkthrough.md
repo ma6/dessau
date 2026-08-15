@@ -27,12 +27,16 @@ python3 -m http.server 8000 --bind 127.0.0.1
 # http://localhost:8000/reference/
 ```
 
-Two combinations, because they disagree and the disagreements are the point:
+One combination:
 
 | Screen reader | Browser | Platform |
 | --- | --- | --- |
 | VoiceOver | Safari | macOS, and iOS for the touch pass |
-| NVDA | Firefox | Windows |
+
+NVDA + Firefox on Windows is out of scope for #4. It is the pairing that would
+disagree with VoiceOver, and the disagreements are worth having — but a second
+reader is a comparison, and this walk is about the first one. Nothing here has
+been heard at all, and one reader closes that.
 
 The reference pages are `lang="en"` with German demo content tagged `lang="de"`,
 so both voices will be exercised. That is deliberate: a wrong `lang` is most
