@@ -172,7 +172,22 @@
   }
 
   /* =========================================================================
-     Spacing rulers
+     Rulers — a ramp drawn at true size, until true size does not fit
+
+     Spacing tokens are a few dozen pixels and always fit. Container tokens are
+     384px to 1200px, and the bar is a flex item, so on a phone every one of them
+     shrank to the ~150px left over after the name and the readout — five
+     identical bars in a specimen whose entire job is to let a ramp be judged by
+     eye. The smallest of them is already more than twice the space available, so
+     this was not an edge case: on a phone the specimen was never right.
+
+     So: true size where the widest bar fits, and proportional where it does not,
+     with the specimen saying which of the two it is showing. A scaled ramp
+     presented as true size would be the same defect in the other direction.
+
+     Measured rather than assumed — the available width depends on the reader's
+     window, the width switcher's stage and the font size, and a `@media` query
+     could not see any of them. `ResizeObserver` re-decides on every change.
      ========================================================================= */
   function renderRulers(container) {
     var names;
@@ -224,8 +239,10 @@
 
       var bar = document.createElement('div');
       bar.className = 'ref-ruler-bar';
-      // Drawn at true size, so the ramp can be judged by eye.
+      // The true size is kept on the element; `fit()` below decides whether it
+      // is what gets drawn.
       bar.style.inlineSize = value;
+      bar.dataset.refRulerSize = value;
       row.appendChild(bar);
 
       var readout = document.createElement('span');
@@ -238,6 +255,69 @@
 
       container.appendChild(row);
     });
+
+    fitRulers(container);
+
+    /* The decision depends on measured width, so it has to be re-made whenever
+       the width changes: a resized window, the width switcher's stage, a
+       changed text size. Observing the CONTAINER rather than a bar is what keeps
+       this from feeding itself — `fitRulers` writes bar widths, and a bar is
+       inside the box being observed, not the box itself. */
+    if (typeof ResizeObserver === 'function' && !container.dataset.refRulerObserved) {
+      container.dataset.refRulerObserved = 'true';
+      new ResizeObserver(function () {
+        fitRulers(container);
+      }).observe(container);
+    }
+  }
+
+  /**
+   * Draw the ramp at true size if the widest bar fits, and proportionally if not.
+   *
+   * The proportion is taken from the widest bar rather than from the track, so
+   * the ratios between the bars are exactly the ratios between the values —
+   * which is what the specimen is for. Only the scale is lost, and the readout
+   * beside every bar still carries the real number.
+   */
+  function fitRulers(container) {
+    var bars = Array.prototype.slice.call(
+      container.querySelectorAll('[data-ref-ruler-size]')
+    );
+    if (!bars.length) return;
+
+    var sizes = bars.map(function (bar) {
+      var raw = bar.dataset.refRulerSize;
+      return parseFloat(raw) * (raw.indexOf('rem') !== -1 ? 16 : 1);
+    });
+    var widest = Math.max.apply(null, sizes);
+
+    // The space a bar actually has: the row's width, less the name and readout
+    // beside it. Measured on a real row rather than computed from the tokens.
+    var row = bars[0].parentElement;
+    var used = Array.prototype.slice.call(row.children).reduce(function (total, child) {
+      return child === bars[0] ? total : total + child.getBoundingClientRect().width;
+    }, 0);
+    var available = row.getBoundingClientRect().width - used - 24;
+
+    var scaled = widest > available;
+
+    bars.forEach(function (bar, i) {
+      bar.style.inlineSize = scaled
+        ? Math.max(2, (sizes[i] / widest) * 100) + '%'
+        : bar.dataset.refRulerSize;
+    });
+
+    var note = container.querySelector('[data-ref-ruler-scale]');
+    if (!note) {
+      note = document.createElement('p');
+      note.className = 'dds-text-2xs dds-text-muted';
+      note.setAttribute('data-ref-ruler-scale', '');
+      container.appendChild(note);
+    }
+    note.textContent = scaled
+      ? 'Drawn to scale: the widest value is the full width here, and the ratios ' +
+        'between the bars are true. There is not room to draw these at their real size.'
+      : 'Drawn at true size.';
   }
 
   /* =========================================================================
