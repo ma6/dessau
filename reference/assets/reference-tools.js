@@ -145,8 +145,10 @@
      Code view
      =========================================================================
      Markup:
-       <div data-ref-code>
-         <div class="…the component…"></div>
+       <div class="ref-specimen" data-ref-code>
+         <p class="ref-specimen-label">…</p>     ← skipped, reference-only
+         <div class="…the component…"></div>     ← this, and any sibling like it
+         <p class="ref-note">…</p>               ← skipped, reference-only
        </div>
 
      The markup is read from the live DOM and cleaned up, rather than being
@@ -182,6 +184,13 @@
       // Elements generated wholly at runtime (an error message, a rendered
       // option) are not authored markup.
       if (element.hasAttribute && element.hasAttribute('data-dds-error-for')) {
+        element.remove();
+      }
+      // Neither is reference-only markup that sits *inside* a specimen — a
+      // cluster of variants captions each one. Skipping it at the top level and
+      // then serialising it from one level down would put the class into the
+      // sample by the back door.
+      if (element !== clone && isReferenceOnly(element)) {
         element.remove();
       }
     });
@@ -223,7 +232,14 @@
     while (lines.length && !lines[0].trim()) lines.shift();
     while (lines.length && !lines[lines.length - 1].trim()) lines.pop();
 
+    /* The first line is excluded from the measurement and from the cut.
+       `outerHTML` begins *at* the element, so that line has already lost its
+       indentation while every line after it has kept the source's — measuring
+       across all of them therefore always finds a common indent of zero and
+       removes nothing. The bug was invisible for as long as the only thing this
+       ever serialised was a single-line caption. */
     var indents = lines
+      .slice(1)
       .filter(function (line) {
         return line.trim();
       })
@@ -234,15 +250,54 @@
     var common = indents.length ? Math.min.apply(null, indents) : 0;
 
     return lines
-      .map(function (line) {
-        return line.slice(common);
+      .map(function (line, index) {
+        return index === 0 ? line : line.slice(common);
       })
       .join('\n');
   }
 
+  /**
+   * The elements of a specimen that are the component.
+   *
+   * A specimen is not just its component: it opens with a caption, it usually
+   * ends with a note, and it may demonstrate several elements at once — a
+   * divider between two paragraphs, a button and the dialog it opens. Taking the
+   * first child assumed a shape that most specimens on the reference do not
+   * have, and quietly offered the caption as the markup for the component.
+   *
+   * So the rule is by role, not by position, and it follows the convention that
+   * already exists: `ref-` is reference-only (`agent/conventions.md`). Anything
+   * carrying it is either scaffolding to skip or a layout wrapper to unwrap, and
+   * everything else is what an author would write.
+   */
+  function componentParts(host) {
+    var parts = [];
+
+    Array.prototype.forEach.call(host.children, function (child) {
+      // Reference layout that exists to arrange several variants side by side.
+      // The variants are the sample; the grid holding them is not.
+      if (child.classList.contains('ref-matrix') || child.classList.contains('ref-bp-stage')) {
+        parts = parts.concat(Array.prototype.slice.call(child.children));
+        return;
+      }
+      // Caption, note, and the code view this function is building.
+      if (isReferenceOnly(child)) return;
+
+      parts.push(child);
+    });
+
+    return parts;
+  }
+
+  function isReferenceOnly(element) {
+    return Array.prototype.some.call(element.classList, function (name) {
+      return name.indexOf('ref-') === 0;
+    });
+  }
+
   function buildCodeView(host) {
-    var source = host.firstElementChild;
-    if (!source) return;
+    var sources = componentParts(host);
+    if (!sources.length) return;
 
     var details = document.createElement('details');
     details.className = 'ref-codeview';
@@ -278,7 +333,13 @@
 
     details.addEventListener('toggle', function () {
       if (!details.open || serialised !== null) return;
-      serialised = dedent(cleanClone(source).outerHTML);
+      // Each part dedented on its own, then joined: they are siblings, so a
+      // shared indent is not a nesting level and would only be noise to delete.
+      serialised = sources
+        .map(function (source) {
+          return dedent(cleanClone(source).outerHTML);
+        })
+        .join('\n');
       // textContent, so the markup is displayed rather than parsed.
       code.textContent = serialised;
       summaryText.textContent = 'Hide markup';
