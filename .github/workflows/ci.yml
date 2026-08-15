@@ -92,11 +92,12 @@ jobs:
     runs-on: ubuntu-latest
 
     strategy:
-      # Both engines report. A Chromium failure must not hide a WebKit one, or
-      # the second engine has stopped earning its place in the suite.
+      # Every engine reports. A Chromium failure must not hide a WebKit or a
+      # Gecko one, or the other engines have stopped earning their place in the
+      # suite — which is the entire reason for running more than one.
       fail-fast: false
       matrix:
-        engine: [chromium, webkit]
+        engine: [chromium, webkit, firefox]
 
     steps:
       - uses: actions/checkout@v4

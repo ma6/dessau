@@ -87,5 +87,21 @@ export default defineConfig({
       name: 'webkit',
       use: { ...devices['Desktop Safari'] },
     },
+    /**
+     * Firefox, because two engines out of three is a choice and the missing one was
+     * the only Gecko. Blink and WebKit agree with each other more often than either
+     * agrees with Gecko, so a suite of those two can be entirely green while the
+     * third engine is where `@supports`-gated features, anchor positioning and
+     * `interpolate-size` actually diverge (#22).
+     *
+     * It is the cheapest half of that ticket. The expensive half — somebody opening
+     * eight pages on three engines in both themes and looking — a test run cannot
+     * do, because a layout that is wrong but not broken passes every assertion in
+     * this suite.
+     */
+    {
+      name: 'firefox',
+      use: { ...devices['Desktop Firefox'] },
+    },
   ],
 });

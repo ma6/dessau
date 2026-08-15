@@ -707,10 +707,18 @@ DDS.theme                             // read / set / observe the theme</code></
           </p>
           <p class="dds-text-sm dds-text-subtle dds-mbs-xs">
             That is what <code class="dds-code">tests/</code> is for:
-            <code class="dds-code">npx playwright test</code>, on Chromium and WebKit.
+            <code class="dds-code">npx playwright test</code>, on all three engines.
             WebKit is not optional — it is the engine on every iPhone and iPad, and it is
             where a container query or <code class="dds-code">:has()</code> behaves
-            differently first.
+            differently first. Firefox is not optional either, for the opposite reason:
+            Blink and WebKit agree with each other more often than either agrees with
+            Gecko, so two of them can be green while the third is where a feature behind
+            <code class="dds-code">@supports</code> actually diverges.
+          </p>
+          <p class="dds-text-sm dds-text-subtle dds-mbs-xs">
+            What the suite still cannot do is look at the pages. A layout that is wrong
+            but not broken — a mask clipping a shape badly, an odd rag, something a few
+            pixels off centre — passes every assertion in it.
           </p>
         </div>
       </section>

@@ -34,7 +34,7 @@ gh auth login
 # Playwright — the browser tests. The npm package first, then the browsers,
 # which are a separate ~500 MB download and not part of the package.
 npm install
-npx playwright install chromium webkit
+npx playwright install chromium webkit firefox
 ```
 
 Check it worked:
@@ -57,7 +57,7 @@ them inside the repository instead — useful if a sandbox cannot read your home
 directory:
 
 ```bash
-PLAYWRIGHT_BROWSERS_PATH=.playwright-browsers npx playwright install chromium webkit
+PLAYWRIGHT_BROWSERS_PATH=.playwright-browsers npx playwright install chromium webkit firefox
 ```
 
 `.playwright-browsers/` is git-ignored. Set the same variable when running the
