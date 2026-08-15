@@ -79,6 +79,15 @@ Two things you will not discover on your own, and both fail silently:
   An external <use href="icons.svg#…"> breaks currentColor silently — the icon
   renders, in black, in both themes.
 
+There is a rendered reference. Serve the project and open it when you are unsure
+how a component should behave or what markup it expects:
+
+  python3 -m http.server 8000 --bind 127.0.0.1
+  http://localhost:8000/libs/dessau/reference/
+
+It works from the project root because those pages reach into DDS only by relative
+path. Prefer looking at it over guessing, and copy its markup including the ARIA.
+
 Before you tell me it is done:
   node libs/dessau/scripts/sync-icons.mjs --dir=. --check
   and walk libs/dessau/agent/definition-of-done.md.

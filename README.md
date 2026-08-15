@@ -172,12 +172,27 @@ never reach your product untested. ([Why](agent/architecture.md#distribution-a-p
 # Recommended: a submodule, pinned to a commit
 git submodule add https://github.com/ma6/dessau.git libs/dessau
 
-# Or copy it in. Simpler to start, updates pulled by hand. Fine for a prototype.
-cp -R <dessau>/dds libs/dessau/dds
+# Or copy it in. Updates by hand, and it costs you the three directories below.
+cp -R /path/to/dessau/dds libs/dessau/dds
 ```
 
-Only `dds/` is needed at runtime. `agent/`, `docs/`, `reference/` and `scripts/`
-are for working *on* Dessau and for reading.
+Only `dds/` is needed **at runtime**. That sentence is true and, on its own,
+misleading — three directories are not runtime and are not optional either:
+
+| Directory | Needed for |
+| --- | --- |
+| `agent/` | The `AGENTS.md` you copy into your product opens with *"Read first: `[PATH]/AGENTS.md`, then `[PATH]/agent/index.json`"* |
+| `scripts/` | `sync-icons.mjs`, which inlines the icon sprite — step 3, and in the agent prompt |
+| `reference/` | The rendered proof the same template tells an agent to serve and look at |
+
+So a copied `dds/` leaves your product's own `AGENTS.md` pointing at three things
+that are not there, and nothing announces it — the icon step is the only part that
+fails out loud, with *command not found*.
+
+**For a derived design system, the copy is not a trade-off, it is the wrong tool.**
+There the scripts are your verification, `index.json` is what your own consumers
+query, and the reference is what you fork your own from. Use the submodule.
+([Why](agent/recipes/derive-a-standalone-system.md))
 
 ### 2. The page shell
 
