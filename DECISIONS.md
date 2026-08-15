@@ -1354,7 +1354,16 @@ two is a supported operation rather than a workaround. It is Bootstrap's
 `_variables.scss` substitution without a preprocessor, and — unlike a fork — it
 keeps updates as submodule bumps.
 
-**Why the namespace stays `dds-`.** Renaming per client forks the agent context per
+**Why the namespace stays `dds-`, and the better reason found afterwards.** `dds`
+reads as *derived design system* as readily as it reads as *Dessau Design System*.
+That was not why it was chosen and is not a claim about intent — it was noticed
+after this entry was written — but it is now the stronger of the two arguments. The
+prefix in a client's codebase is then not somebody else's name inherited; it is a
+description of what the thing is, and it is accurate in all five of them at once.
+It also matches the layer chain, which has carried "Derived systems" as its own
+layer since #62: the layer and the prefix are the same word.
+
+The pragmatic argument stands underneath it. Renaming per client forks the agent context per
 client: 957 `dds-` occurrences in `agent/`, 237 in `scripts/`, plus `index.json`,
 every recipe and every check. Five clients would mean five diverging copies of the
 thing that makes Dessau a base rather than a template somebody copied. Two derived
@@ -1364,10 +1373,12 @@ differentiation lived in the values.
 
 **What it costs.**
 
-*Ambiguity in the wild.* A client's developer sees `.dds-card` and cannot search
-for it. The class names carry a namespace whose documentation they do not have, and
-that is the derived system's job to supply — which is why it owes its own
-reference and its own `index.json` rather than pointing at Dessau's.
+*Ambiguity in the wild, and it is smaller than first recorded.* A client's
+developer sees `.dds-card` and cannot search for it — but the prefix at least tells
+them what kind of thing it is, which a name like `acme-` would not. The class names
+still carry a namespace whose documentation they do not have, and supplying that is
+the derived system's job: it owes its own reference and its own `index.json` rather
+than pointing at Dessau's.
 
 *Every gate has to be repointed.* `check-contrast.mjs` and
 `check-accent-separation.mjs` read `dds/css/*` by hardcoded path. A derived system

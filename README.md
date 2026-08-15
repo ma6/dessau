@@ -11,6 +11,11 @@ correctly without rediscovering the rules.
 implementation namespace throughout: `.dds-button`,
 `--dds-color-action-primary`, `data-dds-dialog-open`, `window.DDS`.
 
+It reads the other way too, and that is the useful half: **derived design system.**
+Every system built on Dessau keeps the `dds-` prefix, so in a client's codebase it
+is not somebody else's name inherited — it is a description of what the thing is.
+(DECISIONS 036.)
+
 ```
 Principles → Foundations → Components → Patterns → Derived systems → Products
 ```

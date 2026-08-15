@@ -23,9 +23,11 @@ one per client. It substitutes the foundation rather than overriding it. A produ
 consuming Dessau directly is supported and is the second case, not the first. See
 `agent/architecture.md` → Two kinds of consumer, and DECISIONS 036.
 
-**DDS** (Dessau Design System) is the UI layer inside Dessau. `dds` is the
-implementation namespace everywhere: `.dds-button`, `--dds-color-action-primary`,
-`data-dds-dialog-open`, `window.DDS`.
+**DDS** (Dessau Design System — and, read the other way, **derived design system**)
+is the UI layer inside Dessau. `dds` is the implementation namespace everywhere:
+`.dds-button`, `--dds-color-action-primary`, `data-dds-dialog-open`, `window.DDS`.
+Every derived system keeps the prefix, so both readings stay true wherever it is
+used (DECISIONS 036).
 
 Dessau is deliberately lightweight: semantic HTML, modern CSS, vanilla
 JavaScript, no framework, no build step, no runtime dependencies.
