@@ -171,17 +171,35 @@ function minify(css) {
   );
 }
 
+/**
+ * The attribution banner, prepended to both outputs.
+ *
+ * MIT requires its notice to accompany copies, and a built artefact is the copy
+ * most likely to travel on its own — a product ships `dds.min.css` from its own
+ * pipeline and nothing else from this repository goes with it.
+ *
+ * Prepended AFTER minifying rather than written into the source. The minifier
+ * here strips comments, and it is a deliberately simple one: teaching it to
+ * preserve `/*!` bang comments would be a second rule to get right for a banner
+ * that can simply be added afterwards.
+ */
+const BANNER =
+  '/*! Dessau — DDS. Copyright (c) 2026 Martin Gude — https://martin-gude.com\n' +
+  ' * MIT licensed. Full text: https://github.com/ma6/dessau/blob/main/LICENSE\n' +
+  ' * Icons: Ionicons, Copyright (c) 2015-present Ionic (http://ionic.io/), MIT.\n' +
+  ' * No support, no warranty. See CONTRIBUTING.md. */\n';
+
 const bundled = await inlineImports(ENTRY);
 const minified = minify(bundled);
 
 await mkdir(OUT_DIR, { recursive: true });
-await writeFile(join(OUT_DIR, 'dds.css'), bundled, 'utf8');
-await writeFile(join(OUT_DIR, 'dds.min.css'), minified, 'utf8');
+await writeFile(join(OUT_DIR, 'dds.css'), BANNER + bundled, 'utf8');
+await writeFile(join(OUT_DIR, 'dds.min.css'), BANNER + minified, 'utf8');
 
 const kb = (value) => (value / 1024).toFixed(1) + ' kB';
 
-console.log('Wrote dist/dds.css      ' + kb(Buffer.byteLength(bundled)));
-console.log('Wrote dist/dds.min.css  ' + kb(Buffer.byteLength(minified)));
+console.log('Wrote dist/dds.css      ' + kb(Buffer.byteLength(BANNER + bundled)));
+console.log('Wrote dist/dds.min.css  ' + kb(Buffer.byteLength(BANNER + minified)));
 console.log(
   '\nBoth are optional. Linking dds/dds.css directly is fully supported; ' +
     'dist/ is git-ignored so a stale artefact can never be mistaken for the source.'
