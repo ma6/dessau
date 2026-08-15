@@ -208,7 +208,7 @@ platform does not provide.
 | `js/dds.js` | **Required by all the others.** `register` / `enhance` / `announce` / `theme` |
 | `js/format.js` | `DDS.format` — numbers, dates, currency, file sizes |
 | `js/components.js` | Dialog opener, tabs, `DDS.toast()`, copy-to-clipboard |
-| `js/components-forms.js` | Number stepper, file upload, character count |
+| `js/components-forms.js` | Number stepper, file upload, character count, password reveal |
 | `js/components-navigation.js` | Header disclosure, table of contents |
 | `js/components-content.js` | Lightbox, consent embed |
 | `js/patterns/combobox.js` | Autocomplete |
@@ -217,7 +217,7 @@ platform does not provide.
 | `js/patterns/conditional-fields.js` | Fields revealed by an earlier answer |
 | `js/patterns/wizard.js` | Multi-step form |
 | `js/patterns/derived-output.js` | A read-only value resolved from input |
-| `js/patterns/auth.js` | Password reveal toggle |
+| `js/patterns/auth.js` | Confirming a new password against its repeat |
 
 All `defer`, all in that order. Adding markup later? `DDS.enhance(element)` — that
 is the whole integration for dynamic content.

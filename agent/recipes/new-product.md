@@ -121,5 +121,36 @@ will invent a second button style, use raw hex values and write its own ARIA.
 - `python3 -m http.server` and check **both themes**.
 - Keyboard only, mouse unplugged.
 - 320px wide and 400% zoom.
-- A screen-reader pass over one complete flow.
+- A screen-reader pass over one complete flow —
+  `docs/screenreader-walkthrough.md` is the script.
 - Walk `agent/definition-of-done.md`.
+
+---
+
+## How far this recipe has actually been tested
+
+Stated because "these instructions have never been executed" was true for long
+enough to be worth never letting be true silently again (#5).
+
+**Executed.** Steps 1 to 3, literally, in an empty repository, by somebody
+following the text and filling nothing in from memory. That found one defect —
+`sync-icons.mjs --dir=.` descending into the vendored copy of Dessau and
+rewriting its reference pages — and three missing steps, all now in the text
+above.
+
+**Gated.** `node scripts/check-adoption.mjs` verifies the mechanical half on
+every run: every repository path this file and `README.md` name exists, and the
+README's behaviour table agrees with `dds/js/` in both directions. It was written
+because a table row had quietly stopped being true — `patterns/auth.js` was
+documented as the password reveal long after the reveal moved to
+`components-forms.js`.
+
+**Not tested.** Whether the steps read correctly to somebody meeting Dessau for
+the first time, and whether their order makes sense before you know what any of
+it is for. Steps 4 to 7 have been read for accuracy but not executed end to end.
+A check can tell you the recipe points at things that exist; it cannot tell you
+the recipe is followable.
+
+The honest test for that is one real product, built by somebody who did not write
+this. Nothing here substitutes for it — see `ISSUES-TO-CREATE.md` item 11, which
+calls it the highest-value item on the list and is right.
