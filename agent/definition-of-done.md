@@ -65,9 +65,13 @@ not apply, it does not apply — but say so rather than skipping silently.
       depends on the device.
 - [ ] A `-frame` layer exists where a container query needs one.
 - [ ] Checked at every stop on the width switcher (`data-ref-bp`).
-- [ ] Works at **320px** with no horizontal page scroll, and at **400% zoom**.
+- [ ] Works at **320px** with no horizontal page scroll, and at **400% zoom** —
+      asserted by `npx playwright test tests/viewport.spec.mjs`, which measures
+      every reference page at 320, 390, 412 and 834 and names what is over the
+      edge. Run it rather than judging by eye: the element that sets the width is
+      usually nowhere near the section that looks wrong.
 - [ ] Any reorder is bound inside the query it is meant for.
-- [ ] Touch targets ≥ 24px at the narrowest width.
+- [ ] Touch targets ≥ 24px at the narrowest width — the same spec asserts it.
 - [ ] A `.ref-note` on the reference page describes the width-dependent
       behaviour.
 

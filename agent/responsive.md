@@ -325,6 +325,23 @@ this file.
 9. **On a second engine**, if anything on the page uses `content-visibility` —
    size estimates differ per engine, and so does everything that depends on them.
 
+Points 1 and 8 are measured rather than judged:
+
+```bash
+npx playwright test tests/viewport.spec.mjs
+```
+
+It loads every reference page at 320, 390, 412 and 834, fails when the document
+is wider than the viewport, and **names the outermost elements that are over the
+edge** — because "the page is 812px too wide" is a true statement nobody can act
+on, and the element responsible is usually nowhere near the section that looks
+wrong. It asserts the 24px minimum target size at 320 as well.
+
+Anything inside a scroll or clip container is exempt, so a table scrolling in its
+own region is the documented exception rather than a finding.
+
+The rest still needs eyes:
+
 ```bash
 python3 -m http.server 8000 --bind 127.0.0.1
 # http://localhost:8000/reference/navigation.html
