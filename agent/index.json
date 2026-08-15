@@ -94,7 +94,7 @@
       ],
       "css": "dds/css/components-navigation.css",
       "spec": "## Sticky action bar — `.dds-actionbar`",
-      "reference": "reference/navigation.html#toolbar",
+      "reference": "reference/navigation.html#actionbar",
       "accessibility": "safe-area-inset-bottom; .dds-actionbar-host reserves scroll space (WCAG 2.4.11)."
     },
     {
@@ -109,7 +109,7 @@
       ],
       "css": "dds/css/components-navigation.css",
       "spec": "## App navigation — `.dds-appnav`",
-      "reference": "reference/navigation.html#contentnav",
+      "reference": "reference/navigation.html#appnav",
       "accessibility": "aria-current=\"page\" on the current area, carried by a leading rail in the action colour. The fill and the heavier weight support it and cannot replace it: the fill measures 1.01:1 against the surface behind it in dark mode, so an edge is what survives greyscale and forced colours (#33). Icons are aria-hidden; the visible label carries the meaning. Items are 2.75rem tall for WCAG 2.5.8 Target Size."
     },
     {
@@ -124,7 +124,7 @@
       ],
       "css": "dds/css/components-content.css",
       "spec": "## Gallery — `.dds-gallery` · Avatar — `.dds-avatar`",
-      "reference": "reference/content.html#media",
+      "reference": "reference/content.html#avatar",
       "accessibility": "Initials are aria-hidden; the name goes in real text."
     },
     {
@@ -160,7 +160,7 @@
       ],
       "css": "dds/css/components-navigation.css",
       "spec": "## Alert banner — `.dds-banner`",
-      "reference": "reference/navigation.html#topbar",
+      "reference": "reference/navigation.html#banner",
       "accessibility": "Only one at a time. No role when present at load; role=status or alert only when it appears."
     },
     {
@@ -209,7 +209,7 @@
       ],
       "css": "dds/css/components-content.css",
       "spec": "## Byline — `.dds-byline`",
-      "reference": "reference/content.html#media",
+      "reference": "reference/content.html#byline",
       "accessibility": "Avatar aria-hidden, name real text. A contact link names whom it reaches."
     },
     {
@@ -337,7 +337,7 @@
       ],
       "css": "dds/css/components-content.css",
       "spec": "## Call to action — `.dds-cta`",
-      "reference": "reference/content.html#promotion"
+      "reference": "reference/content.html#cta"
     },
     {
       "name": "datalist",
@@ -352,7 +352,7 @@
       ],
       "css": "dds/css/components-content.css",
       "spec": "## Key-value list — `.dds-keyvalue` · Data list — `.dds-datalist`",
-      "reference": "reference/content.html#lists"
+      "reference": "reference/content.html#datalist"
     },
     {
       "name": "date-field",
@@ -443,7 +443,7 @@
       ],
       "css": "dds/css/components-content.css",
       "spec": "## Download — `.dds-download`",
-      "reference": "reference/content.html#lists",
+      "reference": "reference/content.html#download",
       "accessibility": "Format and size in the visible text, not a title."
     },
     {
@@ -478,7 +478,7 @@
       ],
       "css": "dds/css/components-content.css",
       "spec": "## Facts — `.dds-facts`",
-      "reference": "reference/content.html#promotion",
+      "reference": "reference/content.html#facts",
       "native": "dl",
       "accessibility": "A real dl, so each figure is paired with its label."
     },
@@ -535,17 +535,28 @@
       "purpose": "An image with a caption.",
       "notFor": "A decorative image with no caption.",
       "classes": [
-        ".dds-figure",
+        ".dds-figure"
+      ],
+      "css": "dds/css/components-content.css",
+      "spec": "## Figure — `.dds-figure`",
+      "reference": "reference/content.html#figure",
+      "native": "figure",
+      "accessibility": "alt replaces, caption supplements. Never interchangeable."
+    },
+    {
+      "name": "textmedia",
+      "purpose": "A block of text beside an image.",
+      "notFor": "A layout grid — it is one content block, not a page skeleton.",
+      "classes": [
         ".dds-textmedia",
         ".dds-textmedia-frame",
         ".dds-textmedia-media",
         ".dds-textmedia-media-end"
       ],
       "css": "dds/css/components-content.css",
-      "spec": "## Figure — `.dds-figure` · Text-media — `.dds-textmedia`",
-      "reference": "reference/content.html#figure",
-      "native": "figure",
-      "accessibility": "alt replaces, caption supplements. Never interchangeable."
+      "spec": "## Text-media — `.dds-textmedia`",
+      "reference": "reference/content.html#textmedia",
+      "accessibility": "The column swap is bound inside the container query, so the stacked reading order is not reversed (WCAG 1.3.2)."
     },
     {
       "name": "filterbar",
@@ -558,7 +569,7 @@
       ],
       "css": "dds/css/components-navigation.css",
       "spec": "## Filter bar — `.dds-filterbar` · Toolbar — `.dds-toolbar`",
-      "reference": "reference/navigation.html#toolbar",
+      "reference": "reference/navigation.html#filterbar",
       "accessibility": "Applied filters must be visible as removable chips."
     },
     {
@@ -570,7 +581,7 @@
       ],
       "css": "dds/css/components-content.css",
       "spec": "## Gallery — `.dds-gallery` · Avatar — `.dds-avatar`",
-      "reference": "reference/content.html#lightbox"
+      "reference": "reference/content.html#gallery"
     },
     {
       "name": "icon",
@@ -613,7 +624,7 @@
       ],
       "css": "dds/css/components-content.css",
       "spec": "## Key-value list — `.dds-keyvalue` · Data list — `.dds-datalist`",
-      "reference": "reference/content.html#lists",
+      "reference": "reference/content.html#keyvalue",
       "native": "dl"
     },
     {
@@ -725,7 +736,7 @@
       ],
       "css": "dds/css/components-navigation.css",
       "spec": "## Pagination — `.dds-pagination`",
-      "reference": "reference/navigation.html#breadcrumb",
+      "reference": "reference/navigation.html#pagination",
       "accessibility": "Real links with hrefs. Names say where they go. aria-current=page."
     },
     {
@@ -751,7 +762,7 @@
       ],
       "css": "dds/css/components-content.css",
       "spec": "## Progress ring — `.dds-progress-ring`",
-      "reference": "reference/content.html#chart",
+      "reference": "reference/content.html#progress-ring",
       "accessibility": "aria-hidden. The value goes on a real <progress> or in text beside it."
     },
     {
@@ -871,7 +882,7 @@
       ],
       "css": "dds/css/components-content.css",
       "spec": "## Specs list — `.dds-specs`",
-      "reference": "reference/content.html#lists",
+      "reference": "reference/content.html#specs",
       "native": "dl",
       "accessibility": "A real dl. The leader dots are generated content, so they are not read aloud."
     },
@@ -982,7 +993,7 @@
       ],
       "css": "dds/css/components-content.css",
       "spec": "## Teaser — `.dds-teaser`",
-      "reference": "reference/content.html#promotion",
+      "reference": "reference/content.html#teaser",
       "accessibility": "Link wraps the heading text; the card grows the hit area."
     },
     {

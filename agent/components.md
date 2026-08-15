@@ -1024,17 +1024,30 @@ buttons are all "Remove" are six identical controls.
 
 `.dds-chip-toggle` is a selectable variant on a checkbox.
 
-## Figure — `.dds-figure` · Text-media — `.dds-textmedia`
+## Figure — `.dds-figure`
+
+**For:** an image with a caption.
 
 `alt` replaces the image for someone who cannot see it; a caption is supplementary
 information everyone gets. **They are not interchangeable** — repeating one as the
 other means the same sentence is announced twice. A decorative image takes
 `alt=""` and may still have a caption.
 
-`.dds-textmedia` needs `.dds-textmedia-frame` around it. The `order` that swaps
-the columns is bound **inside** the container query: applied unconditionally it
-would also reverse the stacked order, putting a caption before what it captions
-(WCAG 1.3.2).
+---
+
+## Text-media — `.dds-textmedia`
+
+**For:** a block of text beside an image — the recurring content block of a page
+built in a CMS.
+
+Needs `.dds-textmedia-frame` around it: a container query cannot style the element
+that establishes the container, so the frame carries `container-type` and the
+inner element carries the layout.
+
+The `order` that swaps the columns is bound **inside** the container query.
+Applied unconditionally it also reverses the stacked order at narrow widths,
+putting a caption before what it captions (WCAG 1.3.2) — a failure that is
+invisible on a desktop.
 
 ## Charts — `.dds-chart`, `.dds-donut`
 
