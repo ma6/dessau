@@ -41,7 +41,13 @@ npm-debug.log*
 .env
 .env.*
 !.env.example
+# An agent's own working state, not the project's configuration. `.claude/`
+# itself stays trackable, so project-level settings, agents and commands can be
+# committed deliberately if they are ever wanted — it is the scratch space
+# underneath that must not be.
 .claude/settings.local.json
+/.claude/plans/
+/.claude/worktrees/
 
 # ---------------------------------------------------------------------------
 # The modern-web-guidance skill
