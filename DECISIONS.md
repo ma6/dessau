@@ -982,3 +982,52 @@ depending on the theme, and one of them undocumented.
 than at one, that the warmth was worth more than the neutrality. It would then be
 warm at the light end only, with the dark end explicitly exempted — and written
 down here, not in a comment.
+
+---
+
+## 032 — Work happens on `main`; a branch is for risk, not for tickets
+
+**Decision.** A ticket is implemented in a series of commits on `main`. There is
+no branch per ticket and no pull request as a matter of course.
+
+A branch is the right tool in three cases, and they are the only ones:
+
+1. **Genuine parallelism** — two or more agents working at the same time, each in
+   its own worktree. Here isolation solves a real problem, because the writes
+   really are concurrent.
+2. **Something that may be thrown away** — a large refactor or a spike whose
+   outcome is uncertain. The branch is an undo, not a process.
+3. **Something that needs to be seen before it lands** — a change wanting CI, or
+   a second pair of eyes that actually exists.
+
+**Why.** Branching does not avoid merge conflicts here; it defers them. A
+conflict requires two changes to the same lines that did not see each other.
+Dessau is maintained by one person working sequentially, so there is nothing for
+a branch to be isolated *from* — the isolation is real but the concurrency it
+protects against never happens.
+
+In a design system it is worse than merely redundant. The conflict surface is not
+spread across the tree, it is concentrated in a few files that almost every
+ticket touches: `dds/css/semantic.css`, `dds/css/primitives.css`,
+`agent/index.json`, and this file. Three tickets developed in parallel branches
+would all edit the semantic layer and would *manufacture* conflicts that linear
+work never produces.
+
+The second cost is the one that matters more. Verification here is global, not
+local: `check-contrast.mjs` walks every pair in both themes, and a token change
+is only meaningful against the whole system. Each branch passes on its own; what
+ships is the union, which nothing has checked. Splitting the work splits the
+evidence, and the evidence is the point.
+
+**Cost.** `main` is never a clean slate mid-ticket, so an abandoned change is
+reverted rather than discarded, and a half-finished ticket is visible in the
+history. Both are acceptable at this scale, and case 2 above is the escape hatch
+for when a change is large enough that they are not.
+
+**Consequence for agents.** Do not create a branch to "be safe". Commit small,
+run the scripts, and leave the history linear and readable. See principle 13 —
+this entry is the reasoning that principle states in one line.
+
+**Reversal condition.** A second regular contributor, or parallel agent runs
+becoming the normal way of working rather than the exception. Either would make
+the concurrency real, and case 1 would stop being a special case.

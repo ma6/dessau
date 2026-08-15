@@ -166,7 +166,9 @@ mandatory pull request, no release gate, no approval board, no simulated team
 roles.
 
 Optimise for quality, not for the appearance of governance. Branches and pull
-requests are tools for risky changes, not ceremony.
+requests are tools for risky changes, not ceremony — work happens on `main`, and
+`DECISIONS.md` 032 records the three cases where a branch is nonetheless the right
+tool, and why branching would not prevent conflicts here anyway.
 
 ---
 
