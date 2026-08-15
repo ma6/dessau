@@ -154,6 +154,10 @@ for (const relativePath of files) {
 
 /* --- file contents --------------------------------------------------------- */
 
+/** Every line the working tree currently holds, so the history pass below can tell
+    "this used to say X" from "this still says X and was already reported". */
+const currentLines = new Set();
+
 for (const relativePath of files) {
   let source;
   try {
@@ -163,6 +167,7 @@ for (const relativePath of files) {
   }
 
   const lines = source.split('\n');
+  for (const line of lines) currentLines.add(line.trim());
 
   for (const entry of TERMS) {
     const pattern = matcher(entry);
@@ -261,6 +266,105 @@ for (const commit of commits) {
         term: entry.term,
         text: line.trim().slice(0, 120),
       });
+    });
+  }
+}
+
+/* --- 3. historical file contents ------------------------------------------- */
+
+/**
+ * What a file USED to say, which is the half this audit did not cover.
+ *
+ * The two halves had different reach and the weaker one was the half that matters
+ * when a repository is made public:
+ *
+ *   commit messages   git log --all              the whole history
+ *   file contents     git ls-files               the current working tree only
+ *
+ * A term that sat in a file at some commit and was later removed is still in the
+ * history, still readable by anybody with a clone, and was invisible here. While
+ * the repository is private that is theoretical. On the day it goes public it is
+ * the only thing standing between "clean today" and "safe to publish" — and by
+ * then it is unfixable without rewriting history.
+ *
+ * Added lines across every diff, rather than every blob in every tree. Anything
+ * that ever entered a file entered as an addition somewhere, including in the
+ * initial commit, so this sees it once instead of once per commit it survived.
+ * `--unified=0` drops context lines, which would otherwise report the same
+ * surviving line again for every commit that happened to touch its neighbours.
+ *
+ * What it does not see: content inside binary files, which git does not diff as
+ * text. Nothing in this repository is binary except the reference site's fonts and
+ * images, and a term hidden in one of those is not the failure mode this guards
+ * against.
+ */
+async function historicalAdditions() {
+  try {
+    const { stdout } = await run(
+      'git',
+      ['-C', ROOT, 'log', '--all', '-p', '--unified=0', '--format=%x1e%H'],
+      { maxBuffer: 256 * 1024 * 1024 }
+    );
+
+    const records = [];
+
+    for (const chunk of stdout.split('\x1e')) {
+      if (!chunk.trim()) continue;
+      const newline = chunk.indexOf('\n');
+      const hash = (newline === -1 ? chunk : chunk.slice(0, newline)).trim().slice(0, 9);
+      let path = '';
+
+      for (const line of chunk.slice(newline + 1).split('\n')) {
+        if (line.startsWith('+++ b/')) {
+          path = line.slice('+++ b/'.length);
+          continue;
+        }
+        /* `+++` is a header, not an addition. Everything else starting with a
+           single `+` is a line that entered the repository. */
+        if (line.startsWith('+') && !line.startsWith('+++')) {
+          records.push({ hash, path, text: line.slice(1) });
+        }
+      }
+    }
+
+    return records;
+  } catch (error) {
+    console.error('\nCannot run: reading the history diffs failed.\n');
+    console.error('  ' + error.message);
+    console.error('\nPast file contents are in scope, so an audit that cannot read');
+    console.error('them has not checked what it claims to check.\n');
+    process.exit(1);
+  }
+}
+
+const additions = await historicalAdditions();
+
+/* Only what is no longer present. A term on a line the working tree still holds
+   was already reported by the pass above, and reporting it again with a commit
+   hash attached would bury the findings that are visible only here. */
+for (const addition of additions) {
+  /* The same exclusions as the working-tree pass. This script and the example term
+     list contain the terms by definition, and they contained them in every earlier
+     revision too — without this, the audit reports itself, loudly, and buries the
+     findings that matter. */
+  if (EXCLUDE_FILES.has(addition.path)) continue;
+  if (BINARY.test(addition.path)) continue;
+
+  for (const entry of TERMS) {
+    if (!matcher(entry).test(addition.text)) continue;
+    if (currentLines.has(addition.text.trim())) continue;
+
+    const key = 'history:' + entry.term;
+    if (ALLOWED.has(key)) {
+      allowed.push({ file: `history ${addition.hash}`, line: 0, term: entry.term });
+      continue;
+    }
+
+    findings.push({
+      file: `${addition.path} @ ${addition.hash} (removed since)`,
+      line: 0,
+      term: entry.term,
+      text: addition.text.trim().slice(0, 120),
     });
   }
 }

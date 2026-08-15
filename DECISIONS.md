@@ -1329,7 +1329,14 @@ client-ds/
   dist/client-ds.css  one file, one value per token, no Dessau at runtime
 ```
 
-The `dds-` namespace stays. Products remain a supported consumer, one level
+The `dds-` **implementation namespace** stays — and that is the only thing a
+derived system inherits about its identity. **Its name, its brand, its logo, its
+voice and its whole visual identity are its own.** 024 already put brand assets
+outside `dds/` and kept the mark out of the icon sprite for precisely this reason:
+"a white-labelling product would have to remember to strip it." Nothing about
+`.dds-button` obliges a system to be called Dessau, or to look like it.
+
+Products remain a supported consumer, one level
 further down.
 
 **Why substitution rather than overriding.** A derived system cannot ship "Dessau

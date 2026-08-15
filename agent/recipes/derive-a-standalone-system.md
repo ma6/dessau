@@ -15,6 +15,13 @@ The six decisions come first and this is the plumbing under them. Read
 `derive-a-design-system.md` for *what* the values are; this file is *where they go*
 when the answer has to stand alone.
 
+**Your system's name, brand and identity are yours.** The only thing inherited is
+the `dds-` implementation namespace — class names and custom properties — and that
+is a maintenance decision about not forking the agent context per client, nothing
+more (DECISIONS 036). Dessau ships no brand: 024 keeps the mark and the logo out of
+`dds/` and out of the icon sprite precisely so a derived system has nothing to
+strip. Call it what you like and make it look like whatever it is.
+
 ## 0. Substitution, not overriding
 
 A product overrides: it loads Dessau and puts its own unlayered stylesheet on top.
