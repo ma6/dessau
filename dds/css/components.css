@@ -1655,7 +1655,10 @@
      centred by the rule above. */
   @supports (anchor-name: --dds-probe) and (position-anchor: auto) {
     .dds-tooltip {
-      position: absolute;
+      /* `position` stays `fixed` from the rule above — see `.dds-menu` for why
+         `absolute` makes an engine judge overflow against a containing block at
+         the document origin, and flip at the wrong moments (#54). */
+
       /* Release the centring insets before anchoring one edge: an
          over-constrained box drops the anchored edge and keeps the zero. */
       inset: auto;

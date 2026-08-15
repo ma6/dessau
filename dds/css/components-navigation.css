@@ -670,7 +670,17 @@
      that the menu is on screen and readable instead of wedged into the corner. */
   @supports (anchor-name: --dds-probe) and (position-anchor: auto) {
     .dds-menu {
-      position: absolute;
+      /* `position` stays `fixed` from the rule above, and that is a decision
+         rather than an omission (#54). An absolutely positioned element in the top
+         layer takes the initial containing block — which is anchored at the
+         DOCUMENT origin, not at the viewport. Engines then judge "does this
+         overflow" against a box that is scrolled away from what the reader can
+         see, and `position-try-fallbacks` fires at the wrong moments: measured on
+         a scrolled page, WebKit flipped the menu above its button with 400px of
+         visible room below it, and Chromium declined to flip with the menu hanging
+         117px off the bottom of the screen. A fixed element's containing block is
+         the viewport, so the overflow question is asked about the space the reader
+         actually has. */
       inset: auto;
       margin: 0;
 
