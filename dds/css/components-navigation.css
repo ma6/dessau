@@ -1061,6 +1061,13 @@
     margin: calc(-1 * var(--dds-space-md)) calc(-1 * var(--dds-space-md)) 0;
     padding: var(--dds-space-md) var(--dds-space-md) var(--dds-space-sm);
     background-color: var(--dds-color-surface-raised);
+
+    /* The edge the clipping happens at. Without it a group title scrolling
+       under the header is a row of half-height letters ending in mid-air, which
+       reads as a rendering fault rather than as content passing behind a bar.
+       The line is what makes it legible as a bar — the same reason the groups
+       below separate with one. */
+    border-block-end: var(--dds-border-thin) solid var(--dds-color-border-subtle);
   }
 
   .dds-contentnav-title {
@@ -1216,6 +1223,8 @@
       margin: 0 0 var(--dds-space-sm);
       padding: 0;
       background-color: transparent;
+      /* Nothing scrolls under it here, so the edge has nothing to explain. */
+      border-block-end: 0;
     }
   }
 
