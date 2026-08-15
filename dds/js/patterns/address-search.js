@@ -80,8 +80,23 @@
     minLength: 3,
     debounceMs: 250,
     maxResults: 20,
-    messages: {
-      /** @param {object} address */
+  };
+
+  /**
+   * Address-search wording, per language.
+   *
+   * The three failure messages all end with what to do instead — type it into
+   * the fields below — and that clause is the whole value of them. A search that
+   * says only "unavailable" leaves the user believing the form is broken, when
+   * every field they need is right there and works.
+   *
+   * `filled` builds the confirmation from the address itself, so the parts come
+   * from the provider and only the sentence around them is translated. The
+   * comma-and-space between the parts stays as it is: it is punctuation both
+   * languages share, and pulling it into the table would suggest it varies.
+   */
+  var WORDING = {
+    en: {
       filled: function (address) {
         return (
           'Address filled in: ' +
@@ -92,6 +107,18 @@
       noResults: 'No matching address found. You can type the address in the fields below.',
       error: 'Address search is unavailable. Please type the address in the fields below.',
       minLength: 'Type at least 3 characters to search for an address',
+    },
+    de: {
+      filled: function (address) {
+        return (
+          'Adresse übernommen: ' +
+          [address.streetLine, address.postalCode, address.locality].filter(Boolean).join(', ') +
+          '. Alle Felder lassen sich weiter bearbeiten.'
+        );
+      },
+      noResults: 'Keine passende Adresse gefunden. Sie können die Adresse unten eintragen.',
+      error: 'Die Adresssuche ist nicht verfügbar. Bitte tragen Sie die Adresse unten ein.',
+      minLength: 'Mindestens 3 Zeichen eingeben, um nach einer Adresse zu suchen',
     },
   };
 
@@ -120,7 +147,8 @@
    */
   function createAddressSearch(root, options) {
     var config = Object.assign({}, DEFAULTS, options);
-    config.messages = Object.assign({}, DEFAULTS.messages, (options || {}).messages);
+    // Language first, the product's own overrides on top. See combobox.js.
+    config.messages = Object.assign({}, DDS.utils.wording(root, WORDING), (options || {}).messages);
 
     var comboboxRoot = root.querySelector('[data-dds-address-combobox]');
     var searchField = root.querySelector('[data-dds-address-search-field]');

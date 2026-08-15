@@ -58,19 +58,58 @@
     maxResults: 20,
     /** Highlight the matched substring in each option. */
     highlightMatch: true,
-    messages: {
+  };
+
+  /**
+   * Combobox wording, per language.
+   *
+   * This used to be `DEFAULTS.messages`, one set of English strings. It is now
+   * one set per language, chosen from the nearest `[lang]` when the combobox is
+   * created — and a `messages` option still overrides any of it, per instance,
+   * which is what a product with its own voice needs.
+   *
+   * `resultCount` is the one that could not stay as it was. It counted with
+   * `count === 1 ? … : …`, which is English's rule written as if it were
+   * arithmetic. `DDS.utils.plural` asks the language instead.
+   *
+   * Every entry carries its whole sentence, including the keyboard instructions
+   * after the count. Those are the part a user actually needs — a bare "5
+   * suggestions" tells somebody who cannot see the list nothing about how to
+   * reach it — and they are also the part most likely to be left in English by
+   * a translation that only looked at the noun.
+   */
+  var WORDING = {
+    en: {
       loading: 'Searching…',
       noResults: 'No matches found',
       error: 'Search is unavailable. You can still type the value yourself.',
       minLength: 'Keep typing to see suggestions',
-      /** @param {number} count */
-      resultCount: function (count) {
-        return count === 1
-          ? '1 suggestion. Use the up and down arrow keys to review, Enter to choose.'
-          : count + ' suggestions. Use the up and down arrow keys to review, Enter to choose.';
+      cleared: 'Search field cleared',
+      counts: {
+        one: '1 suggestion. Use the up and down arrow keys to review, Enter to choose.',
+        other: '{n} suggestions. Use the up and down arrow keys to review, Enter to choose.',
       },
       truncated: function (shown, total) {
-        return 'Showing the first ' + shown + ' of ' + total + ' matches. Keep typing to narrow them down.';
+        return (
+          'Showing the first ' + shown + ' of ' + total + ' matches. Keep typing to narrow them down.'
+        );
+      },
+    },
+    de: {
+      loading: 'Wird gesucht …',
+      noResults: 'Keine Treffer',
+      error: 'Die Suche ist nicht verfügbar. Sie können den Wert selbst eintragen.',
+      minLength: 'Weiter tippen für Vorschläge',
+      cleared: 'Suchfeld geleert',
+      counts: {
+        one: '1 Vorschlag. Mit den Pfeiltasten nach oben und unten durchgehen, mit der Eingabetaste auswählen.',
+        other:
+          '{n} Vorschläge. Mit den Pfeiltasten nach oben und unten durchgehen, mit der Eingabetaste auswählen.',
+      },
+      truncated: function (shown, total) {
+        return (
+          'Die ersten ' + shown + ' von ' + total + ' Treffern. Weiter tippen, um sie einzugrenzen.'
+        );
       },
     },
   };
@@ -88,7 +127,11 @@
    */
   function createCombobox(root, options) {
     var config = Object.assign({}, DEFAULTS, options);
-    config.messages = Object.assign({}, DEFAULTS.messages, (options || {}).messages);
+    /* Language first, then the product's overrides on top. Resolved once, at
+       creation: the `lang` of a region does not change under a live component,
+       and re-reading it per announcement would only invite it to disagree with
+       itself mid-interaction. */
+    config.messages = Object.assign({}, DDS.utils.wording(root, WORDING), (options || {}).messages);
 
     var input = root.querySelector('input');
     var list = root.querySelector('[role="listbox"]');
@@ -292,10 +335,18 @@
       setActive(-1);
       open();
 
+      /**
+       * `resultCount` was a documented option and takes a count, so a product
+       * that supplied one keeps winning — the option contract does not get to
+       * break because the default behind it improved. Without an override the
+       * count goes through the language's own plural rules.
+       */
+      var counted = config.messages.resultCount
+        ? config.messages.resultCount(items.length)
+        : DDS.utils.plural(root, items.length, config.messages.counts);
+
       announceResults(
-        total > items.length
-          ? config.messages.truncated(items.length, total)
-          : config.messages.resultCount(items.length)
+        total > items.length ? config.messages.truncated(items.length, total) : counted
       );
     }
 
@@ -444,7 +495,7 @@
             items = [];
             list.replaceChildren();
             if (typeof config.onClear === 'function') config.onClear();
-            DDS.announce('Search field cleared');
+            DDS.announce(config.messages.cleared);
           }
           break;
 
