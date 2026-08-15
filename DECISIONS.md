@@ -1441,3 +1441,62 @@ this entry and are not any more.
 checked against one. It is derived from how the system is built rather than from
 experience of maintaining several, and the first real derived system is what will
 show which line is in the wrong place.
+
+---
+
+## 038 — MIT, and no support
+
+**Decision.** Dessau is MIT licensed, `Copyright (c) 2026 Martin Gude`. One licence
+for the whole repository. `CONTRIBUTING.md` states plainly that there is no
+support, that the issues are the maintainer's own working notes, and that pull
+requests are not being accepted.
+
+**Why MIT.** It is the intent stated in legal form: anybody may use, change, ship
+and sell, provided the copyright and permission notice travel with copies, with
+warranty and liability disclaimed in full. It is what the design systems this one
+is modelled against use, and it is already the licence of the Ionicons material
+inside `dds/`.
+
+**Why one licence and not two.** A split — MIT for the code, CC BY 4.0 for the
+prose in `agent/` and `docs/` — was drafted and dropped. It would mean explaining
+which file falls under which, forever, in a repository whose whole argument is that
+a second copy of anything eventually becomes a wrong copy. Creative Commons also
+advises against CC licences for software, and this is CSS, JavaScript and Node
+scripts with prose alongside rather than the reverse.
+
+**Why not ShareAlike.** It was the first instinct and it would have been expensive.
+A derived design system incorporates ten of Dessau's twelve CSS imports into what
+it ships, which makes it an adaptation rather than a use. Under BY-SA the client's
+own design system would have to be copyleft — negotiable in every engagement, and
+usually not the thing a client commissioning a bespoke system expects to hear. MIT
+lets a derived system carry the notice and license itself however it likes, which
+is the arrangement 036 assumes.
+
+**"No support" is not a licence term**, and the distinction is worth keeping
+straight. There is no support obligation to disclaim; a licence disclaims warranty
+and liability, which MIT does. What is being declined is a *relationship*, and that
+belongs in prose where a person will read it rather than in a legal text they will
+not.
+
+The reason it is declined at all: the documentation burden of open source is
+already paid here — the agent context, the recipes, the reversal conditions, the
+"how far this has actually been executed" sections — because agents need it. What
+open source would newly add is triage, response expectations, and a compatibility
+promise to consumers who cannot be telephoned. 037's contract binds this repository
+to a handful of derived systems it controls; extending it to strangers is a
+different and unbounded commitment.
+
+**`"private": true` stays in `package.json`**, alongside `"license": "MIT"`. It is
+not a statement about openness — it prevents an accidental `npm publish`, and
+Dessau is consumed as a submodule rather than a package. The two fields answer
+different questions and both answers are deliberate.
+
+**What it costs.** MIT gives away the right to do anything with this, including
+compete with it, without asking. That is the trade for the reputational value of it
+being visible and usable, and it is a trade rather than an oversight.
+
+**Reversal condition.** MIT is not practically reversible for what has already been
+published — anybody who has a copy keeps their rights to it. What can change is the
+licence on future work. A reason to consider that would be Dessau becoming
+commercially load-bearing in a way that a permissive licence undermines; wanting
+peace and quiet is not one, because that is what `CONTRIBUTING.md` is for.

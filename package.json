@@ -1,8 +1,9 @@
 {
   "name": "dessau",
   "version": "0.1.0",
+  "license": "MIT",
   "private": true,
-  "description": "Foundations for digital products. The DDS design system, its reference, and structured context for coding agents.",
+  "description": "A base for design systems, and for the products built on them. The DDS design system, its reference, and structured context for coding agents.",
   "type": "module",
   "engines": {
     "node": ">=20"

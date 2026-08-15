@@ -220,6 +220,21 @@ formats default to German. See [`agent/ux-writing.md`](agent/ux-writing.md).
 
 ---
 
+## Licence, and what is not offered
+
+**MIT** — [`LICENSE`](LICENSE). Use it, change it, ship it, sell what you build with
+it; keep the notice and you are done.
+
+**No support, no contributions, no compatibility promise** to anybody not paying
+for one. The issues here are the maintainer's own working notes rather than a
+queue, and pull requests are not being accepted — see
+[`CONTRIBUTING.md`](CONTRIBUTING.md) for why that is a maintenance decision rather
+than an unfriendly one. Forking is the intended answer, and
+[`agent/recipes/derive-a-standalone-system.md`](agent/recipes/derive-a-standalone-system.md)
+is written for it.
+
+---
+
 ## Third-party material
 
 | What | Licence |
