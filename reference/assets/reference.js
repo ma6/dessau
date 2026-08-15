@@ -491,7 +491,59 @@
     window.addEventListener('load', run, { once: true });
   }
 
+  /* =========================================================================
+     The header knows whether the page has been scrolled
+
+     Sets `data-ref-scrolled` on `.ref-header` once the page has moved off the
+     top; the stylesheet uses it to take the logo down to its reading size.
+
+     A scroll listener rather than an IntersectionObserver on a sentinel, because
+     the sentinel would have to be added to nine pages to answer a question the
+     scroll position answers directly. It is `passive`, and it does no work of
+     its own — it schedules one attribute write per frame at most, which is the
+     part that matters.
+
+     The threshold is a few pixels rather than zero so that overscroll bounce and
+     a browser restoring a scroll position of 1 do not flicker the logo.
+
+     Run once at startup as well: arriving on a `#fragment`, or reloading
+     halfway down a page, both start scrolled, and a logo that begins large and
+     animates down on a page nobody has scrolled yet is worse than no animation.
+     ========================================================================= */
+  function wireHeaderScrollState() {
+    var header = document.querySelector('.ref-header');
+    if (!header) return;
+
+    var pending = false;
+
+    function apply() {
+      pending = false;
+      header.toggleAttribute('data-ref-scrolled', window.scrollY > 4);
+    }
+
+    apply();
+
+    /* Only now is the transition allowed to exist. Applied in the same frame as
+       the first state, a page that loads scrolled would animate the logo down in
+       front of somebody who has not scrolled anything. */
+    requestAnimationFrame(function () {
+      header.setAttribute('data-ref-scroll-ready', '');
+    });
+
+    window.addEventListener(
+      'scroll',
+      function () {
+        if (pending) return;
+        pending = true;
+        requestAnimationFrame(apply);
+      },
+      { passive: true }
+    );
+  }
+
   function init() {
+    wireHeaderScrollState();
+
     whenTokensResolve(function () {
       renderAll(document);
     });
