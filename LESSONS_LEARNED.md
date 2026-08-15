@@ -586,3 +586,39 @@ announcement useful, and is it in the right voice" is a fact about what a person
 hears, and no script in this repository can ask it. That is what the walkthrough
 in `docs/screenreader-walkthrough.md` is for, and this entry is the argument for
 doing it before a release rather than after.
+
+---
+
+## `git add -A` commits whatever the maintainer had open
+
+Dessau has one maintainer and one working tree, and the maintainer codes in it
+while an agent does. That is the normal condition, not an edge case.
+
+An agent finishing the accent-token rename staged with `git add -A` and committed
+19 files. One of them was `menupos.tmp.mjs` — a Playwright scratch script about
+menu positioning, written by the maintainer, in the tree, untracked, and nothing
+to do with accents. It went into the history under `[#47]`.
+
+The command did exactly what it was asked. That is the whole difficulty:
+
+- **Nothing failed.** No check runs on staging, and none could. Git does not
+  record which files a session wrote, so there is no fact to compare against.
+- **The commit lies in two directions.** Its diff no longer answers "what did
+  this ticket change", and the scratch file is now in the history at a
+  half-finished moment nobody chose — which is the worse half. Before a commit an
+  experiment is deletable; after one it is archaeology.
+- **It was caught by luck**, reading `git show --stat` after the fact rather than
+  `git status` before it.
+
+**Do:** name the paths. `git add dds/css/semantic.css reference/foundations.html`,
+not `git add -A`, not `git add .` — and read `git status` before committing rather
+than after.
+
+**When it happens anyway:** `git rm --cached <file>` and `git commit --amend`.
+**Leave the file on disk.** It is somebody's work in progress, and an agent
+deciding to tidy it away is a second, larger version of the same mistake.
+
+**And the general shape:** the tempting fix is a pre-commit hook, and it cannot
+work — it would need to know which files this session wrote, which is exactly the
+fact git does not have. Some rules have no check behind them and have to be
+instructions that are actually followed. `AGENTS.md` §6 carries this one.

@@ -220,6 +220,19 @@ faithful over HTTP.
 
   Co-Authored-By: Claude <noreply@anthropic.com>
   ```
+- **Stage only what this session changed. Never `git add -A`, never `git add .`.**
+  The maintainer codes in parallel, in the same working tree, and a blanket stage
+  sweeps up whatever they have open — a scratch file, a half-finished spec, a
+  debug script — and commits it under a ticket it has nothing to do with. Name the
+  paths, or stage the files this session actually wrote:
+  ```bash
+  git add dds/css/semantic.css reference/foundations.html   # yes
+  git add -A                                                # no
+  ```
+  Check `git status` before committing and after, and if something you did not
+  write is in the commit, take it out with `git rm --cached` and amend. Leave the
+  file on disk untouched — it is somebody's work in progress, not litter, and
+  deleting it is not the fix.
 - **Keep documentation in the same commit as the change.** A component whose
   specification lags behind its code is a component nobody can trust.
 - **Record reasoning, not just outcomes.** `DECISIONS.md` for architecture,
