@@ -878,16 +878,16 @@
 
           <div class="ref-specimen" data-ref-code>
             <p class="ref-specimen-label">File upload</p>
-            <div class="dds-upload" data-dds-upload data-dds-upload-max-bytes="10485760">
+            <div class="dds-upload" data-dds-upload data-dds-upload-max-bytes="10485760" lang="de">
               <div class="dds-upload-zone">
                 <svg class="dds-icon" aria-hidden="true"><use href="#dds-icon-upload"/></svg>
                 <label>
-                  <span class="dds-button dds-button-secondary" lang="de">Dateien auswählen</span>
+                  <span class="dds-button dds-button-secondary">Dateien auswählen</span>
                   <input class="dds-sr-only" id="upload" name="documents" type="file" multiple
                          accept=".pdf,.jpg,.jpeg,.png,application/pdf,image/jpeg,image/png"
                          aria-describedby="upload-hint">
                 </label>
-                <p class="dds-hint" id="upload-hint" lang="de">
+                <p class="dds-hint" id="upload-hint">
                   PDF, JPG oder PNG, je bis 10 MB. Dateien können auch hierher gezogen werden.
                 </p>
               </div>
@@ -900,6 +900,15 @@
               restriction is discovered only after choosing wrongly. Drag-and-drop
               is additive — dragging is impossible for many people
               (WCAG 2.2 2.5.7), so the button is always the primary route.
+            </p>
+            <p class="ref-note">
+              <svg class="dds-icon" aria-hidden="true"><use href="#dds-icon-info"/></svg>
+              <code class="dds-code">lang="de"</code> sits on the component, not on
+              the two German sentences inside it. It used to sit only on those,
+              because the file list the script builds was English whatever the page
+              said — so tagging the whole thing would have been a lie. Choose files
+              here: the list, the sizes, the rejection wording and the announcement
+              are all German now, from a table beside the behaviour (#20).
             </p>
           </div>
 
@@ -1715,7 +1724,7 @@
 <script src="../dds/js/format.js?v=8f2e10f1" defer></script>
 <script src="../dds/js/components.js?v=07fa7736" defer></script>
 <script src="../dds/js/components-navigation.js?v=2f0ca276" defer></script>
-<script src="../dds/js/components-forms.js?v=ba71578b" defer></script>
+<script src="../dds/js/components-forms.js?v=2e7fdc5a" defer></script>
 <script src="assets/reference.js?v=bdde7648" defer></script>
 <script src="assets/reference-tools.js?v=d85fbb00" defer></script>
 </body>

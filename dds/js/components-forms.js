@@ -280,6 +280,28 @@
      0.30000000000000004 and the browser's own implementation does not.
      ========================================================================= */
 
+  /**
+   * Stepper wording.
+   *
+   * The label comes from the page's own `<label>`, so it is already in the right
+   * language. `value` is only reached when there is no label at all — which is a
+   * markup defect the announcement should not also make unreadable.
+   */
+  var STEPPER_WORDING = {
+    en: {
+      value: 'Value',
+      announcement: function (label, value) {
+        return label + ': ' + value;
+      },
+    },
+    de: {
+      value: 'Wert',
+      announcement: function (label, value) {
+        return label + ': ' + value;
+      },
+    },
+  };
+
   DDS.register('stepper', '[data-dds-stepper]', function (root) {
     var input = root.querySelector('input');
     var decrement = root.querySelector('[data-dds-stepper-decrement]');
@@ -329,8 +351,9 @@
       // Announce the new value. The visual change is obvious to a sighted user
       // and invisible otherwise, and the buttons themselves say nothing about
       // what the value became.
-      var label = input.labels && input.labels[0] ? input.labels[0].textContent.trim() : 'Value';
-      DDS.announce(label + ': ' + input.value);
+      var words = DDS.utils.wording(root, STEPPER_WORDING);
+      var label = input.labels && input.labels[0] ? input.labels[0].textContent.trim() : words.value;
+      DDS.announce(words.announcement(label, input.value));
     }
 
     if (decrement) {
@@ -377,7 +400,48 @@
      again — a rejected file here has simply not been uploaded yet.
      ========================================================================= */
 
+  /**
+   * Upload wording. Every entry is a whole phrase, including its word order.
+   *
+   * `removed` and `remove` are functions rather than a prefix the code prepends,
+   * and that is not fussiness: English puts the verb first ("Remove report.pdf")
+   * and German puts it last ("report.pdf entfernen"). A string concatenated in
+   * the source can only ever produce one of those.
+   */
+  var UPLOAD_WORDING = {
+    en: {
+      none: 'No files selected',
+      selected: { one: '1 file selected', other: '{n} files selected' },
+      removed: function (name) {
+        return 'Removed ' + name;
+      },
+      remove: function (name) {
+        return 'Remove ' + name;
+      },
+      tooLarge: function (size) {
+        return size + ' — too large';
+      },
+      wrongType: 'Unsupported format',
+    },
+    de: {
+      none: 'Keine Dateien ausgewählt',
+      selected: { one: '1 Datei ausgewählt', other: '{n} Dateien ausgewählt' },
+      removed: function (name) {
+        return name + ' entfernt';
+      },
+      remove: function (name) {
+        return name + ' entfernen';
+      },
+      tooLarge: function (size) {
+        return size + ' — zu groß';
+      },
+      wrongType: 'Format wird nicht unterstützt',
+    },
+  };
+
   DDS.register('upload', '[data-dds-upload]', function (root) {
+    var words = DDS.utils.wording(root, UPLOAD_WORDING);
+
     var input = root.querySelector('input[type="file"]');
     var zone = root.querySelector('.dds-upload-zone') || root;
     var list = root.querySelector('[data-dds-upload-list]');
@@ -455,10 +519,10 @@
         var meta = document.createElement('span');
         meta.className = 'dds-upload-item-size';
         if (tooBig) {
-          meta.textContent = formatSize(file.size) + ' — too large';
+          meta.textContent = words.tooLarge(formatSize(file.size));
           meta.classList.add('dds-text-error');
         } else if (wrongType) {
-          meta.textContent = 'Unsupported format';
+          meta.textContent = words.wrongType;
           meta.classList.add('dds-text-error');
         } else {
           meta.textContent = formatSize(file.size);
@@ -472,7 +536,7 @@
         // identical controls.
         var removeLabel = document.createElement('span');
         removeLabel.className = 'dds-sr-only';
-        removeLabel.textContent = 'Remove ' + file.name;
+        removeLabel.textContent = words.remove(file.name);
         remove.appendChild(removeLabel);
         var removeIcon = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
         removeIcon.setAttribute('class', 'dds-icon');
@@ -507,19 +571,16 @@
 
       input.dispatchEvent(new Event('change', { bubbles: true }));
       render();
-      DDS.announce('Removed ' + name);
+      DDS.announce(words.removed(name));
     }
 
     input.addEventListener('change', function () {
       render();
       var count = (input.files || []).length;
-      DDS.announce(
-        count === 0
-          ? 'No files selected'
-          : count === 1
-            ? '1 file selected'
-            : count + ' files selected'
-      );
+      /* Zero is its own sentence rather than a plural category: "0 files
+         selected" is a count, and "No files selected" is what a person says.
+         Every other count goes through the language's own plural rules. */
+      DDS.announce(count === 0 ? words.none : DDS.utils.plural(root, count, words.selected));
     });
 
     /* --- drag and drop, strictly additive ------------------------------- */
@@ -588,6 +649,23 @@
      an "over" state can only be reached when a product sets a soft limit itself.
      ========================================================================= */
 
+  /**
+   * Character-count wording.
+   *
+   * German says it the other way round — "Noch 8 Zeichen" rather than "8
+   * characters remaining" — so the number is not at the same end of the phrase
+   * in both languages. That alone rules out prepending a count to a translated
+   * noun, which is what a naive version of this does.
+   */
+  var CHARCOUNT_WORDING = {
+    en: {
+      remaining: { one: '1 character remaining', other: '{n} characters remaining' },
+    },
+    de: {
+      remaining: { one: 'Noch 1 Zeichen', other: 'Noch {n} Zeichen' },
+    },
+  };
+
   DDS.register('charcount', '[data-dds-charcount]', function (output) {
     var id = output.getAttribute('data-dds-charcount');
     var field = document.getElementById(id);
@@ -602,6 +680,12 @@
       console.error('[DDS] charcount needs a maxlength on the field', field);
       return;
     }
+
+    /* Resolved from the FIELD, not from the output element. The count describes
+       what the user is typing, so it belongs to the language they are typing in
+       — and the two can differ, since the output may sit outside the region the
+       field is in. */
+    var words = DDS.utils.wording(field, CHARCOUNT_WORDING);
 
     // The live region only carries the text; the visible number updates
     // immediately so a sighted user sees it respond to every keystroke.
@@ -619,7 +703,7 @@
       var used = field.value.length;
       var remaining = max - used;
 
-      visible.textContent = remaining + ' characters remaining';
+      visible.textContent = DDS.utils.plural(field, remaining, words.remaining);
       output.setAttribute('data-dds-charcount-state', state(remaining));
     }
 
@@ -628,7 +712,7 @@
       var remaining = max - field.value.length;
       // Only worth speaking when it starts to matter.
       if (state(remaining) === 'ok') return;
-      DDS.announce(remaining + ' characters remaining');
+      DDS.announce(DDS.utils.plural(field, remaining, words.remaining));
     }, 700);
 
     field.addEventListener('input', function () {
