@@ -112,6 +112,15 @@
       color var(--dds-duration-instant) var(--dds-ease-standard);
   }
 
+  /* Same reason as `.dds-error[hidden]`: `display: inline-flex` in this layer
+     outranks the base sheet's `[hidden]` rule whatever its specificity, because
+     the layer is decided first. The copy button removes itself this way when
+     there is no clipboard API to copy with, and a button that cannot do its one
+     job is worse than no button. */
+  .dds-button[hidden] {
+    display: none;
+  }
+
   /* Keep the underline off buttons that happen to be links. */
   a.dds-button { text-decoration: none; }
   a.dds-button:hover { text-decoration: none; }
@@ -406,6 +415,13 @@
     gap: var(--dds-space-2xs);
   }
 
+  /* A whole field is something a product hides — a conditional question, or the
+     address search when no provider was configured, which the pattern removes
+     rather than leave a dead control on the page. Without this it stayed. */
+  .dds-field[hidden] {
+    display: none;
+  }
+
   .dds-label {
     font-size: var(--dds-font-size-sm);
     font-weight: var(--dds-font-weight-medium);
@@ -639,6 +655,18 @@
     font-size: var(--dds-font-size-sm);
     font-weight: var(--dds-font-weight-medium);
     color: var(--dds-color-text-error);
+  }
+
+  /* `hidden` has to mean hidden here, and the rule above is why it otherwise
+     would not: `display: flex` sits in `dds.components`, the base sheet's
+     `:where([hidden])` sits in `dds.base`, and layer order is resolved before
+     specificity — so the lower layer loses however it is written.
+
+     The symptom was not an obviously visible error. `clearError()` empties the
+     message text before hiding the element, so what stayed on screen was the
+     icon alone, in error red, under a field the user had just corrected. */
+  .dds-error[hidden] {
+    display: none;
   }
 
   /* Aligning an icon to the first line of the text beside it.

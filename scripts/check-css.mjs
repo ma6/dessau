@@ -4,7 +4,7 @@
  *
  *   node scripts/check-css.mjs
  *
- * Catches six classes of mistake that produce NO error anywhere — no console
+ * Catches seven classes of mistake that produce NO error anywhere — no console
  * message, no broken layout, no failing test. Just a piece of design that is
  * quietly absent. Every one of these is the kind of thing that gets noticed
  * weeks later, in a product, by a user.
@@ -30,15 +30,25 @@
  *    happened: `dds-scroll-locked` was toggled by the dialog code and never
  *    defined, so the scroll lock behind every modal silently did nothing.
  *
- * 5. A named `@container` query with no matching `container-name`.
+ * 5. `display` on a dialog outside its open state.
+ *    The UA closes a `<dialog>` with `display: none`; an author declaration beats
+ *    it, so the closed dialog stays in the layout and swallows every click.
+ *
+ * 6. A class whose `display` cancels the `hidden` attribute.
+ *    `dds.components` is a later layer than `dds.base`, so a class that sets
+ *    `display` beats the base sheet's `[hidden]` rule however that is written.
+ *    The JavaScript hides the element, nothing logs, and the box stays.
+ *
+ * 7. A named `@container` query with no matching `container-name`.
  *    The rule never matches anything. The component just stays in its base form,
  *    usually the narrow one, at every width.
  *
  * Zero dependencies, Node stdlib only. Exit code 1 on any finding.
  * @catches An undefined custom property, a primitive colour leaking past the
  *   semantic layer, a raw colour value, a class the JavaScript toggles that no
- *   stylesheet defines, `display` on a dialog outside `[open]`, and a container
- *   query whose container does not exist.
+ *   stylesheet defines, `display` on a dialog outside `[open]`, a class whose
+ *   `display` defeats the `hidden` attribute, and a container query whose
+ *   container does not exist.
  *
  */
 
@@ -310,7 +320,208 @@ for (const [file, css] of stripped) {
   }
 }
 
-/* ------------------------------------------------------ 6. container queries */
+/* ------------------- 6. a class that quietly disables `hidden` ------------- */
+
+/**
+ * `hidden` is the DOM's own way of saying "not here", and it is what the
+ * JavaScript in this system uses: `element.hidden = true`, never a class. It is
+ * hidden by `:where([hidden]:not([hidden="until-found"]))` in `dds.base`.
+ *
+ * A class that sets `display` cancels that, and not because of specificity —
+ * `dds.components` is a later layer than `dds.base`, and layer order is resolved
+ * first, so the base rule loses however it is written. The element keeps its box.
+ *
+ * That is a silent failure of the worst kind, because the JavaScript is right,
+ * the markup is right, and nothing logs. The one that was found in the wild:
+ * `clearError()` empties the message text and then hides the paragraph, so what
+ * stayed on screen was a lone error icon, in error red, under a field the user
+ * had just corrected. It read as "still wrong" and was not.
+ *
+ * The fix is one rule per class — `.dds-thing[hidden] { display: none }` — not a
+ * blanket rule in a late layer. `.dds-primary-nav` is why: above its container
+ * threshold it deliberately *shows* a `hidden` nav, so that the menu does not
+ * stay collapsed after a resize. A system-wide override would break it.
+ *
+ * A class is only reported when something actually hides it: an element in the
+ * repo's HTML carrying both the class and the `hidden` attribute, or a variable
+ * in the JavaScript that is assigned that class and later hidden.
+ *
+ * That evidence is the limit of the check, and it is worth stating plainly.
+ * `.dds-button` has the same defect — the copy button removes itself with
+ * `button.hidden = true` when there is no clipboard API — and this check cannot
+ * see it, because the behaviour is registered on `[data-dds-copy]` and no page in
+ * this repository uses that attribute, so there is no markup to read the class
+ * from. A product's own markup is outside what any static check here can reach.
+ * The check narrows the gap; it does not close it.
+ */
+{
+  /** Classes with evidence that something hides them, and where that came from. */
+  const hiddenClasses = new Map();
+
+  function noteHidden(name, evidence) {
+    if (!name.startsWith('dds-')) return;
+    if (!hiddenClasses.has(name)) hiddenClasses.set(name, evidence);
+  }
+
+  const htmlFiles = [join(ROOT, 'index.html')];
+  for (const entry of await readdir(join(ROOT, 'reference'), { withFileTypes: true })) {
+    if (entry.isFile() && entry.name.endsWith('.html')) {
+      htmlFiles.push(join(ROOT, 'reference', entry.name));
+    }
+  }
+
+  /** Every opening tag in the repo's HTML, so attributes can be looked up. */
+  const tags = [];
+  for (const file of htmlFiles) {
+    const html = await readFile(file, 'utf8');
+    for (const match of html.matchAll(/<[a-zA-Z][^>]*>/g)) {
+      tags.push({ file, tag: match[0] });
+    }
+  }
+
+  function classesOf(tag) {
+    const attribute = tag.match(/\sclass\s*=\s*"([^"]*)"/);
+    return attribute ? attribute[1].split(/\s+/).filter(Boolean) : [];
+  }
+
+  // `hidden` written on an element that also carries a DDS class.
+  for (const { file, tag } of tags) {
+    // `hidden` as an attribute of its own, not `aria-hidden` and not a value.
+    if (!/\shidden(\s|>|=\s*"(?:hidden|)")/.test(tag)) continue;
+    for (const name of classesOf(tag)) {
+      noteHidden(name, `${relative(ROOT, file)} writes hidden on .${name}`);
+    }
+  }
+
+  /** The DDS classes on every element carrying a given `data-` attribute. */
+  function classesForAttribute(attribute) {
+    const found = new Set();
+    for (const { tag } of tags) {
+      if (!new RegExp(`\\s${attribute}(\\s|=|>)`).test(tag)) continue;
+      classesOf(tag).forEach((name) => found.add(name));
+    }
+    return found;
+  }
+
+  const jsFiles = [];
+  async function collectJs(directory) {
+    for (const entry of await readdir(directory, { withFileTypes: true })) {
+      const path = join(directory, entry.name);
+      if (entry.isDirectory()) await collectJs(path);
+      else if (entry.name.endsWith('.js')) jsFiles.push(path);
+    }
+  }
+  await collectJs(join(ROOT, 'dds/js'));
+
+  for (const file of jsFiles) {
+    const source = stripComments(await readFile(file, 'utf8'));
+
+    // Which variables get hidden at all.
+    const hides = new Set();
+    for (const match of source.matchAll(/\b([A-Za-z_$][\w$]*)\.hidden\s*=[^=]/g)) {
+      hides.add(match[1]);
+    }
+    for (const match of source.matchAll(
+      /\b([A-Za-z_$][\w$]*)\.setAttribute\(\s*'hidden'/g
+    )) {
+      hides.add(match[1]);
+    }
+    if (hides.size === 0) continue;
+
+    for (const variable of hides) {
+      const evidence = `${relative(ROOT, file)} hides \`${variable}\``;
+      const escaped = variable.replace(/\$/g, '\\$');
+
+      // Built here: `x.className = 'dds-thing'`, or `x.classList.add('dds-thing')`.
+      const assigned = new RegExp(
+        `\\b${escaped}\\.(?:className\\s*=|setAttribute\\(\\s*'class'\\s*,|classList\\.add\\()\\s*'([^']+)'`,
+        'g'
+      );
+      for (const match of source.matchAll(assigned)) {
+        match[1].split(/\s+/).forEach((name) => noteHidden(name, evidence));
+      }
+
+      // Found here: `var x = root.querySelector('.dds-thing')`, `closest(...)`.
+      const bound = new RegExp(`\\b${escaped}\\s*=\\s*([^;]+);`, 'g');
+      for (const match of source.matchAll(bound)) {
+        /* Only the value, never the test that chose it. `var element = field
+           .closest('.dds-field, .dds-choice') ? … : null` says nothing about
+           `.dds-field` being hidden — it is the question, not the answer, and
+           reading it as evidence reported two classes that are never hidden. */
+        const branch = match[1].split(/\?(?!\.)/);
+        const value = branch.length > 1 ? branch.slice(1).join('?') : match[1];
+
+        for (const selector of value.matchAll(/\.(dds-[\w-]+)/g)) {
+          noteHidden(selector[1], evidence);
+        }
+        for (const selector of match[1].matchAll(/\[(data-dds-[\w-]+)[\]=]/g)) {
+          classesForAttribute(selector[1]).forEach((name) => noteHidden(name, evidence));
+        }
+      }
+
+      // Handed in here: the root a behaviour is registered on, matched by
+      // selector, so the class it carries is only knowable from the markup.
+      const registered = new RegExp(
+        `register\\(\\s*'[^']*'\\s*,\\s*'([^']+)'\\s*,\\s*function\\s*\\(\\s*${escaped}\\b`,
+        'g'
+      );
+      for (const match of source.matchAll(registered)) {
+        for (const selector of match[1].matchAll(/\.(dds-[\w-]+)/g)) {
+          noteHidden(selector[1], evidence);
+        }
+        for (const selector of match[1].matchAll(/\[(data-dds-[\w-]+)[\]=]/g)) {
+          classesForAttribute(selector[1]).forEach((name) => noteHidden(name, evidence));
+        }
+      }
+    }
+  }
+
+  /** Where a class takes a `display` of its own, and where it guards `hidden`. */
+  const displays = new Map();
+  const guards = new Set();
+
+  for (const [file, css] of stripped) {
+    for (const match of css.matchAll(/([^{}]+)\{([^{}]*)\}/g)) {
+      const [, selector, body] = match;
+      if (!/(^|[;\s])display\s*:/.test(body)) continue;
+      const hides = /display\s*:\s*none/.test(body);
+
+      for (const part of selector.split(',')) {
+        const trimmed = part.trim();
+
+        const guard = trimmed.match(/^\.(dds-[\w-]+)\[hidden\]$/);
+        if (guard && hides) {
+          guards.add(guard[1]);
+          continue;
+        }
+
+        // Only a rule whose whole subject is the class itself: a descendant or a
+        // state variant does not decide whether the element has a box.
+        const own = trimmed.match(/^\.(dds-[\w-]+)$/);
+        if (own && !hides && !displays.has(own[1])) {
+          displays.set(own[1], { file, line: lineOf(css, match.index) });
+        }
+      }
+    }
+  }
+
+  for (const [name, evidence] of hiddenClasses) {
+    if (guards.has(name)) continue;
+    const declaration = displays.get(name);
+    if (!declaration) continue;
+
+    report(
+      declaration.file,
+      declaration.line,
+      'hidden-defeated-by-display',
+      `.${name} sets \`display\`, which beats the base sheet's [hidden] rule — a later ` +
+        `layer wins whatever the specificity. ${evidence}, and the element stays in the ` +
+        `layout. Add .${name}[hidden] { display: none }.`
+    );
+  }
+}
+
+/* ------------------------------------------------------ 7. container queries */
 
 const containerNames = new Set();
 for (const css of stripped.values()) {

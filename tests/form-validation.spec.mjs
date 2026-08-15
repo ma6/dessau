@@ -152,3 +152,50 @@ test('an error is announced programmatically, not only coloured', async ({ page 
     'the field is marked invalid but points at no message with any text in it'
   ).toBe(true);
 });
+
+/**
+ * A corrected field goes back to looking correct.
+ *
+ * `clearError()` empties the message text and sets `hidden` on the paragraph, and
+ * both of those were true while the icon stayed on screen: `.dds-error` sets
+ * `display: flex` in `dds.components`, and the rule that hides `[hidden]` is in
+ * `dds.base`, which is an earlier layer and therefore loses regardless of how it
+ * is written. What was left under the corrected field was the error glyph alone,
+ * in error red, saying something is still wrong.
+ *
+ * Only a browser can see this. The DOM is exactly what it should be — the element
+ * is `hidden` and its text is empty — so the failure exists solely in the
+ * cascade, and the assertion has to be about layout, not about attributes.
+ */
+test('a corrected field leaves no part of the error behind', async ({ page }) => {
+  await page.goto(PATTERNS);
+
+  const form = page.locator('#validation form[data-dds-validate]').first();
+  await form.locator('button[type="submit"]').first().click();
+
+  const name = page.locator('#v-name');
+  const error = form.locator('[data-dds-error-for="v-name"]');
+  await expect(error).toBeVisible();
+
+  // Correct it. The pattern clears the error the moment the value becomes valid.
+  await name.fill('Ilva Bergström');
+  await expect(error).toBeHidden();
+
+  /**
+   * `toBeHidden()` alone would have passed while the bug was live: Playwright
+   * reads the `hidden` attribute. The box is the thing to measure.
+   */
+  const box = await error.evaluate((element) => {
+    const rects = [...element.getClientRects()];
+    const icon = element.querySelector('.dds-icon');
+    return {
+      rects: rects.length,
+      iconRects: icon ? icon.getClientRects().length : 0,
+      display: getComputedStyle(element).display,
+    };
+  });
+
+  expect(box.display, 'the error still generates a box after being cleared').toBe('none');
+  expect(box.rects, 'the cleared error still occupies space').toBe(0);
+  expect(box.iconRects, 'the error icon is still painted under a corrected field').toBe(0);
+});

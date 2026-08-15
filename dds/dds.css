@@ -98,7 +98,7 @@
 /* Reusable UI building blocks, split by concern so no single file becomes
    unnavigable. All four land in the same `dds.components` layer — the split is
    for the reader, not for the cascade. */
-@import url("./css/components.css?v=c6752605");
+@import url("./css/components.css?v=f1a5e449");
 @import url("./css/components-forms.css?v=8c4581e6");
 @import url("./css/components-navigation.css?v=c048191f");
 @import url("./css/components-content.css?v=5828d4cc");

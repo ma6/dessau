@@ -495,6 +495,46 @@ whole point of `:where()` being about specificity rather than about origin.
 
 ---
 
+## The fix for that had the same hole, one layer up
+
+The rule written to close the gap above lives in `dds.base`:
+
+```css
+:where([hidden]:not([hidden="until-found"])) { display: none; }
+```
+
+Zero specificity, deliberately, so it undoes the media reset and nothing else. It
+also does nothing at all for `.dds-error`, `.dds-field` or `.dds-button` — because
+`dds.components` is a **later layer**, and layer order is resolved before
+specificity, so the base rule loses however it is written. `:where()` was never the
+weak part. The layer was.
+
+The symptom was not a visibly wrong error message. `clearError()` empties the
+message text *and then* hides the paragraph, so what stayed on screen under a
+corrected field was the error icon on its own, in error red, still saying no.
+
+Everything that made the first version hard to find was true again: the markup was
+right, the JavaScript was right, `element.hidden` was `true`, and nothing logged.
+It was found the same way, by somebody looking at a screen and asking what the
+circle under the valid field was for.
+
+**Do:** when a class sets `display`, say in the same place what `hidden` means for
+it — `.dds-thing[hidden] { display: none }`. `check-css.mjs` now reports a class
+that is hidden somewhere in the repository and has no such rule.
+
+**Do not:** fix it once in a late layer. `[hidden] { display: none }` in
+`dds.utilities` would win everywhere, including over `.dds-primary-nav[hidden] {
+display: block }`, which exists so the header menu does not stay collapsed after a
+resize past its container threshold. A blanket rule would break the one component
+that means something different by `hidden`.
+
+**And:** the static check can only see what the repository can see. The copy
+button hides itself the same way and is registered on `[data-dds-copy]`, which no
+page here uses, so no markup connects the behaviour to `.dds-button`. Its rule was
+written by hand and the gap is recorded in the script rather than pretended away.
+
+---
+
 ## Text moved out of its subtree leaves its language behind
 
 The upload demo is `lang="de"`. Choosing a file announced "1 Datei ausgewählt" —
