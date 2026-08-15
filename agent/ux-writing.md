@@ -289,6 +289,13 @@ Demo, placeholder and test content is part of the product's quality.
   messages.
 - **Never a placeholder domain that could become real.** Use the reserved
   `example.org` / `example.com` / `.example` for addresses that must not resolve.
+- **No vocabulary from one industry.** Category labels, form fields, table rows and
+  wizard steps stay in words any product recognises — a topic, a document, a
+  department. Dessau is a foundation, and a specimen written in one sector's terms
+  costs twice: it narrows what the reference appears to be for, and it is a trace
+  of provenance in a repository whose whole point is not to carry one.
+  `scripts/audit-whitelabel.mjs` enforces this, and its term list is local and
+  git-ignored for the reason the script's header gives.
 
 ---
 
