@@ -638,6 +638,10 @@ DDS.theme                             // read / set / observe the theme</code></
                   <td>A documented component with no rendered example, an anchor or in-page link that does not resolve, a token name no stylesheet declares, an asset that does not load, unbalanced markup, a forced <code class="dds-code">data-theme</code> with no rule to match, a flex component missing its <code class="dds-code">-body</code> wrapper, and a stale generated block.</td>
                 </tr>
                 <tr>
+                  <th scope="row"><code class="dds-code">check-enhancement-coverage.mjs</code></th>
+                  <td>A registered enhancement with no browser test, a spec that never says what it covers, a coverage note that has gone stale in either direction, and a <code class="dds-code">@covers</code> naming an enhancement nothing registers.</td>
+                </tr>
+                <tr>
                   <th scope="row"><code class="dds-code">build-foundations.mjs</code><br><span class="dds-text-2xs dds-text-muted">verify only · regenerate to fix</span></th>
                   <td>A stale machine-readable export, when run with <code class="dds-code">--check</code>. The CSS is the source of truth and <code class="dds-code">dds/foundations.json</code> is downstream of it.</td>
                 </tr>

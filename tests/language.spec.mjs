@@ -14,6 +14,9 @@
  *
  * So the assertions are on the two places that decide it: the language resolver
  * itself, and the two controls that use it. See DECISIONS.md 028.
+ *
+ * @covers theme-toggle
+ *
  */
 
 import { test, expect } from '@playwright/test';

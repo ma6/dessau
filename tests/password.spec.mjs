@@ -15,6 +15,10 @@
  *
  * So the assertions are on what a user gets: a button that is there, that says the
  * same thing in both states, and that makes the characters readable.
+ *
+ * @covers password, password-toggle — the enhancement that builds the control,
+ *   and the behaviour of one the page authored itself
+ *
  */
 
 import { test, expect } from '@playwright/test';

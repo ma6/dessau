@@ -25,6 +25,9 @@
  * These tests assert on the observable consequences — `data-dds-enhanced`, the
  * ARIA attributes an enhancement adds, the elements it generates — rather than on
  * internals, so they keep testing the right thing if the implementation changes.
+ *
+ * @covers combobox, address-search
+ *
  */
 
 import { test, expect } from '@playwright/test';

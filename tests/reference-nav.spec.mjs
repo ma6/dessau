@@ -19,6 +19,10 @@
  * group's pages, so a wrong group means the reader is offered somebody else's
  * siblings. That is checked too, on every page, because the generator derives it and a
  * derivation is only as good as the structure it reads.
+ *
+ * @covers nav-toggle — through the reference's own header, not the shipped
+ *   `.dds-siteheader` component; that one is tests/siteheader.spec.mjs (#11)
+ *
  */
 
 import { test, expect } from '@playwright/test';

@@ -18,6 +18,9 @@
  *
  * It is not visible in the source and not visible on a short page. It needs a real
  * viewport, a real scroll, and a check on the last entry specifically.
+ *
+ * @covers toc
+ *
  */
 
 import { test, expect } from '@playwright/test';

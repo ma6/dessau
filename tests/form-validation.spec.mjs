@@ -19,6 +19,9 @@
  *
  * Both halves of that are invisible to a static check: the DOM is only wrong after
  * a failed submit, and the message text is generated at that moment.
+ *
+ * @covers form-validation
+ *
  */
 
 import { test, expect } from '@playwright/test';

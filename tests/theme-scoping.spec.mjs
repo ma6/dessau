@@ -19,6 +19,10 @@
  * A static check can confirm the rule exists (`scripts/check-reference.mjs` does).
  * Only a browser can confirm the values actually resolve differently, which is the
  * thing that was broken.
+ *
+ * @covers none — this is about which custom properties resolve where. No script
+ *   is involved: a forced `data-theme` is markup, and the bug was in the cascade.
+ *
  */
 
 import { test, expect } from '@playwright/test';
