@@ -143,7 +143,10 @@ const ROOT_DOC_IN_PROSE = /`([A-Z][A-Z0-9_-]*\.md)`/g;
 const PATH_UNQUOTED =
   /(?:^|[\s(])(?:\/?libs\/dessau\/)((?:dds|agent|scripts|docs|reference|tests)\/[\w./-]+\.\w+)/gm;
 
-const UNQUOTED_PATHS_IN = new Set(['agent/consumer-init.prompt.md']);
+const UNQUOTED_PATHS_IN = new Set([
+  'agent/consumer-init.prompt.md',
+  'agent/derived-system-init.prompt.md',
+]);
 
 for (const doc of await docs()) {
   const source = await readFile(join(ROOT, doc), 'utf8');

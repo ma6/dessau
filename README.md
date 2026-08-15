@@ -77,10 +77,10 @@ and you have not chosen neutrality; you have taken Dessau's taste complete and
 unexamined, and roundness in particular is close to unchangeable by the time there
 are forty components.
 
-| You are building | Then |
-| --- | --- |
-| **A design system** that ships to a client and works without Dessau | [`recipes/derive-a-standalone-system.md`](agent/recipes/derive-a-standalone-system.md) — substitute the foundation, own your reference, repoint the gates |
-| **A product**, on Dessau or on a derived system | *Start a new project*, below |
+| You are building | Recipe | Prompt to paste into an agent |
+| --- | --- | --- |
+| **A design system** that ships to a client and works without Dessau | [`derive-a-standalone-system.md`](agent/recipes/derive-a-standalone-system.md) | [`derived-system-init.prompt.md`](agent/derived-system-init.prompt.md) |
+| **A product**, on Dessau or on a derived system | [`new-product.md`](agent/recipes/new-product.md) | [`consumer-init.prompt.md`](agent/consumer-init.prompt.md) |
 
 The difference is not scale. A derived system **substitutes** the foundation,
 because it cannot hand its own consumers a dependency on Dessau. A product
