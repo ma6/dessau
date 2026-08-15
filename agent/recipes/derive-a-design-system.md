@@ -116,6 +116,57 @@ above: two of the five accents *share* their ramp with a status hue. Repointing
 `--dds-green-*` because accent 4 should be teal also repaints every success
 message you have.
 
+### Strongly recommended: your brand is not your action or status colour
+
+This one is advice rather than a rule — it is your system and your call — but it
+is the advice given with the least hedging in this document, because the move it
+warns against is the first one most people reach for. Making the action colour the
+brand colour, and pulling status towards the brand palette so the interface looks
+of a piece, is the obvious way to make a derived system feel owned. It is also the
+one that costs the most and shows the bill latest.
+
+**Action is a learned signal, not decoration.** The whole reason DDS has *one*
+interactive colour is so that colour comes to mean "you can act on this". A brand
+colour does not stay in interactive places: it is in the header, the illustration,
+the empty state, the marketing banner someone drops in later. Bind the two and
+either everything brand-coloured reads as actionable, or — much more likely —
+nothing does, and the signal you spent the restraint on is gone.
+
+**The two colours are chosen under different constraints.** A brand hue is judged
+large, once, on a background somebody controlled. An action colour has to clear
+3:1 as a graphical object and 4.5:1 as text, in both themes, at 16px, against
+surfaces you do not get to choose. Plenty of brand colours simply cannot — a
+bright yellow, a pale teal — and the usual ending is a value nudged far enough to
+pass that it is no longer recognisably the brand. The coupling then delivered
+neither thing.
+
+**Brands change on somebody else's schedule.** Bound to action, a rebrand re-tunes
+every affordance, focus ring and selected state in the product, and re-opens the
+contrast work across the whole system. That puts an accessibility-critical
+decision in the hands of people who do not own accessibility and will not be told
+that is what they decided.
+
+**Status is the worse half.** Red, amber, green and cyan are conventions a reader
+brings with them; they are not yours to re-mean. Tint them towards a brand and
+success means whatever the brand means this year — and if the brand is itself red,
+an error stops being distinguishable from ordinary chrome. Status is also the one
+place where being wrong is not a matter of taste.
+
+**Where the brand does belong: the accent layer.** That is what it is for. DDS
+treats a product's brand accent and a categorical chart colour as the same
+mechanism at different scopes (DECISIONS 033) — `data-dds-accent` on `<html>` is
+the brand, on a bar it is a category. The accent is decorative by rule, so a brand
+sitting there can be any colour it likes, changes without touching a signal, and
+never has to carry meaning it cannot support.
+
+**If you are going to do it anyway**, and sometimes there is a real reason, the
+test is honest and short. The brand hue has to meet the action colour's contrast
+obligations *on its own merits*, in both themes, measured rather than eyeballed —
+and you have to accept in writing that the next rebrand re-opens that measurement
+across the system. Record both in the product's `DECISIONS.md`, including the
+reversal condition, because this is the decision most likely to be inherited by
+somebody who was not in the room.
+
 ### The five accents, and naming them yourself
 
 The accent set is five numbered slots — `--dds-color-accent-1` … `-5`, each with

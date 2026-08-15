@@ -33,6 +33,15 @@ accents. The restraint is where it matters: **one** interactive colour, so that
 colour starts to mean "you can act on this". The accents are the one plural set,
 because their entire job is to be plural.
 
+**A derived system should not make that interactive colour its brand colour, and
+should not tint status towards a brand palette.** Action and status are learned
+signals with contrast obligations in both themes; a brand is chosen large, once,
+on a controlled background, and changes on a schedule nobody here sets. The accent
+layer is where a brand belongs — decorative by rule, so it can be any colour it
+likes without carrying meaning it cannot support. Strongly recommended, not
+enforced, and nothing can check it: `recipes/derive-a-design-system.md` §1 has the
+reasoning and the test for doing it anyway.
+
 ### Primitive ramps
 
 | Family | Character | Role |
