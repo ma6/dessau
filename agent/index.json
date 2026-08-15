@@ -100,7 +100,7 @@
       "css": "dds/css/components-navigation.css",
       "spec": "## App navigation — `.dds-appnav`",
       "reference": "reference/navigation.html#contentnav",
-      "accessibility": "aria-current=\"page\" on the current area, shown three ways — fill, weight and colour — because a fill alone vanishes in forced-colors and in greyscale. Icons are aria-hidden; the visible label carries the meaning. Items are 2.75rem tall for WCAG 2.5.8 Target Size."
+      "accessibility": "aria-current=\"page\" on the current area, carried by a leading rail in the action colour. The fill and the heavier weight support it and cannot replace it: the fill measures 1.01:1 against the surface behind it in dark mode, so an edge is what survives greyscale and forced colours (#33). Icons are aria-hidden; the visible label carries the meaning. Items are 2.75rem tall for WCAG 2.5.8 Target Size."
     },
     {
       "name": "avatar",
@@ -1309,7 +1309,7 @@
       "css": "dds/css/patterns-flows.css",
       "spec": "## Filtering — `.dds-filtering`",
       "reference": "reference/patterns.html#filtering",
-      "accessibility": "Applied filters always visible as chips. Count announced. Filter state in the URL."
+      "accessibility": "Applied filters always visible as chips. Count announced. Filter state in the URL is the product's job — DDS renders and announces it, and does not navigate."
     },
     {
       "name": "upload-flow",

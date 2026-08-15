@@ -413,10 +413,25 @@ Composes the filter bar and chips with the results and empty states.
   interface — the user concludes the data is missing.
 - The result count is announced when it changes, politely and debounced.
 - "No results" **names the active filters** and offers to clear them.
-- **Filter state lives in the URL**, so a filtered view can be shared, bookmarked
-  and returned to with the back button.
 - Filters apply on change, **or** behind an explicit Apply button — never
   ambiguously both.
+
+**Filter state in the URL is the product's job, not the foundation's.** A
+filtered view should be shareable, bookmarkable and reachable with the back
+button — that requirement is right and it is not withdrawn here. What is
+withdrawn is the claim that DDS does it (#25).
+
+It does not, and it should not. A product's URLs belong to its router: whether
+state goes in the query string or the path, which changes are worth a history
+entry, whether the server has to render the filtered view for a cold link, and
+what happens on `popstate` when a request is already in flight. A foundation that
+takes a position on any of that collides with the framework the product chose,
+and there is no version of the collision the foundation wins.
+
+So the pattern renders and announces the filter state, and the product decides
+what to do with the URL. If it does own the URL, the honest shape is
+`replaceState` while typing and `pushState` on a committed change, so the back
+button steps through decisions rather than through keystrokes.
 
 ---
 
