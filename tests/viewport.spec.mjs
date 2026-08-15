@@ -150,7 +150,43 @@ const findOverflow = () => {
     .slice(0, 6)
     .map(({ element }) => describe(element));
 
+  /* Where the overflow BEGINS, by definition rather than by geometry.
+     ----------------------------------------------------------------------
+     An element whose scrollable area is wider than its client area contains
+     something that sticks out — and for a box with `overflow: visible` that
+     fact propagates up the ancestor chain, so the whole chain reports it. The
+     DEEPEST such elements are therefore where it starts.
+
+     This finds what element rects cannot: a pseudo-element, a margin, a
+     transformed box, an inline box's overflow. All of those were guesses in the
+     previous two runs; this is a measurement.
+
+     `::before` and `::after` are read out of the computed style for the same
+     reason — they have no rect to measure, and they are the first suspect when
+     nothing else is over the edge. */
+  const overflowing = [...document.body.querySelectorAll('*')].filter(
+    (element) => element.scrollWidth - element.clientWidth > 1
+  );
+  const deepest = overflowing
+    .filter((element) => !overflowing.some((other) => other !== element && element.contains(other)))
+    .slice(0, 6)
+    .map((element) => {
+      const pseudo = ['::before', '::after']
+        .map((which) => {
+          const style = getComputedStyle(element, which);
+          if (!style.content || style.content === 'none') return null;
+          return `${which} { content: ${style.content}; width: ${style.width}; position: ${style.position} }`;
+        })
+        .filter(Boolean);
+      return (
+        `${describe(element)}  [scrollWidth ${Math.round(element.scrollWidth)} vs ` +
+        `client ${Math.round(element.clientWidth)}]` +
+        (pseudo.length ? `\n        ${pseudo.join('\n        ')}` : '')
+      );
+    });
+
   return {
+    deepest,
     pageOverflow: document.documentElement.scrollWidth - viewport,
     viewport,
     offenders: outermost.slice(0, 8).map(describe),
@@ -224,6 +260,10 @@ for (const viewport of VIEWPORTS) {
               (result.widest.length
                 ? result.widest.map((line) => `    ${line}`).join('\n')
                 : '    (none wider than the viewport)') +
+              '\n  Where the overflow begins (deepest box whose content sticks out):\n' +
+              (result.deepest.length
+                ? result.deepest.map((line) => `    ${line}`).join('\n')
+                : '    (nothing)') +
               '\n  Over the edge but filtered out:\n' +
               (result.skipped.length
                 ? result.skipped.map((line) => `    ${line}`).join('\n')
