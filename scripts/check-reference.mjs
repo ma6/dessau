@@ -35,8 +35,8 @@
  * @catches A documented component with no rendered example, an anchor or in-page
  *   link that does not resolve, a token name no stylesheet declares, an asset
  *   that does not load, unbalanced markup, a forced `data-theme` with no rule to
- *   match, a flex component missing its `-body` wrapper, and a stale generated
- *   block.
+ *   match, a flex component missing its `-body` wrapper, a `<video>` or
+ *   `<audio>` with no transcript beside it, and a stale generated block.
  *
  */
 
@@ -513,6 +513,51 @@ for (const [path, page] of pages) {
     } else {
       report(`${path}: uses data-theme="${theme}", which no rule matches`);
     }
+  }
+}
+
+/* ------------------- 9a. every player has a transcript beside it */
+
+/**
+ * WCAG 2.2 1.2.1 requires an alternative for audio-only and video-only content,
+ * and it is the single most commonly skipped requirement in the standard —
+ * because the work is producing the transcript, not writing the markup. A rule
+ * whose cost is entirely outside the code is a rule that needs a gate.
+ *
+ * The transcript is looked for as a `[data-dds-transcript]` sibling within the
+ * same specimen or figure, not anywhere on the page: "there is a transcript
+ * somewhere" is exactly the claim that stops being true when a second player is
+ * added.
+ *
+ * A `<video>` carrying only `<track kind="captions">` still fails. Captions
+ * serve somebody watching; a transcript serves somebody reading, searching or
+ * skimming, and a search engine only ever reads the second.
+ */
+for (const [path, page] of pages) {
+  for (const [element, tag] of page.source.matchAll(/<(video|audio)\b[^>]*>/g)) {
+    const at = page.source.indexOf(element);
+
+    /* The enclosing block: a specimen, a figure, or failing both, a generous
+       window after the element. Deliberately not the whole page. */
+    const before = page.source.slice(Math.max(0, at - 2000), at);
+    const blockStart =
+      Math.max(
+        before.lastIndexOf('<div class="ref-specimen'),
+        before.lastIndexOf('<figure')
+      ) + Math.max(0, at - 2000);
+
+    const scope = page.source.slice(
+      blockStart > 0 ? blockStart : at,
+      at + 3000
+    );
+
+    if (scope.includes('data-dds-transcript')) continue;
+
+    report(
+      `${path}: <${tag}> with no [data-dds-transcript] beside it — WCAG 2.2 ` +
+        `1.2.1 requires an alternative for audio-only and video-only content, ` +
+        `and it is required rather than recommended (agent/components.md)`
+    );
   }
 }
 

@@ -1114,6 +1114,21 @@
             <audio class="dds-media" controls
                    src="assets/media/silence.wav"
                    aria-label="Example audio track"></audio>
+
+            <details class="dds-disclosure" data-dds-transcript>
+              <summary>Transcript — Example audio track</summary>
+              <div class="dds-prose dds-text-sm">
+                <p>
+                  [00:00] This recording is four seconds of silence. It exists so
+                  the player has something to play, and so this transcript has
+                  something to transcribe.
+                </p>
+                <p>
+                  [00:04] End of recording.
+                </p>
+              </div>
+            </details>
+
             <p class="ref-note">
               <svg class="dds-icon" aria-hidden="true"><use href="#dds-icon-info"/></svg>
               Native controls: keyboard operable, screen-reader accessible, and
@@ -1121,6 +1136,19 @@
               speech additionally requires a
               <code class="dds-code">&lt;track kind="captions"&gt;</code> — that is
               WCAG 1.2.2, not a nice-to-have.
+            </p>
+            <p class="ref-note">
+              <svg class="dds-icon" aria-hidden="true"><use href="#dds-icon-warning"/></svg>
+              <strong>The transcript is required, not recommended</strong> (WCAG
+              2.2 1.2.1). Audio-only content without one is unusable for a deaf
+              user and unfindable for everyone — a search engine and a page search
+              both read text, and neither reads a waveform. It is the most commonly
+              skipped requirement in the standard, because the work is producing
+              the transcript rather than writing the markup, so
+              <code class="dds-code">check-reference.mjs</code> fails on a
+              <code class="dds-code">&lt;video&gt;</code> or
+              <code class="dds-code">&lt;audio&gt;</code> with no
+              <code class="dds-code">[data-dds-transcript]</code> beside it.
             </p>
           </div>
 

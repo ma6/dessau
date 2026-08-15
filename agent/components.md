@@ -1002,6 +1002,32 @@ accessible, and they honour the platform's own accessibility settings.
 **Video with speech requires `<track kind="captions">`** (WCAG 1.2.2). Reviewed
 auto-generated captions are acceptable; unreviewed ones are not.
 
+**Every `<video>` and `<audio>` requires a transcript** (WCAG 2.2 1.2.1). Not
+recommended — required. It is stated here as well as in
+[`accessibility.md`](accessibility.md) because this is where somebody building a
+player looks, and a requirement recorded only in the catalogue is a requirement
+that gets read after the work is done.
+
+```html
+<audio class="dds-media" controls src="…" aria-label="…"></audio>
+
+<details class="dds-disclosure" data-dds-transcript>
+  <summary>Transcript — …</summary>
+  <div class="dds-prose dds-text-sm">…</div>
+</details>
+```
+
+A `<details>` beside the player, not a link to another page: the transcript is
+the alternative to this media, and putting it one navigation away makes it the
+alternative to leaving.
+
+It is the single most commonly skipped requirement in the whole standard,
+because the work is producing the transcript rather than writing the markup —
+so `check-reference.mjs` fails on a `<video>` or `<audio>` with no
+`[data-dds-transcript]` as a sibling. Captions are not a substitute and neither
+is the transcript: a video with speech needs both, because captions serve
+someone watching and a transcript serves someone reading, searching or skimming.
+
 ## Gallery — `.dds-gallery` · Avatar — `.dds-avatar`
 
 A grid of lightbox triggers; a person as an image or initials.
