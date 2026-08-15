@@ -649,15 +649,26 @@
 
      `inset: auto` first: the two anchored insets below only place the menu if the
      other two are released. Left at 0 the box is over-constrained, and an
-     over-constrained box drops the anchored edge, not the zero. */
+     over-constrained box drops the anchored edge, not the zero.
+
+     Each `anchor()` carries a fallback, and that second argument is the whole
+     safety net. `@supports (anchor-name: …)` answers "does this engine have
+     anchor positioning", which is not the same question as "does this engine
+     give a popover its invoker as an implicit anchor" — and there is no
+     `@supports` test for the second one. Where the anchor does not resolve and
+     no fallback is given, the declaration is invalid at computed-value time,
+     every inset computes to `auto`, and a top-layer box with no insets at all
+     lands in the corner of the screen. The percentages are not a layout anyone
+     wants; they are a box that is on screen and readable rather than one that is
+     wedged against the edge. */
   @supports (anchor-name: --dds-probe) {
     .dds-menu {
       position: absolute;
       inset: auto;
       margin: 0;
 
-      inset-block-start: anchor(bottom);
-      inset-inline-end: anchor(right);
+      inset-block-start: anchor(bottom, 35%);
+      inset-inline-end: anchor(right, 35%);
       margin-block-start: var(--dds-space-3xs);
       position-try-fallbacks: flip-block, flip-inline;
     }

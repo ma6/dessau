@@ -1657,7 +1657,11 @@
       inset: auto;
       margin: 0;
 
-      inset-block-end: anchor(top);
+      /* The fallback argument, for an engine that has anchor positioning but
+         does not give a popover its invoker as an implicit anchor. Without it
+         the inset is invalid at computed-value time and the tooltip lands in the
+         corner of the screen. See `.dds-menu` for the long version. */
+      inset-block-end: anchor(top, 45%);
       justify-self: anchor-center;
       margin-block-end: var(--dds-space-2xs);
       /* Flip below rather than overflowing off the top of the viewport. */
