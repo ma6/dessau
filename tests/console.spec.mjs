@@ -69,10 +69,29 @@ const REFERENCE_PAGES = readdirSync(join(ROOT, 'reference'))
 const PAGES = ['/index.html', ...REFERENCE_PAGES];
 
 /** Two frames after load, so anything deferred to rAF has run and thrown. */
+const twoFrames = () =>
+  new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+
+/**
+ * Wait out the frames, and survive the page leaving while we do.
+ *
+ * The root redirect is a zero-delay `<meta refresh>`, so it navigates during
+ * exactly this wait and destroys the context the evaluation was running in.
+ * That is the page doing its job, not a failure — but it arrives as an
+ * exception, and the first version of this file reported it as one.
+ *
+ * Console listeners are attached to the page, not to the document, so they keep
+ * collecting across the navigation. Nothing is lost by settling again on the
+ * other side.
+ */
 async function settle(page) {
-  await page.evaluate(
-    () => new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)))
-  );
+  try {
+    await page.evaluate(twoFrames);
+  } catch (error) {
+    if (!/Execution context was destroyed|navigation/i.test(error.message)) throw error;
+    await page.waitForLoadState('load');
+    await page.evaluate(twoFrames);
+  }
 }
 
 for (const path of PAGES) {
