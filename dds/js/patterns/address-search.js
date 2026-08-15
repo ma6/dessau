@@ -220,7 +220,7 @@
       if (fields.line2) setValue(fields.line2, '');
 
       // Rule 6: four fields changing at once is invisible without this.
-      DDS.announce(config.messages.filled(address));
+      DDS.announce(config.messages.filled(address), { from: root });
 
       // Clear any stale validation state on the fields that were just filled.
       [fields.street, fields.postalCode, fields.locality].forEach(function (field) {

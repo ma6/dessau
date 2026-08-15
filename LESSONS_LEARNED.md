@@ -492,3 +492,57 @@ exclude `hidden="until-found"` — that value is deliberately not `display: none
 **And:** a reset written in `:where()` is weak against author rules only. Against
 the UA stylesheet it is as strong as any other author declaration, which is the
 whole point of `:where()` being about specificity rather than about origin.
+
+---
+
+## Text moved out of its subtree leaves its language behind
+
+The upload demo is `lang="de"`. Choosing a file announced "1 Datei ausgewählt" —
+the right words, in the right language — and VoiceOver read it out **in an English
+voice**.
+
+Nothing about the wording was wrong. `wording()` and `plural()` resolved the
+nearest `lang` and returned German, which is the rule the whole of DECISIONS.md 028
+is about. The message was then written into the live region `DDS.announce` appends
+to `<body>`, and `<body>` inherits `<html lang="en">`. The text had left the
+subtree whose `lang` produced it, so the attribute that made it pronounceable no
+longer applied to it.
+
+This is not specific to live regions. Anything relocated to the end of the document
+— a live region, a `<dialog>`, a lightbox, a toast — is in the *document's*
+language, whatever the code that built it was looking at. Two places in DDS had
+already reasoned their way to it one case at a time (the lightbox resolves its
+wording from the thumbnail, the toast from `documentElement`, both with a comment
+saying why) without anyone noticing it was the same fact twice, and the third case
+was left broken.
+
+Every property of a failure this repository claims to guard against:
+
+- Nothing is visibly wrong. The sentence renders correctly for anyone reading it.
+- No check could see it. The markup is valid, the `lang` is present, the strings
+  are the right strings, and both the language spec and the enhancement coverage
+  gate were green.
+- It is only wrong out loud, and only to the one user who cannot check it against
+  the screen.
+- It needs two languages on one page to be audible at all. On a monolingual page
+  it is invisible forever.
+
+It was found by somebody putting VoiceOver on and listening to the upload demo. It
+had been there since `announce` was written.
+
+**Do:** when a string is written anywhere other than where it was decided, carry
+the language with it — `announce(message, { from: element })`, or `lang` on the
+node you insert. The test is mechanical: if the text ends up outside the element
+whose `lang` chose it, that `lang` is gone.
+
+**And:** set it once, at creation, rather than mutating it on a live element. One
+region per politeness and language, not one region reconfigured per message —
+assistive technology is watching that element, and the same reasoning that keeps
+`aria-live` fixed applies to `lang`.
+
+**And:** the general lesson about the gates. Contrast, roles, labels and focus
+order are all checkable because they are facts about the DOM. "Is this
+announcement useful, and is it in the right voice" is a fact about what a person
+hears, and no script in this repository can ask it. That is what the walkthrough
+in `docs/screenreader-walkthrough.md` is for, and this entry is the argument for
+doing it before a release rather than after.

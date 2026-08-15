@@ -192,7 +192,7 @@
     // Announcements are debounced separately from the request, and more slowly.
     // A screen reader interrupted on every keystroke is unusable.
     var announceResults = DDS.utils.debounce(function (message) {
-      DDS.announce(message);
+      DDS.announce(message, { from: root });
     }, 350);
 
     /* --- opening and closing --------------------------------------------- */
@@ -412,7 +412,7 @@
           console.error('[DDS] combobox source failed', error);
           // Say what the user can do instead, not just that something broke.
           renderMessage(config.messages.error, true);
-          DDS.announce(config.messages.error, { assertive: true });
+          DDS.announce(config.messages.error, { assertive: true, from: root });
         });
     }
 
@@ -500,7 +500,7 @@
             items = [];
             list.replaceChildren();
             if (typeof config.onClear === 'function') config.onClear();
-            DDS.announce(config.messages.cleared);
+            DDS.announce(config.messages.cleared, { from: root });
           }
           break;
 

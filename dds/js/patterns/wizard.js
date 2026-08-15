@@ -197,7 +197,9 @@
         heading.focus();
       }
 
-      DDS.announce(words.change(current + 1, steps.length, label(steps[current], current)));
+      DDS.announce(words.change(current + 1, steps.length, label(steps[current], current)), {
+        from: root,
+      });
     }
 
     /* --- validation, current step only ---------------------------------- */
@@ -240,6 +242,7 @@
         invalid[0].focus();
         DDS.announce(DDS.utils.plural(root, invalid.length, words.problems), {
           assertive: true,
+          from: root,
         });
       } else {
         invalid[0].reportValidity();

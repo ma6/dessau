@@ -155,7 +155,7 @@
 
       input.focus();
 
-      DDS.announce(revealing ? labels.shown : labels.hidden);
+      DDS.announce(revealing ? labels.shown : labels.hidden, { from: input });
     });
   }
 
@@ -353,7 +353,7 @@
       // what the value became.
       var words = DDS.utils.wording(root, STEPPER_WORDING);
       var label = input.labels && input.labels[0] ? input.labels[0].textContent.trim() : words.value;
-      DDS.announce(words.announcement(label, input.value));
+      DDS.announce(words.announcement(label, input.value), { from: root });
     }
 
     if (decrement) {
@@ -571,7 +571,7 @@
 
       input.dispatchEvent(new Event('change', { bubbles: true }));
       render();
-      DDS.announce(words.removed(name));
+      DDS.announce(words.removed(name), { from: root });
     }
 
     input.addEventListener('change', function () {
@@ -580,7 +580,9 @@
       /* Zero is its own sentence rather than a plural category: "0 files
          selected" is a count, and "No files selected" is what a person says.
          Every other count goes through the language's own plural rules. */
-      DDS.announce(count === 0 ? words.none : DDS.utils.plural(root, count, words.selected));
+      DDS.announce(count === 0 ? words.none : DDS.utils.plural(root, count, words.selected), {
+        from: root,
+      });
     });
 
     /* --- drag and drop, strictly additive ------------------------------- */
@@ -712,7 +714,7 @@
       var remaining = max - field.value.length;
       // Only worth speaking when it starts to matter.
       if (state(remaining) === 'ok') return;
-      DDS.announce(DDS.utils.plural(field, remaining, words.remaining));
+      DDS.announce(DDS.utils.plural(field, remaining, words.remaining), { from: field });
     }, 700);
 
     field.addEventListener('input', function () {

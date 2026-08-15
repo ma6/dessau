@@ -385,12 +385,12 @@
 
       navigator.clipboard.writeText(String(value).trim()).then(
         function () {
-          DDS.announce(words.copied);
+          DDS.announce(words.copied, { from: button });
           toast(words.copied, { kind: 'success', duration: 2500 });
         },
         function () {
           // Denied permission, or a non-secure context.
-          DDS.announce(words.failedAnnouncement, { assertive: true });
+          DDS.announce(words.failedAnnouncement, { assertive: true, from: button });
           toast(words.failedToast, { kind: 'error' });
         }
       );

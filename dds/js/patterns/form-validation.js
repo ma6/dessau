@@ -503,7 +503,7 @@
           problems.length,
           DDS.utils.wording(form, WORDING).summaryAnnouncement
         ),
-        { assertive: true }
+        { assertive: true, from: form }
       );
     });
 

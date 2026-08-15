@@ -106,8 +106,12 @@ test('the announcement is not half-translated', async ({ page }) => {
    * component's own status element — the first version of this test asked for
    * both and failed on the ambiguity. The one DDS creates is the visually hidden,
    * atomic one it appends to the body (see `getLiveRegion` in dds.js).
+   *
+   * `[lang="de"]` is part of the identity of the region and not decoration on the
+   * selector: there is one region per politeness *and* language, so a German
+   * toggle and an English one do not share one (#44).
    */
-  const live = page.locator('div.dds-sr-only[aria-live="polite"][aria-atomic="true"]');
+  const live = page.locator('div.dds-sr-only[aria-live="polite"][aria-atomic="true"][lang="de"]');
 
   /**
    * This is the defect the rule was hiding: the label came from the table and the
@@ -181,7 +185,7 @@ test('a component inside lang="de" writes German, without being configured', asy
   const list = page.locator('[data-dds-upload-list]');
   await expect(list).toContainText('antrag.pdf');
 
-  const live = page.locator('div.dds-sr-only[aria-live="polite"][aria-atomic="true"]');
+  const live = page.locator('div.dds-sr-only[aria-live="polite"][aria-atomic="true"][lang="de"]');
   await expect(live).toHaveText(/Datei ausgewählt/);
 
   /**
@@ -199,7 +203,7 @@ test('the plural form is chosen by the language, not by appending an s', async (
     { name: 'zwei.pdf', mimeType: 'application/pdf', buffer: Buffer.from('%PDF-1.4 b') },
   ]);
 
-  const live = page.locator('div.dds-sr-only[aria-live="polite"][aria-atomic="true"]');
+  const live = page.locator('div.dds-sr-only[aria-live="polite"][aria-atomic="true"][lang="de"]');
 
   /**
    * "2 Dateien ausgewählt", not "2 Datei ausgewählts". German and English happen
@@ -208,6 +212,48 @@ test('the plural form is chosen by the language, not by appending an s', async (
    * `Intl.PluralRules` is what makes the third language a data change.
    */
   await expect(live).toHaveText(/2 Dateien ausgewählt/);
+});
+
+test('an announcement is spoken in the language of what raised it, not the page', async ({
+  page,
+}) => {
+  /**
+   * The defect this exists for was found by ear, not by any check here (#44).
+   *
+   * `DDS.announce` does not speak from where it was called: it writes into a
+   * region appended to `<body>`, which inherits `<html lang="en">`. The upload
+   * demo is `lang="de"`, the wording table returned German, and VoiceOver read
+   * "1 Datei ausgewählt" out in an English voice — right words, wrong mouth. The
+   * text was moved to a place where the `lang` that produced it no longer applied.
+   *
+   * Every assertion below was true before the fix except the language of the
+   * region, which is the entire failure: it is inaudible on screen and every
+   * existing test passed.
+   */
+  await page.goto(COMPONENTS);
+
+  await page.locator('#upload').setInputFiles({
+    name: 'unterlage.pdf',
+    mimeType: 'application/pdf',
+    buffer: Buffer.from('%PDF-1.4 test'),
+  });
+
+  const german = page.locator('div.dds-sr-only[aria-live="polite"][lang="de"]');
+  await expect(german).toHaveText(/Datei ausgewählt/);
+
+  /**
+   * And nothing German landed in a region that claims to be English. Asserted as
+   * well as the positive, because the fix could have been "set `lang` on the one
+   * shared region", which would announce correctly once and then mispronounce
+   * every message that followed from somewhere else — the same reason `aria-live`
+   * is not mutated on a live element either.
+   */
+  const englishText = await page
+    .locator('div.dds-sr-only[aria-live="polite"]:not([lang])')
+    .allTextContents();
+  expect(englishText.join(' '), 'a German sentence is sitting in the page-language region').not.toMatch(
+    /ausgewählt/
+  );
 });
 
 test('a German field inside an English form is explained in German', async ({ page }) => {

@@ -858,6 +858,26 @@ the table every unrecognised language falls back to. `data-dds-error-<constraint
 `messages.resultCount` still works even though the default behind it became a
 plural rule — an option contract does not break because its default improved.
 
+**Extended again (#44), and this is the part the rule had a hole in.** Choosing the
+string by `lang` is only half of it. The string still has to be *said* somewhere,
+and `DDS.announce` said it somewhere else: a single live region appended to
+`<body>`, inheriting `<html lang="en">`. So the last bullet above was true of the
+lookup and false of the outcome — the field decided the words, and the destination
+overruled the voice. A `lang="de"` component produced correct German and VoiceOver
+read it out in English. Found by ear, on a German Mac, walking #4.
+
+`DDS.announce(message, { from: element })` now takes the element the message is
+about, and there is one region per politeness **and** language — `lang` set once at
+creation, never mutated. Mutating it was the smaller change and it is the wrong one
+for the same reason `aria-live` is not mutated either: a screen reader is watching
+that element, and an attribute changed underneath it mid-flight is not something to
+depend on. Omitting `from` still means "about the document as a whole", which is
+the toast's argument and remains a claim rather than a default worth falling into.
+
+The general shape, worth stating once: **text moved out of its subtree leaves its
+language behind.** Anything appended to `<body>` — a live region, a dialog, a
+lightbox, a toast — is in the document's language whatever the code around it says.
+
 ---
 
 ## 029 — Container queries have no fallback, and that is written down

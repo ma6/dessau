@@ -174,7 +174,7 @@
           if (DDS.formValidation) {
             DDS.formValidation.showError(input, message);
           }
-          DDS.announce(message, { assertive: true });
+          DDS.announce(message, { assertive: true, from: input });
         });
     }
 

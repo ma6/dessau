@@ -197,12 +197,18 @@
   /**
    * Create (once) and return a live region.
    *
-   * Two separate regions, because politeness is not a per-message decision the
-   * same element can make: a screen reader watches the element, and changing
-   * `aria-live` on it mid-flight is unreliable.
+   * One region per politeness *and* per language, and both for the same reason:
+   * a screen reader watches the element, and changing what the element says
+   * about itself while it is being watched is not dependable. `aria-live` is the
+   * obvious case. `lang` is the one that was missed — see below.
+   *
+   * @param {string} politeness  `polite` or `assertive`.
+   * @param {string} lang  A primary language subtag, or `''` for "not stated",
+   *   which leaves the region inheriting the document's language.
    */
-  function getLiveRegion(politeness) {
-    if (liveRegions[politeness]) return liveRegions[politeness];
+  function getLiveRegion(politeness, lang) {
+    var key = politeness + '|' + lang;
+    if (liveRegions[key]) return liveRegions[key];
 
     var region = document.createElement('div');
     region.className = 'dds-sr-only';
@@ -213,17 +219,31 @@
     // Announce the whole region so a partial DOM update is read as one message
     // rather than as a fragment.
     region.setAttribute('aria-atomic', 'true');
+    if (lang) region.setAttribute('lang', lang);
     document.body.appendChild(region);
 
-    liveRegions[politeness] = region;
+    liveRegions[key] = region;
     return region;
   }
 
   /**
    * Announce a message to assistive technology.
    *
+   * `from` is the element the message is about — the same one whose wording table
+   * produced it. **Pass it.** The message is not spoken where it was raised: it is
+   * written into a region appended to `<body>`, which inherits the document's
+   * language and nothing else's. Without `from`, a German sentence from a
+   * `lang="de"` component is read out in an English voice on an English page. The
+   * words are right, the pronunciation is not, and it is inaudible to everybody
+   * who can see the screen. That is how it survived every check in this
+   * repository until somebody listened to it (#44).
+   *
+   * Omitting `from` says "this is about the document as a whole" — an application
+   * -level message, the same argument the toast region makes about itself. It is
+   * a claim, not a default to fall into.
+   *
    * @param {string} message
-   * @param {{ assertive?: boolean }} [options]
+   * @param {{ assertive?: boolean, from?: Element }} [options]
    *   `assertive: true` interrupts whatever is being read. Reserve it for
    *   something the user must know immediately — a failed submit, a lost
    *   connection. Everything else is polite, because interrupting someone
@@ -231,7 +251,10 @@
    */
   function announce(message, options) {
     var opts = options || {};
-    var region = getLiveRegion(opts.assertive ? 'assertive' : 'polite');
+    var region = getLiveRegion(
+      opts.assertive ? 'assertive' : 'polite',
+      opts.from ? language(opts.from) : ''
+    );
 
     // Clearing first forces a change even when the new message is identical to
     // the previous one, which otherwise would not be announced at all. The
@@ -391,7 +414,7 @@
          changed to say what pressing again would do, which is not what the user
          needs to hear — they need confirmation of what just happened. The change
          is obvious to a sighted user and invisible otherwise. */
-      announce(themeLabelsFor(button)[currentTheme()].applied);
+      announce(themeLabelsFor(button)[currentTheme()].applied, { from: button });
     });
   });
 

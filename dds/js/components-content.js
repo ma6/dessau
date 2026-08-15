@@ -291,8 +291,9 @@
       /* Resolved from the trigger, not from the dialog: the viewer is appended
          to `<body>`, so it has no language of its own — the gallery it was
          opened from does. */
-      var words = DDS.utils.wording(group[index] || document.body, LIGHTBOX_WORDING);
-      DDS.announce(words.position(index + 1, count, text));
+      var place = group[index] || document.body;
+      var words = DDS.utils.wording(place, LIGHTBOX_WORDING);
+      DDS.announce(words.position(index + 1, count, text), { from: place });
     }
   }
 
@@ -404,7 +405,9 @@
       // document and loses the user's place.
       frame.focus();
 
-      DDS.announce(words.loaded(gate.getAttribute('data-dds-embed-provider') || words.provider));
+      DDS.announce(words.loaded(gate.getAttribute('data-dds-embed-provider') || words.provider), {
+        from: gate,
+      });
     });
   });
 })(typeof window !== 'undefined' ? window : globalThis);
