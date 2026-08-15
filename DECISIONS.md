@@ -1245,3 +1245,67 @@ itself — say `--dds-color-accent-brand` as a documented synonym for slot 1. Th
 would be 033's argument returning with a name that cannot go stale, and it would
 deserve a hearing. A return to hue names would not, unless ramps stop being
 replaceable, which would cost more than this ever did.
+
+---
+
+## 035 — An anchored popover is `position: fixed`, and the reason is the containing block
+
+**Decision.** In the `@supports` branch where `.dds-menu` and `.dds-tooltip` are
+anchored to their invoker, `position` stays `fixed` — inherited from the base rule,
+not overridden to `absolute`. The anchored branch resets `inset`, sets
+`position-anchor: auto`, and leaves `position` alone.
+
+```css
+.dds-menu {
+  position: fixed;          /* also the centred fallback: inset: 0; margin: auto */
+  inset: 0;
+  margin: auto;
+}
+
+@supports (anchor-name: --dds-probe) and (position-anchor: auto) {
+  .dds-menu {
+    inset: auto;
+    margin: 0;
+    position-anchor: auto;
+    inset-block-start: anchor(bottom, 35%);
+    inset-inline-end: anchor(right, 35%);
+    position-try-fallbacks: flip-block, flip-inline;
+  }
+}
+```
+
+**Why.** `position: absolute` on a top-layer element takes the *initial containing
+block*, which is anchored at the document origin. Everything an engine computes
+about overflow is then computed against a box that has scrolled away from what the
+reader can see — and `position-try-fallbacks` is a decision made entirely on the
+answer to that question.
+
+Both engines got it wrong from this, in opposite directions, which is what kept it
+invisible for so long. Measured on `reference/navigation.html`, 1280×900:
+
+| Engine | Situation | Behaviour |
+| --- | --- | --- |
+| WebKit | 400px of visible room below the invoker | flipped the menu above it anyway |
+| Chromium | invoker at the bottom edge | declined to flip; menu hung 117px off-screen |
+
+The dump that settled it: computed `top: 687.14px` on a box rendering at `285.14`
+— a difference of `402`, exactly the scroll offset. A fixed element's containing
+block is the viewport, so the overflow question is asked about the space the reader
+actually has, and both engines then agree.
+
+**Why this is not merely cosmetic.** The last item in these menus is "Sign out" or
+"Delete selected". Off the bottom of the screen it cannot be clicked, and there is
+nothing on screen to suggest it exists.
+
+**What it cost, and what had to be proved.** A fixed element is positioned against
+the viewport, so it only follows its invoker if the engine applies the anchor's
+scroll adjustment. If it does not, the menu stays where it was drawn while the
+button scrolls out from under it — worse than the defect being fixed, and invisible
+to any test that never scrolls. `tests/menu.spec.mjs` therefore scrolls with the
+menu open and asserts it is still fastened. That test is not optional decoration;
+it is the evidence this decision rests on.
+
+**Reversal condition.** An engine that tracks the anchor for `absolute` and not for
+`fixed`, which would show up as the scroll test failing on one project and not the
+others. The fix would then be per-engine and belongs behind a feature query, not in
+a blanket swap back — reverting to `absolute` would restore both flip defects.
