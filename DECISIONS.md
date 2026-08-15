@@ -857,3 +857,35 @@ the table every unrecognised language falls back to. `data-dds-error-<constraint
 `data-dds-label` and the `messages` option all still beat the table, and
 `messages.resultCount` still works even though the default behind it became a
 plural rule — an option contract does not break because its default improved.
+
+---
+
+## 029 — Container queries have no fallback, and that is written down
+
+**Decision.** Every DDS component responds to its container, with no fallback
+for engines below Baseline 2023 — Chrome 105, Safari 16, Firefox 110. Below that
+floor every component stays permanently in its narrow form. No polyfill.
+
+**Why the degradation is acceptable.** The narrow form is the mobile-first form,
+and it is a complete, usable component: every control is reachable, every label
+is readable, nothing is clipped and nothing is hidden. What is lost is the wide
+layout, not the functionality. A user on a 2021 browser gets a design that looks
+like it was made for a phone, on a desktop.
+
+**Why it still needs saying.** That outcome is indistinguishable from a bug. The
+person who meets it has no way to tell "this is the documented degradation" from
+"the stylesheet failed to load", and will spend an afternoon looking for the
+second. Silence is the only option here that costs somebody real time.
+
+**Why no polyfill.** `container-query-polyfill` works by parsing the stylesheets
+and re-evaluating them with a `ResizeObserver`. It is a runtime dependency, it
+runs on every resize, and it does not support `@container` inside `@layer` —
+which is where every rule in DDS lives. Dessau's promise is no build step and no
+runtime dependencies, and that promise is worth more than the wide layout on
+browsers three years out of support.
+
+**Reversal condition.** A consumer with a measured population below the floor
+that they cannot move. The answer then is a product-level stylesheet using
+`@media` for that one product — not a polyfill in the foundation, and not a
+second set of rules in DDS that everyone else pays to download.
+

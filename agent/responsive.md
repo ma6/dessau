@@ -167,6 +167,24 @@ must be neutral there — by leaving the rule out, not by resetting it.
 
 ---
 
+## Below the floor, everything stays narrow — and that is the plan
+
+Container queries are Baseline 2023: Chrome 105, Safari 16, Firefox 110. There is
+no fallback and there will not be one.
+
+Below that floor, `@container` matches nothing, so every component stays
+permanently in its narrow form. That form is the mobile-first one: every control
+reachable, every label readable, nothing clipped and nothing hidden. What is lost
+is the wide layout, not the functionality.
+
+It is written down because the outcome is indistinguishable from a bug. Somebody
+meeting a desktop that looks like it was designed for a phone cannot tell the
+documented degradation from a stylesheet that failed to load, and will go looking
+for the second. See DECISIONS.md 029 for why no polyfill, and for what to do if a
+consumer genuinely cannot move off an older engine.
+
+---
+
 ## `content-visibility: auto` changes what "the page" is
 
 `.dds-defer-render` sets `content-visibility: auto` with a `contain-intrinsic-size`
