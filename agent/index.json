@@ -66,6 +66,7 @@
   "accessibilityBaseline": "WCAG 2.2 AA",
   "verify": [
     "node scripts/check-contrast.mjs",
+    "node scripts/check-accent-separation.mjs",
     "node scripts/check-css.mjs",
     "node scripts/check-agent-index.mjs",
     "node scripts/sync-icons.mjs --check",

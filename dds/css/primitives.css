@@ -72,6 +72,10 @@
      emphasis have somewhere to go that is not the action colour and not a
      status colour. Earthy rather than a saturated primary: the Bauhaus
      influence here is material honesty, not red/yellow/blue geometry.
+
+     It is the FIRST of five accent hues and the one every default points at.
+     The other four are `magenta` and `violet` below, plus `green` and `cyan`,
+     which the status section already defines — see the note there.
      --------------------------------------------------------------------------- */
   --dds-clay-50:  #fdf5f1;
   --dds-clay-100: #fae8de;
@@ -85,9 +89,61 @@
   --dds-clay-900: #482417;
 
   /* ---------------------------------------------------------------------------
+     Accent — "magenta" and "violet". The two hues added so that a categorical
+     set of five exists at all.
+
+     Derived rather than picked. Every step sits at the mean OKLCH lightness and
+     ~1.3x the mean chroma of the four chromatic ramps above at the same step, so
+     a `600` here behaves like every other `600` — same contrast against a
+     surface, same weight beside a clay bar. The extra chroma buys separation:
+     these two are the closest neighbours in the set, and at the shared chroma
+     they were close enough to be argued about.
+
+     The hue angles are what was left. Red, clay, amber, green and cyan already
+     mean something, and indigo means "you can act on this" — that leaves the
+     purple-to-pink arc, and these two are placed at its ends: magenta at OKLCH
+     hue -10, violet at -62. Violet is deliberately no bluer than that, because
+     the next thing along the arc is the action colour.
+
+     Verified by: node scripts/check-accent-separation.mjs
+     --------------------------------------------------------------------------- */
+  --dds-magenta-50:  #fff2f8;
+  --dds-magenta-100: #ffe0ee;
+  --dds-magenta-200: #fdc1dc;
+  --dds-magenta-300: #f496c3;
+  --dds-magenta-400: #e069a6;
+  --dds-magenta-500: #c34389;
+  --dds-magenta-600: #a13170;
+  --dds-magenta-700: #812759;
+  --dds-magenta-800: #642045;
+  --dds-magenta-900: #4d1a35;
+
+  --dds-violet-50:  #f7f4ff;
+  --dds-violet-100: #ede6ff;
+  --dds-violet-200: #dacbff;
+  --dds-violet-300: #c2a6fd;
+  --dds-violet-400: #a67fef;
+  --dds-violet-500: #8a5dd4;
+  --dds-violet-600: #7048b0;
+  --dds-violet-700: #593a8d;
+  --dds-violet-800: #452e6e;
+  --dds-violet-900: #352453;
+
+  /* ---------------------------------------------------------------------------
      Status hues. Four, each unmistakably its own hue at every step, because
      status must survive being read by someone who sees hue differently — the
      colour is a reinforcement, the text and icon carry the meaning.
+
+     `green` and `cyan` are ALSO two of the five accent hues, and that sharing is
+     deliberate. A primitive is a raw value with no meaning; what a colour means
+     is decided one layer up. Minting a second green a few degrees away, purely so
+     the accent set could own one, would put two greens in the system that nobody
+     could tell apart and everybody would have to choose between. One green, two
+     jobs, and the semantic layer says which is which.
+
+     What keeps "success" and "category three" apart is therefore not the hex. It
+     is that status is never carried by colour alone (rule 7) and that an accent
+     is never allowed to encode status — see semantic.css.
      --------------------------------------------------------------------------- */
 
   /* Success — green */

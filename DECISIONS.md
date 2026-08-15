@@ -1065,3 +1065,82 @@ wrong finds out from its own network tab rather than from us.
 **Reversal condition.** Evidence rather than anticipation: a product that
 followed the recipe and still got it wrong. The first fix would then be a clearer
 recipe, and the file only if that failed too.
+
+---
+
+## 033 — Five accents, selected by attribute, sharing two ramps with status
+
+**Decision.** DDS ships five decorative accents — `clay`, `magenta`, `cyan`,
+`green`, `violet` — declared per theme as `--dds-color-accent-<hue>` and
+`--dds-color-accent-<hue>-subtle`. `data-dds-accent="<hue>"` on any element puts
+one of them in force for that subtree by re-pointing `--dds-color-accent`. Clay
+is the default, so nothing that existed before changes colour.
+
+**Why one mechanism for two jobs.** The request was two things that look
+different: a categorical set for chart series, tags and avatars, and a brand
+accent a product picks for itself. They are the same thing at different scopes.
+On `<html>` the attribute is a brand; on a chart bar it is one category among
+five. Building them separately would have meant two vocabularies, two places to
+add a sixth colour, and a product's brand accent that charts could not use.
+
+**Why an inherited custom property rather than component variants.** Every
+component that already read `--dds-color-accent` — the bar chart, the donut, the
+avatar, `.dds-quote-accented` — follows without a line of new CSS, because all
+that changed is a value it inherits. The alternative, `.dds-chart-bar-magenta`
+and its four siblings on each of four components, is twenty classes that all say
+the same thing and go stale one at a time.
+
+**Why hue names and not `accent-1` … `accent-5`.** An ordinal set is the obvious
+shape for a categorical palette and it was rejected twice over: a second name for
+one colour has to be kept in step with the first, and `data-dds-accent="3"`
+cannot be reviewed without a lookup table while `data-dds-accent="cyan"` can. A
+product assigning colours in a loop reads the documented order and indexes it
+itself.
+
+**Why `green` and `cyan` are shared with the status ramps.** Because the
+alternative is worse. The hue circle was already spoken for — red, clay, amber,
+green and cyan mean something, indigo means "you can act on this" — so an accent
+set of five either reuses two of those hues or mints near-duplicates a few degrees
+away. Two greens nobody can tell apart is not a separation; it is a choice
+everybody has to make and nobody can make correctly. A primitive is a raw value
+with no meaning, and meaning is assigned one layer up. What keeps "success" and
+"category three" apart is that status is never carried by colour alone, and that
+**an accent may never encode status** — written into `semantic.css`,
+`agent/foundations.md` and the reference page, because it is the one rule this
+sharing puts weight on.
+
+**Why the two new ramps were derived rather than picked.** Every step of
+`magenta` and `violet` sits at the mean OKLCH lightness of the four older
+chromatic ramps at that step, so a `600` here behaves like every other `600`
+against a surface. Chroma is ~1.3× the mean: at the shared chroma these two — the
+closest pair in the set — were close enough to argue about, and the extra
+saturation is what buys the separation. Their hue angles are the ends of the only
+free arc, with violet held back from the blue end because the next thing along it
+is the action colour.
+
+**Why a second check script.** `check-contrast.mjs` answers whether a colour can
+be seen against a background. It cannot answer whether two colours can be told
+apart — two hues at the same luminance have a ratio of 1.0 whether they are
+obviously different or identical — and that second question is the entire point
+of a categorical palette. `check-accent-separation.mjs` measures perceptual
+distance in OKLab, floor ΔE 0.07, both themes. For scale: the closest pair of
+meaningful colours already in Dessau is clay against red at 0.04; the shipped
+accent set's worst pair is magenta against violet in dark mode at 0.109.
+
+**Cost, and it is a real one.** An element carrying `data-theme` re-declares
+`--dds-color-accent` from its theme block, so a forced-theme subtree inside a
+branded page falls back to clay. This is not fixable without giving something up:
+custom properties are substituted where they are declared, not where they are
+used, so the theme block *must* re-declare the accent for a forced theme to work
+at all — which is decision 020, and it outranks this. The workaround is one
+attribute: put `data-dds-accent` on the same element as `data-theme`.
+
+The dark clay tint also moved, from a hand-written `#3a2318` to `--dds-clay-900`.
+Five bespoke dark tints would not have landed within 1.20–1.29:1 of the page by
+luck; one rule for all five did, and it makes the clay tint slightly more visible
+than before rather than less.
+
+**Reversal condition.** A sixth accent being asked for. Five is the point at
+which a set stops being memorable and starts being a lookup, and the honest
+answer to a sixth is a product setting the two custom properties itself and
+owning the contrast result — not a sixth entry here.

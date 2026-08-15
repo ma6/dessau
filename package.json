@@ -8,9 +8,10 @@
     "node": ">=20"
   },
   "scripts": {
-    "check": "npm run check:css && npm run check:contrast && npm run check:icons && npm run check:index && npm run check:reference && npm run check:enhancements && npm run check:adoption && npm run check:generated && npm run check:whitelabel",
+    "check": "npm run check:css && npm run check:contrast && npm run check:accents && npm run check:icons && npm run check:index && npm run check:reference && npm run check:enhancements && npm run check:adoption && npm run check:generated && npm run check:whitelabel",
     "check:css": "node scripts/check-css.mjs",
     "check:contrast": "node scripts/check-contrast.mjs",
+    "check:accents": "node scripts/check-accent-separation.mjs",
     "check:icons": "node scripts/check-icons.mjs",
     "check:index": "node scripts/check-agent-index.mjs",
     "check:reference": "node scripts/check-reference.mjs",

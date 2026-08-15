@@ -86,7 +86,7 @@ function resolve(all, name, seen = new Set()) {
  */
 function categoryOf(name) {
   if (/^--dds-color-/.test(name)) return 'color';
-  if (/^--dds-(stone|indigo|clay|green|amber|red|cyan)-/.test(name)) return 'palette';
+  if (/^--dds-(stone|indigo|clay|magenta|violet|green|amber|red|cyan)-/.test(name)) return 'palette';
   if (/^--dds-font-size-/.test(name)) return 'fontSize';
   if (/^--dds-font-weight-/.test(name)) return 'fontWeight';
   if (/^--dds-font-/.test(name)) return 'fontFamily';

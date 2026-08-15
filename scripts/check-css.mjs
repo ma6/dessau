@@ -159,7 +159,8 @@ for (const [file, css] of stripped) {
     // Space, radius, type, motion, z-index and border widths have no semantic
     // alias by design — they are not theme-dependent, so consuming them directly
     // is correct. Only the colour primitives are a real problem.
-    const isColourPrimitive = /^--dds-(stone|indigo|clay|green|amber|red|cyan)-/.test(name);
+    const isColourPrimitive =
+      /^--dds-(stone|indigo|clay|magenta|violet|green|amber|red|cyan)-/.test(name);
     if (!isColourPrimitive) continue;
 
     report(

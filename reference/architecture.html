@@ -14,7 +14,7 @@
 <link rel="preload" href="assets/fonts/Inter-Variable.ttf" as="font"
       type="font/ttf" crossorigin>
 <link rel="stylesheet" href="assets/fonts.css?v=395fbad1">
-<link rel="stylesheet" href="../dds/dds.css?v=94ce3735">
+<link rel="stylesheet" href="../dds/dds.css?v=77df4b4d">
 <link rel="stylesheet" href="assets/reference.css?v=c6855308">
 </head>
 <body>
@@ -624,6 +624,10 @@ DDS.theme                             // read / set / observe the theme</code></
                 <tr>
                   <th scope="row"><code class="dds-code">check-contrast.mjs</code></th>
                   <td>Any colour pair below its WCAG 2.2 AA threshold, in both themes — text, borders, focus rings and status fills.</td>
+                </tr>
+                <tr>
+                  <th scope="row"><code class="dds-code">check-accent-separation.mjs</code></th>
+                  <td>Two accent colours that have drifted close enough to be mistaken for each other, in either theme — which makes a chart legend or a set of category tags say nothing while every contrast check still passes.</td>
                 </tr>
                 <tr>
                   <th scope="row"><code class="dds-code">check-icons.mjs</code></th>

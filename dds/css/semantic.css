@@ -150,10 +150,33 @@
   --dds-color-on-info-solid: var(--dds-stone-0);
 
   /* ----------------------------------------------------------------- accent */
-  /* Decorative only. Never a status, never an action, never a text colour on a
-     light surface. Charts, illustration, editorial emphasis. */
-  --dds-color-accent: var(--dds-clay-600);
-  --dds-color-accent-subtle: var(--dds-clay-100);
+  /* Five decorative hues, and one of them in force.
+
+     Decorative means decorative: an accent tells one category from another. It
+     never says "this succeeded" and never says "you can act on this" — those are
+     the status and action colours, and they are the ones a reader has learnt.
+     `green` and `cyan` being shared with the status ramps makes this a rule worth
+     stating rather than assuming.
+
+     `--dds-color-accent` and `--dds-color-accent-subtle` are what components
+     read; they are the accent *in force*. The five named pairs below are what
+     they can be set to, and they carry the per-theme value — 600 on 100 in light,
+     300 on 900 in dark. Selecting one is a single attribute (see the end of this
+     file), so every component that already consumes the accent follows without a
+     line of its own. */
+  --dds-color-accent-clay: var(--dds-clay-600);
+  --dds-color-accent-clay-subtle: var(--dds-clay-100);
+  --dds-color-accent-magenta: var(--dds-magenta-600);
+  --dds-color-accent-magenta-subtle: var(--dds-magenta-100);
+  --dds-color-accent-cyan: var(--dds-cyan-600);
+  --dds-color-accent-cyan-subtle: var(--dds-cyan-100);
+  --dds-color-accent-green: var(--dds-green-600);
+  --dds-color-accent-green-subtle: var(--dds-green-100);
+  --dds-color-accent-violet: var(--dds-violet-600);
+  --dds-color-accent-violet-subtle: var(--dds-violet-100);
+
+  --dds-color-accent: var(--dds-color-accent-clay);
+  --dds-color-accent-subtle: var(--dds-color-accent-clay-subtle);
 
   /* -------------------------------------------------------------- selection */
   /* Fixed across themes for the same reason as the solid statuses. */
@@ -275,10 +298,89 @@
 
   --dds-color-focus-ring: var(--dds-indigo-300);
 
-  --dds-color-accent: var(--dds-clay-300);
-  --dds-color-accent-subtle: #3a2318;
+  /* Each accent lightens to its 300 and its tint drops to its 900 — the same two
+     steps for all five, so no hue is the one that has to be looked at twice.
+
+     The tint used to be a hand-written `#3a2318` for the single clay accent. Step
+     900 replaces it: it sits a touch lighter against the dark surfaces (1.22:1
+     rather than 1.14:1, so the tint is actually visible as a tint), and all five
+     land within 1.20–1.29:1 of the page, which a set of five bespoke values would
+     not have done by luck. */
+  --dds-color-accent-clay: var(--dds-clay-300);
+  --dds-color-accent-clay-subtle: var(--dds-clay-900);
+  --dds-color-accent-magenta: var(--dds-magenta-300);
+  --dds-color-accent-magenta-subtle: var(--dds-magenta-900);
+  --dds-color-accent-cyan: var(--dds-cyan-300);
+  --dds-color-accent-cyan-subtle: var(--dds-cyan-900);
+  --dds-color-accent-green: var(--dds-green-300);
+  --dds-color-accent-green-subtle: var(--dds-green-900);
+  --dds-color-accent-violet: var(--dds-violet-300);
+  --dds-color-accent-violet-subtle: var(--dds-violet-900);
+
+  --dds-color-accent: var(--dds-color-accent-clay);
+  --dds-color-accent-subtle: var(--dds-color-accent-clay-subtle);
 
   --dds-elevation-sm: var(--dds-shadow-sm-dark);
   --dds-elevation-md: var(--dds-shadow-md-dark);
   --dds-elevation-lg: var(--dds-shadow-lg-dark);
+}
+
+/* =============================================================================
+   Selecting an accent
+   =============================================================================
+
+   `data-dds-accent="<hue>"` on any element puts that accent in force for the
+   element and everything inside it. On `<html>` it is a product's brand accent;
+   on a chart bar, a tag or an avatar it is one category among several. One
+   mechanism, both jobs, and no component knows either of them happened.
+
+       <html data-dds-accent="magenta">              a product's accent
+
+       <span class="dds-tag" data-dds-accent="cyan">Vertrag</span>
+       <div class="dds-chart-bar" data-dds-accent="green" style="…"></div>
+
+   The hue name is the whole vocabulary. There are no `accent-1` … `accent-5`
+   aliases on purpose: a second name for the same thing has to be kept in step
+   with the first, and `data-dds-accent="3"` cannot be reviewed without a lookup
+   table, while `data-dds-accent="cyan"` can.
+
+   WHY THESE RULES COME LAST. `[data-dds-accent="…"]`, `[data-theme="dark"]` and
+   `:root` all weigh (0,1,0). Equal specificity means source order decides, so
+   these have to sit below both theme blocks — otherwise `<html data-theme="dark"
+   data-dds-accent="magenta">` would take the dark block's clay, since both rules
+   match the same element.
+
+   THE ONE PLACE THIS DOES NOT REACH, stated because it is invisible: an element
+   that carries `data-theme` re-declares `--dds-color-accent` from its theme
+   block, which overrides an accent inherited from an ancestor. A subtree with a
+   forced theme inside a branded page therefore falls back to clay. That is a
+   consequence of custom properties being substituted where they are declared, not
+   where they are used — the theme block has to re-declare the accent for a forced
+   theme to work at all (see the header of this file). Put `data-dds-accent` on
+   the element that carries `data-theme` and both hold.
+   ============================================================================= */
+
+[data-dds-accent="clay"] {
+  --dds-color-accent: var(--dds-color-accent-clay);
+  --dds-color-accent-subtle: var(--dds-color-accent-clay-subtle);
+}
+
+[data-dds-accent="magenta"] {
+  --dds-color-accent: var(--dds-color-accent-magenta);
+  --dds-color-accent-subtle: var(--dds-color-accent-magenta-subtle);
+}
+
+[data-dds-accent="cyan"] {
+  --dds-color-accent: var(--dds-color-accent-cyan);
+  --dds-color-accent-subtle: var(--dds-color-accent-cyan-subtle);
+}
+
+[data-dds-accent="green"] {
+  --dds-color-accent: var(--dds-color-accent-green);
+  --dds-color-accent-subtle: var(--dds-color-accent-green-subtle);
+}
+
+[data-dds-accent="violet"] {
+  --dds-color-accent: var(--dds-color-accent-violet);
+  --dds-color-accent-subtle: var(--dds-color-accent-violet-subtle);
 }

@@ -28,9 +28,10 @@ indirection.
 
 ## Colour
 
-One neutral, one interactive hue, one decorative accent, four status hues. The
-restraint is the point: when everything actionable shares one colour, that colour
-starts to mean "you can act on this".
+One neutral, one interactive hue, four status hues, and a set of five decorative
+accents. The restraint is where it matters: **one** interactive colour, so that
+colour starts to mean "you can act on this". The accents are the one plural set,
+because their entire job is to be plural.
 
 ### Primitive ramps
 
@@ -38,11 +39,25 @@ starts to mean "you can act on this".
 | --- | --- | --- |
 | `stone` | True grey, no hue | Every neutral surface, text and border |
 | `indigo` | Blue-violet | The single interactive hue |
-| `clay` | Muted terracotta | Decorative accent only |
-| `green` | Green | Success |
+| `clay` | Muted terracotta | Accent — and the default one |
+| `magenta` | Pink-magenta | Accent |
+| `violet` | Purple | Accent |
+| `green` | Green | Success — **and** an accent |
 | `amber` | Olive-leaning amber | Warning |
 | `red` | Red | Error, and destructive actions |
-| `cyan` | Cyan | Information |
+| `cyan` | Cyan | Information — **and** an accent |
+
+`green` and `cyan` doing two jobs is deliberate. A primitive is a raw value with
+no meaning, and meaning is assigned one layer up. Minting a second green a few
+degrees away so the accent set could own one would put two greens in the system
+that nobody can tell apart and everybody has to choose between. What keeps
+"success" and "category three" separate is not the hex: it is that status is never
+carried by colour alone, and that an accent may never encode status.
+
+`magenta` and `violet` are derived rather than picked — each step sits at the mean
+OKLCH lightness and ~1.3× the mean chroma of the older chromatic ramps at that
+step, so a `600` here behaves like every other `600`. Their hue angles are what
+red, clay, amber, green, cyan and indigo left free. See DECISIONS.md 033.
 
 Steps run `50` (lightest) to `950` (darkest), plus `--dds-stone-0` (pure white)
 and `--dds-stone-850`.
@@ -144,23 +159,65 @@ machine-checkable, because the effective background depends on the content
 behind. The mitigation is the strong variant — at 85% black, near-white text
 clears AA against anything underneath.
 
-**Accent** — `--dds-color-accent`, `--dds-color-accent-subtle`.
+**Accent** — five hues, and one of them in force.
 
-Decorative only. Never a status, never an action, never body text on a light
-surface. It exists so illustration, charts and editorial emphasis have somewhere
-to go that is not the action colour.
+`--dds-color-accent` and `--dds-color-accent-subtle` are what a component reads:
+the accent *in force*. `--dds-color-accent-<hue>` and
+`--dds-color-accent-<hue>-subtle` are what it can be set to, for
+`clay` · `magenta` · `cyan` · `green` · `violet`. Each carries its own per-theme
+value — 600 on 100 in light, 300 on 900 in dark. With nothing selected, the accent
+is clay.
+
+**Selecting one is an attribute, on any element:**
+
+```html
+<html data-dds-accent="magenta">                    a product's own accent
+
+<span class="dds-avatar" data-dds-accent="cyan">    one category among several
+<div class="dds-chart-bar" data-dds-accent="green">
+```
+
+One mechanism, both jobs. Every component that already reads the accent — the bar
+chart, the donut, the avatar, `.dds-quote-accented` — follows without a line of
+its own CSS, because all that changed is a custom property it inherits.
+
+**The hue name is the whole vocabulary.** There are no `accent-1` … `accent-5`
+aliases: a second name for one colour has to be kept in step with the first, and
+`data-dds-accent="3"` cannot be reviewed without a lookup table.
+
+**Decorative only, and that is a rule rather than a description.** An accent
+distinguishes one category from another. It never says "this succeeded" and never
+says "you can act on this" — a green accent is not a success and a chart bar is
+not a button. Two of the five share a ramp with a status hue, so this is the line
+that keeps them apart, along with the standing rule that status is never carried
+by colour alone.
+
+**One place the attribute does not reach.** An element carrying `data-theme`
+re-declares `--dds-color-accent` from its theme block, which overrides an accent
+inherited from an ancestor — so a forced-theme subtree inside a branded page falls
+back to clay. Custom properties are substituted where they are declared, not where
+they are used, and the theme block has to re-declare the accent for a forced theme
+to work at all. Put `data-dds-accent` on the same element as `data-theme` and both
+hold.
 
 **Selection** — `--dds-color-selection-bg` / `-text`, fixed across themes.
 
 ### Verification
 
 ```bash
-node scripts/check-contrast.mjs            # 148 pairs, both themes
+node scripts/check-contrast.mjs            # 188 pairs, both themes
 node scripts/check-contrast.mjs --verbose  # print the passing ones too
+
+node scripts/check-accent-separation.mjs   # can the five accents be told apart?
 ```
 
 Adding a semantic colour means adding it to the `PAIRS` table in that script. A
 value nobody checks is a value nobody can trust.
+
+The second script answers a question contrast cannot: two colours with the same
+luminance have a ratio of 1.0 whether they are obviously different or identical.
+A categorical palette lives on that question, so it gets its own measure —
+perceptual distance in OKLab, floor ΔE 0.07, both themes.
 
 ---
 
