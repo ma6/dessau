@@ -122,7 +122,7 @@ never reach your product untested. ([Why](agent/architecture.md#distribution-a-p
 
 ```bash
 # Recommended: a submodule, pinned to a commit
-git submodule add <dessau-url> libs/dessau
+git submodule add https://github.com/ma6/dessau.git libs/dessau
 
 # Or copy it in. Simpler to start, updates pulled by hand. Fine for a prototype.
 cp -R <dessau>/dds libs/dessau/dds

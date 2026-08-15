@@ -17,7 +17,7 @@ there are forty components using it.
 Git submodule, pinned:
 
 ```bash
-git submodule add <dessau-url> libs/dessau
+git submodule add https://github.com/ma6/dessau.git libs/dessau
 ```
 
 Or copy `dds/` in. Either way **pinned and local** — never loaded at runtime from a
