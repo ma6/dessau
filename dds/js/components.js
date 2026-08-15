@@ -328,6 +328,28 @@
      leaves the user unsure whether to press it again.
      ========================================================================= */
 
+  /**
+   * Copy-button wording.
+   *
+   * The failure has two strings, not one, and they are different lengths on
+   * purpose: the toast is a glance and the announcement has to say what to do
+   * instead. A copy that silently did nothing is the worst outcome here, because
+   * the user walks away believing they have the value.
+   */
+  var COPY_WORDING = {
+    en: {
+      copied: 'Copied to clipboard',
+      failedAnnouncement: 'Could not copy. Select the text and copy it manually.',
+      failedToast: 'Could not copy automatically',
+    },
+    de: {
+      copied: 'In die Zwischenablage kopiert',
+      failedAnnouncement:
+        'Kopieren nicht möglich. Markieren Sie den Text und kopieren Sie ihn selbst.',
+      failedToast: 'Automatisches Kopieren nicht möglich',
+    },
+  };
+
   DDS.register('copy', '[data-dds-copy]', function (button) {
     // No async clipboard API means no reliable copy. Rather than a button that
     // does nothing, remove it and let the user select the text themselves.
@@ -343,17 +365,17 @@
 
       var value = 'value' in source ? source.value : source.textContent;
 
+      var words = DDS.utils.wording(button, COPY_WORDING);
+
       navigator.clipboard.writeText(String(value).trim()).then(
         function () {
-          DDS.announce('Copied to clipboard');
-          toast('Copied to clipboard', { kind: 'success', duration: 2500 });
+          DDS.announce(words.copied);
+          toast(words.copied, { kind: 'success', duration: 2500 });
         },
         function () {
           // Denied permission, or a non-secure context.
-          DDS.announce('Could not copy. Select the text and copy it manually.', {
-            assertive: true,
-          });
-          toast('Could not copy automatically', { kind: 'error' });
+          DDS.announce(words.failedAnnouncement, { assertive: true });
+          toast(words.failedToast, { kind: 'error' });
         }
       );
     });

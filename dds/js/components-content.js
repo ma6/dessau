@@ -78,6 +78,30 @@
     });
   });
 
+  /**
+   * Lightbox wording.
+   *
+   * `position` takes the caption too, rather than the caller appending it. The
+   * separator between "Image 3 of 8" and the caption is punctuation with a
+   * language attached — and a sentence that ends in one language and continues
+   * in another is the half-translated announcement this rule exists to stop
+   * (DECISIONS.md 028).
+   */
+  var LIGHTBOX_WORDING = {
+    en: {
+      viewer: 'Image viewer',
+      position: function (current, total, caption) {
+        return 'Image ' + current + ' of ' + total + (caption ? '. ' + caption : '');
+      },
+    },
+    de: {
+      viewer: 'Bildbetrachter',
+      position: function (current, total, caption) {
+        return 'Bild ' + current + ' von ' + total + (caption ? '. ' + caption : '');
+      },
+    },
+  };
+
   var dialog = null;
   var imageWrap = null;
   var image = null;
@@ -97,7 +121,7 @@
     dialog = document.createElement('dialog');
     dialog.className = 'dds-lightbox';
     // The dialog needs a name; the image's own alt text is not the dialog's name.
-    dialog.setAttribute('aria-label', 'Image viewer');
+    dialog.setAttribute('aria-label', DDS.utils.wording(document.body, LIGHTBOX_WORDING).viewer);
 
     var figure = document.createElement('figure');
     figure.className = 'dds-lightbox-figure';
@@ -264,7 +288,11 @@
     nextZone.hidden = !many;
 
     if (many) {
-      DDS.announce('Image ' + (index + 1) + ' of ' + count + (text ? '. ' + text : ''));
+      /* Resolved from the trigger, not from the dialog: the viewer is appended
+         to `<body>`, so it has no language of its own — the gallery it was
+         opened from does. */
+      var words = DDS.utils.wording(group[index] || document.body, LIGHTBOX_WORDING);
+      DDS.announce(words.position(index + 1, count, text));
     }
   }
 
@@ -319,6 +347,31 @@
      the material is reachable without JavaScript and without accepting the embed.
      ========================================================================= */
 
+  /**
+   * Embed wording.
+   *
+   * `provider` is the fallback when the page did not name one. The provider
+   * itself — "YouTube", "Vimeo" — is a proper noun and is not translated; what
+   * varies is the sentence built around it, which is why `loaded` takes the name
+   * rather than the caller appending "content loaded" to it.
+   */
+  var EMBED_WORDING = {
+    en: {
+      untitled: 'Embedded content',
+      provider: 'Embedded',
+      loaded: function (provider) {
+        return provider + ' content loaded';
+      },
+    },
+    de: {
+      untitled: 'Eingebetteter Inhalt',
+      provider: 'Eingebetteter',
+      loaded: function (provider) {
+        return provider + ' Inhalt geladen';
+      },
+    },
+  };
+
   DDS.register('embed', '[data-dds-embed]', function (gate) {
     var trigger = gate.querySelector('[data-dds-embed-consent]');
     var src = gate.getAttribute('data-dds-embed-src');
@@ -333,7 +386,8 @@
       frame.src = src;
       // An iframe MUST have a title, or it is announced as an unnamed frame and
       // the user has no idea what they have just landed in.
-      frame.title = gate.getAttribute('data-dds-embed-title') || 'Embedded content';
+      var words = DDS.utils.wording(gate, EMBED_WORDING);
+      frame.title = gate.getAttribute('data-dds-embed-title') || words.untitled;
       frame.loading = 'lazy';
       frame.allowFullscreen = true;
       // Only what a media embed actually needs. Omitting `autoplay` is
@@ -350,9 +404,7 @@
       // document and loses the user's place.
       frame.focus();
 
-      DDS.announce(
-        (gate.getAttribute('data-dds-embed-provider') || 'Embedded') + ' content loaded'
-      );
+      DDS.announce(words.loaded(gate.getAttribute('data-dds-embed-provider') || words.provider));
     });
   });
 })(typeof window !== 'undefined' ? window : globalThis);
