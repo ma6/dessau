@@ -889,3 +889,39 @@ that they cannot move. The answer then is a product-level stylesheet using
 `@media` for that one product — not a polyfill in the foundation, and not a
 second set of rules in DDS that everyone else pays to download.
 
+
+---
+
+## 030 — Built artefacts hang on a release tag, not in the tree
+
+**Decision.** `dist/` stays git-ignored (023). A tagged release carries
+`dds.css` and `dds.min.css` as attached assets, built by
+`.github/workflows/release.yml` from the tag's own source.
+
+**CSS only.** `bundle.mjs` produces no `dds.min.js`, and none is added here. The
+scripts are separate files a page includes as it needs them — `dds.js` plus
+whichever components and patterns it uses — so there is no single order to
+concatenate them in, and a page that uses two patterns should not download
+seventeen. Offering a bundle that does not exist would be worse than offering
+none.
+
+**The gap this closes.** 023 is right that a committed minified file is a second
+copy of the truth that eventually becomes a wrong copy. It left a consumer with
+nowhere to get one, and that contradicted "no build step" — a product pinning
+Dessau as a submodule got the layer files and a bundler to run. The answer
+differed depending on which document you read, which is the actual defect.
+
+**Why an attached asset rather than a committed one.** A release asset is
+versioned, immutable and outside the working tree, so it cannot drift from the
+source it was built from — it is rebuilt from the tag every time, by a workflow
+nobody has to remember to run. Committing `dist/` on tags only would have the
+same effect with a history that is inconsistent about what a commit contains.
+
+**What did not change.** Linking the layer files directly still works and is
+still documented; `dds.css` still reaches them with `@import`. Both remain
+equivalent to the bundle, and the bundle additionally removes the `@import`
+timing problem — a token read from script at `DOMContentLoaded` can come back as
+an empty string when the sheets arrive that way (see LESSONS_LEARNED.md).
+
+**Reversal condition.** Releases becoming frequent enough that building on each
+tag is slower than the alternative. Nothing about that is in prospect.

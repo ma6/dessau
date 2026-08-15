@@ -398,6 +398,31 @@ node scripts/sync-cache-busting.mjs  # re-stamp ?v= on every stylesheet and scri
 node scripts/bundle.mjs              # optional: dist/dds.css and dds.min.css
 ```
 
+### Where a consumer gets the built stylesheet
+
+Three ways, all equivalent, in the order most projects should try them:
+
+1. **Link the layer files directly**, or link `dds/dds.css` and let its `@import`s
+   fetch them. Works today, no build, no release. One caveat, and it is real:
+   an `@import`ed sheet has not necessarily applied by `DOMContentLoaded`, so a
+   script reading `--dds-*` back out of the computed style can get an empty
+   string. Wait for `load`, or use one of the other two.
+2. **A tagged release**, which carries `dds.css` and `dds.min.css` as attached
+   assets. Built from the tag's own source by
+   [`.github/workflows/release.yml`](.github/workflows/release.yml) — versioned,
+   immutable, and not in the tree.
+3. **Run `node scripts/bundle.mjs` yourself** and ship the output from your own
+   pipeline.
+
+`dist/` is git-ignored and stays that way: a committed minified file is a second
+copy of the truth that eventually becomes a wrong copy
+([`DECISIONS.md`](DECISIONS.md) 023 and 030).
+
+There is no JavaScript bundle. The scripts are separate files a page includes as
+it needs them — `dds.js` plus whichever components and patterns it uses — so
+there is no single order to concatenate them in, and a page using two patterns
+should not download seventeen.
+
 The `?v=<hash>` on every `<link>` and `<script>` is generated, never typed. It is
 the content hash of the file being referenced, so a change to a stylesheet reaches
 a reader who already has the old one — including the eleven layer files behind

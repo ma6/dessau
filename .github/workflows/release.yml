@@ -1,0 +1,76 @@
+# -----------------------------------------------------------------------------
+# Dessau — a tagged release carries the built stylesheet and script.
+# -----------------------------------------------------------------------------
+#
+# `dist/` is git-ignored on purpose: a committed minified file is a second copy
+# of the truth that eventually becomes a wrong copy (DECISIONS 023). That left a
+# consumer with nowhere to get one, which contradicted "no build step" — pinning
+# Dessau as a submodule meant getting the layer files and a bundler to run.
+#
+# A release asset closes that without reopening the first problem. It is
+# versioned, immutable and outside the tree, and it is rebuilt from the tag's own
+# source every time rather than from whatever somebody had locally.
+#
+# Linking the layer files directly still works and is still documented. The
+# bundle is the convenience, and it removes one real problem of its own: a token
+# read from script can come back as an empty string while `@import`ed sheets are
+# still arriving.
+# -----------------------------------------------------------------------------
+
+name: Release
+
+on:
+  push:
+    tags: ['v*']
+  # So a release can be rebuilt without moving the tag.
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Tag to build and attach to'
+        required: true
+
+permissions:
+  contents: write
+
+jobs:
+  bundle:
+    name: Build and attach
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.inputs.tag || github.ref }}
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - run: npm ci
+
+      # The full build, not `bundle.mjs` alone: the generators write the
+      # foundations JSON and the cache-busting hashes the bundle reads, so
+      # running only the last step would ship a bundle built from stale inputs.
+      - run: npm run build
+
+      # A tag that does not pass the gates must not become a release. The
+      # browser suite is CI's job on the commit; this is the last chance to stop
+      # a bundle nobody can trust from being handed to a consumer.
+      - run: npm run check:css
+
+      - name: Attach the bundle
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ github.event.inputs.tag || github.ref_name }}
+        run: |
+          ls -l dist/
+          # CSS only, because that is what `bundle.mjs` produces. The scripts are
+          # deliberately separate files a page includes as it needs them — there
+          # is no one order to concatenate them in, and each is small and
+          # optional. Attaching a `dds.min.js` that does not exist would be worse
+          # than not offering one.
+          #
+          # `--clobber` so a rebuild replaces the assets rather than failing on a
+          # name that already exists.
+          gh release upload "$TAG" dist/dds.css dist/dds.min.css --clobber
