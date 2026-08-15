@@ -1,0 +1,142 @@
+# -----------------------------------------------------------------------------
+# Dessau — the checks run without being asked.
+# -----------------------------------------------------------------------------
+#
+# Every gate in this repository exists because a defect got through review: a
+# component documented and never demonstrated, a contrast pair below 4.5:1, a
+# class the JavaScript toggles and no stylesheet defines, an enhancement sweep
+# that ran before anything had registered. Each one was written the day it was
+# needed and then depended on somebody remembering to type `npm run check`.
+#
+# That is the whole gap this closes. Nothing here is new verification — it is
+# the same eight gates and the same browser suite, hung on something that runs
+# whether or not anyone thought of it.
+#
+# WebKit is not optional. It is the engine on every iPhone and iPad, it is the
+# last to ship several of the features Dessau relies on, and it is where a
+# container query or an `:has()` selector behaves differently first. It has
+# already found a real difference here (#9). It gets its own matrix leg so that
+# "passed on Chromium, failed on WebKit" is visible at a glance rather than
+# buried in a log.
+#
+# Deliberately cheap: the gates are zero-dependency Node, Playwright is the only
+# devDependency, and the test server is Python's own — already on the runner,
+# and the same command README.md tells a reader to use.
+# -----------------------------------------------------------------------------
+
+name: CI
+
+on:
+  push:
+    branches: ['**']
+  pull_request:
+  workflow_dispatch:
+
+# A superseded run tells you about code nobody is looking at any more.
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    name: Gates
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+        # `audit-whitelabel.mjs` reads commit messages as well as files, so a
+        # shallow clone would silently narrow what it audits to one commit.
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - run: npm ci
+
+      # `audit-whitelabel.mjs` reads `.whitelabel-terms.json`, which is
+      # git-ignored on purpose: an audit that enumerates the names it is looking
+      # for is the most reliable place to find those names. So the list cannot
+      # simply be in the checkout, and the script fails loudly without it rather
+      # than passing with nothing to search for.
+      #
+      # A repository secret keeps both properties. Without one, CI falls back to
+      # the committed example — which exercises the mechanism and finds the
+      # generic clichés, but not the names the audit actually exists for. That
+      # is said out loud rather than passing quietly, because a check nobody
+      # knows is running at half strength is a check that is trusted wrongly.
+      - name: Term list for the whitelabel audit
+        env:
+          TERMS: ${{ secrets.WHITELABEL_TERMS }}
+        run: |
+          if [ -n "$TERMS" ]; then
+            printf '%s' "$TERMS" > .whitelabel-terms.json
+            echo "Using the term list from the WHITELABEL_TERMS secret."
+          else
+            cp .whitelabel-terms.example.json .whitelabel-terms.json
+            echo "::warning title=Whitelabel audit is running on the example list::Set the WHITELABEL_TERMS repository secret to audit the real terms. The generic entries still apply; the project-specific ones are absent."
+          fi
+
+      # One command, exactly as a person runs it locally. If this file ever
+      # lists the gates individually it will drift from `package.json`, and the
+      # drift will be in the direction of running fewer of them.
+      - run: npm run check
+
+  test:
+    name: Browser (${{ matrix.engine }})
+    runs-on: ubuntu-latest
+
+    strategy:
+      # Both engines report. A Chromium failure must not hide a WebKit one, or
+      # the second engine has stopped earning its place in the suite.
+      fail-fast: false
+      matrix:
+        engine: [chromium, webkit]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - run: npm ci
+
+      # Keyed on the resolved Playwright version, not on the lockfile as a
+      # whole: a lockfile changes for reasons that have nothing to do with the
+      # browsers, and a needlessly cold cache costs ~90 seconds per run.
+      - name: Resolve the Playwright version
+        id: playwright
+        run: |
+          version=$(node -p "require('@playwright/test/package.json').version")
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+
+      - uses: actions/cache@v4
+        id: browsers
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-${{ runner.os }}-${{ steps.playwright.outputs.version }}-${{ matrix.engine }}
+
+      # `--with-deps` every time, cache hit or not: the cache holds the browser
+      # bundle, not the system libraries it links against, and a runner image
+      # update changes those without changing the version key.
+      - run: npx playwright install --with-deps ${{ matrix.engine }}
+
+      - run: npx playwright test --project=${{ matrix.engine }}
+
+      # Only on failure, and only then is it worth anything: the trace is how a
+      # failure that does not reproduce locally gets understood.
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: playwright-${{ matrix.engine }}
+          path: |
+            playwright-report/
+            test-results/
+          retention-days: 7

@@ -64,6 +64,24 @@ PLAYWRIGHT_BROWSERS_PATH=.playwright-browsers npx playwright install chromium we
 tests, or they will look in the default location and report the browsers as
 missing.
 
+Both commands also run in CI, on every push and every pull request, on Chromium
+and on WebKit — see [`.github/workflows/ci.yml`](.github/workflows/ci.yml).
+Running them locally is faster feedback, not a substitute: a check that only
+runs when somebody remembers is a check that eventually does not.
+
+One thing CI cannot do for itself is the whitelabel audit's term list.
+`.whitelabel-terms.json` is git-ignored deliberately — an audit that enumerates
+the names it looks for is the best place to find them — so CI reads it from the
+`WHITELABEL_TERMS` repository secret:
+
+```bash
+gh secret set WHITELABEL_TERMS < .whitelabel-terms.json
+```
+
+Without the secret the audit falls back to `.whitelabel-terms.example.json` and
+says so in the run's annotations. The generic entries still apply; the
+project-specific ones do not.
+
 ---
 
 ## Look at it
