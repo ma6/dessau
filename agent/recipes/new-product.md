@@ -138,6 +138,12 @@ The markers in the shell above are where it goes. Then reference icons by role:
 The script also reports any `<use>` pointing at an icon that does not exist — a typo
 there renders nothing at all, with no error anywhere.
 
+**It writes a one-line Ionicons attribution above the sprite. Keep it.** The icons
+are MIT-licensed third-party artwork and MIT requires its notice to accompany
+copies. The sprite is inlined, so a deployment may ship the artwork without ever
+shipping `libs/dessau/dds/icons/` — that line is then the only notice there is.
+Check that a minifier is not configured to strip comments from your HTML.
+
 `--dir=.` walks the whole project and deliberately steps over the vendored copy
 of Dessau, saying so in its output. It used to descend into `libs/dessau` and
 rewrite Dessau's own reference pages with the product's icon set — a build step

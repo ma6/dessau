@@ -141,8 +141,25 @@ function spriteMarkup(source) {
   return source.slice(start, end + '</svg>'.length);
 }
 
+/**
+ * The attribution line that goes into every page with the sprite.
+ *
+ * MIT requires its notice to accompany copies; it does not say where, and a
+ * licence file shipped alongside is the normal way to satisfy that. `dds/icons/
+ * LICENSE-ionicons.txt` is that file — but the sprite is *inlined*, so a deployed
+ * product needs no `dds/icons/` at runtime and may not ship it at all. Then the
+ * notice is not elsewhere, it is gone.
+ *
+ * So one line travels with the artwork: the copyright notice itself, which is
+ * short and is the part MIT names first, and a link to the permission notice.
+ * The full text would be ~1.6 kB on every page for nothing a reader will read.
+ */
+const ATTRIBUTION =
+  '<!-- Icons: Ionicons — Copyright (c) 2015-present Ionic (http://ionic.io/) — ' +
+  'MIT: https://github.com/ionic-team/ionicons/blob/main/LICENSE -->';
+
 const spriteSource = await readFile(SPRITE_PATH, 'utf8');
-const sprite = spriteMarkup(spriteSource);
+const sprite = `${ATTRIBUTION}\n${spriteMarkup(spriteSource)}`;
 
 // Every symbol id in the sprite, so pages can be checked for references to
 // icons that do not exist.

@@ -72,6 +72,14 @@ Icons need one extra step: the sprite from `[PATH]/dds/icons/icons.svg` must be
 **inlined once per document**. An external `<use href="icons.svg#…">` breaks
 `currentColor` silently — the icon renders black regardless of theme.
 
+**The icons are third-party and carry an obligation.** They come from Ionicons under
+MIT, which requires its notice to accompany copies. `sync-icons.mjs` writes a
+one-line attribution above every inlined sprite — **do not strip it**, and do not
+let a minifier strip it either. That line is the only trace that survives when a
+deployment ships the inlined markup and not `[PATH]/dds/icons/`. The full notice is
+`[PATH]/dds/icons/LICENSE-ionicons.txt`; shipping it alongside is the safer answer
+if this product publishes a licences page.
+
 ### Rules that are not negotiable
 
 - **WCAG 2.2 AA is the floor.** It outranks visual preference, convenience and
