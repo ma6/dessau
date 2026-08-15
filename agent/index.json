@@ -28,6 +28,7 @@
     "definitionOfDone": "agent/definition-of-done.md",
     "modernWebGuidance": "agent/modern-web-guidance.md",
     "recipes": "agent/recipes/",
+    "deriveDesignSystem": "agent/recipes/derive-a-design-system.md",
     "consumerTemplate": "agent/consumer-AGENTS.template.md"
   },
   "implementation": {

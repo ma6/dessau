@@ -1,5 +1,17 @@
 # Recipe: start a product with Dessau
 
+## 0. Decide what it looks like — `derive-a-design-system.md`
+
+This recipe is plumbing. Before it, spend an hour on
+[`derive-a-design-system.md`](derive-a-design-system.md), which walks the six
+decisions a derived system is made of: colour, type, roundness, density, depth
+and motion.
+
+It is genuinely first, not merely recommended. Skip it and the product does not
+get a neutral starting point — it gets Dessau's own taste, complete and
+unexamined, and roundness in particular is close to unchangeable by the time
+there are forty components using it.
+
 ## 1. Bring Dessau in
 
 Git submodule, pinned:
