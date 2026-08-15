@@ -54,10 +54,21 @@ const supportsAnchor = (page) =>
     () => CSS.supports('anchor-name: --dds-probe') && CSS.supports('position-anchor: auto')
   );
 
-/** The invoker and the popover it opens, measured after the popover is open. */
+/**
+ * The invoker and the popover it opens, measured after the popover is open.
+ *
+ * The invoker is scrolled to the MIDDLE of the viewport first, and that is not
+ * tidiness. `scrollIntoViewIfNeeded` — and Playwright's own auto-scroll before a
+ * click — moves an element just far enough to be visible, which leaves it pressed
+ * against the bottom edge. There is then no room underneath for the menu, every
+ * engine is entitled to `flip-block` it above the button instead, and a test that
+ * asserts "below" is asserting something the component never promised in that
+ * situation. Centring the invoker is what makes "below" the case actually under
+ * test.
+ */
 async function openAndMeasure(page, id) {
   const invoker = page.locator(`[popovertarget="${id}"]`);
-  await invoker.scrollIntoViewIfNeeded();
+  await invoker.evaluate((element) => element.scrollIntoView({ block: 'center' }));
   await invoker.click();
 
   const popover = page.locator(`#${id}`);
@@ -111,9 +122,10 @@ for (const { name, id } of [
 
     /**
      * Below the button, by the gap the component asks for and not much more.
-     * `position-try-fallbacks: flip-block` may put it above instead when there
-     * is no room underneath — at this viewport height there is room, so below is
-     * the case being described.
+     * `position-try-fallbacks: flip-block` puts it above instead when there is no
+     * room underneath, which is why `openAndMeasure` centres the invoker: with
+     * half a viewport of space below it, "below" is the case under test rather
+     * than a coin toss between two correct behaviours.
      */
     expect(box.top).toBeGreaterThanOrEqual(anchor.bottom - 1);
     expect(box.top - anchor.bottom, 'detached from the button it belongs to').toBeLessThan(16);
