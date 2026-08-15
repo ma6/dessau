@@ -62,10 +62,39 @@ test('the theme toggle is named in the language of where it sits', async ({ page
 });
 
 test('the announcement is not half-translated', async ({ page }) => {
+  /**
+   * A throw inside the click handler would leave the announcement unmade and
+   * nothing else to see. Collected rather than assumed, because the first version
+   * of this test could not tell "the toggle did nothing" from "the toggle said
+   * the wrong thing" — and a WebKit-only failure was read as the second when the
+   * evidence only supported the first.
+   */
+  const errors = [];
+  page.on('pageerror', (error) => errors.push(String(error)));
+  page.on('console', (message) => {
+    if (message.type() === 'error') errors.push(message.text());
+  });
+
   await page.goto(COMPONENTS);
+
+  const root = page.locator('html');
+  const before = await root.getAttribute('data-dds-theme');
 
   const german = page.locator('[lang="de"] .dds-theme-toggle');
   await german.click();
+
+  /**
+   * The theme has to have actually changed before the announcement means
+   * anything. Asserted separately so that a click which does not take effect
+   * fails HERE, saying so, instead of surfacing three lines down as a live region
+   * that was never created.
+   */
+  await expect(
+    root,
+    `the toggle did not change the theme (it was "${before}" before the click)`
+  ).not.toHaveAttribute('data-dds-theme', before);
+
+  expect(errors, 'the toggle threw while switching the theme').toEqual([]);
 
   /**
    * DDS's own live region, not any polite region on the page.
