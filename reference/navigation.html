@@ -336,6 +336,7 @@
               <li><a href="#pagination">Pagination</a></li>
               <li><a href="#steps">Step progress</a></li>
               <li><a href="#toolbar">Toolbar</a></li>
+              <li><a href="#menu">Menu</a></li>
               <li><a href="#filterbar">Filter bar</a></li>
               <li><a href="#actionbar">Action bar</a></li>
               <li><a href="#toc">Table of contents</a></li>
@@ -668,6 +669,62 @@
           </div>
 
 </div>
+      </section>
+
+      <!-- =============================================================== menu -->
+      <section class="ref-section" id="menu">
+        <div class="ref-section-head">
+          <h2>Menu</h2>
+          <p class="dds-text-subtle dds-measure-default dds-mbs-xs">
+            A list of actions opened from a control. It is shown here on its own,
+            though it never appears on its own: a menu is always invoked by
+            something, and the two other menus on this page sit inside the site
+            header and the toolbar, where they belong.
+          </p>
+        </div>
+
+        <div class="dds-stack dds-stack-lg">
+          <div class="ref-specimen" data-ref-code>
+            <p class="ref-specimen-label">Menu — a popover, invoked declaratively</p>
+            <button type="button" class="dds-button dds-button-secondary"
+                    popovertarget="demo-standalone-menu">
+              Actions
+              <svg class="dds-icon" aria-hidden="true"><use href="#dds-icon-chevron-down"/></svg>
+            </button>
+            <div class="dds-menu" id="demo-standalone-menu" popover>
+              <ul>
+                <li><button type="button" class="dds-menu-item">
+                  <svg class="dds-icon" aria-hidden="true"><use href="#dds-icon-edit"/></svg>
+                  Rename
+                </button></li>
+                <li><button type="button" class="dds-menu-item">
+                  <svg class="dds-icon" aria-hidden="true"><use href="#dds-icon-download"/></svg>
+                  Export as CSV
+                </button></li>
+                <li><hr class="dds-menu-separator"></li>
+                <li><button type="button" class="dds-menu-item dds-menu-item-danger">
+                  <svg class="dds-icon" aria-hidden="true"><use href="#dds-icon-trash"/></svg>
+                  Delete
+                </button></li>
+              </ul>
+            </div>
+            <p class="ref-note">
+              <svg class="dds-icon" aria-hidden="true"><use href="#dds-icon-info"/></svg>
+              <code class="dds-code">popovertarget</code> and no JavaScript. Light
+              dismiss, Escape, top-layer rendering and focus return come from the
+              platform, and the invoker is the popover's implicit anchor — which is
+              why the menu opens under the button it belongs to without a name per
+              instance (#48, DECISIONS 035).
+            </p>
+            <p class="ref-note">
+              <svg class="dds-icon" aria-hidden="true"><use href="#dds-icon-info"/></svg>
+              <strong>Narrow:</strong> it is capped at the smaller of 20rem and the
+              viewport less a gutter. 20rem is 320px — the whole of the narrowest
+              supported screen — and being <code class="dds-code">position: fixed</code>
+              nothing else would have constrained it.
+            </p>
+          </div>
+        </div>
       </section>
 
       <!-- ============================================================ filterbar -->

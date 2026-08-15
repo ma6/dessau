@@ -319,11 +319,13 @@
               <li><a href="#field">Field</a></li>
               <li><a href="#password">Password field</a></li>
               <li><a href="#choice">Checkbox and radio</a></li>
+              <li><a href="#fieldgroup">Field group</a></li>
               <li><a href="#switch">Switch</a></li>
               <li><a href="#stepper">Number stepper</a></li>
               <li><a href="#segmented">Segmented control</a></li>
               <li><a href="#file-upload">File upload</a></li>
-              <li><a href="#range">Range and character count</a></li>
+              <li><a href="#range">Range</a></li>
+              <li><a href="#charcount">Character count</a></li>
               <li><a href="#date-field">Date field</a></li>
               <li><a href="#theme-toggle">Theme toggle</a></li>
               <li><a href="#badge">Badge</a></li>
@@ -341,6 +343,8 @@
               <li><a href="#sheet">Bottom sheet</a></li>
               <li><a href="#toast">Toast</a></li>
               <li><a href="#progress">Progress, spinner and skeleton</a></li>
+              <li><a href="#spinner">Spinner</a></li>
+              <li><a href="#skeleton">Skeleton</a></li>
             </ul>
             <!-- REF_TOC:END -->
           </nav>
@@ -813,6 +817,54 @@
           </div>
       </section>
 
+      <!-- ========================================================= fieldgroup -->
+      <section class="ref-section" id="fieldgroup">
+        <div class="ref-section-head">
+          <h2>Field group</h2>
+          <p class="dds-text-subtle dds-measure-default dds-mbs-xs">
+            A <code class="dds-code">&lt;fieldset&gt;</code> with a
+            <code class="dds-code">&lt;legend&gt;</code>, for fields that only make
+            sense together. The legend is read before each field inside it, which
+            is what makes “Von” and “Bis” mean something on their own.
+          </p>
+        </div>
+
+        <div class="dds-stack dds-stack-lg">
+          <div class="ref-specimen" data-ref-code>
+            <p class="ref-specimen-label">Related fields under one legend</p>
+            <fieldset class="dds-fieldgroup" style="max-inline-size: 26rem" lang="de">
+              <legend class="dds-legend">Bauzeitraum</legend>
+              <div class="dds-fieldgroup-options dds-fieldgroup-options-inline">
+                <div class="dds-field">
+                  <label class="dds-label" for="fg-from">Von</label>
+                  <input class="dds-input" id="fg-from" name="from" type="date">
+                </div>
+                <div class="dds-field">
+                  <label class="dds-label" for="fg-to">Bis</label>
+                  <input class="dds-input" id="fg-to" name="to" type="date">
+                </div>
+              </div>
+            </fieldset>
+            <p class="ref-note">
+              <svg class="dds-icon" aria-hidden="true"><use href="#dds-icon-info"/></svg>
+              A group heading in a <code class="dds-code">&lt;div&gt;</code> looks
+              identical and is not read with the fields, so a screen-reader user
+              hears “Von” with nothing to relate it to. The same element groups a
+              set of checkboxes or radios, where the legend is the question the
+              options answer.
+            </p>
+            <p class="ref-note">
+              <svg class="dds-icon" aria-hidden="true"><use href="#dds-icon-info"/></svg>
+              <strong>Narrow:</strong>
+              <code class="dds-code">.dds-fieldgroup-options-inline</code> puts the
+              fields side by side and wraps when they no longer fit. It was a grid
+              with <code class="dds-code">max-content</code> columns, which cannot
+              wrap by definition and made the row wider than the screen (#77).
+            </p>
+          </div>
+        </div>
+      </section>
+
       <!-- ============================================================ switch -->
       <section class="ref-section" id="switch">
         <div class="ref-section-head">
@@ -984,7 +1036,7 @@
       <!-- ============================================================ range -->
       <section class="ref-section" id="range">
         <div class="ref-section-head">
-          <h2>Range and character count</h2>
+          <h2>Range</h2>
             <p class="dds-text-subtle dds-measure-default dds-mbs-xs">
               A slider for a value whose exactness does not matter, and a live count for a limited field.
             </p>
@@ -992,37 +1044,52 @@
 
         <div class="dds-stack dds-stack-lg">
           <div class="ref-specimen" data-ref-code>
-            <p class="ref-specimen-label">Range and character count</p>
-            <div class="dds-stack dds-stack-md" style="max-inline-size: 26rem">
-              <div class="dds-field">
-                <label class="dds-label" for="threshold">Warnschwelle</label>
-                <div class="dds-range-row">
-                  <input class="dds-range" id="threshold" name="threshold" type="range"
-                         min="0" max="100" step="5" value="70"
-                         aria-describedby="threshold-hint">
-                  <output class="dds-range-value" for="threshold">70 %</output>
-                </div>
-                <p class="dds-hint" id="threshold-hint">
-                  Only appropriate when the exact value does not matter. If it
-                  does, use a number field — a slider cannot be operated
-                  precisely with a trackpad, and is very hard to operate with a
-                  tremor.
-                </p>
+            <p class="ref-specimen-label">Range — with its value shown, because a slider alone says nothing</p>
+            <div class="dds-field" style="max-inline-size: 26rem">
+              <label class="dds-label" for="threshold">Warnschwelle</label>
+              <div class="dds-range-row">
+                <input class="dds-range" id="threshold" name="threshold" type="range"
+                       min="0" max="100" step="5" value="70"
+                       aria-describedby="threshold-hint">
+                <output class="dds-range-value" for="threshold">70 %</output>
               </div>
+              <p class="dds-hint" id="threshold-hint">
+                Only appropriate when the exact value does not matter. If it
+                does, use a number field — a slider cannot be operated
+                precisely with a trackpad, and is very hard to operate with a
+                tremor.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
 
-              <div class="dds-field">
-                <label class="dds-label" for="summary">Kurzbeschreibung</label>
-                <textarea class="dds-textarea" id="summary" name="summary" rows="3"
-                          maxlength="280" aria-describedby="summary-count"></textarea>
-                <p class="dds-charcount" id="summary-count" data-dds-charcount="summary"
-                   role="status" aria-live="polite"></p>
-              </div>
+      <!-- ========================================================== charcount -->
+      <section class="ref-section" id="charcount">
+        <div class="ref-section-head">
+          <h2>Character count</h2>
+          <p class="dds-text-subtle dds-measure-default dds-mbs-xs">
+            How much room is left in a field that has a limit. The limit itself is
+            the input's <code class="dds-code">maxlength</code>, so the browser
+            enforces it whether or not the script runs.
+          </p>
+        </div>
+
+        <div class="dds-stack dds-stack-lg">
+          <div class="ref-specimen" data-ref-code>
+            <p class="ref-specimen-label">Character count — visible on every keystroke, announced when it matters</p>
+            <div class="dds-field" style="max-inline-size: 26rem">
+              <label class="dds-label" for="summary">Kurzbeschreibung</label>
+              <textarea class="dds-textarea" id="summary" name="summary" rows="3"
+                        maxlength="280" aria-describedby="summary-count"></textarea>
+              <p class="dds-charcount" id="summary-count" data-dds-charcount="summary"
+                 role="status" aria-live="polite"></p>
             </div>
             <p class="ref-note">
               <svg class="dds-icon" aria-hidden="true"><use href="#dds-icon-info"/></svg>
-              The character count updates visibly on every keystroke but is
-              announced only when it starts to matter, debounced. A live region
-              reading a number after every character is unusable.
+              The count updates visibly on every keystroke but is announced only
+              when it starts to matter, debounced. A live region reading a number
+              after every character is unusable.
             </p>
           </div>
 
@@ -1929,28 +1996,80 @@
 
         <div class="dds-stack dds-stack-lg">
           <div class="ref-specimen">
-            <p class="ref-specimen-label">Progress, spinner, skeleton</p>
-            <div class="dds-stack dds-stack-md">
-              <div>
-                <label class="dds-label" for="ref-progress">Upload progress</label>
-                <progress class="dds-progress" id="ref-progress" value="62" max="100">62%</progress>
-              </div>
+            <p class="ref-specimen-label">Progress — a wait whose end is known</p>
+            <div>
+              <label class="dds-label" for="ref-progress">Upload progress</label>
+              <progress class="dds-progress" id="ref-progress" value="62" max="100">62%</progress>
+            </div>
+            <p class="ref-note">
+              <svg class="dds-icon" aria-hidden="true"><use href="#dds-icon-info"/></svg>
+              A native <code class="dds-code">&lt;progress&gt;</code>, so the value is
+              announced and the text inside it is what a browser without support
+              shows. Only where the proportion is real — a bar that reaches 90% and
+              waits is worse than no bar.
+            </p>
+          </div>
+        </div>
+      </section>
 
-              <p class="dds-cluster dds-cluster-xs">
-                <span class="dds-spinner" aria-hidden="true"></span>
-                <span role="status">Loading projects…</span>
-              </p>
+      <!-- ============================================================ spinner -->
+      <section class="ref-section" id="spinner">
+        <div class="ref-section-head">
+          <h2>Spinner</h2>
+          <p class="dds-text-subtle dds-measure-default dds-mbs-xs">
+            A wait whose end is not known. Decorative by definition: the waiting is
+            said in words beside it, because a rotating shape announces nothing.
+          </p>
+        </div>
 
-              <div aria-busy="true" aria-label="Loading project list">
-                <div class="dds-stack dds-stack-xs" aria-hidden="true">
-                  <span class="dds-skeleton dds-skeleton-title" style="inline-size: 45%"></span>
-                  <span class="dds-skeleton dds-skeleton-text"></span>
-                  <span class="dds-skeleton dds-skeleton-text" style="inline-size: 80%"></span>
-                </div>
+        <div class="dds-stack dds-stack-lg">
+          <div class="ref-specimen">
+            <p class="ref-specimen-label">Spinner — always paired with a live region</p>
+            <p class="dds-cluster dds-cluster-xs">
+              <span class="dds-spinner" aria-hidden="true"></span>
+              <span role="status">Loading projects…</span>
+            </p>
+            <p class="ref-note">
+              <svg class="dds-icon" aria-hidden="true"><use href="#dds-icon-info"/></svg>
+              The spinner is <code class="dds-code">aria-hidden</code> and the text
+              carries <code class="dds-code">role="status"</code>. Under reduced
+              motion the rotation becomes an opacity pulse — the global duration
+              collapse would otherwise leave a static broken ring.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <!-- =========================================================== skeleton -->
+      <section class="ref-section" id="skeleton">
+        <div class="ref-section-head">
+          <h2>Skeleton</h2>
+          <p class="dds-text-subtle dds-measure-default dds-mbs-xs">
+            The shape of what is coming, while it comes. For content whose layout is
+            known in advance — a list of rows, a card — not for a wait of unknown
+            shape.
+          </p>
+        </div>
+
+        <div class="dds-stack dds-stack-lg">
+          <div class="ref-specimen">
+            <p class="ref-specimen-label">Skeleton — the region says it is busy, the shapes say nothing</p>
+            <div aria-busy="true" aria-label="Loading project list">
+              <div class="dds-stack dds-stack-xs" aria-hidden="true">
+                <span class="dds-skeleton dds-skeleton-title" style="inline-size: 45%"></span>
+                <span class="dds-skeleton dds-skeleton-text"></span>
+                <span class="dds-skeleton dds-skeleton-text" style="inline-size: 80%"></span>
               </div>
             </div>
+            <p class="ref-note">
+              <svg class="dds-icon" aria-hidden="true"><use href="#dds-icon-info"/></svg>
+              <code class="dds-code">aria-busy</code> on the region and
+              <code class="dds-code">aria-hidden</code> on the shapes: a screen reader
+              is told the region is loading rather than made to read three empty
+              boxes. A skeleton that does not match what replaces it is a worse first
+              impression than a blank space.
+            </p>
           </div>
-
         </div>
       </section>
 

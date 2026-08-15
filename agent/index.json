@@ -247,7 +247,7 @@
       ],
       "css": "dds/css/components-forms.css",
       "spec": "## Character count — `.dds-charcount`",
-      "reference": "reference/components.html#range",
+      "reference": "reference/components.html#charcount",
       "js": "dds/js/components-forms.js",
       "hooks": [
         "data-dds-charcount"
@@ -551,7 +551,7 @@
       ],
       "css": "dds/css/components.css",
       "spec": "## Fieldset group — `.dds-fieldgroup`",
-      "reference": "reference/components.html#choice",
+      "reference": "reference/components.html#fieldgroup",
       "native": "fieldset, legend",
       "accessibility": "Required for radio groups.",
       "responsive": "self — wraps when it runs out of room"
@@ -718,7 +718,7 @@
       ],
       "css": "dds/css/components-navigation.css",
       "spec": "## Menu — `.dds-menu`",
-      "reference": "reference/navigation.html#toolbar",
+      "reference": "reference/navigation.html#menu",
       "native": "popover",
       "accessibility": "popover + popovertarget, no JS. Buttons/links in a list, NOT role=menu.",
       "responsive": "self — capped to the viewport less a gutter, so it cannot be wider than the screen"
@@ -917,7 +917,7 @@
       ],
       "css": "dds/css/components.css",
       "spec": "## Skeleton — `.dds-skeleton`",
-      "reference": "reference/components.html#progress",
+      "reference": "reference/components.html#skeleton",
       "accessibility": "aria-hidden; the region carries aria-busy.",
       "responsive": "none — nothing about it changes with width"
     },
@@ -944,7 +944,7 @@
       ],
       "css": "dds/css/components.css",
       "spec": "## Spinner — `.dds-spinner`",
-      "reference": "reference/components.html#progress",
+      "reference": "reference/components.html#spinner",
       "accessibility": "aria-hidden. Pair with text in a role=status region. Non-moving fallback under reduced motion.",
       "responsive": "none — nothing about it changes with width"
     },
