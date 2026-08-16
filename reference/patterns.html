@@ -371,7 +371,7 @@
                     Street and number <span class="dds-label-note">(required)</span>
                   </label>
                   <input class="dds-input" id="addr-street" type="text" name="street"
-                         data-dds-address-field="street" required
+                         data-dds-address-field="street" required autocomplete="address-line1"
                          data-dds-label="the street and number">
                 </div>
 
@@ -380,7 +380,8 @@
                     Apartment, floor or care of <span class="dds-label-note">(optional)</span>
                   </label>
                   <input class="dds-input" id="addr-line2" type="text" name="addressLine2"
-                         data-dds-address-field="line2" aria-describedby="addr-line2-hint">
+                         data-dds-address-field="line2" autocomplete="address-line2"
+                         aria-describedby="addr-line2-hint">
                   <p class="dds-hint" id="addr-line2-hint">
                     Never filled in by the search — no address service knows it.
                   </p>
@@ -392,7 +393,7 @@
                       Postcode <span class="dds-label-note">(required)</span>
                     </label>
                     <input class="dds-input" id="addr-postcode" type="text" name="postalCode"
-                           data-dds-address-field="postalCode" required
+                           data-dds-address-field="postalCode" required autocomplete="postal-code"
                            data-dds-label="the postcode">
                   </div>
                   <div class="dds-field">
@@ -400,7 +401,7 @@
                       Town or city <span class="dds-label-note">(required)</span>
                     </label>
                     <input class="dds-input" id="addr-locality" type="text" name="locality"
-                           data-dds-address-field="locality" required
+                           data-dds-address-field="locality" required autocomplete="address-level2"
                            data-dds-label="the town or city">
                   </div>
                 </div>
