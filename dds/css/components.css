@@ -1046,7 +1046,11 @@
   .dds-dialog {
     --dds-dialog-width: var(--dds-container-sm);
 
-    inline-size: min(var(--dds-dialog-width), calc(100vw - var(--dds-space-xl)));
+    /* `%` rather than `vw` in the calc: `<dialog>` positions like `fixed`
+       (UA stylesheet), so a percentage here resolves against that same
+       containing block and already excludes a classic scrollbar's width,
+       where `vw` would not (#96, and `.dds-lightbox` above). */
+    inline-size: min(var(--dds-dialog-width), calc(100% - var(--dds-space-xl)));
     max-block-size: min(80svh, calc(100svh - var(--dds-space-xl)));
     /* Reset the UA's default border and padding. */
     padding: 0;
@@ -1167,7 +1171,10 @@
      is genuinely what "reachable by a thumb" depends on. */
   @media (max-width: 30rem) {
     .dds-dialog-sheet {
-      --dds-dialog-width: 100vw;
+      /* Large enough that the `calc(100% - var(--dds-space-xl))` branch of
+         the `min()` above always wins over this — same unit as that branch
+         now, so the comparison stays apples-to-apples (#96). */
+      --dds-dialog-width: 100%;
 
       margin-block-end: 0;
       margin-block-start: auto;

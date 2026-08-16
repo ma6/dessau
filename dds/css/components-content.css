@@ -798,9 +798,20 @@
 
      Behaviour: js/components-content.js */
   .dds-lightbox {
-    /* Fill the viewport; the dialog is the whole surface. */
-    inline-size: 100vw;
-    max-inline-size: 100vw;
+    /* Fill the viewport; the dialog is the whole surface.
+
+       `%` rather than `vw`: a modal `<dialog>` is positioned like `fixed`
+       (UA stylesheet), and `vw` is defined off `window.innerWidth`, which
+       includes a classic scrollbar's own width — `100vw` on a platform with
+       one renders past the edge of the actually-visible area, by exactly the
+       scrollbar's width. `%` resolves against the fixed-position containing
+       block instead, which already excludes it — the same reason the HTML
+       spec's own `<dialog>` UA stylesheet sizes with `calc(100% - 6px)`
+       rather than a viewport unit (#96). Not observable on this platform,
+       which uses overlay scrollbars — the bug is real on Windows and Linux
+       regardless. */
+    inline-size: 100%;
+    max-inline-size: 100%;
     block-size: 100svh;
     max-block-size: 100svh;
     margin: 0;
@@ -860,7 +871,16 @@
      the wrapper. The wrapper is `inline-flex` and shrinks to its content, so a
      percentage here would be circular — wrapper width depends on the image,
      image width depends on the wrapper — and collapses the image to zero in some
-     engines. */
+     engines.
+
+     `vw` genuinely stays here rather than becoming `%` (#96): `dvw`/`svw` do
+     not help either — they differ from `vw` only on the block axis, where a
+     mobile browser's chrome shows and hides; for inline sizing all three are
+     the same value. So this is the one place in the lightbox where the
+     guidance's flagged unit is kept, and it is kept deliberately: the 2rem
+     subtracted below is comfortably wider than any classic scrollbar
+     (~15-17px), so the worst case is a slightly larger safety margin than
+     intended, never an image wider than the visible area. */
   .dds-lightbox-image {
     display: block;
     max-inline-size: calc(100vw - 2rem);
