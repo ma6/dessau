@@ -1818,3 +1818,57 @@ case-by-case override — then it gets one, the same way the first two did. The
 global switch itself is reversed only if `agent/principles.md` is reversed
 first, since the switch exists to serve the principle and not the other way
 round.
+
+---
+
+## 044 — `.dds-tooltip` stays `popover`, not `popover="hint"` (#94)
+
+**Decision.** `.dds-tooltip` keeps the bare `popover` attribute (the `auto`
+state). It does not switch to `popover="hint"`, despite that being the value
+`modern-web-guidance`'s `interest-triggered-tooltips.md` prescribes for a
+tooltip specifically.
+
+**Why this needed measurement and not reasoning.** `popover` is an enumerated
+attribute. A browser that does not recognise `"hint"` applies its own
+*invalid-value default*, and the HTML spec leaves engines free to choose one —
+it is not something a guide, or a changelog, or a support table can answer
+correctly from outside a browser. Guessing wrong in either direction was
+possible: assuming the default is `auto` when it is actually `manual` ships a
+component with no light dismiss and no Escape to every Safari user, which is
+the exact WCAG 2.2 1.4.13 failure the current `popover` design exists to
+avoid. So this was checked directly rather than inferred from the guide's
+support table, which only states feature *availability*, not fallback
+*behaviour* — those are different questions and the table only answers one.
+
+**The measurement.** A minimal page — one `popovertarget` button, one
+`popover="hint"` target — driven through Playwright on all three engines,
+checking the `popover` IDL reflection, dismissal on an outside click, and
+dismissal on `Escape`:
+
+| Engine | `.popover` reflects | Outside click dismisses | Escape dismisses |
+| --- | --- | --- | --- |
+| Chromium | `hint` | yes | yes |
+| Firefox | `hint` | yes | yes |
+| WebKit | `manual` | **no** | **no** |
+
+WebKit's invalid-value default is confirmed as `manual`, and a `manual`
+popover has neither light dismiss nor Escape by design — that is what
+`manual` means. This is the regression the ticket asked whether the fallback
+avoided. It does not. (Measured through Playwright's bundled WebKit, which
+implements the same popover behaviour as Safari; not measured in Safari
+itself, which is close enough for an attribute default defined by the HTML
+spec and implemented in WebKit's DOM code, not in Safari's application
+layer.)
+
+**What stays true regardless.** `role="tooltip"` continues to not be set by
+hand — the guide is right about that independent of which popover state is
+used, and `.dds-tooltip`'s implicit role already comes from being referenced
+by `aria-describedby`, not from `popover="hint"`. `interestfor` stays out of
+scope, per the ticket, under [001](#001--no-framework-no-build-step-no-runtime-dependencies)
+— it has no native support outside Chrome/Edge and needs a polyfill.
+
+**Reversal condition.** Safari changes `popover="hint"`'s invalid-value
+default, or ships `hint` support outright. `agent/modern-web-guidance.md`'s
+row for this is the thing to check first — re-measure with the same script
+before flipping the attribute, rather than trusting that a new Safari version
+number means the fallback question is settled.

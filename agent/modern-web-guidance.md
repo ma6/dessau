@@ -193,7 +193,7 @@ And what is deliberately **not** adopted yet, each behind `@supports` or waiting
 | --- | --- |
 | `light-dark()` | Declined — see `DECISIONS.md` |
 | `field-sizing: content` | Not interoperable |
-| `popover="hint"` | Open — the right value for a tooltip, but not in Safari, and an unsupported enumerated value must not be allowed to land on `manual`, which has no light dismiss (WCAG 1.4.13). See #94 |
+| `popover="hint"` | Not yet — measured, not assumed. WebKit's invalid-value default for `popover="hint"` is `manual`: light dismiss and Escape both stay broken (checked directly, not inferred). See `DECISIONS.md` #044 and #94 |
 | `interestfor` | Not adopted — Chrome 142+ only and the guide requires a polyfill. Dessau adds no runtime dependency |
 | `interpolate-size` | Behind `@supports`, for the conditional-fields reveal |
 | `@starting-style` | Used; degrades to no entry animation |
