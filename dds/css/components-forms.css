@@ -222,8 +222,20 @@
 
      Use it for two to four options whose labels are short. More than that, or
      longer labels, and it becomes a select. */
+  /* `flex-wrap: wrap` because the options do not: `white-space: nowrap` below is
+     deliberate (DECISIONS 039), and nowrap content in a flex container with no
+     overflow of its own spills onto the page at narrow widths. It has done so
+     twice — a button label over the edge at 320px, then this control inside the
+     reference's variant switch — so the group wraps onto a second row rather
+     than widening the page.
+
+     Wrapping the GROUP is not what 039 ruled out. That was about a wrapping
+     LABEL, which turns a segmented control into a different control; here every
+     option stays intact and only the arrangement changes. It costs nothing while
+     the options fit, which is every current usage. */
   .dds-segmented {
     display: inline-flex;
+    flex-wrap: wrap;
     padding: var(--dds-space-3xs);
     gap: var(--dds-space-3xs);
 

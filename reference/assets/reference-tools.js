@@ -244,13 +244,31 @@
     legend.textContent = host.getAttribute('data-ref-variants') || 'Variant';
     fieldset.appendChild(legend);
 
-    function show(index) {
+    /**
+     * @param {number} index
+     * @param {Element} [revealed]  A panel the browser is about to show because
+     *   find-in-page matched inside it. It must not be hidden again here.
+     */
+    function show(index, revealed) {
       panels.forEach(function (panel, position) {
+        if (position === index || panel === revealed) {
+          panel.removeAttribute('hidden');
+          return;
+        }
+
         /* The `hidden` attribute, never `display: none` from a class. A variant
            that is out of view must also be out of the tab order, and hiding with
            CSS alone leaves every control inside it as an invisible tab stop —
-           the same rule DDS applies to conditional form fields. */
-        panel.hidden = position !== index;
+           the same rule DDS applies to conditional form fields.
+
+           `until-found` so the text inside an inactive variant is still found by
+           Ctrl+F and still reachable by a scroll-to-text link. This is
+           documentation: find-in-page is how people read it, and three quarters
+           of a section being unfindable because a control is set to the wrong
+           option is a poor trade for tidiness. It degrades by itself — a browser
+           that does not know the value has a `hidden` attribute and hides the
+           element outright, which is where this started. */
+        panel.setAttribute('hidden', 'until-found');
       });
 
       /* The code view listens: its sample is the variant on screen, and a stale
@@ -274,6 +292,16 @@
          built on radios. */
       input.addEventListener('change', function () {
         if (input.checked) show(index);
+      });
+
+      /* Find-in-page matched inside this variant, and the browser is about to
+         reveal it. Move the control to match, or the page ends up showing one
+         variant while the switch says another — the state the `hidden` attribute
+         was doing the work of preventing. Fires only where `until-found` is
+         supported; where it is not, there is nothing to match. */
+      panel.addEventListener('beforematch', function () {
+        input.checked = true;
+        show(index, panel);
       });
 
       var text = document.createElement('span');
@@ -476,8 +504,12 @@
 
     Array.prototype.forEach.call(host.children, function (child) {
       /* A variant that is not on show is not the sample. The specimen holds all
-         of them; only one of them is what the reader is looking at. */
-      if (child.hasAttribute('data-ref-variant') && child.hidden) return;
+         of them; only one of them is what the reader is looking at.
+
+         The ATTRIBUTE, not the `hidden` property: an inactive variant carries
+         `hidden="until-found"`, and the property reflects that as a string in
+         browsers that support it and as a boolean in browsers that do not. */
+      if (child.hasAttribute('data-ref-variant') && child.hasAttribute('hidden')) return;
 
       if (isReferenceLayout(child)) {
         parts = parts.concat(componentParts(child));

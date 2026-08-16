@@ -862,35 +862,22 @@
    exclusive options, all visible at once".
    ============================================================================= */
 
+/* Block, not grid, and the reason is the panels rather than the switch.
+   `hidden="until-found"` leaves an element in the layout with its contents
+   skipped — a zero-height box. Zero-height boxes cost nothing in block flow and
+   cost a full `gap` each in a grid, so two inactive variants would open a hole
+   under the switch. */
 [data-ref-variants] {
-  display: grid;
-  gap: var(--dds-space-md);
+  margin-block: var(--dds-space-md);
 }
 
-/* A grid item's `min-width` is `auto`, which means min-content — so one item
-   that refuses to shrink sizes the whole column and pushes the page sideways.
-   That is not hypothetical: it is how this tool first shipped (#87). */
-[data-ref-variants] > * {
-  min-inline-size: 0;
-}
-
-/* A grid item stretches, and a stretched `inline-flex` control would run the
-   full width of the specimen with its options adrift at the leading edge.
-
-   `flex-wrap` because `.dds-segmented` keeps `white-space: nowrap` on its
-   options deliberately (DECISIONS 039) — a segmented control with a wrapping
-   LABEL is a different control. A group that wraps onto a second ROW is not:
-   every option stays intact and only the arrangement changes. Without it, three
-   options of ordinary length measured 366px inside a 238px slot at 320px, and
-   nothing could give.
-
-   Shorter labels are the other half and are not enough on their own. The tool is
-   general, so the next person to use it will not know they are spending a
-   character budget nobody told them about. */
+/* Never wider than the specimen. `.dds-segmented` wraps its own options
+   (components-forms.css), which is what lets this cap be honoured instead of
+   overflowed — three options of ordinary length measured 366px in a 238px slot
+   at 320px when it could do neither (#87). */
 .ref-variants-switch {
-  justify-self: start;
   max-inline-size: 100%;
-  flex-wrap: wrap;
+  margin-block-end: var(--dds-space-md);
 }
 
 /* Before the switch exists, every variant is on show — nothing is hidden until
@@ -1262,6 +1249,10 @@
     inset-block-start: 4.5rem;
     max-block-size: calc(100svh - 6rem);
     overflow-y: auto;
+    /* The shell's own copy of what `.dds-toc-sticky` carries: contain the
+       scroll chain, and reserve the scrollbar so the entries do not shift. */
+    overscroll-behavior: contain;
+    scrollbar-gutter: stable;
 
     /* At this width the list is furniture, not a card. */
     padding: 0;

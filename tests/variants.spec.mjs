@@ -61,6 +61,30 @@ test('an inactive variant is hidden by the attribute, not by CSS', async ({ page
   expect(hiddenAttribute.filter(Boolean)).toHaveLength(hiddenAttribute.length - 1);
 });
 
+test('an inactive variant is still findable by find-in-page', async ({ page }) => {
+  await page.goto(PAGE);
+
+  /* Where the engine has no `until-found` the attribute is simply `hidden`, and
+     the variant is hidden outright — the behaviour this replaced. Nothing to
+     assert there, and skipping says so rather than asserting a weaker thing on
+     every engine. */
+  const supported = await page.evaluate(() => 'onbeforematch' in HTMLElement.prototype);
+  test.skip(!supported, 'this engine does not support hidden="until-found"');
+
+  /* This is documentation, and find-in-page is how documentation gets read. A
+     plain `hidden` makes two thirds of a section unfindable because a control is
+     set to the wrong option — which nobody would guess is why their search
+     failed. */
+  const values = await page
+    .locator('[data-ref-variants] > [data-ref-variant][hidden]')
+    .evaluateAll((panels) => panels.map((panel) => panel.getAttribute('hidden')));
+
+  expect(values.length).toBeGreaterThan(0);
+  for (const value of values) {
+    expect(value, 'an inactive variant is hidden outright, not until found').toBe('until-found');
+  }
+});
+
 test('the group is named, so it is not three unrelated radio buttons', async ({ page }) => {
   await page.goto(PAGE);
 

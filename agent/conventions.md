@@ -313,6 +313,14 @@ The code view serialises the visible variant only, and re-serialises when the
 choice changes. Anything carrying a `ref-` class or a `data-ref-*` host attribute
 is reference scaffolding and never reaches the sample.
 
+Inactive variants carry **`hidden="until-found"`**, not a plain `hidden` and never
+a CSS class: out of the tab order and out of the accessibility tree, but still
+found by Ctrl+F and still reachable by a scroll-to-text link. A `beforematch`
+listener moves the control to whichever variant the browser is about to reveal,
+so the page never shows one variant while the switch says another. Where the
+attribute value is not supported it is simply `hidden`, which is the old
+behaviour and needs no fallback code.
+
 ---
 
 ## Files

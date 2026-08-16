@@ -680,11 +680,23 @@
     padding-inline-start: var(--dds-space-lg);
   }
 
+  /* A real scroll region, and one the component now scrolls itself to keep the
+     marked entry in view — so it needs the two things every scroll container
+     needs and this one did not have.
+
+     `overscroll-behavior: contain` stops the scroll chain: reaching the end of
+     the list would otherwise hand the gesture to the page, and a reader who
+     meant to move the list finds they have moved the article instead — which
+     also moves the reading position, which moves the mark, which scrolls the
+     list. `scrollbar-gutter: stable` reserves the scrollbar's width, so the
+     entries do not shift sideways the moment the list becomes scrollable. */
   .dds-toc-sticky {
     position: sticky;
     inset-block-start: var(--dds-space-md);
     max-block-size: calc(100svh - var(--dds-space-2xl));
     overflow-y: auto;
+    overscroll-behavior: contain;
+    scrollbar-gutter: stable;
   }
 
   /* ==========================================================================
