@@ -11,16 +11,24 @@
 
    Everything here is inside `@layer dds.base`, so a product's own stylesheet
    overrides it without needing higher specificity or `!important`.
+
+   The one exception is the box model reset just below: it lives in
+   `dds.reset`, the layer named and documented on the foundations page as
+   "the smallest sane floor" (#114) — a universal box-model reset is a
+   different, lower-level kind of thing than the element defaults the rest
+   of this file sets, and the layer existed to hold it, unused, before this.
    ============================================================================= */
 
-@layer dds.base {
+@layer dds.reset {
   /* --------------------------------------------------------------- box model */
   *,
   *::before,
   *::after {
     box-sizing: border-box;
   }
+}
 
+@layer dds.base {
   /* Remove the default margin only. Padding is left alone: zeroing padding on
      everything means re-adding it for lists, fieldsets and dialogs anyway. */
   :where(body, h1, h2, h3, h4, h5, h6, p, figure, blockquote, dl, dd, ol, ul) {
