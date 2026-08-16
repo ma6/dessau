@@ -393,7 +393,7 @@
            </label>
            <p class="dds-hint">PDF, JPG or PNG, up to 10 MB each. You can also drop files here.</p>
          </div>
-         <ul class="dds-upload-list" data-dds-upload-list></ul>
+         <ul class="dds-upload-list" data-dds-upload-list role="list"></ul>
        </div>
 
      Drag-and-drop is added on top of the native picker, never instead of it:
@@ -449,6 +449,9 @@
     var input = root.querySelector('input[type="file"]');
     var zone = root.querySelector('.dds-upload-zone') || root;
     var list = root.querySelector('[data-dds-upload-list]');
+    // Safari drops list semantics from a styled `<ul>` (#97). Set defensively
+    // rather than only documented, so a markup that omits it still works.
+    if (list) list.setAttribute('role', 'list');
 
     if (!input) {
       console.error('[DDS] upload needs an <input type="file">', root);
