@@ -259,6 +259,7 @@
       "name": "chart",
       "purpose": "A bar or donut chart.",
       "notFor": "Precise values — use a table.",
+      "markup": "The bars share one grid: .dds-chart-bars sizes the label and value columns and each .dds-chart-row is subgrid, so every track starts and ends in the same place.",
       "classes": [
         ".dds-chart",
         ".dds-chart-bar",

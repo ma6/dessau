@@ -14,7 +14,7 @@
 <link rel="preload" href="assets/fonts/Inter-Variable-latin-ext.woff2" as="font"
       type="font/woff2" crossorigin>
 <link rel="stylesheet" href="assets/fonts.css?v=713f2669">
-<link rel="stylesheet" href="../dds/dds.css?v=4e3244e5">
+<link rel="stylesheet" href="../dds/dds.css?v=1f5e986f">
 <link rel="stylesheet" href="assets/reference.css?v=a5bb34d7">
 </head>
 <body>
@@ -813,6 +813,15 @@
               The label column is capped at a share of the row and wraps beyond it,
               for the same reason as the key-value list. The value keeps its natural
               width — it is a number, and a number that wraps is unreadable.
+            </p>
+            <p class="ref-note">
+              <svg class="dds-icon" aria-hidden="true"><use href="#dds-icon-info"/></svg>
+              <strong>One grid, not one per row.</strong> The rows are
+              <code class="dds-code">subgrid</code>, so the widest label and the
+              longest number size a column that every row then shares. Measured per
+              row instead, four labels of four lengths give four different starting
+              points — and comparing lengths that do not share an origin is the one
+              thing the eye cannot do, which is the only thing a bar chart is for.
             </p>
           </div>
 

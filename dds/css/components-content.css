@@ -579,13 +579,45 @@
 
   /* Same reasoning as `.dds-keyvalue-columns`: the label is capped at a share of
      the row and wraps beyond it, rather than being as wide as its longest word.
-     The value stays `max-content` — it is a number and a unit. */
+     The value stays `max-content` — it is a number and a unit.
+
+     Declared here as well as in the `@supports` below, because this is the
+     fallback: without `subgrid` the row sizes its own columns, which is what the
+     chart used to do everywhere. */
   .dds-chart-row {
     display: grid;
     grid-template-columns: fit-content(35%) minmax(0, 1fr) max-content;
     align-items: center;
     gap: var(--dds-space-sm);
     font-size: var(--dds-font-size-sm);
+  }
+
+  /* ONE grid for the whole chart, so every bar starts and ends in the same
+     place.
+
+     Sizing each row separately looks like a detail and is the whole component:
+     "Harbour" gives a narrower label column than "Paving survey", "8" a narrower
+     value column than "1.204", and the tracks between them therefore begin and
+     end at four different x positions. Comparing lengths that do not share an
+     origin is the one thing the eye cannot do — the 39% bar was drawn starting
+     further right than the 100% one — so the chart was misreading its own data
+     while every check passed (#89).
+
+     `subgrid` rather than flattening the rows into the parent: the row element
+     is what groups a label with its bar and its value, and a chart whose markup
+     is twelve loose children in a grid is a chart nobody can generate from a
+     loop. The parent measures every label and every value; the row places
+     them. */
+  @supports (grid-template-columns: subgrid) {
+    .dds-chart-bars {
+      grid-template-columns: fit-content(35%) minmax(0, 1fr) max-content;
+      column-gap: var(--dds-space-sm);
+    }
+
+    .dds-chart-row {
+      grid-column: 1 / -1;
+      grid-template-columns: subgrid;
+    }
   }
 
   .dds-chart-label {
@@ -615,7 +647,11 @@
     border-radius: var(--dds-radius-sm);
   }
 
+  /* Aligned on the last digit. Once the value column is shared it is as wide as
+     the longest number in the chart, so "8" left in that column would sit under
+     the "1" of "1.204" — tabular figures lining up nothing. */
   .dds-chart-value {
+    justify-self: end;
     font-variant-numeric: tabular-nums;
     color: var(--dds-color-text-default);
     font-weight: var(--dds-font-weight-medium);

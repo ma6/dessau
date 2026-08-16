@@ -1170,6 +1170,14 @@ A donut is only worth using for one value against a whole. For comparing
 categories, bars are read more accurately: angle is much harder to judge than
 length.
 
+**The bars share one grid.** `.dds-chart-bars` sizes the label and value columns
+across the whole chart and each `.dds-chart-row` is `subgrid`, so every track
+starts and ends in the same place. Sized per row, four labels of four lengths give
+four different starting points — and lengths that do not share an origin cannot be
+compared, which is the only thing a bar chart is for. Without `subgrid` the row
+falls back to sizing its own columns; the chart is readable and the alignment is
+what is lost.
+
 ## Lightbox — `.dds-lightbox`
 
 The trigger is a real `<a href>` at the full-size file, so without JavaScript the
