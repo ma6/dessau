@@ -1176,6 +1176,11 @@
     inline-size: min(20rem, 85%);
     overflow-y: auto;
     overscroll-behavior: contain;
+    /* Reserve the scrollbar's space so entries do not shift sideways the
+       moment the list becomes scrollable — the same fix `.dds-toc-sticky`
+       already carries. Not overridden by the wide sticky-column variant
+       below, so it applies there too. */
+    scrollbar-gutter: stable;
 
     /* No inline padding, and none at the block start: the children carry their
        own. A scroll container with padding and a full-width sticky child inside
