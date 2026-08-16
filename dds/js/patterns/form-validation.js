@@ -277,6 +277,9 @@
     element.className = 'dds-error';
     element.id = DDS.utils.uniqueId('dds-error');
     element.setAttribute('data-dds-error-for', field.id);
+    // Not authored markup — see `agent/conventions.md`. An error message an
+    // author typed out would be an error message shown before there is one.
+    element.setAttribute('data-dds-generated', '');
     element.hidden = true;
 
     var icon = document.createElementNS('http://www.w3.org/2000/svg', 'svg');

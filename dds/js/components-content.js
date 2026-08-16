@@ -54,11 +54,18 @@
 
     /* The magnifier badge, generated rather than required in the markup — for the
        same reason. `aria-hidden` because the link already says what it does, and
-       an announced magnifier adds nothing. */
+       an announced magnifier adds nothing.
+
+       `data-dds-generated` says the same thing to a reader of the DOM, and it is
+       what keeps the badge out of the reference's markup sample: the sample is
+       serialised from the live page, so without a marker it offers this span as
+       something an author has to type — the exact opposite of what generating it
+       was for (`agent/conventions.md`). */
     if (!trigger.querySelector('.dds-lightbox-zoom')) {
       var badge = document.createElement('span');
       badge.className = 'dds-lightbox-zoom';
       badge.setAttribute('aria-hidden', 'true');
+      badge.setAttribute('data-dds-generated', '');
 
       var badgeIcon = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
       badgeIcon.setAttribute('class', 'dds-icon');

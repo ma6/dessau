@@ -1673,3 +1673,41 @@ full-width image over a text block, and the text is capped at
 `--dds-measure-default` because full width is not a measure. Half the width would
 have been a smaller picture rather than a different layout, which is not what the
 variant is for.
+
+---
+
+## 042 — What a script inserts is marked, and the markup sample strips it
+
+**Decision.** Any element DDS creates and puts inside authored markup carries
+`data-dds-generated`. The reference's code view removes every marked element from
+its sample, in one rule (#88).
+
+**What it replaces.** Three hand-named special cases in `reference-tools.js` — a
+validation error, a combobox list, a set of ARIA attributes — in a file that knows
+nothing about components and had to be edited every time one grew a generated
+element. It was not edited for the lightbox. So the magnifier badge, which
+`components-content.js` builds *because* promising a viewer that does not exist
+would be a lie, was offered in the sample as markup to hard-code: the component's
+own documentation undoing the component's own reasoning.
+
+**Why a marker rather than a list.** The list lives in the reference tooling; the
+knowledge lives in the component. A marker put on the element at the moment it is
+created cannot go stale, cannot be forgotten by a file that has no reason to know
+the component exists, and answers the same question for a person in dev tools —
+"did I write this, or did the script?" — which previously required searching the
+source for a class name.
+
+**Not on a wrapper.** `.dds-password` and the table's scroll region are generated
+too, and are deliberately unmarked: they enclose the author's own control, and
+"strip this element" would take it with them. The marker means *this element is
+not the author's*, which a wrapper around the author's element is not. Whole
+widgets appended to `<body>` — the lightbox dialog, the toast region — need no
+marker either; they are inside nobody's markup.
+
+**The lightbox trigger stays in the accessibility tree**, which was raised at the
+same time and answered the other way. Hiding the link would remove the thumbnail's
+`alt` — the image's only description — and leave a focusable element with no
+accessible name (WCAG 4.1.2), and it would take the enlargement away from the
+readers most likely to want a bigger picture. What is hidden is the badge, which
+is `aria-hidden` because the link already says where it goes. The redundancy worth
+removing was the announcement, and it was already removed.

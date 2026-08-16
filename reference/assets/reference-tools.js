@@ -344,6 +344,14 @@
      Attributes added at runtime by DDS (`data-dds-enhanced`, and the ARIA that
      `combobox.js` applies) are stripped, because they are not what an author
      writes. Showing them would suggest they have to be typed by hand.
+
+     So are elements DDS inserts into authored markup. Those carry
+     `data-dds-generated` and the rule is one line, which is the point: it was
+     three hand-named special cases, one per component, in a file that knows
+     nothing about components — so the lightbox's magnifier badge was offered as
+     markup to type, in the specimen of a component whose script generates it
+     precisely so that nobody has to (#88). The marker travels with the element
+     that needs it. See `agent/conventions.md`.
      ========================================================================= */
 
   /** Attributes that exist only at runtime and must not appear in a sample. */
@@ -352,6 +360,7 @@
     'aria-activedescendant',
     'data-dds-charcount-state',
     'data-dds-dragging',
+    'data-dds-lightbox-ready',
   ];
 
   function cleanClone(node) {
@@ -363,9 +372,10 @@
       RUNTIME_ATTRIBUTES.forEach(function (attribute) {
         element.removeAttribute(attribute);
       });
-      // Elements generated wholly at runtime (an error message, a rendered
-      // option) are not authored markup.
-      if (element.hasAttribute && element.hasAttribute('data-dds-error-for')) {
+      /* An element DDS made — a magnifier badge, an error message, a rendered
+         row. Never one that WRAPS authored markup: those are not marked, because
+         removing them would take the author's own content with them. */
+      if (element.hasAttribute && element.hasAttribute('data-dds-generated')) {
         element.remove();
       }
       // Neither is reference-only markup that sits *inside* a specimen — a

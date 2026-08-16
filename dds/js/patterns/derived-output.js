@@ -110,12 +110,16 @@
     function render(fields) {
       output.replaceChildren();
 
+      // The `<output>` is the author's; every row inside it is this file's.
+      // See `agent/conventions.md`.
       Object.keys(fields).forEach(function (label) {
         var term = document.createElement('dt');
+        term.setAttribute('data-dds-generated', '');
         term.textContent = label;
         output.appendChild(term);
 
         var value = document.createElement('dd');
+        value.setAttribute('data-dds-generated', '');
         // textContent: the value came from outside the application.
         value.textContent = fields[label];
         output.appendChild(value);

@@ -1176,6 +1176,16 @@ The trigger is a real `<a href>` at the full-size file, so without JavaScript th
 click simply opens the image. One shared native `<dialog>`, reused. Arrow keys
 move, Escape closes, position is announced.
 
+**The magnifier badge is not markup.** `.dds-lightbox-zoom` is generated, along
+with the zoom cursor and the hover scale, and all three are scoped to
+`[data-dds-lightbox-ready]` — because with no JavaScript there is no viewer, and
+promising one with a magnifier would be a lie. Do not write it out by hand.
+
+The trigger stays in the accessibility tree. It is a link to the full-size image,
+its name comes from the thumbnail's `alt`, and hiding it would take both the
+enlargement and the image's description away from exactly the readers most likely
+to want a bigger picture.
+
 `alt` is deliberately **not** a caption source.
 
 ## Consent embed — `.dds-embed`

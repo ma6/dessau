@@ -167,6 +167,33 @@ Attributes that describe **structure** — `aria-labelledby`, `aria-describedby`
 `scope`, `aria-current` — belong in the markup, because they are true whether or
 not the script runs.
 
+### An element the script inserts carries `data-dds-generated`
+
+Anything a script creates and puts **inside authored markup** says so:
+
+```js
+badge.setAttribute('data-dds-generated', '');
+```
+
+Two things read it. A person opening dev tools, who can otherwise only find out
+by searching the source for a class. And the reference's code view, which
+serialises its markup sample from the live DOM and therefore has no other way to
+tell the author's markup from the script's — it strips every marked element, in
+one rule, for every component including the ones not written yet.
+
+Without it the sample offers generated markup as something to type, which is the
+exact opposite of what generating it was for. The lightbox's magnifier badge is
+built by `components-content.js` *because* promising a viewer that does not exist
+would be a lie, and the sample was inviting authors to hard-code it (#88).
+
+**Not on a wrapper.** `.dds-password` and the table's scroll region enclose the
+author's own control; marked, they would take it with them when stripped. The
+marker means "this element is not the author's", which a wrapper around the
+author's element is not.
+
+Whole widgets appended to `<body>` — a dialog, a toast region — need no marker.
+They are not inside anybody's markup.
+
 ### Text goes in with `textContent`
 
 Never `innerHTML` for a value from outside the application. The one place that

@@ -91,6 +91,15 @@ for (const name of PAGES) {
         /data-ref-(bp|variants|variant|code)\b/
       );
 
+      /* An element DDS inserted into the markup is not markup. The lightbox's
+         magnifier badge was in its own sample for as long as the code view knew
+         about generated elements one component at a time — offered as something
+         to type, in the specimen of a component that builds it so nobody has
+         to (#88). */
+      expect(code, `${where}: the sample contains a generated element`).not.toMatch(
+        /data-dds-generated/
+      );
+
       /* "Not blank" is a weaker claim than it looks. Unwrapping the width
          preview one level deep left `<div data-ref-bp>` standing as the sample,
          `cleanClone` stripped the generated frame out of it as reference-only,
@@ -124,6 +133,22 @@ for (const name of PAGES) {
     }
   });
 }
+
+test('the lightbox badge is on the page and not in the sample', async ({ page }) => {
+  await page.goto('/reference/content.html');
+  await openEveryCodeView(page);
+
+  const specimen = page.locator('#lightbox [data-ref-code]').first();
+
+  // Both halves matter. Generated and stripped is correct; stripped because it
+  // was never generated is a broken component with a tidy sample.
+  await expect(specimen.locator('.dds-lightbox-zoom')).toHaveCount(1);
+
+  const code = await specimen.locator('.ref-codeview code').textContent();
+  expect(code).toContain('data-dds-lightbox');
+  expect(code).not.toContain('dds-lightbox-zoom');
+  expect(code).not.toContain('data-dds-lightbox-ready');
+});
 
 test('a specimen that demonstrates several elements shows all of them', async ({ page }) => {
   await page.goto('/reference/components.html');

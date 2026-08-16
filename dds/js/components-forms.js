@@ -222,6 +222,10 @@
       button.type = 'button';
       button.className =
         'dds-button dds-button-subtle dds-button-icon dds-button-sm dds-password-toggle';
+      // Not authored markup — see `agent/conventions.md`. The `.dds-password`
+      // wrapper above is deliberately unmarked: it holds the author's own input,
+      // and a marker means "this element is not the author's".
+      button.setAttribute('data-dds-generated', '');
 
       // The name is a real element rather than `aria-label`, so it is translated
       // by the same machinery as the rest of the page.
@@ -500,6 +504,7 @@
 
         var item = document.createElement('li');
         item.className = 'dds-upload-item';
+        item.setAttribute('data-dds-generated', '');
         if (rejected) item.setAttribute('data-dds-rejected', '');
 
         var icon = document.createElementNS('http://www.w3.org/2000/svg', 'svg');

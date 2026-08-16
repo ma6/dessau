@@ -201,6 +201,10 @@
       var note = existing || document.createElement('p');
       if (!existing) {
         note.setAttribute('data-dds-address-attribution', '');
+        // Not authored markup — see `agent/conventions.md`. Marked only when
+        // this file created it: an attribution the page wrote out itself is the
+        // page's, and the provider only fills it in.
+        note.setAttribute('data-dds-generated', '');
         note.className = 'dds-hint';
         comboboxRoot.insertAdjacentElement('afterend', note);
       }
