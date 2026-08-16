@@ -1872,3 +1872,70 @@ default, or ships `hint` support outright. `agent/modern-web-guidance.md`'s
 row for this is the thing to check first — re-measure with the same script
 before flipping the attribute, rather than trusting that a new Safari version
 number means the fallback question is settled.
+
+---
+
+## 045 — `.dds-toc` keeps revealing from `scroll`, not `scrollend` (#98)
+
+**Decision.** `.dds-toc`'s reveal — the `getBoundingClientRect()` pair and the
+`scrollTop` write that keep the marked entry inside its scrolling list — stays
+on the existing rAF-throttled `scroll` handler. It does not move to
+`scrollend`, even though `defer-work-until-scroll-ends.md` names exactly this
+shape (layout-dependent work inside a `scroll` handler) as the thing to move.
+
+**Why this needed measurement and not just agreement with the guide.** The
+guide's reasoning is sound in general, but the ticket that found this
+correctly declined to fix it on the strength of the reasoning alone: "the
+cost is a handful of forced layouts across a whole page rather than sixty a
+second" is a claim about *how often*, not about whether the cost is large
+enough to matter, and moving to `scrollend` is not free — the marked entry
+would stop following during a slow continuous scroll and jump to catch up
+once the reader stops, which is a real, user-visible behaviour change made
+for a performance reason that had not actually been checked.
+
+**The measurement.** `components.html` has the most `.dds-toc` entries of any
+reference page (30, against 6–20 elsewhere) and a page height where the
+sticky list genuinely overflows and scrolls itself — confirmed directly
+(`.ref-aside`: `scrollHeight` 858 vs `clientHeight` 704) rather than assumed
+from the CSS. A simulated slow scroll from top to bottom (150 steps, 16ms
+apart, driving real `scroll` events) was run twice through Chrome's
+`Performance.getMetrics`, once against the current code and once with
+`Element.prototype.scrollTop`'s setter replaced by a no-op — keeping both
+`getBoundingClientRect()` reads in `reveal()` but removing only the write, to
+isolate its cost. Confirmed the no-op actually changed behaviour first: the
+list's own `scrollTop` ended the run at 154px with the write live, 0px with
+it disabled — so the write really was running and really was neutralised,
+not silently skipped for some unrelated reason.
+
+| | Layouts | Layout duration | Script duration | Task duration | Long tasks (>50ms) |
+| --- | --- | --- | --- | --- | --- |
+| Write live (current code) | 43 | 8.25ms | 11.80ms | 253.10ms | 0 |
+| Write disabled (isolated) | 43 | 8.29ms | 11.44ms | 253.17ms | 0 |
+
+Identical layout count, and every duration within noise of the other. Zero
+long tasks in either run, across the whole scroll. The forced layout the
+guide warns about is real in shape — a write followed by a read that needs
+current geometry — but at this component's scale (a few dozen list items,
+firing only when the marked entry changes, not once a frame) it does not
+surface as measurable cost, on the page most likely to show one.
+
+**What this is not.** Not a claim that `defer-work-until-scroll-ends.md` is
+wrong, or that no `.dds-toc`-shaped component ever needs `scrollend`. It is a
+claim about this component, at this scale, measured rather than assumed —
+the same distinction [044](#044--dds-tooltip-stays-popover-not-popoverhint-94)
+draws for a different question. A page with hundreds of sections, or a
+reveal that ran on every frame instead of on change, would be a different
+measurement.
+
+**The slow-scroll behaviour, decided anyway.** Even though the performance
+case did not hold, the ticket asked for this to be a deliberate choice, not
+a side effect of leaving the code alone: the mark **should** track a slow
+continuous scroll rather than lag and catch up at rest, because it is
+reporting a reading position, not a destination — a reader watching the list
+while scrolling slowly is exactly the case `scrollend`-only updates would
+make wrong, and there is no measured cost buying that trade back.
+
+**Reversal condition.** A future page whose `.dds-toc` is meaningfully larger
+than 30 entries, or a change that makes `reveal()` run every frame instead of
+only on a mark change — re-measure with the same method before assuming
+either the old numbers or the guide's general concern still apply.

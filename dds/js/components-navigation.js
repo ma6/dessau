@@ -210,6 +210,15 @@
      * including the document — so the page scroll that just moved the reading
      * position would be answered by moving the page again. `block: 'nearest'`
      * limits how far each ancestor scrolls, not which ancestors scroll.
+     *
+     * The two reads plus this write are a forced layout during scroll — the
+     * shape modern-web-guidance's `defer-work-until-scroll-ends.md` says to
+     * move to `scrollend`. Measured before deciding not to (#98,
+     * `DECISIONS.md` #045): on the reference page with the most entries, a
+     * full simulated scroll shows no measurable difference in layout count,
+     * layout duration, or long tasks with this write live versus disabled.
+     * Moving to `scrollend` would make the mark lag a slow scroll and jump at
+     * rest — a real behaviour change bought with a cost that was not there.
      */
     function reveal(link) {
       if (!link) return;
