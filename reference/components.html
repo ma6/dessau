@@ -14,7 +14,7 @@
 <link rel="preload" href="assets/fonts/Inter-Variable-latin-ext.woff2" as="font"
       type="font/woff2" crossorigin>
 <link rel="stylesheet" href="assets/fonts.css?v=713f2669">
-<link rel="stylesheet" href="../dds/dds.css?v=2b5f6ab0">
+<link rel="stylesheet" href="../dds/dds.css?v=d781c45f">
 <link rel="stylesheet" href="assets/reference.css?v=7024fd49">
 </head>
 <body>
@@ -1787,13 +1787,15 @@
         <div class="dds-stack dds-stack-lg">
           <div class="ref-specimen" data-ref-code>
             <p class="ref-specimen-label">Search field — one unit, real submit</p>
-            <form class="dds-search" role="search" action="#search" method="get"
-                  style="max-inline-size: 26rem">
-              <svg class="dds-icon" aria-hidden="true"><use href="#dds-icon-search"/></svg>
-              <input id="s-q" name="q" type="search" aria-label="Projekte durchsuchen"
-                     placeholder="Projekt oder Person">
-              <button type="submit" class="dds-button dds-button-primary">Suchen</button>
-            </form>
+            <search>
+              <form class="dds-search" action="#search" method="get"
+                    style="max-inline-size: 26rem">
+                <svg class="dds-icon" aria-hidden="true"><use href="#dds-icon-search"/></svg>
+                <input id="s-q" name="q" type="search" enterkeyhint="search"
+                       aria-label="Projekte durchsuchen" placeholder="Projekt oder Person">
+                <button type="submit" class="dds-button dds-button-primary">Suchen</button>
+              </form>
+            </search>
             <p class="ref-note">
               <svg class="dds-icon" aria-hidden="true"><use href="#dds-icon-info"/></svg>
               <code class="dds-code">role="search"</code> makes it findable as a

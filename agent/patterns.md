@@ -304,6 +304,16 @@ valuable, where a browser crash on step six loses everything.
 - **Advancing validates the current step only.** Validating the whole form reports
   problems the user has not reached.
 - **A summary step precedes anything irreversible.**
+- **Enter in a field does nothing, and that is load-bearing.** The Continue button
+  is `type="button"`, so the form's default button is the final step's submit —
+  which is `disabled` while its step is hidden, and a disabled default button means
+  the browser performs no implicit submission. Without that, Enter on step one
+  would submit the whole wizard past every step after it. Do not "fix" the disable
+  by exempting buttons.
+
+  It also means the field carries **no `enterkeyhint`**: the attribute states what
+  Enter will do, and here it does nothing. Whether it *should* advance the step is
+  an open question, not an oversight.
 
 ---
 

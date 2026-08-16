@@ -581,14 +581,24 @@
      ==========================================================================
      A query input and its submit button as one visual unit.
 
-     A real `<form>` with `role="search"` on it, so the region is findable as a
+     A real `<form>` inside a `<search>`, so the region is findable as a
      landmark, and a real submit button — not a magnifier that only works with
      JavaScript.
+
+     `<search>` rather than `role="search"` on the form: the element carries the
+     landmark natively, and ARIA supplements semantics rather than replacing them.
+     It shipped in all three engines in late 2023 — one Firefox and one Safari
+     version later than the container-query floor — and below that the landmark is
+     simply absent rather than broken, which is the same trade Dessau already
+     takes for container queries.
 
      `type="search"` rather than `type="text"`: the platform adds a clear control,
      offers previous queries, and on iOS relabels the keyboard's return key to
      "Search". None of that is worth giving up for a slightly different clear
      button.
+
+     `enterkeyhint="search"` says the same thing to every other platform, and says
+     it explicitly rather than leaving it to be inferred from `type`.
 
      The button is never icon-only without a name. A magnifier with no accessible
      name is announced as "button". */

@@ -852,8 +852,9 @@
       "css": "dds/css/components-forms.css",
       "spec": "## Search field — `.dds-search`",
       "reference": "reference/components.html#search",
-      "native": "input[type=search]",
-      "accessibility": "role=\"search\" on the form. A real submit button with a name, never an unnamed magnifier.",
+      "native": "search, input[type=search]",
+      "markup": "A <form> inside a <search>. The element carries the landmark; role=\"search\" is not used.",
+      "accessibility": "The <search> element is the landmark — ARIA supplements semantics rather than replacing them. A real submit button with a name, never an unnamed magnifier. enterkeyhint=\"search\", because Enter submits a search.",
       "responsive": "self — shrinks rather than pushing its neighbours out"
     },
     {

@@ -716,8 +716,23 @@ locale and platform, so the reader cannot infer it from the control.
 **For:** a query input and its submit button as one unit.
 **Not for:** a filter control — use the filter bar.
 
-A real `<form role="search">` and a real submit `<button>`, so it works without
-JavaScript and the region is findable as a landmark.
+```html
+<search>
+  <form class="dds-search" action="/search" method="get">
+    <svg class="dds-icon" aria-hidden="true"><use href="#dds-icon-search"/></svg>
+    <input name="q" type="search" enterkeyhint="search" aria-label="…">
+    <button type="submit" class="dds-button dds-button-primary">Suchen</button>
+  </form>
+</search>
+```
+
+A real `<form>` inside a **`<search>`**, and a real submit `<button>`, so it works
+without JavaScript and the region is findable as a landmark.
+
+**`<search>`, not `role="search"`.** The element carries the landmark natively, and
+ARIA supplements semantics rather than replacing them. Below the version where the
+element shipped the landmark is absent rather than broken — the same trade Dessau
+already takes for container queries.
 
 `type="search"` rather than `type="text"`: the platform adds a clear control,
 offers previous queries, and relabels the iOS return key to "Search". Not worth
@@ -725,6 +740,20 @@ giving up for a slightly different clear button.
 
 **The button always has a name.** A magnifier with no accessible name is announced
 as "button".
+
+### `enterkeyhint` says what Enter does — so it has to be true
+
+`enterkeyhint="search"` here, because Enter submits a search.
+
+**`enterkeyhint="next"` is almost always wrong in Dessau.** It promises that Enter
+moves to the next field, and in a plain HTML form Enter *submits* — nothing moves.
+The value is right only where something actually advances focus, and Dessau does
+not do that: overriding Enter in a form is a native behaviour worth keeping.
+
+So: `search` on a search field, `go`/`send` where Enter submits and the label helps,
+and nothing at all where Enter's effect is not certain — an unset hint shows the
+platform default, which is the honest answer. `.dds-wizard` has none for that
+reason (see `patterns.md`).
 
 ---
 
