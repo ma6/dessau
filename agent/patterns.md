@@ -304,16 +304,24 @@ valuable, where a browser crash on step six loses everything.
 - **Advancing validates the current step only.** Validating the whole form reports
   problems the user has not reached.
 - **A summary step precedes anything irreversible.**
-- **Enter in a field does nothing, and that is load-bearing.** The Continue button
-  is `type="button"`, so the form's default button is the final step's submit —
-  which is `disabled` while its step is hidden, and a disabled default button means
-  the browser performs no implicit submission. Without that, Enter on step one
-  would submit the whole wizard past every step after it. Do not "fix" the disable
-  by exempting buttons.
+- **Enter in a field does nothing, and that stays a decision, not a side effect.**
+  The Continue button is `type="button"`, so the form's default button is the final
+  step's submit — which is `disabled` while its step is hidden, and a disabled
+  default button means the browser performs no implicit submission. Without that,
+  Enter on step one would submit the whole wizard past every step after it. Do not
+  "fix" the disable by exempting buttons.
+
+  **Decided not to make Enter advance the step either** (#103, `DECISIONS.md`
+  #046). It was a real option — reuse `validateCurrent()` and `show()`, the exact
+  path the Continue button already takes — and it would have made a keyboard
+  user's single most common action in a form do *something* instead of nothing.
+  It lost to the same reasoning already written above for `enterkeyhint="next"`:
+  overriding Enter in a form is a native behaviour Dessau keeps rather than
+  hijacks, and a wizard is the one component in the system with a real,
+  server-rendered alternative one URL per step, where Enter has never needed help.
 
   It also means the field carries **no `enterkeyhint`**: the attribute states what
-  Enter will do, and here it does nothing. Whether it *should* advance the step is
-  an open question, not an oversight.
+  Enter will do, and here it does nothing.
 
 ---
 

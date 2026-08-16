@@ -143,3 +143,33 @@ test('going back never discards what was typed', async ({ page }) => {
   await expect(page.locator('#w-name')).toHaveValue('Ada Lovelace');
   await expect(page.locator('#w-email')).toHaveValue('ada@example.org');
 });
+
+/**
+ * Enter does nothing on any step but the last (#103, `DECISIONS.md` #046).
+ * Load-bearing three separate ways at once — the Continue button forced to
+ * `type="button"`, the final step's submit button `disabled` while hidden, and
+ * no `keydown` handler added to recover the behaviour — so a change to any one
+ * of them is invisible in the source and only shows up by pressing the key.
+ */
+test('Enter in a field neither advances the step nor submits', async ({ page }) => {
+  await page.goto(PATTERNS);
+
+  const name = page.locator('#w-name');
+  await name.fill('Ada Lovelace');
+  await page.locator('#w-email').fill('ada@example.org');
+
+  await name.press('Enter');
+
+  await expect(step(page, 0)).toBeVisible();
+  await expect(step(page, 1)).toBeHidden();
+  await expect(name).toHaveValue('Ada Lovelace');
+});
+
+test('a wizard field carries no enterkeyhint — Enter does nothing, so nothing is promised', async ({
+  page,
+}) => {
+  await page.goto(PATTERNS);
+
+  await expect(page.locator('#w-name')).not.toHaveAttribute('enterkeyhint');
+  await expect(page.locator('#w-email')).not.toHaveAttribute('enterkeyhint');
+});

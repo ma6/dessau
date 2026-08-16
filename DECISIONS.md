@@ -1939,3 +1939,56 @@ make wrong, and there is no measured cost buying that trade back.
 than 30 entries, or a change that makes `reveal()` run every frame instead of
 only on a mark change — re-measure with the same method before assuming
 either the old numbers or the guide's general concern still apply.
+
+---
+
+## 046 — Enter stays inert in the wizard (#103)
+
+**Decision.** `.dds-wizard` does not gain a `keydown` handler to make Enter
+advance the current step. Enter in a wizard field continues to do nothing on
+every step but the last, where it already submits natively. This was a real
+option, not a straw one: `agent/patterns.md`'s own `enterkeyhint` note already
+sketched the exact implementation (reuse `validateCurrent()` and `show()`,
+the same path `[data-dds-wizard-next]`'s click handler takes), and the ticket
+that raised this named the cost of not doing it plainly — pressing Enter
+after filling a field is one of the most common things a keyboard user does,
+and here it silently does nothing.
+
+**Why inertness won anyway.** `agent/components.md`'s `enterkeyhint` section,
+written for #102 just before this ticket was filed against the same
+component, already states the governing reasoning: *"overriding Enter in a
+form is a native behaviour worth keeping."* That line was written about
+`enterkeyhint="next"` specifically, but the reasoning is not about the
+attribute — it is about whether Dessau hijacks Enter's meaning inside a form
+at all, and the wizard advancing on Enter is exactly that hijack, just spelled
+with a `keydown` listener instead of an HTML attribute. Keeping the two
+consistent mattered more than the two tickets happening to be filed
+separately.
+
+**The tie-break that made it not a coin flip.** Every other component in
+Dessau that intercepts Enter (`.dds-combobox`, the one precedent) does so to
+implement a widely-implemented, spec-described interaction — Enter selecting
+the active option in an open listbox — and even there the code's own comment
+is defensive about it: *"Otherwise it must still submit the form."* A wizard
+advancing on Enter has no equivalent standard to point to; it would be a
+Dessau-specific convention invented for one component. `agent/principles.md`
+already prices this kind of trade: *"Replacing a native control requires
+documenting what it gains and what it gives up. It always gives up
+something."* What it would give up here is the one property the reference
+architecture note at the top of `wizard.js` exists to protect — the module is
+explicitly *"a single-page enhancement,"* not the source of truth, and the
+source of truth (one URL per step, server-rendered) has never needed Enter's
+behaviour touched at all, because each step there is an ordinary form.
+
+**What is not being claimed.** Not that discoverability doesn't matter — the
+ticket's cost is real and stays real. Not that no wizard-shaped component
+should ever intercept Enter. Only that for *this* component, with a
+server-rendered alternative that already gets this right for free, inventing
+a bespoke convention to recover it in the JS enhancement was judged not worth
+the "native behaviour" it spends, applying the same scale
+`agent/components.md` had already set down days earlier for the adjacent
+question.
+
+**Reversal condition.** A second component independently wants to advance on
+Enter, which would turn "a bespoke convention for one component" into "an
+emerging pattern," and change the trade this entry weighs.
