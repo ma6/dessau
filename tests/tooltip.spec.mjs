@@ -28,20 +28,34 @@ import { test, expect } from '@playwright/test';
 
 const PAGE = '/reference/components.html';
 
-test('the term is not inside the button', async ({ page }) => {
+test('the term is on the page, and no word is inside the button', async ({ page }) => {
   await page.goto(PAGE);
 
   const specimen = page.locator('#tooltip [data-ref-code]').first();
+  await expect(specimen).toContainText('Aufbewahrungsdauer');
 
-  await expect(specimen.getByText('Aufbewahrungsdauer', { exact: true })).toBeVisible();
-
-  /* The button holds an icon and a visually hidden name — nothing a sighted
-     reader reads as a word. A trigger with the term inside it is the bug. */
-  const triggerText = await specimen
+  /* What a sighted reader sees inside the trigger, which is the thing under
+     discussion: an icon and nothing else. The button's own `textContent` is not
+     that — it holds the `.dds-sr-only` name, which is the point of the name.
+     `getByText(term, { exact: true })` was the first attempt and matched
+     nothing on any engine, because the term is a bare text node in the
+     paragraph rather than an element of its own. Wrapping it in a `<span>` to
+     make the assertion easy would have put markup on the page for the test's
+     benefit and left the actual claim — no word in the button — unasserted. */
+  const visibleTriggerText = await specimen
     .locator('button[popovertarget]')
-    .evaluate((button) => button.textContent.trim());
+    .evaluate((button) =>
+      Array.from(button.childNodes)
+        .filter(
+          (node) =>
+            !(node.nodeType === Node.ELEMENT_NODE && node.classList.contains('dds-sr-only'))
+        )
+        .map((node) => node.textContent)
+        .join('')
+        .trim()
+    );
 
-  expect(triggerText).not.toBe('Aufbewahrungsdauer');
+  expect(visibleTriggerText, 'the trigger shows a word, not just an icon').toBe('');
 });
 
 test('the trigger is named after the term, not "Info"', async ({ page }) => {
