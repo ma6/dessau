@@ -211,3 +211,107 @@ test('where the list is sticky, it still tracks', async ({ page }) => {
 
   await expect(toc.locator('[aria-current="location"]')).toHaveCount(1);
 });
+
+/**
+ * The mark has to be somewhere the reader can see it.
+ *
+ * The list lives in a sticky box with a `max-block-size` and `overflow-y: auto`,
+ * so on a page with more entries than fit it, the mark moves down a list that
+ * never scrolls — and after a few sections it is outside the visible part of its
+ * own list, in both directions (#91). A component whose entire job is to say
+ * where you are was then silent for exactly the pages long enough to need one.
+ *
+ * Every assertion that already exists here passed throughout, because they all
+ * ask which entry is marked and none asks whether anybody can see it.
+ */
+test('the marked entry stays inside its own list, scrolling down and back up', async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 1280, height: 800 });
+  await page.goto('/reference/components.html');
+
+  const toc = page.locator('[data-dds-toc]').first();
+
+  /* The list must genuinely overflow its box, or this test asserts nothing on a
+     page that happens to be short enough. `components.html` has the longest list
+     in the reference, which is why it is the page used here. */
+  const overflows = await toc.evaluate((element) => {
+    for (let node = element.parentElement; node && node !== document.body; node = node.parentElement) {
+      const overflow = getComputedStyle(node).overflowY;
+      if ((overflow === 'auto' || overflow === 'scroll') && node.scrollHeight > node.clientHeight) {
+        return true;
+      }
+    }
+    return false;
+  });
+  expect(overflows, 'the list fits its box here, so this test proves nothing').toBe(true);
+
+  /** Is the marked entry inside the visible part of the box that holds it? */
+  async function markIsVisible() {
+    return toc.evaluate((element) => {
+      const current = element.querySelector('[aria-current="location"]');
+      if (!current) return null;
+
+      let box = current.parentElement;
+      while (box && box !== document.body) {
+        const overflow = getComputedStyle(box).overflowY;
+        if ((overflow === 'auto' || overflow === 'scroll') && box.scrollHeight > box.clientHeight) {
+          break;
+        }
+        box = box.parentElement;
+      }
+      if (!box || box === document.body) return null;
+
+      const item = current.getBoundingClientRect();
+      const frame = box.getBoundingClientRect();
+      return item.top >= frame.top - 1 && item.bottom <= frame.bottom + 1;
+    });
+  }
+
+  const downThenUp = [0.2, 0.45, 0.7, 0.95, 0.7, 0.45, 0.2, 0];
+
+  for (const fraction of downThenUp) {
+    await page.evaluate((f) => {
+      const max = document.documentElement.scrollHeight - window.innerHeight;
+      window.scrollTo({ top: Math.round(max * f), behavior: 'instant' });
+    }, fraction);
+
+    /* Poll: the reveal runs from the same throttled frame as the mark, and on a
+       page with `content-visibility: auto` the height keeps settling. */
+    await expect
+      .poll(markIsVisible, {
+        message: `at ${Math.round(fraction * 100)}% down the page, the marked entry is outside the visible part of its list`,
+      })
+      .toBe(true);
+  }
+});
+
+/**
+ * The page is what the reader is scrolling; the list is not allowed to join in.
+ *
+ * `scrollIntoView` is the obvious call for the test above and the wrong one — it
+ * scrolls every scrollable ancestor including the document, so the page scroll
+ * that moved the reading position would be answered by moving the page.
+ */
+test('revealing the marked entry never moves the page', async ({ page }) => {
+  await page.setViewportSize({ width: 1280, height: 800 });
+  await page.goto('/reference/components.html');
+
+  for (const fraction of [0.3, 0.6, 0.9]) {
+    const target = await page.evaluate((f) => {
+      const max = document.documentElement.scrollHeight - window.innerHeight;
+      const top = Math.round(max * f);
+      window.scrollTo({ top, behavior: 'instant' });
+      return top;
+    }, fraction);
+
+    // Long enough for several throttled frames, and any reveal they trigger.
+    await page.waitForTimeout(250);
+
+    const landed = await page.evaluate(() => Math.round(window.scrollY));
+
+    // Tolerant of the page growing under `content-visibility: auto`, intolerant
+    // of the tens or hundreds of pixels a hijacked scroll would move.
+    expect(Math.abs(landed - target)).toBeLessThan(4);
+  }
+});

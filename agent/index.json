@@ -1113,7 +1113,7 @@
       "hooks": [
         "data-dds-toc"
       ],
-      "accessibility": "IntersectionObserver. aria-current=\"location\", not \"page\".",
+      "accessibility": "aria-current=\"location\", not \"page\": the reading position moved, the user did not navigate. Measured geometrically against a reading line, not with an IntersectionObserver band, which can never activate the last entry. The list scrolls its own scroll box to keep the marked entry in view — scrollTop on that one box, never scrollIntoView, which would move the page too.",
       "responsive": "self — the reading mark exists only where the list is sticky, so on a phone it does not claim one"
     },
     {

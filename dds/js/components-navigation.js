@@ -146,6 +146,11 @@
 
     if (!byId.size) return;
 
+    /* The entry currently marked, so the list is only scrolled when the answer
+       changes. Re-revealing on every frame would fight a reader who has scrolled
+       the list by hand, and would do it sixty times a second. */
+    var marked = null;
+
     function mark(link) {
       links.forEach(function (candidate) {
         if (candidate === link) {
@@ -154,12 +159,78 @@
           candidate.removeAttribute('aria-current');
         }
       });
+
+      if (link !== marked) {
+        marked = link;
+        reveal(link);
+      }
     }
 
     function clear() {
       links.forEach(function (candidate) {
         candidate.removeAttribute('aria-current');
       });
+      marked = null;
+    }
+
+    /**
+     * The scroll region the list itself lives in, if it has one.
+     *
+     * A table of contents long enough to need this is normally inside a sticky
+     * box with a `max-block-size` and `overflow-y: auto` — `.dds-toc-sticky`
+     * here, and whatever the consuming shell uses. Returns null when there is no
+     * such box, or when there is one and nothing overflows it: in both cases the
+     * entry is already as visible as it is going to get, and scrolling would
+     * only move something the reader did not ask to have moved.
+     */
+    function scrollBox(element) {
+      for (
+        var node = element.parentElement;
+        node && node !== document.body;
+        node = node.parentElement
+      ) {
+        var overflow = getComputedStyle(node).overflowY;
+        var scrolls = overflow === 'auto' || overflow === 'scroll';
+        if (scrolls && node.scrollHeight > node.clientHeight) return node;
+      }
+      return null;
+    }
+
+    /**
+     * Bring the marked entry into view — in the LIST, and nowhere else.
+     *
+     * Without this the mark moves down a list that never scrolls, so on any page
+     * with more entries than fit the box it spends most of the page outside the
+     * visible part of its own list, in both directions (#91). A component whose
+     * entire job is to say where you are is then silent for exactly the pages
+     * long enough to need one.
+     *
+     * `scrollTop` on one element rather than `scrollIntoView`, which is the
+     * obvious call and the wrong one: it scrolls EVERY scrollable ancestor,
+     * including the document — so the page scroll that just moved the reading
+     * position would be answered by moving the page again. `block: 'nearest'`
+     * limits how far each ancestor scrolls, not which ancestors scroll.
+     */
+    function reveal(link) {
+      if (!link) return;
+
+      var box = scrollBox(link);
+      if (!box) return;
+
+      var item = link.getBoundingClientRect();
+      var frame = box.getBoundingClientRect();
+
+      /* One entry of context in the direction of travel, so the current one is
+         never flush against an edge with nothing visible after it. Capped at a
+         quarter of the box, or in a list short enough to show three entries the
+         margin would be most of the box and every update would scroll. */
+      var margin = Math.min(item.height, frame.height / 4);
+
+      if (item.top < frame.top + margin) {
+        box.scrollTop += item.top - frame.top - margin;
+      } else if (item.bottom > frame.bottom - margin) {
+        box.scrollTop += item.bottom - frame.bottom + margin;
+      }
     }
 
     /**

@@ -930,6 +930,16 @@ reading position that never changes. The component asks its own computed
 position, not a width, so a product that makes the list sticky at some other
 width — or never — gets the right behaviour without configuring anything.
 
+**The list scrolls to keep the marked entry in view — and only the list.** A list
+long enough to be worth having is normally in a sticky box with a
+`max-block-size` and `overflow-y: auto`, and without this the mark walks out of
+the visible part of its own list after a few sections, in both directions.
+
+Done with `scrollTop` on that one box, never `scrollIntoView`: that scrolls every
+scrollable ancestor including the document, so the page scroll which moved the
+reading position would be answered by moving the page. Only when the marked entry
+changes, or a reader scrolling the list by hand is fought once a frame.
+
 **Not an `IntersectionObserver`.** A band answers "what is inside this band", and
 at the bottom of a page nothing is, so the last entry could never activate. The
 position is measured geometrically instead, against a reading line a quarter of
