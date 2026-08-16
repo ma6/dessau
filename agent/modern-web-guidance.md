@@ -119,20 +119,45 @@ rediscovered, and the rediscovery costs more than the note.
 
 ---
 
-## If the skill does not resolve
+## If the skill does not resolve — read the files
 
-Say so plainly, in the work summary. Do not quietly substitute recall and describe
-it as a guidance review — the whole point of the skill is that it is more current
-than recall.
+**The guidance is on disk, at `.agents/skills/modern-web-guidance/`.** Around 140
+markdown guides. `Skill(...)` failing to resolve means the *invocation* is
+unavailable; it does not mean the material is.
 
-Then:
+```bash
+ls .agents/skills/modern-web-guidance/guides/          # the categories
+cat .agents/skills/modern-web-guidance/SKILL.md        # how it is meant to be used
+grep -ril "<what you are building>" .agents/skills/modern-web-guidance/guides/
+```
 
-1. Retry it. The skill registry loads at session start, so a newly installed skill
-   may need a fresh session.
-2. If it still does not resolve, perform the equivalent review from documented
-   platform practice and **label it as such**.
-3. Record the substitution in `DECISIONS.md` and open an issue to redo the review
-   with the real skill.
+Each category has a hub document that indexes it — `guides/css/css.md`,
+`guides/forms/forms.md`, `guides/accessibility/accessibility.md` — and beside it
+the focused guides, one use case each, named for the use case
+(`interest-triggered-tooltips.md`, `overflow-clipping-control.md`,
+`size-aware-styling.md`).
+
+`.agents/` is git-ignored on purpose: `skills-lock.json` declares the source and a
+content hash, and vendoring 140 files of third-party guidance into this history is
+a different thing from declaring a dependency on it. Ignored is not absent. Look
+before concluding it is missing.
+
+`SKILL.md` also documents an `npx modern-web-guidance search` CLI, which does
+semantic search rather than grep. Use it if it runs. In a sandboxed agent session
+it may be blocked or offline — that costs the ranking, not the guidance.
+
+### Only if the files are genuinely not there
+
+1. Retry the skill. The registry loads at session start, so a newly installed
+   skill may need a fresh session.
+2. Perform the equivalent review from documented platform practice and **label it
+   as such**, plainly, in the work summary. Do not describe recall as a guidance
+   review — the whole point is that the guidance is more current than recall.
+3. Record the substitution in `DECISIONS.md` and open an issue to redo the review.
+
+**Step 2 is the last resort, not the first fallback.** A whole session's work once
+went out under it while all 140 guides sat in `.agents/`, unread, because "the
+skill did not resolve" was treated as "the guidance is unavailable" (#93).
 
 ---
 
@@ -168,6 +193,8 @@ And what is deliberately **not** adopted yet, each behind `@supports` or waiting
 | --- | --- |
 | `light-dark()` | Declined — see `DECISIONS.md` |
 | `field-sizing: content` | Not interoperable |
+| `popover="hint"` | Open — the right value for a tooltip, but not in Safari, and an unsupported enumerated value must not be allowed to land on `manual`, which has no light dismiss (WCAG 1.4.13). See #94 |
+| `interestfor` | Not adopted — Chrome 142+ only and the guide requires a polyfill. Dessau adds no runtime dependency |
 | `interpolate-size` | Behind `@supports`, for the conditional-fields reveal |
 | `@starting-style` | Used; degrades to no entry animation |
 | Anchor positioning | Behind `@supports`, for menu and tooltip |

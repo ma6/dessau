@@ -36,8 +36,21 @@ documented Dessau principle, the principle wins and the conflict is recorded in
 
 Full expectations: [`agent/modern-web-guidance.md`](agent/modern-web-guidance.md).
 
-If the skill does not resolve, say so plainly rather than quietly substituting
-recall, and note it in the work summary.
+**If `Skill(...)` does not resolve, read the files — do not fall back to recall.**
+The guides are on disk at `.agents/skills/modern-web-guidance/`, about 140 of
+them, indexed by a hub document per category (`guides/css/css.md`,
+`guides/forms/forms.md`, …):
+
+```bash
+ls .agents/skills/modern-web-guidance/guides/
+grep -ril "<what you are building>" .agents/skills/modern-web-guidance/guides/
+```
+
+`.agents/` is git-ignored deliberately — `skills-lock.json` declares the
+dependency, the working copy is not vendored — so it will not show in `git
+status` and is easy to conclude is missing. It is not. Only if the directory is
+genuinely absent does the recall fallback apply, and then it is labelled as such
+in the work summary.
 
 ### Sandbox constraint: no `token` in a filename
 
