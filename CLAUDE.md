@@ -74,24 +74,28 @@ node scripts/sync-icons.mjs --check
 Do not estimate a contrast ratio. Do not assume a custom property exists. Both
 are verifiable in under a second, and both fail silently in a browser.
 
-### The browser tests are the maintainer's to run — do not attempt them
-
-`npx playwright test` cannot run from here, and neither can `npx playwright
-install`: the browser cache lives outside the sandbox and the download is denied
-before it starts. Do not try it — the attempt costs several minutes and ends the
-same way every time.
-
-So write the test, say plainly in the work summary that it has not been run, and
-leave it for the maintainer:
+### Run the browser tests
 
 ```bash
+npx playwright test                       # all three engines
 npx playwright test tests/<file>.spec.mjs
 ```
 
-The `scripts/check-*.mjs` gates do run here, and they are the ones to lean on.
-What they cannot see is anything that is only true once the cascade has run —
-which is exactly what the browser suite is for, and exactly why an unrun test
-must be reported as unrun rather than as passing.
+They run from here. That is worth stating because it was not always true and the
+instructions said so for a while: the browsers were once outside the sandbox and
+the installer was denied, so tests were written, left unrun, and reported as
+unrun. If `npx playwright test` fails to launch a browser, say so plainly and
+leave the test for the maintainer rather than reporting it as passing — but try
+first.
+
+**A test for a bug nobody can see is worth nothing until it has been seen to
+fail.** Before keeping a regression test, break the fix and watch the test go
+red, then restore it. The dialog's drag-dismiss test earned its place that way
+(#100); several assertions written this repository's whole history would have
+passed against the bug they were written for.
+
+The `scripts/check-*.mjs` gates still catch a different class of failure, and
+they are faster. Run both.
 
 ### Rendering check
 
