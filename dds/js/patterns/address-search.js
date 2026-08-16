@@ -126,10 +126,17 @@
    * Field roles looked up inside the pattern root, and the autofill token each
    * one must carry.
    *
+   * `street` is `address-line1`, not `street-address` (#110): `street-address`
+   * is for a single field holding the entire address, and is not meant to
+   * appear alongside `address-line2` — this form has both, because street and
+   * number stay one field (never split further, and never a `<textarea>` —
+   * see `docs/guidance-review.md` §11) while `address-line2` is the always-
+   * present, always-manual second line the provider never touches.
+   *
    * `addressLine2` is intentionally absent from anything the provider fills.
    */
   var FIELD_ROLES = {
-    street: 'street-address',
+    street: 'address-line1',
     line2: 'address-line2',
     postalCode: 'postal-code',
     locality: 'address-level2',
