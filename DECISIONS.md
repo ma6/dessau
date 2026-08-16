@@ -1577,3 +1577,57 @@ region the table now always has. `.dds-segmented-option` is the one that could
 grow a long label from a product, and it is left as it is deliberately: a
 segmented control with a wrapping option is a different control, and the
 constraint that its options are short is part of what the component is for.
+
+---
+
+## 040 — Variants that differ in content or behaviour are switched, not stacked
+
+**Decision.** On the reference pages, a component with two to five variants that
+change its layout, its wording or what it does is shown one variant at a time
+behind a `.dds-segmented` control: `data-ref-variants` on the specimen,
+`data-ref-variant` on each child (#87). `.ref-matrix` stays for the other case.
+
+**The dividing question** is whether the reader compares the variants side by
+side or one after the other. Five button sizes in a row: the grid *is* the
+comparison. Three text-media layouts in a column: the difference between them
+never appears in one viewport, and the difference is the entire reason anybody
+scrolled to that section.
+
+**Why the segmented control specifically.** DDS already prescribes it for "two to
+five mutually exclusive options, all visible at once", and the reference should be
+the first place that takes its own prescription seriously — a documentation page
+that reaches for a bespoke tab strip is evidence against the component it is
+documenting. It is built from radios, so the keyboard behaviour is the platform's
+and the checked option is announced rather than merely tinted.
+
+**Three details that are not decoration.**
+
+- Inactive variants carry the `hidden` **attribute**. Hidden with CSS instead,
+  the page looks identical and every control in the two invisible variants stays
+  in the tab order — the same failure Dessau already forbids for conditional form
+  fields.
+- Without JavaScript nothing is hidden at all: every variant stays on the page and
+  CSS captions each one from its own attribute. A control is what earns the right
+  to hide something.
+- The width chosen in one variant is applied to the others. Without that,
+  switching layouts at 375px lands back at full width, and the reader compares a
+  phone layout against a desktop one and reads the difference as a variant
+  difference.
+
+**Nothing is announced on switch**, deliberately. The option's own label names
+what is now on screen and the browser announces a radio becoming checked; a live
+region would say it twice. The locale switch on the writing page does announce,
+because it re-renders a table elsewhere on the page and its control gives no hint
+of it. The distinction is whether the control already names the outcome.
+
+**What it exposed.** The code view had to learn which variant is the sample, and
+unwrapping the reference's own layout one level deep turned out to be too shallow
+already. A width preview is four levels — host, frame, scroller, stage — so where
+a specimen wrapped one, `<div data-ref-bp>` was serialised as the component and
+`cleanClone` then stripped the generated frame out of it as reference-only.
+Three specimens on `navigation.html` offered an empty `<div>` as their markup.
+`tests/codeview.spec.mjs` passed on all three, because an empty div is not blank,
+carries no `ref-` class and mentions no runtime attribute. Unwrapping now recurses
+over both the generated classes and the authored host attributes, and
+`codeview.spec.mjs` gained the assertion that would have caught it: a sample with
+no content in it is not a sample.

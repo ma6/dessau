@@ -68,6 +68,13 @@ Three places, in the same commit:
    `data-ref-bp` if it has width-dependent behaviour, plus a `.ref-note` describing
    that behaviour, plus do/don't guidance where misuse is likely.
 
+Variants that differ in **content or behaviour** — a different layout, different
+wording, a different thing done — go behind a segmented control rather than down
+the page: `data-ref-variants="<axis>"` on the specimen, `data-ref-variant="<label>"`
+on each one. `.ref-matrix` is for the other case, where the variants are small
+state variations and seeing them together *is* the comparison. See
+[`../conventions.md`](../conventions.md) → Reference specimens.
+
 ## 7. Verify
 
 ```bash

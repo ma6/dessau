@@ -844,6 +844,50 @@
 }
 
 /* =============================================================================
+   Variant switch
+   =============================================================================
+
+   One component, several variants that differ in content or behaviour, shown one
+   at a time behind a segmented control.
+
+   `.ref-matrix` above is the other answer, and the two are not interchangeable.
+   A matrix is right for small state variations — five button sizes, four badge
+   tones — where seeing them together is the comparison. A switch is right when a
+   variant is a whole layout, because three of those stacked in a column put the
+   difference between them outside the viewport, and the difference is the entire
+   reason the reader scrolled here.
+
+   The control itself is `.dds-segmented`, unmodified: the reference is the first
+   place that ought to take its own prescription for "two to five mutually
+   exclusive options, all visible at once".
+   ============================================================================= */
+
+[data-ref-variants] {
+  display: grid;
+  gap: var(--dds-space-md);
+}
+
+/* A grid item stretches, and a stretched `inline-flex` control would run the
+   full width of the specimen with its options adrift at the leading edge. */
+.ref-variants-switch {
+  justify-self: start;
+}
+
+/* Before the switch exists, every variant is on show — nothing is hidden until
+   there is a control able to bring it back. Each therefore needs the caption the
+   segmented control would otherwise be giving it, and the attribute that names
+   it for the enhanced case is already on the element. */
+[data-ref-variants]:not([data-ref-variants-enhanced]) > [data-ref-variant]::before {
+  content: attr(data-ref-variant);
+  display: block;
+
+  margin-block-end: var(--dds-space-xs);
+  font-size: var(--dds-font-size-xs);
+  font-weight: var(--dds-font-weight-medium);
+  color: var(--dds-color-text-muted);
+}
+
+/* =============================================================================
    Breakpoint preview
    =============================================================================
 

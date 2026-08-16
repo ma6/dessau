@@ -243,6 +243,43 @@ Three rules follow from the tables being complete phrases:
 
 ---
 
+## Reference specimens
+
+The reference pages have three tools, each one attribute (`reference-tools.js`):
+
+| Attribute | What it builds |
+| --- | --- |
+| `data-ref-bp` | A width switcher around the specimen |
+| `data-ref-variants="<axis>"` | A segmented control over `[data-ref-variant]` children |
+| `data-ref-code` | "Show markup", generated from the live DOM |
+
+**Variants that differ in content or behaviour are switched, not stacked.** Where
+a component has two to five variants that change its layout, its wording or what
+it does, the specimen wraps them in `data-ref-variants` and lets a segmented
+control choose between them:
+
+```html
+<div class="ref-specimen" data-ref-code>
+  <p class="ref-specimen-label">Text-media</p>
+  <div data-ref-variants="Layout">
+    <div data-ref-variant="Media trailing">…</div>
+    <div data-ref-variant="Media leading">…</div>
+  </div>
+</div>
+```
+
+`.ref-matrix` remains right for the other case: small state variations — sizes,
+tones, disabled — where seeing them all at once *is* the comparison. The dividing
+question is whether the reader compares them side by side or one after the other.
+A variant that is a whole layout is the second kind, and three of those in a
+column put the difference between them outside the viewport.
+
+The code view serialises the visible variant only, and re-serialises when the
+choice changes. Anything carrying a `ref-` class or a `data-ref-*` host attribute
+is reference scaffolding and never reaches the sample.
+
+---
+
 ## Files
 
 - `kebab-case.css`, `kebab-case.js`, `SCREAMING_SNAKE.md` for root documents,

@@ -61,6 +61,25 @@ node scripts/sync-icons.mjs --check
 Do not estimate a contrast ratio. Do not assume a custom property exists. Both
 are verifiable in under a second, and both fail silently in a browser.
 
+### The browser tests are the maintainer's to run — do not attempt them
+
+`npx playwright test` cannot run from here, and neither can `npx playwright
+install`: the browser cache lives outside the sandbox and the download is denied
+before it starts. Do not try it — the attempt costs several minutes and ends the
+same way every time.
+
+So write the test, say plainly in the work summary that it has not been run, and
+leave it for the maintainer:
+
+```bash
+npx playwright test tests/<file>.spec.mjs
+```
+
+The `scripts/check-*.mjs` gates do run here, and they are the ones to lean on.
+What they cannot see is anything that is only true once the cascade has run —
+which is exactly what the browser suite is for, and exactly why an unrun test
+must be reported as unrun rather than as passing.
+
 ### Rendering check
 
 ```bash

@@ -83,6 +83,23 @@ for (const name of PAGES) {
       expect(code, `${where}: the sample contains a runtime attribute`).not.toMatch(
         /data-dds-enhanced/
       );
+
+      /* The host of a reference tool is scaffolding too, and it is the half the
+         `ref-` check above cannot see: `data-ref-bp` and `data-ref-variants` sit
+         on plain `<div>`s that carry no class of their own. */
+      expect(code, `${where}: the sample is a reference tool's host`).not.toMatch(
+        /data-ref-(bp|variants|variant|code)\b/
+      );
+
+      /* "Not blank" is a weaker claim than it looks. Unwrapping the width
+         preview one level deep left `<div data-ref-bp>` standing as the sample,
+         `cleanClone` stripped the generated frame out of it as reference-only,
+         and three specimens shipped an empty `<div>` as the markup for their
+         component — past every assertion above, because an empty element is not
+         a blank string. */
+      expect(code, `${where}: the sample is an empty element`).not.toMatch(
+        /^<(\w[\w-]*)[^>]*><\/\1>$/
+      );
     }
   });
 
