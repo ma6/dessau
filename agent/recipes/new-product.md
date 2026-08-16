@@ -59,7 +59,12 @@ which is obvious from the step above:
 
 ```html
 <!DOCTYPE html>
-<html lang="de">
+<!-- data-theme="dark" is the no-JS fallback (#113): theme-init.js overwrites
+     both theme attributes unconditionally once it runs, so this only matters
+     if the script fails to load — and then it must match the resolution
+     order's own last step ("neither known → dark", see theme-init.js and
+     DECISIONS.md #012), not silently default to light. -->
+<html lang="de" data-theme="dark" data-dds-theme="dark">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
