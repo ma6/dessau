@@ -351,7 +351,17 @@
 
      Durations collapse to ~0 instead of `animation: none` so that JS which
      waits for `transitionend`/`animationend` still fires and does not leave an
-     element stuck mid-state. */
+     element stuck mid-state.
+
+     Reviewed against modern-web-guidance's "do not globally collapse
+     animation-duration" advice (#101) and kept as-is: that advice is about
+     `animation`, specifically infinite/looping ones, which freeze mid-cycle
+     rather than going still. It does not describe `transition`, which is most
+     of what this rule touches and which has no such failure mode. The two
+     `animation` sites that do loop (spinner, skeleton, in components.css)
+     already carry their own case-by-case override, which is the guide's own
+     alternative remedy layered under this floor rather than a contradiction
+     of it. See DECISIONS.md #043. */
   @media (prefers-reduced-motion: reduce) {
     *,
     *::before,

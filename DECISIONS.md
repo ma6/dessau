@@ -1731,3 +1731,90 @@ accessible name (WCAG 4.1.2), and it would take the enlargement away from the
 readers most likely to want a bigger picture. What is hidden is the badge, which
 is `aria-hidden` because the link already says where it goes. The redundancy worth
 removing was the announcement, and it was already removed.
+
+---
+
+## 043 — The global reduced-motion collapse stays global (#101)
+
+**Decision.** `base.css`'s `prefers-reduced-motion: reduce` block keeps
+collapsing every `animation-duration` and `transition-duration` to `0.01ms`
+rather than being dismantled into per-component `--animation-reduced` custom
+properties. No mechanism changed. This entry exists because the guidance skill
+said not to, and it is right about the general case — this is the documented
+exception.
+
+**The conflict, stated plainly.** `modern-web-guidance`'s `css.md` §9: *"DO NOT
+globally apply `animation-duration: 0.01ms;` globally as it can cause certain
+animations to become more jarring. Either apply reduced motion versions on a
+case by case basis, or use a custom property."* `agent/principles.md` already
+said the opposite, before the guidance sweep existed to disagree with it: *"the
+switch is global, not per component, because a component that forgets can
+genuinely make someone ill."* Per `CLAUDE.md`, a documented Dessau principle
+beats the skill, and the disagreement gets written down instead of quietly
+overridden. This is that write-down.
+
+**Why the principle is right and not just older.** The guidance's own concern —
+"certain animations become more jarring" — is real, but it is a claim about a
+specific failure shape: an `animation` with `infinite` (or any loop) forced to
+`iteration-count: 1` completes one cycle in 0.01ms and then freezes on whatever
+frame the loop's `to` state leaves it on, which is not the same as "not
+animating." A `transition` has no such failure mode — collapsing its duration
+to near-zero lands the element on its end state, which for a state change
+(colour swap, translate, rotate, opacity, fill) is exactly what "reduced
+motion" is supposed to look like. Conflating the two is where "DO NOT globally
+apply" overreaches: it is true of `animation-duration`, not of
+`transition-duration`, and the guide's own remedy (the `--animation-reduced`
+custom property, set through the `animation` shorthand) only ever addresses
+`animation` — it has no equivalent for `transition` at all.
+
+**The inventory (checklist item 1).** Every `animation:` and `transition:` in
+`dds/css/`, grepped rather than estimated:
+
+- `animation`, three sites total: `.dds-spinner` (`dds-spin`, infinite),
+  `.dds-skeleton` (`dds-skeleton-sweep`, infinite), `.dds-toast`
+  (`dds-toast-in`, one-shot). Both infinite ones already carry a case-by-case
+  `@media (prefers-reduced-motion: reduce)` override with `!important` — the
+  spinner becomes an opacity pulse, the skeleton drops its sweep entirely. The
+  one-shot toast animation needs nothing extra: collapsed to 0.01ms it simply
+  appears, which is correct.
+- `transition`, roughly twenty-seven sites across `components.css`,
+  `components-forms.css`, `components-navigation.css`,
+  `components-content.css` and `patterns.css`. Colour, background-color,
+  opacity, translate, rotate, scale, inline-size. None loop. None have a
+  meaningful intermediate frame. Collapsed to 0.01ms, every one of them lands
+  correctly on its end state.
+
+That closes the ticket's real fear — "a third will not announce itself" — for
+the current codebase: there is no undiscovered infinite animation hiding
+without an override. There are exactly two, and both were already found and
+fixed, the hard way, before this ticket existed.
+
+**What the two existing overrides actually are.** Not workarounds for a broken
+mechanism — they are Dessau already doing the guidance's own first-listed
+remedy: *"apply reduced motion versions on a case by case basis."* The global
+collapse is the floor (nothing animates fully if a component is forgotten); the
+spinner and skeleton overrides are the case-by-case ceiling for the two
+components where the floor alone was not good enough. That is a safety net with
+two known holes patched, not a pattern being contradicted twice. Neither is
+"no longer needed" — they are the mechanism.
+
+**One honest gap, not worth closing.** `.dds-skeleton`'s override sets
+`animation: none !important`, not a collapsed duration — so unlike the rest of
+the system, an `animationend` listener on a skeleton would not fire under
+reduced motion, contradicting the "durations collapse to ~0 rather than `none`
+so JS still gets its event" guarantee stated in `base.css` and
+`agent/foundations.md`. Nothing in the codebase currently listens for
+`animationend` or `transitionend` anywhere (checked). Recorded here so the next
+person adding such a listener checks this component first, rather than
+learning it by a stuck skeleton.
+
+**The `!important` count.** Unchanged, and already covered by
+[003](#003--cascade-layers-and-therefore-no-important)'s "user-preference
+overrides" exception — this entry sharpens that exception's reasoning, it does
+not add to it.
+
+**Reversal condition.** A fourth animation site is added that loops and has no
+case-by-case override — then it gets one, the same way the first two did. The
+global switch itself is reversed only if `agent/principles.md` is reversed
+first, since the switch exists to serve the principle and not the other way
+round.
