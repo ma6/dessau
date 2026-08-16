@@ -408,8 +408,9 @@
         "data-dds-dialog-close"
       ],
       "native": "dialog",
-      "accessibility": "aria-labelledby required. showModal(), never <dialog open>.",
-      "responsive": "viewport — (max-width: 30rem)"
+      "accessibility": "aria-labelledby required. showModal(), never <dialog open>. Light dismiss is closedby=\"any\"; components.js supplies a feature-detected fallback for engines without it.",
+      "responsive": "viewport — (max-width: 30rem)",
+      "markup": "closedby=\"any\" on the <dialog>. Opened with showModal(), never <dialog open>."
     },
     {
       "name": "disclosure",

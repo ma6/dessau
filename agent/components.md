@@ -393,10 +393,18 @@ and trapped, the rest of the page made inert, Escape closes, top-layer rendering
 so no `overflow` ancestor can clip it, a real backdrop pseudo-element, and focus
 returned to the opener.
 
+**`closedby="any"` is what closes it on a backdrop click**, and it is markup
+rather than script. The browser compares the press and the release, so a text
+selection that starts inside the panel and overshoots onto the backdrop does not
+throw the dialog away. Safari has no `closedby` yet; `components.js` feature-
+detects and supplies a fallback that answers the same question by hand, and it is
+the only reason that code exists — do not extend it, and delete it when Safari
+ships.
+
 ```html
 <button data-dds-dialog-open="rename">Rename</button>
 
-<dialog class="dds-dialog" id="rename" aria-labelledby="rename-title">
+<dialog class="dds-dialog" id="rename" closedby="any" aria-labelledby="rename-title">
   <div class="dds-dialog-header">
     <h2 class="dds-dialog-title" id="rename-title">Rename project</h2>
     <button class="dds-button dds-button-icon" data-dds-dialog-close>

@@ -83,12 +83,33 @@
     // form submit, or `close()` from application code.
     dialog.addEventListener('close', unlockScroll);
 
-    // Clicking the backdrop closes. The backdrop is not a separate element, so
-    // the test is whether the click landed on the dialog box itself rather than
-    // on any of its children — which only happens outside the visible panel.
-    dialog.addEventListener('click', function (event) {
-      if (event.target === dialog) dialog.close('dismiss');
-    });
+    /* Light dismiss belongs to `closedby="any"` in the markup, not to this file.
+       The browser compares the press and the release, so a drag that starts
+       inside the dialog and ends on the backdrop — a text selection that
+       overshoots — does not close it.
+
+       Safari has no `closedby` yet, so the fallback below runs there and nowhere
+       else. It has to answer the same question by hand, and the hand-written
+       version this replaces got it wrong: `click` fires with the dialog as its
+       target for a backdrop click, but ALSO when a press begins on a child and
+       the release lands outside, because the event goes to the common ancestor.
+       Closing on that throws away whatever the user was in the middle of.
+
+       So the press is recorded and a release only counts when both ends were the
+       backdrop. A keyboard activation cannot reach this: `event.target` is only
+       the dialog itself for a pointer landing outside the panel. */
+    if (!('closedBy' in HTMLDialogElement.prototype)) {
+      var pressedBackdrop = false;
+
+      dialog.addEventListener('pointerdown', function (event) {
+        pressedBackdrop = event.target === dialog;
+      });
+
+      dialog.addEventListener('click', function (event) {
+        if (event.target === dialog && pressedBackdrop) dialog.close('dismiss');
+        pressedBackdrop = false;
+      });
+    }
 
     dialog.querySelectorAll('[data-dds-dialog-close]').forEach(function (button) {
       button.addEventListener('click', function () {
