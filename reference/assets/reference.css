@@ -867,10 +867,30 @@
   gap: var(--dds-space-md);
 }
 
+/* A grid item's `min-width` is `auto`, which means min-content — so one item
+   that refuses to shrink sizes the whole column and pushes the page sideways.
+   That is not hypothetical: it is how this tool first shipped (#87). */
+[data-ref-variants] > * {
+  min-inline-size: 0;
+}
+
 /* A grid item stretches, and a stretched `inline-flex` control would run the
-   full width of the specimen with its options adrift at the leading edge. */
+   full width of the specimen with its options adrift at the leading edge.
+
+   `flex-wrap` because `.dds-segmented` keeps `white-space: nowrap` on its
+   options deliberately (DECISIONS 039) — a segmented control with a wrapping
+   LABEL is a different control. A group that wraps onto a second ROW is not:
+   every option stays intact and only the arrangement changes. Without it, three
+   options of ordinary length measured 366px inside a 238px slot at 320px, and
+   nothing could give.
+
+   Shorter labels are the other half and are not enough on their own. The tool is
+   general, so the next person to use it will not know they are spending a
+   character budget nobody told them about. */
 .ref-variants-switch {
   justify-self: start;
+  max-inline-size: 100%;
+  flex-wrap: wrap;
 }
 
 /* Before the switch exists, every variant is on show — nothing is hidden until

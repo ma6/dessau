@@ -289,11 +289,19 @@ control choose between them:
 <div class="ref-specimen" data-ref-code>
   <p class="ref-specimen-label">Text-media</p>
   <div data-ref-variants="Layout">
-    <div data-ref-variant="Media trailing">…</div>
-    <div data-ref-variant="Media leading">…</div>
+    <div data-ref-variant="Media end">…</div>
+    <div data-ref-variant="Media start">…</div>
   </div>
 </div>
 ```
+
+**Name a variant after its modifier** where it has one — "Media end" for
+`.dds-textmedia-media-end`. On a reference page, connecting what you see to what
+you type is the most useful thing a label can do, and it keeps the labels short,
+which the segmented control needs: its options do not wrap (DECISIONS 039), so
+three long ones cannot fit a phone. The switch wraps onto a second row rather
+than overflowing, but a row of prose in a segmented control is a sign the labels
+are doing the specification's job.
 
 `.ref-matrix` remains right for the other case: small state variations — sizes,
 tones, disabled — where seeing them all at once *is* the comparison. The dividing

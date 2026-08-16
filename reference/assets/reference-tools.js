@@ -176,13 +176,14 @@
      =========================================================================
      Markup:
        <div data-ref-variants="Layout">
-         <div data-ref-variant="Media trailing">…</div>
-         <div data-ref-variant="Media leading">…</div>
-         <div data-ref-variant="Media above">…</div>
+         <div data-ref-variant="Media end">…</div>
+         <div data-ref-variant="Media start">…</div>
+         <div data-ref-variant="Media top">…</div>
        </div>
 
      The attribute on the group names the axis and becomes the legend; the
-     attribute on each child is its label.
+     attribute on each child is its label — named after the modifier it selects,
+     which keeps it short and connects what is on screen to what an author types.
 
      -----------------------------------------------------------------------
      Why a segmented control, and why not simply stacking them

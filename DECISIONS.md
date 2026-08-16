@@ -1632,6 +1632,26 @@ over both the generated classes and the authored host attributes, and
 `codeview.spec.mjs` gained the assertion that would have caught it: a sample with
 no content in it is not a sample.
 
+**And it overflowed a phone on the first try**, which is worth recording because
+039 predicted it in the same component and the prediction was not applied. The
+segmented control keeps `white-space: nowrap` on its options deliberately — a
+wrapping label is a different control, and short options are part of what the
+component is for. Three variant labels of ordinary length therefore measured
+366px inside a 238px slot at 320px, and nothing could give: `.dds-segmented`
+would not shrink, and a grid item's `min-width: auto` handed its min-content
+width to the whole column.
+
+Two fixes, and only one of them is the general one. The labels are shorter, named
+after the modifiers they select — useful on a reference page for its own sake.
+But a tool other people will reach for cannot depend on everyone guessing a
+character budget nobody told them about, so `.ref-variants-switch` wraps onto a
+second row and caps at `100%`. Wrapping the GROUP is not what 039 ruled out:
+every option stays intact and only the arrangement changes.
+
+`tests/viewport.spec.mjs` found it on the first full run after the change, at 320
+and at 390, on all three engines. The targeted specs for the switcher all passed
+— they ask whether it works, and none of them asks how wide it is.
+
 ---
 
 ## 041 — Text-media writes the media first, and the phone gets it on top
