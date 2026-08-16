@@ -83,15 +83,28 @@ const twoFrames = () =>
  * Console listeners are attached to the page, not to the document, so they keep
  * collecting across the navigation. Nothing is lost by settling again on the
  * other side.
+ *
+ * A single retry assumed exactly one navigation. Under the load of the full
+ * spec file running in parallel, `waitForLoadState('load')` can itself resolve
+ * against a document that is about to be replaced by a second navigation —
+ * Firefox showed this as the retry's own `evaluate` being destroyed too (#104).
+ * So this loops with a bound instead of retrying once, tolerating however many
+ * navigations actually happen rather than assuming a fixed number.
  */
 async function settle(page) {
-  try {
-    await page.evaluate(twoFrames);
-  } catch (error) {
-    if (!/Execution context was destroyed|navigation/i.test(error.message)) throw error;
-    await page.waitForLoadState('load');
-    await page.evaluate(twoFrames);
+  const MAX_NAVIGATIONS = 5;
+
+  for (let attempt = 0; attempt <= MAX_NAVIGATIONS; attempt++) {
+    try {
+      await page.evaluate(twoFrames);
+      return;
+    } catch (error) {
+      if (!/Execution context was destroyed|navigation/i.test(error.message)) throw error;
+      await page.waitForLoadState('load');
+    }
   }
+
+  throw new Error(`settle() did not land after ${MAX_NAVIGATIONS} navigations`);
 }
 
 for (const path of PAGES) {
