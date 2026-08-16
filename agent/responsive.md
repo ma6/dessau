@@ -226,18 +226,26 @@ The DOM order is the reading order and the tab order (WCAG 1.3.2, 2.4.3).
 **Therefore: bind any reorder inside the query it is meant for.**
 
 ```css
-/* Correct — only swaps where two columns exist. */
+/* Correct — only places the columns where two columns exist. */
 @container dds-textmedia (inline-size > 40rem) {
-  .dds-textmedia-media-end .dds-textmedia-media { order: 2; }
+  .dds-textmedia-media-start .dds-textmedia-media { order: -1; }
+  .dds-textmedia-media-end   .dds-textmedia-media { order: 1; }
 }
 ```
 
-Applied unconditionally, that `order` also reverses the stacked order at narrow
-widths, putting a caption before what it captions. It is a 1.3.2 failure that is
-invisible on a desktop.
+Applied unconditionally, that `order` also reorders the stacked state at narrow
+widths — where the source order is already the intended one, so anything moved is
+moved away from it. It is a 1.3.2 failure that is invisible on a desktop.
 
 Rule of thumb: if a component stacks into one column below a threshold, `order`
 must be neutral there — by leaving the rule out, not by resetting it.
+
+**Which makes the source order a decision, not an accident.** Whatever the
+stacked layout should read as, write *that* order in the DOM, then let the wide
+layout rearrange it. `.dds-textmedia` puts the media element first in all three
+of its variants for exactly this reason: on a phone the illustration belongs with
+its heading rather than four paragraphs below it, and the only way to draw that
+without lying about it is to say it in the markup.
 
 ---
 

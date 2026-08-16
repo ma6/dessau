@@ -1631,3 +1631,45 @@ carries no `ref-` class and mentions no runtime attribute. Unwrapping now recurs
 over both the generated classes and the authored host attributes, and
 `codeview.spec.mjs` gained the assertion that would have caught it: a sample with
 no content in it is not a sample.
+
+---
+
+## 041 — Text-media writes the media first, and the phone gets it on top
+
+**Decision.** `.dds-textmedia` has three variants — `media-start`, `media-end`,
+`media-top` — and one markup contract: `.dds-textmedia-media` is the **first**
+child, in all three. Below the 40rem container query every variant stacks with
+the media above the text, including the trailing one.
+
+**What it replaces.** The block had one modifier and put the media second, so the
+stacked layout read text-then-media: on every phone, the image arrived after the
+paragraphs it illustrates. The maintainer asked for the opposite (#86).
+
+**The part that is a real decision.** There are two ways to draw a phone layout
+that leads with the media, and they produce the same pixels:
+
+1. Write the media first and let the stacked state be the source order.
+2. Write the text first and hoist the media with `order` below the query.
+
+The second is worse in a way no screenshot shows. `order` moves what is drawn and
+not what is announced (WCAG 1.3.2), so option 2 lies about its reading order —
+and it lies in the *narrow* layout, which is the one the most people are in and
+the one nearly all screen-reader use is in. Option 1 spends the mismatch on the
+wide layout instead, where the swap is between a text column and an illustration
+column and neither order is the meaningful one.
+
+So: the media element first, and the `order` that places the columns bound inside
+the container query, where the columns exist.
+
+**This sharpens 'bind the reorder inside the query'; it does not reverse it.**
+The earlier rule said `order` must be neutral in the stacked state. It still must
+be. What was implicit, and is now written down in `agent/responsive.md`, is the
+step before it: **the source order is a decision.** Whatever the stacked layout
+should read as, write that order in the DOM first — then let the wide layout
+rearrange it. The old block had the rule right and the source order by accident.
+
+**What `media-top` gives up.** It never becomes two columns, so at 1280px it is a
+full-width image over a text block, and the text is capped at
+`--dds-measure-default` because full width is not a measure. Half the width would
+have been a smaller picture rather than a different layout, which is not what the
+variant is for.

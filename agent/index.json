@@ -572,18 +572,21 @@
     },
     {
       "name": "textmedia",
-      "purpose": "A block of text beside an image.",
+      "purpose": "A block of text beside an image, in three layouts: media leading, media trailing, media above.",
       "notFor": "A layout grid — it is one content block, not a page skeleton.",
       "classes": [
         ".dds-textmedia",
         ".dds-textmedia-frame",
         ".dds-textmedia-media",
-        ".dds-textmedia-media-end"
+        ".dds-textmedia-media-start",
+        ".dds-textmedia-media-end",
+        ".dds-textmedia-media-top"
       ],
       "css": "dds/css/components-content.css",
       "spec": "## Text-media — `.dds-textmedia`",
       "reference": "reference/content.html#textmedia",
-      "accessibility": "The column swap is bound inside the container query, so the stacked reading order is not reversed (WCAG 1.3.2).",
+      "markup": "The media element comes first inside .dds-textmedia, in every variant. Below 40rem all three stack with the media on top.",
+      "accessibility": "The media is first in the source, so the stacked layout needs no order and what is announced is what is drawn. The column placement is bound inside the container query (WCAG 1.3.2).",
       "responsive": "container — dds-textmedia (inline-size > 40rem)"
     },
     {

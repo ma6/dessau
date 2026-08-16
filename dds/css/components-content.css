@@ -482,7 +482,29 @@
 
   /* Text and media side by side. The frame layer exists so the container query
      has something to query: a container query cannot style the element that
-     establishes the container, only its descendants. */
+     establishes the container, only its descendants.
+
+     Three layouts, one markup contract:
+
+       .dds-textmedia-media-start   media leading, text trailing
+       .dds-textmedia-media-end     media trailing, text leading
+       .dds-textmedia-media-top     media above the text at every width
+
+     -------------------------------------------------------------------------
+     The media comes first in the source. All three variants, always.
+     -------------------------------------------------------------------------
+
+     Below the query every variant stacks, and stacked, the media is on top —
+     including in the media-trailing one, which on a desktop looks like the
+     variant that would put it underneath. That is the point: a phone shows the
+     illustration with its heading, not four paragraphs later.
+
+     Which is only defensible because the source order says the same thing. The
+     alternative — text first in the source, `order` hoisting the media on a
+     phone — draws the identical picture and lies about it to anyone not looking
+     at the picture, and it lies in the layout the most people and the most
+     screen readers are in. So the media element is written first, and the
+     stacked state needs no `order` at all (WCAG 1.3.2 Meaningful Sequence). */
   .dds-textmedia-frame {
     container-type: inline-size;
     container-name: dds-textmedia;
@@ -498,17 +520,36 @@
      of a readable measure. Any narrower and side-by-side stops being a favour to
      the reader. */
   @container dds-textmedia (inline-size > 40rem) {
-    .dds-textmedia {
+    /* Every variant but the one whose whole definition is that it never does
+       this. `media-top` is a block with a full-width image over it at 375px and
+       at 1400px alike — the layout for a lead image, where a half-width column
+       would be a smaller picture rather than a different one. */
+    .dds-textmedia:not(.dds-textmedia-media-top) {
       grid-template-columns: 1fr 1fr;
       align-items: center;
     }
 
-    /* Media on the trailing side. Bound INSIDE the query on purpose: applied
-       unconditionally, `order` would also reverse the stacked order below the
-       breakpoint, putting the caption before what it captions and breaking
-       WCAG 1.3.2 Meaningful Sequence. */
+    /* Bound INSIDE the query, both of them. Applied unconditionally, `order`
+       would also reorder the stacked state — where the source order is already
+       the intended one, and where anything moved is moved away from it.
+
+       Stated on the leading variant too, though the source order already puts it
+       there. The column a block means to be in is not something the next reader
+       should have to derive from the position of a `<div>`, and a variant that
+       only works while nobody edits the markup around it is not a variant. */
+    .dds-textmedia-media-start .dds-textmedia-media {
+      order: -1;
+    }
+
     .dds-textmedia-media-end .dds-textmedia-media {
-      order: 2;
+      order: 1;
+    }
+
+    /* Full width is not a measure. Side by side, the column does the capping;
+       stacked at 1400px, nothing does, and the text would run to eighty or a
+       hundred and thirty characters a line. */
+    .dds-textmedia-media-top > :not(.dds-textmedia-media) {
+      max-inline-size: var(--dds-measure-default);
     }
   }
 

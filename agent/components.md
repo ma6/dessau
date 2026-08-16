@@ -1122,10 +1122,42 @@ Needs `.dds-textmedia-frame` around it: a container query cannot style the eleme
 that establishes the container, so the frame carries `container-type` and the
 inner element carries the layout.
 
-The `order` that swaps the columns is bound **inside** the container query.
-Applied unconditionally it also reverses the stacked order at narrow widths,
-putting a caption before what it captions (WCAG 1.3.2) — a failure that is
-invisible on a desktop.
+Three variants, above 40rem of container width:
+
+| Class | Wide |
+| --- | --- |
+| `.dds-textmedia-media-start` | Media leading, text trailing |
+| `.dds-textmedia-media-end` | Media trailing, text leading |
+| `.dds-textmedia-media-top` | Stays one column — media above, text capped at the reading measure |
+
+**Below 40rem all three stack, and the media is on top.** Including
+`media-end`, which on a desktop looks like the variant that would put it
+underneath. A phone shows the illustration with its heading, not four paragraphs
+later.
+
+**`.dds-textmedia-media` comes first in the source, in every variant.** That is
+the markup contract, and it is what makes the paragraph above defensible: the
+stacked layout needs no `order`, so what is announced and what is drawn are the
+same sequence (WCAG 1.3.2). Writing the text first and hoisting the media with
+`order` on a phone draws the identical picture and lies about it — in the layout
+that the most people, and the most screen readers, are in.
+
+The `order` that places the columns is therefore bound **inside** the container
+query, and only there.
+
+```html
+<div class="dds-textmedia-frame">
+  <div class="dds-textmedia dds-textmedia-media-end">
+    <div class="dds-textmedia-media">
+      <img src="…" width="480" height="480" alt="…">
+    </div>
+    <div class="dds-stack dds-stack-sm">
+      <h3>…</h3>
+      <p>…</p>
+    </div>
+  </div>
+</div>
+```
 
 ## Charts — `.dds-chart`, `.dds-donut`
 

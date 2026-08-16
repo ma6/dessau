@@ -14,7 +14,7 @@
 <link rel="preload" href="assets/fonts/Inter-Variable-latin-ext.woff2" as="font"
       type="font/woff2" crossorigin>
 <link rel="stylesheet" href="assets/fonts.css?v=713f2669">
-<link rel="stylesheet" href="../dds/dds.css?v=eb7e1c8b">
+<link rel="stylesheet" href="../dds/dds.css?v=4e3244e5">
 <link rel="stylesheet" href="assets/reference.css?v=a5bb34d7">
 </head>
 <body>
@@ -943,44 +943,113 @@
         <div class="ref-section-head">
           <h2>Text-media</h2>
             <p class="dds-text-subtle dds-measure-default dds-mbs-xs">
-              A block of text beside an image — the recurring content block of a CMS page. The column swap is bound inside the container query, so the stacked reading order is never reversed.
+              A block of text beside an image — the recurring content block of a CMS page. Three layouts above 40rem of container width; below it all three stack, and the media is on top.
             </p>
         </div>
 
         <div class="dds-stack dds-stack-lg">
-                    <div>
+          <div class="ref-specimen" data-ref-code>
             <p class="ref-specimen-label">Text and media, responsive by container query</p>
-            <div data-ref-bp>
-              <div class="dds-textmedia-frame" style="padding: var(--dds-space-md)">
-                <div class="dds-textmedia dds-textmedia-media-end">
-                  <div class="dds-stack dds-stack-sm">
-                    <h3 class="dds-text-xl">One source, two layouts</h3>
-                    <p class="dds-text-sm dds-text-subtle">
-                      Below 40rem of container width this stacks, with the text
-                      first. Above it, the two columns sit side by side and the
-                      media moves to the trailing edge.
-                    </p>
-                    <p class="dds-text-sm dds-text-subtle">
-                      The <code class="dds-code">order</code> that swaps them is
-                      bound <em>inside</em> the container query. Applied
-                      unconditionally it would also reverse the stacked order,
-                      putting the caption before what it captions.
-                    </p>
+
+            <div data-ref-variants="Layout">
+              <div data-ref-variant="Media trailing">
+                <div data-ref-bp>
+                  <div class="dds-textmedia-frame" style="padding: var(--dds-space-md)">
+                    <div class="dds-textmedia dds-textmedia-media-end">
+                      <div class="dds-textmedia-media">
+                        <img src="assets/img/placeholder-square.svg" width="480" height="480"
+                             alt="" class="dds-radius-md">
+                      </div>
+                      <div class="dds-stack dds-stack-sm">
+                        <h3 class="dds-text-xl">The media is written first anyway</h3>
+                        <p class="dds-text-sm dds-text-subtle">
+                          Wide, the image sits on the trailing edge and the text
+                          reads from the leading one. Narrow, this block stacks
+                          with the image on top — and it is on top because it is
+                          first in the markup, not because
+                          <code class="dds-code">order</code> put it there.
+                        </p>
+                        <p class="dds-text-sm dds-text-subtle">
+                          Take the width down to 375 and back. The only thing
+                          that moves is the column the image is placed in.
+                        </p>
+                      </div>
+                    </div>
                   </div>
-                  <div class="dds-textmedia-media">
-                    <img src="assets/img/placeholder-square.svg" width="480" height="480"
-                         alt="" class="dds-radius-md">
+                </div>
+              </div>
+
+              <div data-ref-variant="Media leading">
+                <div data-ref-bp>
+                  <div class="dds-textmedia-frame" style="padding: var(--dds-space-md)">
+                    <div class="dds-textmedia dds-textmedia-media-start">
+                      <div class="dds-textmedia-media">
+                        <img src="assets/img/placeholder-square.svg" width="480" height="480"
+                             alt="" class="dds-radius-md">
+                      </div>
+                      <div class="dds-stack dds-stack-sm">
+                        <h3 class="dds-text-xl">The same markup, one class apart</h3>
+                        <p class="dds-text-sm dds-text-subtle">
+                          Wide, the image keeps the leading column — which is
+                          where the source order already puts it. The rule is
+                          written out regardless: the column a block means to be
+                          in should not have to be derived from the position of a
+                          <code class="dds-code">&lt;div&gt;</code>.
+                        </p>
+                        <p class="dds-text-sm dds-text-subtle">
+                          Narrow, it is indistinguishable from the variant
+                          before it. That is the intended result, not a
+                          coincidence.
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div data-ref-variant="Media above">
+                <div data-ref-bp>
+                  <div class="dds-textmedia-frame" style="padding: var(--dds-space-md)">
+                    <div class="dds-textmedia dds-textmedia-media-top">
+                      <div class="dds-textmedia-media">
+                        <img src="assets/img/placeholder-wide.svg" width="640" height="360"
+                             alt="" class="dds-radius-md">
+                      </div>
+                      <div class="dds-stack dds-stack-sm">
+                        <h3 class="dds-text-xl">One column at every width</h3>
+                        <p class="dds-text-sm dds-text-subtle">
+                          The lead-image layout. It never becomes two columns,
+                          because half the width would be a smaller picture
+                          rather than a different one.
+                        </p>
+                        <p class="dds-text-sm dds-text-subtle">
+                          The text is capped at the reading measure instead.
+                          Full width is not a measure: at 1280 a paragraph would
+                          run past a hundred characters a line.
+                        </p>
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
             </div>
+
             <p class="ref-note">
               <svg class="dds-icon" aria-hidden="true"><use href="#dds-icon-info"/></svg>
-              Drag the width buttons above. Because the layout comes from
+              Drag the width buttons. Because the layout comes from
               <code class="dds-code">@container</code> rather than
               <code class="dds-code">@media</code>, the stage width is what the
               component measures — which is also why it works correctly inside a
-              narrow panel or a dialog.
+              narrow panel or a dialog. The width survives switching layout, so
+              the three can be compared at the same one.
+            </p>
+            <p class="ref-note">
+              <svg class="dds-icon" aria-hidden="true"><use href="#dds-icon-info"/></svg>
+              <strong>At 375:</strong> all three are the same layout — media,
+              then text. The trailing variant included. A phone shows the
+              illustration with its heading rather than four paragraphs later,
+              and because the media element is first in the source, that is what
+              a screen reader reads out too (WCAG 1.3.2).
             </p>
           </div>
         </div>
