@@ -1332,9 +1332,14 @@
      same shape doing a different job. A bar is clearer for anything wide enough
      to hold one; this exists for when there is not room.
 
-     The figure is `aria-hidden`. The value belongs on a real `<progress>` or in
-     text beside it, because a circle communicates nothing to a screen reader —
-     the same rule as the chart components. */
+     The bare figure is `aria-hidden`: a circle communicates nothing to a screen
+     reader, the same rule as the chart components. The value belongs on a real
+     `<progress>`, in text beside it, or — at `-lg`, see below — inside it as a
+     `.dds-progress-ring-value` child. Whichever it is, it is real text, so
+     `aria-hidden` goes on the ring ONLY while it is bare. An instance carrying
+     a `.dds-progress-ring-value` child must not be `aria-hidden`, or the one
+     piece of real information here is hidden along with the decoration (#109).
+     */
   .dds-progress-ring {
     --dds-progress-ring-value: 0;
     --dds-progress-ring-size: 2.5rem;
