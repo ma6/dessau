@@ -1142,7 +1142,8 @@
       "spec": "## Tooltip — `.dds-tooltip`",
       "reference": "reference/components.html#tooltip",
       "native": "popover",
-      "accessibility": "popover gives the WCAG 1.4.13 dismiss behaviour.",
+      "markup": "Only the icon is the button. The term beside it stays text; the trigger is an icon-only button with a name that identifies the term.",
+      "accessibility": "popover gives the WCAG 1.4.13 dismiss behaviour. The trigger carries aria-describedby as well as popovertarget, because opening a popover moves no focus and announces nothing.",
       "responsive": "none — nothing about it changes with width"
     },
     {

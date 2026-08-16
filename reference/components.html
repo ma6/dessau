@@ -1865,16 +1865,37 @@
         <div class="dds-stack dds-stack-lg">
           <div class="ref-specimen" data-ref-code>
             <p class="ref-specimen-label">Tooltip — supplementary only</p>
-            <p class="dds-cluster dds-cluster-sm" lang="de">
-              <button type="button" class="dds-button dds-button-secondary"
-                      popovertarget="tip-retention">
-                Aufbewahrungsdauer
+            <p class="dds-cluster dds-cluster-2xs" lang="de">
+              Aufbewahrungsdauer
+              <button type="button"
+                      class="dds-button dds-button-subtle dds-button-icon dds-button-sm"
+                      popovertarget="tip-retention" aria-describedby="tip-retention">
+                <span class="dds-sr-only">Erklärung zur Aufbewahrungsdauer</span>
                 <svg class="dds-icon" aria-hidden="true"><use href="#dds-icon-info"/></svg>
               </button>
               <span class="dds-tooltip" id="tip-retention" popover>
                 Dokumente bleiben zehn Jahre gespeichert und werden danach
                 automatisch gelöscht.
               </span>
+            </p>
+            <p class="ref-note">
+              <svg class="dds-icon" aria-hidden="true"><use href="#dds-icon-info"/></svg>
+              <strong>Only the icon is the button.</strong> The term is a term —
+              wrapping it in a button draws a word the reader is meant to read as
+              something they are meant to press, and every button convention in the
+              system then says pressing it will do something. The trigger is its own
+              small control, with its own name: “Erklärung zur Aufbewahrungsdauer”,
+              not “Info”, because a name is read out of context often enough that
+              it has to say which term it explains.
+            </p>
+            <p class="ref-note">
+              <svg class="dds-icon" aria-hidden="true"><use href="#dds-icon-info"/></svg>
+              <code class="dds-code">aria-describedby</code> as well as
+              <code class="dds-code">popovertarget</code>. Opening a popover does
+              not move focus and announces nothing, so without it a screen-reader
+              user can press the trigger and hear silence. Referenced description
+              text is in the accessibility tree whether or not the popover is open,
+              which is exactly right for something supplementary.
             </p>
             <p class="ref-note">
               <svg class="dds-icon" aria-hidden="true"><use href="#dds-icon-warning"/></svg>

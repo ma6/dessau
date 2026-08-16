@@ -588,6 +588,36 @@ status fills, identical in both themes.
 
 Unavailable on touch, easy to miss, and it disappears.
 
+**Only the icon is the button.** A term with a tooltip on it stays a term; the
+trigger is its own small control beside it.
+
+```html
+<p class="dds-cluster dds-cluster-2xs">
+  Aufbewahrungsdauer
+  <button type="button" class="dds-button dds-button-subtle dds-button-icon dds-button-sm"
+          popovertarget="tip-retention" aria-describedby="tip-retention">
+    <span class="dds-sr-only">Erklärung zur Aufbewahrungsdauer</span>
+    <svg class="dds-icon" aria-hidden="true"><use href="#dds-icon-info"/></svg>
+  </button>
+  <span class="dds-tooltip" id="tip-retention" popover>…</span>
+</p>
+```
+
+Wrapping the label itself draws a word the reader is meant to *read* as something
+they are meant to *press*, and every button convention in the system then promises
+that pressing it does something. It also inverts the rule above: the tooltip is
+supplementary to a control that already has a name, and turning the label into a
+button invents the control to hang it on.
+
+**Name the trigger after the term**, not "Info". A name is read out of context
+often enough — in a list of controls, in a rotor — that "Info, button" three times
+on a page is three identical controls.
+
+**`aria-describedby` as well as `popovertarget`.** Opening a popover moves no focus
+and announces nothing, so without it a screen-reader user presses the trigger and
+hears silence. Referenced description text is in the accessibility tree whether or
+not the popover is open, which is what supplementary means.
+
 Built on `popover` with `popovertarget`, which supplies the dismiss behaviour
 WCAG 2.2 1.4.13 requires (Escape, click outside) and top-layer rendering. Anchor
 positioning is used where supported, via the **implicit** anchor — no anchor name,
