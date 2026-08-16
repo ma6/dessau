@@ -224,8 +224,11 @@
     gap: var(--dds-space-md);
   }
 
-  /* The submit row. Sticky on small screens so the primary action stays
-     reachable in a long form without scrolling to the end. */
+  /* The submit row. An ordinary flow element — NOT sticky (#112, corrected
+     after the comment here claimed otherwise since the file's first commit,
+     with nothing implementing it). A form long enough that the primary
+     action needs to stay reachable while scrolling wants `.dds-actionbar`,
+     a distinct component built for exactly that, not this row restyled. */
   .dds-form-actions {
     display: flex;
     flex-wrap: wrap;
