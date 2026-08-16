@@ -125,18 +125,30 @@ test('below the query every variant stacks with the media on top', async ({ page
   for (let index = 0; index < 3; index += 1) {
     await options.nth(index).check();
 
-    const block = group.locator('[data-ref-variant]:not([hidden]) .dds-textmedia');
-    const media = block.locator('.dds-textmedia-media');
-    const text = block.locator('> :not(.dds-textmedia-media)').first();
+    const shown = group.locator('[data-ref-variant]:not([hidden])');
 
-    const mediaBox = await media.boundingBox();
-    const textBox = await text.boundingBox();
+    /* Wait for the width, do not assume it. The stage animates between widths,
+       and this assertion retries until it is there — measuring before it settles
+       reads a layout that is on its way somewhere else. */
+    await expect(shown.locator('.ref-bp-stage')).toHaveCSS('width', '375px');
+
+    /* Both rectangles in ONE evaluate, from one layout pass. Two `boundingBox()`
+       calls are two round trips, and anything that reflows between them — the
+       tail of that width transition — is measured half in the old layout and
+       half in the new. That read as a 22px overlap on Firefox and WebKit and as
+       a pass on Chromium, which is a report about the timing and not about the
+       component. */
+    const gap = await shown.locator('.dds-textmedia').evaluate((block) => {
+      const media = block.querySelector('.dds-textmedia-media');
+      const text = Array.from(block.children).find((child) => child !== media);
+      return text.getBoundingClientRect().top - media.getBoundingClientRect().bottom;
+    });
 
     /* Including the media-trailing variant, which on a desktop looks like the
        one that would put the image underneath. A phone shows the illustration
        with its heading, not four paragraphs later. */
-    expect(mediaBox.y + mediaBox.height, `variant ${index} at 375px`).toBeLessThanOrEqual(
-      textBox.y + 1
+    expect(gap, `variant ${index} at 375px: the media is not above the text`).toBeGreaterThanOrEqual(
+      0
     );
   }
 });
