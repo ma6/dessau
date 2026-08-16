@@ -369,7 +369,8 @@
       "css": "dds/css/components-content.css",
       "spec": "## Key-value list — `.dds-keyvalue` · Data list — `.dds-datalist`",
       "reference": "reference/content.html#datalist",
-      "responsive": "self — wraps when it runs out of room"
+      "responsive": "self — wraps when it runs out of room",
+      "accessibility": "The list carries role=\"list\": Safari drops list semantics from a styled list outside <nav> (agent/accessibility.md)."
     },
     {
       "name": "date-field",
@@ -615,7 +616,8 @@
       "css": "dds/css/components-content.css",
       "spec": "## Gallery — `.dds-gallery` · Avatar — `.dds-avatar`",
       "reference": "reference/content.html#gallery",
-      "responsive": "self — the column count follows the space"
+      "responsive": "self — the column count follows the space",
+      "accessibility": "The list carries role=\"list\": Safari drops list semantics from a styled list outside <nav> (agent/accessibility.md)."
     },
     {
       "name": "icon",
@@ -724,7 +726,7 @@
       "spec": "## Menu — `.dds-menu`",
       "reference": "reference/navigation.html#menu",
       "native": "popover",
-      "accessibility": "popover + popovertarget, no JS. Buttons/links in a list, NOT role=menu.",
+      "accessibility": "popover + popovertarget, no JS. Buttons/links in a list, NOT role=menu. The list carries role=\"list\": Safari drops list semantics from a styled list outside <nav> (agent/accessibility.md).",
       "responsive": "self — capped to the viewport less a gutter, so it cannot be wider than the screen"
     },
     {
@@ -985,7 +987,7 @@
       "css": "dds/css/components-navigation.css",
       "spec": "## Step progress — `.dds-steps`",
       "reference": "reference/navigation.html#steps",
-      "accessibility": "Status in words. aria-current=step. Upcoming steps are never links.",
+      "accessibility": "Status in words. aria-current=step. Upcoming steps are never links. The list carries role=\"list\": Safari drops list semantics from a styled list outside <nav> (agent/accessibility.md).",
       "responsive": "container — dds-steps (inline-size >= 34rem)"
     },
     {
@@ -1186,7 +1188,7 @@
         "data-dds-upload"
       ],
       "native": "input[type=file]",
-      "accessibility": "accept must match the prose. Drag and drop is additive (WCAG 2.5.7).",
+      "accessibility": "accept must match the prose. Drag and drop is additive (WCAG 2.5.7). The list carries role=\"list\": Safari drops list semantics from a styled list outside <nav> (agent/accessibility.md).",
       "responsive": "self — shrinks rather than pushing its neighbours out"
     }
   ],
@@ -1290,7 +1292,7 @@
       "css": "dds/css/patterns.css",
       "spec": "## Search and results — `.dds-results`",
       "reference": "reference/patterns.html#results",
-      "accessibility": "aria-busy while loading; count announced politely. Failed is worded differently from nothing found.",
+      "accessibility": "aria-busy while loading; count announced politely. Failed is worded differently from nothing found. The list carries role=\"list\": Safari drops list semantics from a styled list outside <nav> (agent/accessibility.md).",
       "responsive": "none — nothing about it changes with width"
     },
     {

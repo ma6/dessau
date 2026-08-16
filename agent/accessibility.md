@@ -88,6 +88,26 @@ without reordering the DOM. Where a component reorders, the reorder is bound
 **inside** the query it is meant for — applied unconditionally it also reverses
 the stacked order at narrow widths, which is exactly a 1.3.2 failure.
 
+#### A styled list needs `role="list"` — the one redundant role that is not
+
+`role="list"` on a `<ul>` is redundant by every rule above, and it is required
+anyway: **Safari removes list semantics from a `<ul>` or `<ol>` outside `<nav>`
+once `list-style: none` is applied.** The list stops being announced as "list, four
+items" and stops being skippable as a group; four unrelated things are read
+instead. Nothing on screen changes, no automated check fails, and the rule against
+redundant ARIA argues for deleting the fix.
+
+So it is stated here rather than left to be rediscovered. Every Dessau list that
+removes its markers and is **not** inside a `<nav>` carries it: `.dds-datalist`,
+`.dds-gallery`, `.dds-upload-list`, `.dds-results-list`, `.dds-steps`, and the
+`<ul>` inside `.dds-menu`.
+
+Exempt, and for reasons rather than by oversight: anything inside `<nav>`
+(`.dds-toc`, `.dds-breadcrumb`, `.dds-pagination`, `.dds-primary-nav`,
+`.dds-contentnav`, `.dds-appnav`, `.dds-sitefooter-group`) keeps its semantics in
+Safari; `.dds-combobox-list` is `role="listbox"`, which is an explicit role
+already; and the `list-style: none` on `<summary>` is not a list at all.
+
 ### Forms
 
 | Check | Criterion |
