@@ -59,7 +59,7 @@ client-ds/
   dist/client-ds.css     built, single file, no Dessau at runtime
   agent/                 your index.json, your AGENTS.md
   reference/             your rendered proof
-  scripts/               copied from Dessau and repointed — see step 4
+  scripts/               copied from Dessau and repointed — see step 5
 ```
 
 **`libs/dessau/` is never edited.** It is a pinned dependency, and this repository
@@ -67,7 +67,28 @@ has already paid for writing into one: `sync-icons.mjs --dir=.` used to descend
 into the vendored copy of Dessau and rewrite its reference pages, invisible for as
 long as the two sprites matched.
 
-## 2. The entry file
+## 2. Set up modern-web-guidance
+
+Building this repository IS the kind of work CLAUDE.md's mandate covers —
+substituting the foundation and writing a reference are real CSS/JS work, not
+plumbing exempt from it. Two things, not one, or the skill is silently
+unavailable (the same gap #129 found and fixed for a product; the derived-system
+path never had it at all):
+
+1. **Install the plugin**, once per machine, if it is not already:
+
+   ```text
+   /plugin marketplace add GoogleChrome/modern-web-guidance
+   /plugin install modern-web-guidance@googlechrome
+   /reload-plugins
+   ```
+
+2. **Enable it for this project.** Copy `skills-lock.json` and
+   `.claude/settings.json` from `libs/dessau`'s own root, unedited. This step
+   presumes step 1 already happened — it scopes an installed plugin to this
+   repository, it does not install one.
+
+## 3. The entry file
 
 Copy `libs/dessau/dds/dds.css`, point the first two imports at `tokens/`, and leave
 the other ten alone.
@@ -86,7 +107,7 @@ to have them — or take that script too and let it own your entry file. Do not 
 Dessau's hashes in place pointing at your files; they are hashes of somebody else's
 content and will be wrong from the first edit.
 
-## 3. What to copy from `semantic.css`, and what not to
+## 4. What to copy from `semantic.css`, and what not to
 
 `primitives.css` is yours outright — it is the ramps, and the ramps are the
 identity.
@@ -102,7 +123,7 @@ If you find yourself rewriting most of it, stop: you are building a different
 system rather than a derived one, and Dessau's components will not hold together
 on top of it.
 
-## 4. Repoint the gates, or they lie
+## 5. Repoint the gates, or they lie
 
 This is the step people skip, and it fails in the most convincing way possible: the
 checks pass.
@@ -125,7 +146,7 @@ Copy them, change the paths, and **prove each one can still fail** — break a v
 on purpose, see the report, put it back. A check that cannot fail is worse than no
 check, because it is trusted.
 
-## 5. What you owe your own consumers
+## 6. What you owe your own consumers
 
 You are a design system now, so you owe what Dessau owes:
 
@@ -139,7 +160,7 @@ You are a design system now, so you owe what Dessau owes:
   path and URL. Without it, your first product's agent either hand-edits Dessau's
   copy (the exact silent drift `consumer-init.prompt.md` exists to prevent) or
   gets no prompt at all. `derived-system-init.prompt.md` asks for this as part of
-  step 6.
+  step 7.
 - **Your own reference.** Every component you ship is rendered on it, from your own
   markup and in your own values. You inherit Dessau's rule rather than the softer
   product version: `check-reference.mjs` exists because an earlier version verified
@@ -157,7 +178,7 @@ You are a design system now, so you owe what Dessau owes:
   consumers need to know what may change under them, and you now have Dessau's
   contract *and* whatever you added on top.
 
-## 6. Updating Dessau
+## 7. Updating Dessau
 
 ```bash
 git submodule update --remote libs/dessau

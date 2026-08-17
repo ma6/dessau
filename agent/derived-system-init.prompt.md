@@ -29,9 +29,9 @@ over.
 measure Dessau's palette and report success. So the prompt asks for each one to be
 broken on purpose and seen to fail.
 
-**All three are stated by the recipes step 2 already puts in front of the
+**All three are stated by the recipes step 3 already puts in front of the
 agent** — `derive-a-design-system.md`'s own instruction to ask (#123),
-`derive-a-standalone-system.md`'s step 0 (substitution) and step 4 (prove the
+`derive-a-standalone-system.md`'s step 0 (substitution) and step 5 (prove the
 gates can fail) — so the fenced block below no longer restates them inline.
 It did once; that stopped being anything but a second copy the moment the
 recipes said it themselves, read before the agent would reach any of it.
@@ -52,24 +52,38 @@ WITHOUT Dessau: what it ships to its consumers carries no dependency on it.
 
    Never edit anything inside libs/dessau. It is a pinned dependency.
 
-2. Read, in this order, and treat them as authoritative:
+2. Set up modern-web-guidance — two things, not one:
+
+   a. Install the plugin, once per machine, if it is not already:
+      /plugin marketplace add GoogleChrome/modern-web-guidance
+      /plugin install modern-web-guidance@googlechrome
+      /reload-plugins
+
+   b. Copy skills-lock.json and .claude/settings.json from libs/dessau's
+      own root, unedited. This scopes an already-installed plugin to this
+      repository; it does not install one on its own.
+
+   Substituting the foundation and writing a reference below is real CSS/JS
+   work, not plumbing exempt from CLAUDE.md's mandate.
+
+3. Read, in this order, and treat them as authoritative:
    - libs/dessau/AGENTS.md
    - libs/dessau/agent/index.json
    - libs/dessau/agent/recipes/derive-a-design-system.md
    - libs/dessau/agent/recipes/derive-a-standalone-system.md
 
-3. Work through derive-a-design-system.md end to end — it already tells you
+4. Work through derive-a-design-system.md end to end — it already tells you
    to ask rather than answer, and where the answers go.
 
-4. Then follow derive-a-standalone-system.md end to end.
+5. Then follow derive-a-standalone-system.md end to end.
 
-5. Repoint the verification scripts and prove each one can still fail —
-   derive-a-standalone-system.md step 4 says how, and why a check that
+6. Repoint the verification scripts and prove each one can still fail —
+   derive-a-standalone-system.md step 5 says how, and why a check that
    cannot fail is worse than none. Report which checks you repointed and
    what each one said when you broke it.
 
-6. This is a design system, so it owes what one owes (derive-a-standalone-
-   system.md step 5): our own agent/index.json, AGENTS.md, reference, and
+7. This is a design system, so it owes what one owes (derive-a-standalone-
+   system.md step 6): our own agent/index.json, AGENTS.md, reference, and
    our own version of libs/dessau/agent/consumer-init.prompt.md.
 
    Do not read this repository's future clone URL from `git remote` and
