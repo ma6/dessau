@@ -50,6 +50,12 @@ recurring tasks.
 **Rendered reference:** `[PATH]/reference/` — serve it and look at it when unsure
 how something should behave.
 
+**Also copy `skills-lock.json` and `.claude/settings.json` from `[PATH]` to this
+product's own root**, unedited. A submodule's `.claude/` config does not extend
+to the repository that contains it, so the `modern-web-guidance` skill this file
+requires below is silently unavailable here until those two files exist at the
+product's own root too (#122).
+
 ### Before building any UI
 
 **Check `[PATH]/agent/index.json`.** It lists every component and pattern with its
@@ -97,6 +103,11 @@ if this product publishes a licences page.
 - **Progressive enhancement.** The markup works before JavaScript runs.
 - **Native before custom.** `<dialog>`, `<details>`, `<select>`, `<progress>`, the
   Constraint Validation API, `popover`.
+- **`modern-web-guidance` runs during the work, on any significant HTML/CSS/JS
+  task** — not recalled from training, not skipped because Dessau's own markup
+  looks native-before-custom already. If the skill will not resolve, the guides
+  are still on disk in Dessau's own checkout and must be read directly, the same
+  rule Dessau applies to itself (`[PATH]/CLAUDE.md`).
 - **Never colour alone.** Status, selection and error carry text or an icon too.
 - **No Web Components / Custom Elements.** A deliberate Dessau decision; do not
   introduce them here either.

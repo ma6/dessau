@@ -192,6 +192,16 @@ the paths, and add the product's own rules below the Dessau section. Point
 Without this, an agent working in that repository does not know Dessau exists and
 will invent a second button style, use raw hex values and write its own ARIA.
 
+**Also carry the `modern-web-guidance` setup, at the product's own root — not
+inside `libs/dessau/`.** Two files, both tracked in Dessau's own repository and
+copyable as-is: `skills-lock.json` (declares the skill's source and a content
+hash) and `.claude/settings.json` (`"enabledPlugins": {"modern-web-guidance@
+googlechrome": true}`). A submodule's own `.claude/` config does not extend to
+the checkout that contains it — the skill has to be enabled again, at the
+product's root, or it silently is not there (#122). CLAUDE.md and AGENTS.md
+both call this skill mandatory for CSS/JS/component work; a product that
+skips this step is building without it and nothing says so.
+
 ## 6. Decide two things, and write them down
 
 - **Dark mode.** It works automatically once semantic values are used. Skipping it
