@@ -42,7 +42,7 @@
 (function (global) {
   'use strict';
 
-  var VERSION = '0.1.0';
+  var VERSION = '0.9.0';
   var THEME_STORAGE_KEY = 'dds-theme';
   /** Used when neither a stored choice nor a system preference is available. */
   var FALLBACK_THEME = 'dark';

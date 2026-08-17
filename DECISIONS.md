@@ -2158,3 +2158,46 @@ asked four questions. Two got a real answer built; two got a documented
 — report of a toast silently lost because a dialog opened over it, or a toast
 that visibly needed to survive its dialog closing — and either becomes its
 own ticket, measured the same way this one was, rather than retrofitted here.
+
+---
+
+## 050 — 0.9.0: what the number means, and what it deliberately does not
+
+**Decision.** `package.json` and `DDS.version` move from `0.1.0` to `0.9.0`.
+Not `1.0.0`.
+
+**What earns 0.9.** The guidance-unread gap #93 found (#86-92, a whole
+session shipped without the modern-web-guidance skill actually being read)
+is closed: #95 audited that surface, #106 audited everything before it — 67
+components and patterns, plus the foundations layer — and every finding from
+both sweeps is fixed, deferred with its own ticket and reasoning, or declined
+with a recorded reason. `npm run check` and the full three-engine browser
+suite are confirmed green on `main`, not just believed to be: several of
+today's CI failures (#120) turned out to be genuinely latent, masked by
+earlier ones in the same `&&` chain, and were only found by fixing forward
+through all of them and watching the actual run go green rather than trusting
+a green run from before the fix existed.
+
+**Why not 1.0.** Three open tickets already say what 1.0 requires, and none
+of them are about code quality: **#27** ("Build one real product on
+Dessau"), **#55** (the consumer template "has never been executed in a real
+product"), **#72** (the derived-system recipe "has never been walked against
+a real derived system"). All three ask the same question from a different
+angle — has anything outside this repository actually been built on it — and
+the honest answer today is still no. A guidance audit, however thorough,
+checks whether the system is internally consistent with its own stated
+rules. It cannot check whether those rules are the right ones for a real
+product's actual constraints, which is a different question with a different
+kind of evidence, and Dessau does not have that evidence yet.
+
+**What 0.9 is not a claim about.** Not "feature complete" — `agent/index.json`
+and the reference pages describe what exists today, not a fixed final set.
+Not "no more bugs" — #106's own sweep found a genuine cross-platform bug
+(#120's header wrap) that had been invisible for as long as CI ran on
+overlay-scrollbar macOS runners, which is itself evidence that "looks done"
+and "is done" are not the same claim.
+
+**Reversal condition.** #27, #55 and #72 (or their equivalent) land, meaning
+a real product has actually been built against Dessau and reported back what
+broke — that is what moves the number to 1.0, not a further round of
+internal review.
