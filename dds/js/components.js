@@ -240,20 +240,53 @@
     info: 'Information',
   };
 
-  var toastRegion = null;
-
-  function getToastRegion() {
-    if (toastRegion && document.body.contains(toastRegion)) return toastRegion;
-
-    toastRegion = document.createElement('div');
-    toastRegion.className = 'dds-toast-region';
-    toastRegion.setAttribute('role', 'status');
-    toastRegion.setAttribute('aria-live', 'polite');
+  function createToastRegion() {
+    var region = document.createElement('div');
+    region.className = 'dds-toast-region';
+    region.setAttribute('role', 'status');
+    region.setAttribute('aria-live', 'polite');
     // Read only what was added, not the whole stack again.
-    toastRegion.setAttribute('aria-atomic', 'false');
-    document.body.appendChild(toastRegion);
+    region.setAttribute('aria-atomic', 'false');
+    return region;
+  }
 
-    return toastRegion;
+  /**
+   * Where the next toast goes.
+   *
+   * A modal `<dialog>` always outranks ordinary top-layer content, and that
+   * includes a `popover="manual"` region — measured directly, not assumed
+   * (#115, DECISIONS.md #047). Nothing outside an open dialog can be made to
+   * render above it, so a toast fired while one is open has to become part of
+   * the dialog's own top-layer box instead: appended inside it, not beside it.
+   *
+   * `dialog:modal` rather than tracking open state by hand — it is exactly
+   * the browser's own answer to "is a dialog currently blocking the page",
+   * and it is false the instant `close()` runs.
+   *
+   * Scoped with `:scope >` deliberately: `document.body.querySelector
+   * ('.dds-toast-region')` would find a dialog's own nested region too, since
+   * a dialog is inside body's subtree — which would hand a body-level toast
+   * to a dialog-scoped region, or the reverse, depending on DOM order rather
+   * than on where the toast was actually meant to appear.
+   *
+   * A toast already showing at body level when a dialog opens over it is not
+   * moved — it stays exactly where the bug already left it, invisible until
+   * the dialog closes. Reparenting an in-flight toast is a different problem
+   * (its dismiss timer, its announcement, whether moving it counts as a new
+   * announcement) than the one this fixes: a toast created while a dialog is
+   * already open, which is the reported case (#115) and the common one.
+   */
+  function getToastRegion() {
+    var openDialog = document.querySelector('dialog:modal');
+    var host = openDialog || document.body;
+
+    var region = host.querySelector(':scope > .dds-toast-region');
+    if (!region) {
+      region = createToastRegion();
+      host.appendChild(region);
+    }
+
+    return region;
   }
 
   /**

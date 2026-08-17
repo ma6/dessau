@@ -371,17 +371,19 @@
   --dds-z-dropdown: 20;  /* listbox, menu, popover */
   --dds-z-scrim: 50;     /* overlay behind a panel */
   --dds-z-panel: 60;     /* off-canvas / drawer */
-  /* Neither of the next two is applied to the element its name suggests.
-     `.dds-dialog` is a native `<dialog>` promoted to the browser's top layer
+  /* `.dds-dialog` is a native `<dialog>` promoted to the browser's top layer
      by `showModal()`, which a z-index cannot reach and does not need to —
-     hence `--dds-z-dialog` having no consumer, and `.dds-toast-region`
-     staying `position: fixed` with this value because there is no fix here
-     that reaches above a top-layer dialog either: measured across all three
-     engines, a modal dialog outranks a popover in top-layer stacking
-     regardless of which entered it more recently (#115, DECISIONS.md #047).
-     Kept as documented, accurate scale entries — not a promise either
-     element can out-stack a `<dialog>`, which nothing in author CSS can. */
+     `--dds-z-dialog` has no consumer for that reason.
+
+     A z-index cannot reach above an open dialog either, full stop: measured
+     across all three engines, a modal dialog outranks even a `popover` in
+     top-layer stacking, regardless of which entered it more recently (#115,
+     DECISIONS.md #047). `--dds-z-toast` still only matters when no dialog is
+     open — while one is, `DDS.toast()` appends the toast inside the dialog
+     itself rather than relying on this value at all (#121, DECISIONS.md
+     #049). This scale entry was never wrong; it was never going to be
+     sufficient by itself, and now it doesn't have to be. */
   --dds-z-dialog: 70;    /* unused — .dds-dialog uses the top layer instead */
-  --dds-z-toast: 80;     /* does not reach above an open modal dialog (#115) */
+  --dds-z-toast: 80;     /* only while no dialog is open — see DDS.toast() (#121) */
   --dds-z-tooltip: 90;   /* always outermost among ordinary z-indexed content */
 }

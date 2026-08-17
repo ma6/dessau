@@ -587,6 +587,13 @@ The region is `role="status"` (polite), so a toast never interrupts. The timer
 pauses on hover and on focus. `duration: 0` stays until dismissed. Uses the solid
 status fills, identical in both themes.
 
+**Fired while a modal `<dialog>` is open, the toast renders inside it** (#121)
+— a modal dialog always outranks ordinary top-layer content, popovers included
+(measured directly, DECISIONS.md #047), so nothing outside it can be made to
+show above it. A toast already showing at body level when a dialog opens over
+it is not moved, and a dialog-scoped toast closes with its dialog rather than
+migrating back — both documented limits, not silent gaps (DECISIONS.md #049).
+
 ---
 
 ## Tooltip — `.dds-tooltip`

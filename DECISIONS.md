@@ -2050,6 +2050,13 @@ of whether the reparenting approach does.
 supersedes this entry rather than contradicting it — this entry is about why
 the *simpler* fix fails, not a claim that no fix exists.
 
+**Superseded by [049](#049--the-toast-reparents-into-the-open-dialog-121).**
+#121 landed the reparenting fix this entry predicted was the only thing that
+would work. `.dds-toast-region` still keeps `position: fixed` and the same
+z-index — nothing here was wrong — but the toast now gets appended inside
+whatever dialog is open rather than always at body level, which is the part
+this entry left undone.
+
 ---
 
 ## 048 — No `@media (prefers-color-scheme: dark)` fallback in `semantic.css` (#119)
@@ -2097,3 +2104,57 @@ copies of the dark tokens from one source (matching how
 `scripts/build-foundations.mjs` already keeps `dds/foundations.json`
 generated rather than hand-maintained) — at that point the duplication cost
 this entry declines on is no longer real, and the trade should be re-made.
+
+---
+
+## 049 — The toast reparents into the open dialog (#121)
+
+**Decision.** `DDS.toast()`'s region is chosen fresh at call time: if a modal
+`<dialog>` is currently open (`document.querySelector('dialog:modal')`), the
+toast is appended inside that dialog; otherwise it goes to the existing
+body-level region, as before. Completes the fix
+[047](#047--the-toast-stays-position-fixed-popovermanual-does-not-fix-it-115)
+measured and could not finish with a smaller change.
+
+**Why reparenting and nothing cleverer.** 047 established, by direct
+cross-engine measurement, that nothing outside an open `<dialog>` — no
+z-index, no `popover="manual"` — can be made to render above it, because a
+modal dialog gets stacking priority over every other top-layer citizen by
+design. The only remaining lever is to stop being "outside" it: a toast that
+is a DOM descendant of the open dialog is part of the dialog's own top-layer
+box, and needs no stacking trick at all. `.dds-toast-region`'s existing CSS
+(`position: fixed`, bottom-aligned) turns out to already do the right thing
+nested inside a dialog — `.dds-dialog[open]` sets a non-`none` `translate`
+for its own entrance transition, which by spec establishes the containing
+block for `position: fixed` descendants, so the region anchors to the
+dialog's own box instead of the viewport with no extra CSS.
+
+**Scope, decided deliberately narrower than the ticket's full list.** #121
+asked four questions. Two got a real answer built; two got a documented
+"not this":
+
+- *Detect the open dialog, and place new toasts inside it* — built.
+  `dialog:modal` is the browser's own answer to "is this dialog currently
+  blocking the page", true only between `showModal()` and `close()`.
+- *Keep `role="status"`/`aria-live` working reparented* — verified, not
+  assumed: a live region created and populated as a fresh child of an
+  already-open dialog announces correctly on all three engines, checked
+  directly rather than inferred from spec text.
+- *A toast already showing at body level when a dialog opens over it* — **not
+  moved**. It stays exactly where the current (fixed) bug already leaves it:
+  invisible until the dialog closes. Migrating an in-flight toast is a
+  different problem — its running dismiss timer, whether relocating it counts
+  as a new announcement to a screen reader — than the one #115 actually
+  reported, which is a toast *created* while a dialog is already open. Scoped
+  out rather than guessed at.
+- *A dialog-scoped toast when the dialog closes mid-timer* — **not migrated
+  back**. It closes with the dialog, the same way everything else inside a
+  closed dialog stops being visible. A confirmation toast for an action taken
+  inside a dialog the user has already dismissed has mostly done its job; the
+  alternative (reparent back to body, preserve the timer, avoid a visual jump)
+  is real complexity spent on a rarer sequence than the one being fixed.
+
+**Reversal condition.** Either narrowed case turns out to matter in practice
+— report of a toast silently lost because a dialog opened over it, or a toast
+that visibly needed to survive its dialog closing — and either becomes its
+own ticket, measured the same way this one was, rather than retrofitted here.

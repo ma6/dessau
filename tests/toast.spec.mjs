@@ -110,3 +110,94 @@ for (const theme of ['light', 'dark']) {
     });
   });
 }
+
+/**
+ * -----------------------------------------------------------------------------
+ * Fired while a modal dialog is open (#115, #121)
+ * -----------------------------------------------------------------------------
+ *
+ * A modal `<dialog>` always outranks ordinary top-layer content — measured
+ * directly in #115, including a `popover="manual"` toast region, which still
+ * lost to an open dialog on all three engines. The only way for a toast to
+ * render above an open dialog is to become part of the dialog's own top-layer
+ * box: appended inside it, not beside it.
+ */
+test.describe('while a dialog is open', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.goto(COMPONENTS);
+  });
+
+  test('the toast is appended inside the dialog, not at body level', async ({ page }) => {
+    await page.click('[data-dds-dialog-open="demo-dialog"]');
+    await expect(page.locator('#demo-dialog')).toBeVisible();
+
+    await page.evaluate(() => window.DDS.toast('Saved from inside the dialog', { duration: 0 }));
+
+    const insideDialog = page.locator('#demo-dialog > .dds-toast-region > .dds-toast');
+    await expect(insideDialog).toHaveCount(1);
+
+    // Not also duplicated at body level.
+    const bodyLevel = page.locator('body > .dds-toast-region > .dds-toast');
+    await expect(bodyLevel).toHaveCount(0);
+  });
+
+  test('the toast is visually on top of the dialog, not hidden behind it', async ({ page }) => {
+    await page.click('[data-dds-dialog-open="demo-dialog"]');
+    await page.evaluate(() => window.DDS.toast('On top', { duration: 0 }));
+
+    const toast = page.locator('#demo-dialog .dds-toast').last();
+    await expect(toast).toBeVisible();
+
+    // The element actually under the toast's own centre point must be the
+    // toast itself (or something inside it) — not the dialog's backdrop,
+    // which is exactly what #115 found before this fix.
+    const isOnTop = await toast.evaluate((el) => {
+      const rect = el.getBoundingClientRect();
+      const topElement = document.elementFromPoint(
+        rect.left + rect.width / 2,
+        rect.top + rect.height / 2
+      );
+      return el.contains(topElement);
+    });
+    expect(isOnTop).toBe(true);
+  });
+
+  test('the toast still carries role=status and aria-live once reparented', async ({ page }) => {
+    await page.click('[data-dds-dialog-open="demo-dialog"]');
+    await page.evaluate(() => window.DDS.toast('Announced', { duration: 0 }));
+
+    const region = page.locator('#demo-dialog > .dds-toast-region');
+    await expect(region).toHaveAttribute('role', 'status');
+    await expect(region).toHaveAttribute('aria-live', 'polite');
+    await expect(region).toContainText('Announced');
+  });
+
+  test('opening the toast does not move focus away from the dialog', async ({ page }) => {
+    await page.click('[data-dds-dialog-open="demo-dialog"]');
+    const focusedBefore = await page.evaluate(() => document.activeElement?.id || document.activeElement?.tagName);
+
+    await page.evaluate(() => window.DDS.toast('Should not steal focus', { duration: 0 }));
+
+    const focusedAfter = await page.evaluate(() => document.activeElement?.id || document.activeElement?.tagName);
+    expect(focusedAfter).toBe(focusedBefore);
+  });
+
+  test('once the dialog closes, a new toast goes to the body-level region again', async ({ page }) => {
+    await page.click('[data-dds-dialog-open="demo-dialog"]');
+    await page.evaluate(() => window.DDS.toast('Inside', { duration: 0 }));
+    await page.keyboard.press('Escape');
+    await expect(page.locator('#demo-dialog')).toBeHidden();
+
+    await page.evaluate(() => window.DDS.toast('Outside again', { duration: 0 }));
+
+    const bodyToast = page.locator('body > .dds-toast-region > .dds-toast');
+    await expect(bodyToast).toHaveCount(1);
+    await expect(bodyToast).toContainText('Outside again');
+  });
+
+  test('with no dialog open, a toast still goes to the body-level region', async ({ page }) => {
+    await page.evaluate(() => window.DDS.toast('Ordinary toast', { duration: 0 }));
+
+    await expect(page.locator('body > .dds-toast-region > .dds-toast')).toHaveCount(1);
+  });
+});
