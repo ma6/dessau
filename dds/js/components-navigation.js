@@ -4,7 +4,8 @@
  *   <script src="/dds/js/dds.js" defer></script>
  *   <script src="/dds/js/components-navigation.js" defer></script>
  *
- * Contents: site header disclosure · table of contents · content navigation
+ * Contents: site header disclosure · table of contents · content navigation ·
+ *   banner dismiss
  *
  * The menu component needs no JavaScript at all: it uses the `popover`
  * attribute with `popovertarget`, which the platform handles.
@@ -624,6 +625,34 @@
         document.documentElement.classList.remove('dds-scroll-locked');
       }
     }).observe(frame);
+  });
+
+  /* =========================================================================
+     Banner dismiss
+     =========================================================================
+     Markup:
+       <div class="dds-banner dds-banner-info">
+         …
+         <button class="dds-banner-dismiss dds-button dds-button-subtle dds-button-icon"
+                 type="button" aria-label="Dismiss this message">
+           <svg class="dds-icon" aria-hidden="true"><use href="#dds-icon-close"/></svg>
+         </button>
+       </div>
+
+     DDS owns the ephemeral hide — the button removes the banner from the page,
+     the same one action the toast's own close button takes (#117). It does NOT
+     remember the dismissal: whether "dismissed" survives a reload is a product
+     decision (a cookie, a user preference, an account setting), stated as one in
+     the CSS comment beside `.dds-banner-dismiss`, and answering it here would be
+     guessing at storage the product may not want DDS to own.
+     ========================================================================= */
+  DDS.register('banner', '.dds-banner', function (banner) {
+    var dismiss = banner.querySelector('.dds-banner-dismiss');
+    if (!dismiss) return;
+
+    dismiss.addEventListener('click', function () {
+      banner.remove();
+    });
   });
 
 })(typeof window !== 'undefined' ? window : globalThis);
