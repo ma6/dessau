@@ -2244,3 +2244,29 @@ or on Firefox/WebKit's own `local()` weight-resolution behaviour, finds the
 constant for a specific, observed browser behaviour, not a typographic
 property of Space Grotesk itself, and would need re-deriving if that
 behaviour changes.
+
+---
+
+## 052 — SemVer stays; no move to CalVer (`yy.mm.i`)
+
+**Decision.** `package.json` and `DDS.version` keep using SemVer
+(`major.minor.patch`). Considered and declined: date-based versioning of the
+form `yy.mm.i` (year, month, an incrementing index within the month).
+
+**Why.** 050 already spent the version number on a specific claim —
+`0.9.0` versus `1.0.0` is tied to whether a real product has been built on
+Dessau, not to how much time has passed or how many releases have shipped.
+Consumers pin Dessau by tag (`v*`, [release.yml](.github/workflows/release.yml))
+across a submodule boundary, so the thing worth signalling to them is
+compatibility: does this release change the contract a pinned consumer
+relies on. SemVer's major/minor/patch positions carry exactly that meaning;
+`yy.mm.i` carries only when a release happened, which is not what a
+consumer deciding whether to bump a pin needs to know. Dessau also has no
+fixed release cadence to make a calendar scheme a natural fit — releases
+happen when 050-style criteria are met, not on a schedule.
+
+**Reversal condition.** Dessau moves to a release cadence regular enough
+that the month of a release is more informative to consumers than its
+compatibility class — which would also mean semantic version bumps had
+stopped being meaningful, the same condition under which 050's reasoning
+would need revisiting too.
