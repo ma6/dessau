@@ -16,6 +16,20 @@
 # read from script can come back as an empty string while `@import`ed sheets are
 # still arriving.
 # -----------------------------------------------------------------------------
+#
+# To cut a release: create the GitHub Release FIRST, then push the tag.
+#
+#   gh release create vX.Y.Z --title vX.Y.Z --notes "…"
+#   git tag -a vX.Y.Z <commit> -m "…"
+#   git push origin vX.Y.Z
+#
+# Reversed, this fails on its first real step: `gh release upload` attaches
+# to an EXISTING release, and pushing a tag alone does not create one. That
+# is exactly the error to expect if this ever happens again —
+# "release not found" — and the fix is `gh release create` for the tag that
+# already exists, then `gh run rerun --failed` (#135, found by hitting it on
+# v0.9.0's first-ever run of this workflow).
+# -----------------------------------------------------------------------------
 
 name: Release
 
