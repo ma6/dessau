@@ -731,8 +731,13 @@
     min-inline-size: 12rem;
     /* 20rem is 320px, which is the whole of the narrowest supported screen. The
        menu is `position: fixed`, so nothing else constrains it — it would sit
-       edge to edge with no margin at all. */
-    max-inline-size: min(20rem, calc(100vw - 2 * var(--dds-space-md)));
+       edge to edge with no margin at all.
+
+       `%`, not `vw` (#105): `position: fixed` resolves a percentage against a
+       containing block that already excludes a classic scrollbar's width,
+       where `vw` does not — the same reasoning and the same fix already
+       applied to `.dds-dialog` and `.dds-lightbox` in #96. */
+    max-inline-size: min(20rem, calc(100% - 2 * var(--dds-space-md)));
     padding: var(--dds-space-3xs);
 
     background-color: var(--dds-color-surface-raised);
