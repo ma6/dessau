@@ -216,7 +216,7 @@ const findSmallTargets = () => {
        `.dds-sr-only` by design, and the control a finger actually lands on is
        the label. Measuring the hidden box reports a 1×1 target that no pointer
        will ever be asked to hit. */
-    if (element.closest('.dds-sr-only, .dds-visually-hidden')) continue;
+    if (element.closest('.dds-sr-only')) continue;
     if (style.clipPath && style.clipPath !== 'none' && rect.width <= 2) continue;
 
     /* An exception the success criterion itself makes: a control in a sentence

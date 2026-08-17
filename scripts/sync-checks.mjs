@@ -172,7 +172,7 @@ const inline = (text) =>
 const table = `${START}
           <div class="dds-table-wrap" role="region" aria-labelledby="checks-run-cap" tabindex="0">
             <table class="dds-table dds-text-sm">
-              <caption class="dds-visually-hidden" id="checks-run-cap">
+              <caption class="dds-sr-only" id="checks-run-cap">
                 Every check run by npm run check, and what each one catches
               </caption>
               <thead>

@@ -93,12 +93,12 @@
 @import url("./css/typography.css?v=31f7bcf8");
 
 /* Layout primitives. */
-@import url("./css/layout.css?v=b2bef98e");
+@import url("./css/layout.css?v=e3bb54a7");
 
 /* Reusable UI building blocks, split by concern so no single file becomes
    unnavigable. All four land in the same `dds.components` layer — the split is
    for the reader, not for the cascade. */
-@import url("./css/components.css?v=b9b9979f");
+@import url("./css/components.css?v=d946c878");
 @import url("./css/components-forms.css?v=5c491018");
 @import url("./css/components-navigation.css?v=64c5cd0d");
 @import url("./css/components-content.css?v=4a470383");

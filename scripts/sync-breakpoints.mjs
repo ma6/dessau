@@ -145,7 +145,7 @@ const namedFromCss = [
 const table = `${START}
           <div class="dds-table-wrap dds-mbs-sm" role="region" aria-labelledby="breakpoints-in-use-cap" tabindex="0">
             <table class="dds-table dds-text-sm">
-              <caption class="dds-visually-hidden" id="breakpoints-in-use-cap">
+              <caption class="dds-sr-only" id="breakpoints-in-use-cap">
                 Every width used in a container or media query, generated from the stylesheets
               </caption>
               <thead>

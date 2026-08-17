@@ -236,7 +236,7 @@
 
   /* --- icon-only --------------------------------------------------------- */
   /* Square, and it MUST carry an accessible name — either `aria-label` or a
-     `.dds-visually-hidden` span. An icon-only button with no name is announced
+     `.dds-sr-only` span. An icon-only button with no name is announced
      as just "button", which tells the user nothing. */
   .dds-button-icon {
     --dds-button-padding-inline: var(--dds-space-xs);

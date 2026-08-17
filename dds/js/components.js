@@ -459,7 +459,7 @@
 
   /** Does this element sit inside something that is only for screen readers? */
   function isVisuallyHidden(element) {
-    return !!element.closest('.dds-sr-only, .dds-visually-hidden, [hidden]');
+    return !!element.closest('.dds-sr-only, [hidden]');
   }
 
   /**
