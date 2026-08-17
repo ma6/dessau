@@ -301,9 +301,19 @@
 
     var scaled = widest > available;
 
+    /* Pixels, not a percentage. A `%` resolves against EACH bar's own row, and
+       the rows are not equal width to start with — the readout text differs
+       by row ("75rem (1200px)" is wider than "60rem (960px)"), so two bars at
+       the same percentage of their own row are not the same percentage of
+       anything shared. That let a bar with a HIGHER share of `widest` render
+       NARROWER than one with a lower share, whenever its own row happened to
+       leave less room — measured directly: 100% rendered at 541px while 80%
+       rendered at 545px, on the container ramp. Scaling against the one
+       `available` measured above, in pixels, removes the row as a variable —
+       every bar's width is now a share of the same number. */
     bars.forEach(function (bar, i) {
       bar.style.inlineSize = scaled
-        ? Math.max(2, (sizes[i] / widest) * 100) + '%'
+        ? Math.max(2, (sizes[i] / widest) * available) + 'px'
         : bar.dataset.refRulerSize;
     });
 

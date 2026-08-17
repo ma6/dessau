@@ -609,6 +609,13 @@
   block-size: var(--dds-space-md);
   background-color: var(--dds-color-accent);
   border-radius: var(--dds-radius-sm);
+
+  /* The JS gives this an exact width, in px once scaled — never re-compressed
+     by this row's own flex layout, or a bar with a larger share of `widest`
+     can still render narrower than one with a smaller share, whenever its
+     own row happens to have marginally less room (a real, measured bug: see
+     fitRulers() in reference.js). */
+  flex-shrink: 0;
 }
 
 .ref-ruler-name {
