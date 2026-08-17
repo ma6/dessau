@@ -84,7 +84,19 @@ WITHOUT Dessau: what it ships to its consumers carries no dependency on it.
    repointed and what each one said when you broke it.
 
 6. This is a design system, so it owes what one owes: our own agent/index.json,
-   our own AGENTS.md, our own reference rendering every component we ship.
+   our own AGENTS.md, our own reference rendering every component we ship, and
+   our own version of libs/dessau/agent/consumer-init.prompt.md — adapted for
+   our own products, every libs/dessau replaced with this repository's own path
+   and URL. Without it, our first product's agent either hand-edits Dessau's
+   copy or gets no paste-ready prompt at all.
+
+   Do not read the URL from `git remote` and treat it as settled. Run `git
+   remote get-url origin` if you want a candidate to propose, but ASK ME to
+   confirm both the submodule directory name (the `libs/<name>` your consumers
+   will type) and the clone URL before writing them into the prompt — a repo
+   can be local-only, forked, or moved before its first consumer exists, and
+   this is the same kind of thing the six decisions already taught you not to
+   assume.
 
 DO NOT build components. Dessau's already exist and we are inheriting them —
 your job here is the foundation, the wiring and the gates. If something seems

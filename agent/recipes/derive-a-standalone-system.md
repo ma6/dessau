@@ -133,6 +133,13 @@ You are a design system now, so you owe what Dessau owes:
   this already exist?". Pointing them at Dessau's is wrong — it lists components in
   Dessau's values, not yours.
 - **Your own `AGENTS.md`**, and your own consumer template beneath it.
+- **Your own version of `consumer-init.prompt.md`.** Your consumers are products,
+  the same way Dessau's are, and they need the same paste-ready artefact — adapted
+  from Dessau's own, `libs/dessau` replaced throughout by your own repository's
+  path and URL. Without it, your first product's agent either hand-edits Dessau's
+  copy (the exact silent drift `consumer-init.prompt.md` exists to prevent) or
+  gets no prompt at all. `derived-system-init.prompt.md` asks for this as part of
+  step 6.
 - **Your own reference.** Every component you ship is rendered on it, from your own
   markup and in your own values. You inherit Dessau's rule rather than the softer
   product version: `check-reference.mjs` exists because an earlier version verified

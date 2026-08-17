@@ -11,6 +11,16 @@
 > Dessau — this prompt is the wrong one: it sets up an override on top of a
 > submodule, and a derived system substitutes the foundation instead. Use
 > [`derived-system-init.prompt.md`](derived-system-init.prompt.md).
+>
+> **This covers consuming Dessau directly. A product consuming a *derived* design
+> system is still this case** — `recipes/new-product.md` and
+> `recipes/derive-a-standalone-system.md` both say so — but the block below is
+> written Dessau-default. If the derived system already exists and has produced
+> its own version of this prompt (`derive-a-standalone-system.md` step 5 asks it
+> to), paste that one instead. If it has not, substitute before pasting: every
+> `libs/dessau` becomes `libs/<the derived system's own name>`, and the submodule
+> URL in step 1 becomes that system's repository. Nothing else in the block
+> changes shape — the recipe underneath is the same one either way.
 
 It points at the recipes rather than repeating them. A prompt that restates a
 recipe is a second copy that drifts, and a drifted prompt is worse than none — it
