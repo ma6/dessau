@@ -89,7 +89,6 @@ const report = (message) => findings.push(message);
  * check below insists on exactly that.
  */
 const KNOWN_GAPS = new Map([
-  ['dialog', 'the <dialog> wiring: opened, closed, focus returned, backdrop click'],
   ['dialog-open', 'the opener half of the same pair'],
   ['tabs', 'roving tabindex and the arrow-key contract'],
   ['lightbox', 'opens, traps, restores focus to the thumbnail'],

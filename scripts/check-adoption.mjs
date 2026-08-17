@@ -94,6 +94,14 @@ const NOT_OURS = new Map([
     'SCREAMING_SNAKE.md',
     'agent/conventions.md names the file-naming convention, not a file',
   ],
+  [
+    'SKILL.md',
+    'modern-web-guidance.md names it inside .agents/skills/modern-web-guidance/ ' +
+      '— the ROOT_DOC_IN_PROSE pattern matches it too, because an all-caps .md ' +
+      'name looks the same whether it lives at the repository root or three ' +
+      "directories into a git-ignored one. It is not a root document, and it's " +
+      'genuinely absent from a fresh checkout by design (#120).',
+  ],
 ]);
 
 /* ------------------------- 1. every path the documentation names exists */
