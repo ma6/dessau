@@ -327,6 +327,15 @@ code — each as the first entry in a stack that falls through to `system-ui`.
 nothing: readers who have the face see it, readers who do not get their
 platform's UI font, which is a good typeface everywhere current.
 
+**Said plainly, because "take the default" is easy to answer without
+registering it: almost nobody has Space Grotesk or Inter installed as a
+system font.** "The default costs nothing" is true of what ships, not of
+what renders — without self-hosting (below), the named face is a request
+that almost always misses, and every reader sees `system-ui` regardless of
+which of the two you chose. Taking the default typography decision and
+skipping self-hosting are, in practice, close to the same decision wearing
+two different names.
+
 **Where it goes.** Three semantic tokens, no primitive layer beneath them:
 
 ```css

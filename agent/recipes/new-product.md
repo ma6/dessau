@@ -177,11 +177,25 @@ its real, current markup.
 
 ## 4. Set the locale
 
-German is the default. Only call this if the product is not German:
+German is the default. Only call this if the product is not German — as a
+full, safe script tag, not the bare call on its own:
 
-```js
-DDS.format.setLocale('en-GB');
+```html
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    DDS.format.setLocale('en-GB');
+  });
+</script>
 ```
+
+**The obvious reading — this call as an inline script placed after the
+deferred `format.js`, unwrapped — is wrong, not merely inelegant.** `defer`
+has no effect on an inline script without a `src`; it runs the moment the
+parser reaches it, which is before the deferred `format.js` has executed,
+throwing on `DDS.format` being undefined (found the hard way building a
+real product, #131). `DOMContentLoaded` fires only once every deferred
+script in the shell above has run, which is what actually guarantees
+`DDS.format` exists by the time this call is reached.
 
 ## 5. Give agents the context
 

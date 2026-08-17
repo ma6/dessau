@@ -88,7 +88,17 @@
      button rows, tag lists, filter chips, inline metadata.
 
      `flex-wrap` means no breakpoint is involved — it wraps exactly when it
-     needs to, at any container width. */
+     needs to, at any container width.
+
+     NOT FOR pinning something beside content that may itself span more than
+     one line — an icon beside a multi-line paragraph, say. `flex-wrap` does
+     not keep a pair together; past the wrap point the icon and the text can
+     land on separate lines from EACH OTHER, not just wrap within their own
+     box, leaving the icon stranded above the paragraph it was meant to sit
+     beside (found building a consuming product, #131). If the pairing must
+     never wrap, reach for a plain `display: flex; flex-wrap: nowrap;` rule
+     instead — `.dds-cluster` is the wrong primitive precisely because
+     wrapping is the one thing it is for. */
   .dds-cluster {
     --dds-cluster-space: var(--dds-space-xs);
 

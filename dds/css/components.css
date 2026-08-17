@@ -48,7 +48,16 @@
      the icon. */
   .dds-icon {
     /* `inline-block` + vertical alignment keeps the icon on the text baseline
-       rather than sitting on the line box bottom. */
+       rather than sitting on the line box bottom.
+
+       ONLY IN NORMAL INLINE FLOW. A flex item ignores `vertical-align`
+       entirely — this correction is silently inert the moment `.dds-icon`
+       sits in a flex row (a `.dds-cluster`-style icon+text pairing, say),
+       and `align-items` there lines the icon's own BOX up with its
+       sibling's, not with the visible cap-height a reader expects. If it
+       sits high or low in a flex context, the fix is a manual
+       `margin-block-start` nudge on the icon there, not this property
+       (found building a consuming product, #131). */
     display: inline-block;
     inline-size: 1em;
     block-size: 1em;
