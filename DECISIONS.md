@@ -2049,3 +2049,51 @@ of whether the reparenting approach does.
 **Reversal condition.** #121 lands with a working reparenting fix, which
 supersedes this entry rather than contradicting it — this entry is about why
 the *simpler* fix fails, not a claim that no fix exists.
+
+---
+
+## 048 — No `@media (prefers-color-scheme: dark)` fallback in `semantic.css` (#119)
+
+**Decision.** `semantic.css` keeps applying dark values only through
+`[data-theme="dark"]`. It does not gain a `@media (prefers-color-scheme:
+dark)` block as a second, CSS-only path to the same values.
+
+**The gap is real.** `theme-init.js` sets `[data-theme]` and is the only thing
+that does. If it fails to load — a CDN outage, a CSP block, the exact class
+of failure `agent/principles.md` #3 exists to survive — a page with no
+`data-theme` in its markup renders light-only, silently. That doesn't match
+`DECISIONS.md` #012's own stated resolution order, "neither known → dark,"
+which currently lives only in JavaScript. The markup half of this gap is
+already closed: every reference page, and now the documented product recipe
+(#113), hardcodes `data-theme="dark"` on `<html>` specifically as the no-JS
+fallback.
+
+**Why a second mechanism is declined rather than added.** This is the same
+trade `[013](#013--modern-web-guidance-adopted-with-three-deliberate-exceptions)`
+already made about `light-dark()`, for the same reason, word for word: *"a
+manual theme override needs an explicit `[data-theme]` block anyway, and
+having both mechanisms is worse than having one."* A `@media
+(prefers-color-scheme: dark)` block is a second path to the same ~60 lines of
+dark tokens, scoped to fire only when `[data-theme]` is absent — which means
+every future dark-mode token gets written twice, in two different selector
+mechanisms, and the two copies have no structural way to be kept in sync
+short of a build step this project has deliberately not adopted
+([001](#001--no-framework-no-build-step-no-runtime-dependencies)). A token
+added to one and not the other is a *worse* failure than the one being
+guarded against: not "briefly stuck in the wrong theme until the toggle is
+used," but "silently wrong forever, in the one block nobody remembers to
+check both copies of."
+
+**What actually closes the gap, and what doesn't.** The markup-level fallback
+already covers every page this project ships and documents. It does not cover
+a product that skips the documented recipe and writes its own `<html>` with
+no `data-theme` — but that product has already diverged from the
+documentation in a way a CSS fallback in `semantic.css` cannot generally
+compensate for, and `agent/recipes/new-product.md` is where that
+responsibility is stated, not `semantic.css`.
+
+**Reversal condition.** Dessau adopts a build step that can generate both
+copies of the dark tokens from one source (matching how
+`scripts/build-foundations.mjs` already keeps `dds/foundations.json`
+generated rather than hand-maintained) — at that point the duplication cost
+this entry declines on is no longer real, and the trade should be re-made.
