@@ -29,7 +29,7 @@ runtime*; three directories are not runtime and are not optional either:
 | Directory | Needed for |
 | --- | --- |
 | `agent/` | The `AGENTS.md` you copy into the product opens with "Read first: `[PATH]/AGENTS.md`, then `[PATH]/agent/index.json`" |
-| `scripts/` | `sync-icons.mjs`, which inlines the icon sprite — step 3 |
+| `scripts/` | `sync-icons.mjs`, which inlines the icon sprite — step 4 |
 | `reference/` | The rendered proof the same template tells an agent to serve and look at |
 
 A copied `dds/` therefore leaves the product's own `AGENTS.md` pointing at three
@@ -55,7 +55,40 @@ which is obvious from the step above:
   or `git submodule update --init` after the fact. Worth putting in the product's
   own README on the day the submodule is added, not the day somebody hits it.
 
-## 2. Set up the shell
+## 2. Set up modern-web-guidance
+
+Before any of the shell, locale or component work below — that work is real
+HTML/CSS/JS, exactly what CLAUDE.md's mandate covers, and it is what steps 3
+onward have an agent doing. Setting this up after that work has already
+started (where it used to sit, in "give agents the context") means the
+mandate had nothing to review it against. Two things, not one, or the skill
+is silently unavailable — a submodule's own `.claude/` config does not
+extend to the checkout that contains it:
+
+1. **Install the plugin**, once per machine, if it is not already:
+
+   ```text
+   /plugin marketplace add GoogleChrome/modern-web-guidance
+   /plugin install modern-web-guidance@googlechrome
+   /reload-plugins
+   ```
+
+   This is the part #122's original fix left out (#129) — copying config
+   alone was tried, against a machine that already had the plugin
+   installed, which is exactly why the gap did not show up until someone
+   tried it on one that did not.
+2. **Enable it for this project.** Copy `skills-lock.json` (declares the
+   skill's source and a content hash) and `.claude/settings.json`
+   (`"enabledPlugins": {"modern-web-guidance@googlechrome": true}`) from
+   Dessau's own root, unedited. This step presumes step 1 already happened
+   — it scopes an installed plugin to this repository, it does not install
+   one.
+
+CLAUDE.md and AGENTS.md both call this skill mandatory for CSS/JS/component
+work; a product that skips either step is building without it and nothing
+says so.
+
+## 3. Set up the shell
 
 ```html
 <!DOCTYPE html>
@@ -127,7 +160,7 @@ platform does not provide — the shell above loads the first three.
 All `defer`, all in that order. Adding markup later? `DDS.enhance(element)` — that
 is the whole integration for dynamic content.
 
-## 3. Inline the icon sprite
+## 4. Inline the icon sprite
 
 ```bash
 node libs/dessau/scripts/sync-icons.mjs --dir=.
@@ -175,7 +208,7 @@ stated in words, and the hint referenced from the control. Copy the rest from
 `libs/dessau/reference/` — every component there has a **Show markup** block with
 its real, current markup.
 
-## 4. Set the locale
+## 5. Set the locale
 
 German is the default. Only call this if the product is not German — as a
 full, safe script tag, not the bare call on its own:
@@ -197,7 +230,7 @@ real product, #131). `DOMContentLoaded` fires only once every deferred
 script in the shell above has run, which is what actually guarantees
 `DDS.format` exists by the time this call is reached.
 
-## 5. Give agents the context
+## 6. Give agents the context
 
 Copy `agent/consumer-AGENTS.template.md` into the product as `AGENTS.md`, fill in
 the paths, and add the product's own rules below the Dessau section. Point
@@ -206,34 +239,10 @@ the paths, and add the product's own rules below the Dessau section. Point
 Without this, an agent working in that repository does not know Dessau exists and
 will invent a second button style, use raw hex values and write its own ARIA.
 
-**Also carry the `modern-web-guidance` setup, at the product's own root — not
-inside `libs/dessau/`.** A submodule's own `.claude/` config does not extend to
-the checkout that contains it, so this is genuinely two things, not one, and
-skipping either leaves the skill silently unavailable:
+`modern-web-guidance` is already set up, from step 2 — this is the other half
+of "give agents the context", not a place that setup also lives.
 
-1. **Install the plugin**, once per machine, if it is not already:
-
-   ```text
-   /plugin marketplace add GoogleChrome/modern-web-guidance
-   /plugin install modern-web-guidance@googlechrome
-   /reload-plugins
-   ```
-
-   This is the part #122's fix left out (#129) — copying config alone was
-   tried, against a machine that already had the plugin installed, which is
-   exactly why the gap did not show up until someone tried it on one that
-   did not.
-2. **Enable it for this project.** Copy `skills-lock.json` (declares the
-   skill's source and a content hash) and `.claude/settings.json`
-   (`"enabledPlugins": {"modern-web-guidance@googlechrome": true}`) from
-   Dessau's own root, unedited. This step presumes step 1 already happened —
-   it scopes an installed plugin to this repository, it does not install one.
-
-CLAUDE.md and AGENTS.md both call this skill mandatory for CSS/JS/component
-work; a product that skips either step is building without it and nothing
-says so.
-
-## 6. Decide three things, and write them down
+## 7. Decide three things, and write them down
 
 If an agent is building this and the person it is building for is reachable,
 these are asked, not assumed — the same rule `derive-a-design-system.md`
@@ -253,7 +262,7 @@ states for its own six (#123).
   product-specific section below the Dessau one — an agent reading only the
   Dessau section has no reason to expect it.
 
-## 7. Before shipping
+## 8. Before shipping
 
 - `python3 -m http.server` and check **both themes**. Dark is where colour mistakes
   hide.
@@ -264,7 +273,7 @@ states for its own six (#123).
   `docs/screenreader-walkthrough.md` is the script.
 - Walk `agent/definition-of-done.md`.
 
-## 8. Updating Dessau later
+## 9. Updating Dessau later
 
 ```bash
 git submodule update --remote libs/dessau
@@ -281,11 +290,13 @@ feature commit.**
 Stated because "these instructions have never been executed" was true for long
 enough to be worth never letting be true silently again (#5).
 
-**Executed.** Steps 1 to 3, literally, in an empty repository, by somebody
-following the text and filling nothing in from memory. That found one defect —
-`sync-icons.mjs --dir=.` descending into the vendored copy of Dessau and
-rewriting its reference pages — and three missing steps, all now in the text
-above.
+**Executed.** Bringing Dessau in, setting up the shell, and inlining the icon
+sprite (steps 1, 3 and 4 as currently numbered — step 2, modern-web-guidance
+setup, did not exist yet at the time), literally, in an empty repository, by
+somebody following the text and filling nothing in from memory. That found
+one defect — `sync-icons.mjs --dir=.` descending into the vendored copy of
+Dessau and rewriting its reference pages — and three missing steps, all now
+in the text above.
 
 **Gated.** `node scripts/check-adoption.mjs` verifies the mechanical half on
 every run: every repository path this file and `README.md` name exists, and the
@@ -296,7 +307,8 @@ documented as the password reveal long after the reveal moved to
 
 **Not tested.** Whether the steps read correctly to somebody meeting Dessau for
 the first time, and whether their order makes sense before you know what any of
-it is for. Steps 4 to 7 have been read for accuracy but not executed end to end.
+it is for. Steps 2 and 5 through 8 have been read for accuracy but not executed
+end to end.
 A check can tell you the recipe points at things that exist; it cannot tell you
 the recipe is followable.
 
