@@ -26,12 +26,12 @@ It points at the recipes rather than repeating them. A prompt that restates a
 recipe is a second copy that drifts, and a drifted prompt is worse than none — it
 looks authoritative while sending an agent somewhere the recipe no longer goes.
 
-**The load-bearing instruction is step 3: the agent must ask, not answer.** The six
-design decisions belong to the product. An agent that answers them has not chosen
-neutrality; it has chosen Dessau's taste and presented it as a decision somebody
-made, which is precisely what `recipes/derive-a-design-system.md` exists to
-prevent. Roundness in particular is close to unchangeable by the time there are
-forty components using it.
+**Step 3 used to spell out "ask, don't answer" inline, because
+`derive-a-design-system.md` didn't yet say so itself.** It does now (#123) —
+the recipe states its own instruction to ask, one question at a time, rather
+than take defaults silently — and step 2 already puts that recipe in front
+of the agent before step 3 is reached. Restating it here would be exactly
+the second copy this file exists to avoid, so step 3 is now a bare pointer.
 
 **Not executed.** Nobody has pasted this into an agent against a real product. Its
 paths are gated — `scripts/check-adoption.mjs` reads this file's bare
@@ -55,18 +55,8 @@ This product uses Dessau as its design system.
    - libs/dessau/agent/recipes/derive-a-design-system.md
    - libs/dessau/agent/recipes/new-product.md
 
-3. Work through derive-a-design-system.md FIRST. It is six decisions: colour,
-   type, roundness, density, depth, motion.
-
-   ASK ME each one. Do not answer them yourself and do not take the defaults
-   silently. They are decisions about this product, not facts you can look up —
-   and roundness in particular is close to unchangeable once there are forty
-   components. Tell me what the default is and what it would cost to change it,
-   then wait.
-
-   Write my answers into this repository's DECISIONS.md: the decision, why, what
-   it cost, and what would have to be true for it to be wrong. Say explicitly
-   which of the six I took the default for.
+3. Work through derive-a-design-system.md end to end — it already tells you
+   to ask rather than answer, and where the answers go.
 
 4. Then follow new-product.md end to end.
 

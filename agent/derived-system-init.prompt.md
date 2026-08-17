@@ -29,6 +29,13 @@ over.
 measure Dessau's palette and report success. So the prompt asks for each one to be
 broken on purpose and seen to fail.
 
+**All three are stated by the recipes step 2 already puts in front of the
+agent** — `derive-a-design-system.md`'s own instruction to ask (#123),
+`derive-a-standalone-system.md`'s step 0 (substitution) and step 4 (prove the
+gates can fail) — so the fenced block below no longer restates them inline.
+It did once; that stopped being anything but a second copy the moment the
+recipes said it themselves, read before the agent would reach any of it.
+
 **Not executed.** Nobody has pasted this into an agent, and no derived system
 exists. Its paths are gated by `scripts/check-adoption.mjs`; that they exist is not
 the same claim as that an agent given this produces a working system. Tracked with
@@ -51,52 +58,25 @@ WITHOUT Dessau: what it ships to its consumers carries no dependency on it.
    - libs/dessau/agent/recipes/derive-a-design-system.md
    - libs/dessau/agent/recipes/derive-a-standalone-system.md
 
-3. Work through derive-a-design-system.md FIRST. Six decisions: colour, type,
-   roundness, density, depth, motion.
+3. Work through derive-a-design-system.md end to end — it already tells you
+   to ask rather than answer, and where the answers go.
 
-   ASK ME each one. Do not answer them yourself and do not take a default
-   silently. This system carries somebody's identity and none of it is yours to
-   choose. Tell me what Dessau's default is and what changing it costs, then
-   wait.
+4. Then follow derive-a-standalone-system.md end to end.
 
-   Write my answers into this repository's DECISIONS.md: the decision, why, what
-   it cost, and what would have to be true for it to be wrong. Say explicitly
-   which of the six I took the default for.
+5. Repoint the verification scripts and prove each one can still fail —
+   derive-a-standalone-system.md step 4 says how, and why a check that
+   cannot fail is worse than none. Report which checks you repointed and
+   what each one said when you broke it.
 
-4. Then follow derive-a-standalone-system.md.
+6. This is a design system, so it owes what one owes (derive-a-standalone-
+   system.md step 5): our own agent/index.json, AGENTS.md, reference, and
+   our own version of libs/dessau/agent/consumer-init.prompt.md.
 
-   The mechanism is SUBSTITUTION, not overriding, and this is the part to get
-   right. libs/dessau/dds/dds.css is a @layer declaration and twelve @import
-   statements; the first two are the foundation. This repository supplies its own
-   primitives.css and semantic.css and inherits the other ten.
-
-   Do NOT load Dessau's stylesheet and put ours on top. That produces two values
-   for every token we touch and a system that only works while Dessau is present
-   — which is exactly what we are not shipping.
-
-   Copy Dessau's semantic.css wholesale, comments included, and change only the
-   lines I gave you a reason to change. It is the mapping from roles to ramps and
-   that reasoning is what we are inheriting.
-
-5. Repoint the verification scripts at OUR files, and prove each one still works:
-   break a value on purpose, see it reported, put it back. A check that cannot
-   fail is worse than none, because it is trusted. Report to me which checks you
-   repointed and what each one said when you broke it.
-
-6. This is a design system, so it owes what one owes: our own agent/index.json,
-   our own AGENTS.md, our own reference rendering every component we ship, and
-   our own version of libs/dessau/agent/consumer-init.prompt.md — adapted for
-   our own products, every libs/dessau replaced with this repository's own path
-   and URL. Without it, our first product's agent either hand-edits Dessau's
-   copy or gets no paste-ready prompt at all.
-
-   Do not read the URL from `git remote` and treat it as settled. Run `git
-   remote get-url origin` if you want a candidate to propose, but ASK ME to
-   confirm both the submodule directory name (the `libs/<name>` your consumers
-   will type) and the clone URL before writing them into the prompt — a repo
-   can be local-only, forked, or moved before its first consumer exists, and
-   this is the same kind of thing the six decisions already taught you not to
-   assume.
+   Do not read this repository's future clone URL from `git remote` and
+   treat it as settled. Propose it as a candidate if you want, but ASK ME
+   to confirm both the URL and the `libs/<name>` directory name before
+   writing them into that prompt — a repo can be local-only, forked, or
+   moved before its first consumer exists.
 
 DO NOT build components. Dessau's already exist and we are inheriting them —
 your job here is the foundation, the wiring and the gates. If something seems
