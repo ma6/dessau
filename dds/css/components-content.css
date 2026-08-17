@@ -99,6 +99,13 @@
   .dds-fact-value {
     margin: 0;
     font-family: var(--dds-font-display);
+    /* Sized for a short value — a handful of digits, a short phrase — not
+       stated as a constraint anywhere else, so it is easy to ship something
+       this size was never meant to carry: "WCAG 2.2 AA" reads as visually
+       dominant beside numeric neighbours the same size was chosen for
+       (found building a consuming product, #131). A value long enough to
+       compete with its neighbours wants a smaller size set by hand, or a
+       different component — key-value list, specs list — entirely. */
     font-size: var(--dds-font-size-3xl);
     font-weight: var(--dds-font-weight-bold);
     line-height: var(--dds-line-height-tight);

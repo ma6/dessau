@@ -1163,6 +1163,14 @@ card grows the hit area via `.dds-card-link`.
 
 ## Facts — `.dds-facts`
 
+**Not for:** a value long enough to compete with its neighbours.
+`.dds-fact-value` is sized for a short figure — a handful of digits, a short
+phrase — not stated as a constraint anywhere else in the markup, so it is
+easy to ship something that size was never meant to carry: "WCAG 2.2 AA"
+reads as visually dominant beside numeric neighbours the same size was
+chosen for. A longer value wants a smaller size set by hand, or a
+different component — key-value list, specs list — entirely.
+
 A `<dl>`, so each figure is programmatically paired with its label. A grid of divs
 leaves "1,204" and "Documents" as two unrelated strings. The number is visually
 above the label but **second** in the DOM, because `<dt>` must precede `<dd>`.

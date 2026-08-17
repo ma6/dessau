@@ -510,7 +510,7 @@
     {
       "name": "facts",
       "purpose": "A small set of headline figures.",
-      "notFor": "A data table.",
+      "notFor": "A data table, or a value long enough to compete with its neighbours — .dds-fact-value is sized for a short figure, not a phrase.",
       "classes": [
         ".dds-facts",
         ".dds-fact",
