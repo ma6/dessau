@@ -12,7 +12,8 @@
  * (`<details name>`), no disclosure toggle (`<details>`), no focus trap
  * (`showModal()`), and no validation engine (constraint validation API).
  *
- * Contents: dialog opener · tabs · toast · copy-to-clipboard · table
+ * Contents: dialog opener · tabs · toast · copy-to-clipboard · table ·
+ *   grid trailing-row balance
  */
 (function (global) {
   'use strict';
@@ -581,5 +582,87 @@
     }
 
     update();
+  });
+
+  /* =========================================================================
+     Grid trailing-row balance
+     =========================================================================
+     Markup: none — applies to every `.dds-grid` automatically, no opt-in.
+
+     `.dds-grid`'s `auto-fit` column count (`dds/css/layout.css`) is a pure
+     function of the container's width; it has no notion of item count.
+     Invisible when every row ends up full or fully empty, silently wrong when
+     a partial last row inherits full-width columns from a fully-populated
+     earlier row — an item count that does not divide evenly into however
+     many columns fit at the current width leaves visible dead space (#126).
+
+     There is no selector for "which track did auto-fit produce" — that is a
+     layout result, not something markup expresses — so this cannot be a CSS
+     rule, the same reason `toc`'s reading position above is measured here
+     rather than queried.
+
+     On load, and whenever the grid's OWN box resizes — not only the window,
+     because a grid inside a narrower ancestor needs this independently of the
+     viewport — this measures how many columns `auto-fit` produced on its
+     own, and if the last row would leave more than one empty cell, overrides
+     ONLY the column count, never the per-column sizing formula, down to the
+     largest count at or below the natural one that leaves at most one empty
+     cell. Never forces more columns than `auto-fit` already produced; only
+     ever reduces, and a count that already satisfies the rule is left alone.
+
+     Without JavaScript the grid is exactly what it always was: fully
+     responsive, and occasionally short a row.
+     ========================================================================= */
+
+  DDS.register('grid', '.dds-grid', function (grid) {
+    /**
+     * Clears any earlier override, forces layout, and counts the tracks
+     * `auto-fit` produced unassisted at the current width.
+     */
+    function naturalColumnCount() {
+      grid.style.removeProperty('grid-template-columns');
+      var value = getComputedStyle(grid).gridTemplateColumns;
+      return value && value !== 'none' ? value.trim().split(/\s+/).length : 0;
+    }
+
+    function balance() {
+      var count = grid.children.length;
+      if (!count) return;
+
+      var natural = naturalColumnCount();
+      // A single row: any unused tracks are empty grid-wide, and auto-fit
+      // already collapses those to zero width on its own. Nothing to do.
+      if (!natural || count <= natural) return;
+
+      var remainder = count % natural;
+      if (remainder === 0 || remainder === natural - 1) return;
+
+      for (var columns = natural - 1; columns >= 1; columns -= 1) {
+        if (count % columns === 0 || count % columns === columns - 1) {
+          grid.style.setProperty(
+            'grid-template-columns',
+            'repeat(' + columns + ', minmax(min(var(--dds-grid-min), 100%), 1fr))'
+          );
+          return;
+        }
+      }
+    }
+
+    balance();
+
+    if (typeof ResizeObserver === 'function') {
+      new ResizeObserver(balance).observe(grid);
+    } else {
+      global.addEventListener('resize', DDS.utils.debounce(balance, 100));
+    }
+
+    /* Width is not the only thing that changes the right column count — item
+       count does too, and a grid whose items are filtered, paginated or
+       streamed in changes that after the resize listener has nothing left to
+       tell it. `childList` only: an `.dds-grid` item's own internal content
+       changing is that item's business, not the grid's. */
+    if (typeof MutationObserver === 'function') {
+      new MutationObserver(balance).observe(grid, { childList: true });
+    }
   });
 })(typeof window !== 'undefined' ? window : globalThis);

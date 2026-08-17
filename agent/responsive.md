@@ -60,6 +60,64 @@ The inner `min(<ideal>, 100%)` matters: without it a single item overflows a
 container narrower than the minimum, which is the classic failure of the
 `auto-fit` pattern at 320px.
 
+### A grid's trailing row (#126)
+
+`auto-fit`'s column count is a pure function of container width. It has no
+notion of item count, and there is no selector that can read "how many
+tracks did `auto-fit` produce" — that is a layout result, not something
+markup expresses. Two consequences follow from the same fact:
+
+**It is invisible exactly when it does not matter.** A single row (item
+count at or below the natural column count) is always clean: the unused
+tracks are empty across the *whole* grid, and `auto-fit`'s own collapse rule
+already sizes those to zero. There is nothing to fix there and nothing this
+section is about.
+
+**It is silently wrong exactly when a row is partial.** Once a grid has more
+items than fit in one row, every row — full or not — shares the *same*
+column tracks, because `grid-template-columns` applies once to the whole
+grid, not per row. A fully-populated first row therefore gives every column
+real pixel width, and a partial last row inherits it: whatever items remain
+sit in the first few columns, and the rest of that row's tracks are empty
+but no longer zero-width, because they are not empty *grid-wide*. Confirmed
+live twice on real Dessau/consumer pages, not hypothetical — see #126's own
+investigation for the computed values.
+
+**The fix cannot be a CSS rule, for the same reason the problem cannot be
+detected by one:** nothing in CSS exposes the auto-fit-computed column count
+to a selector. `grid`, in `dds/js/components.js`, does what the `toc`
+component above does for reading position — measures a layout result at
+runtime because no selector can — and overrides the column *count* only,
+never the per-column sizing formula:
+
+1. Clear any earlier override and read `getComputedStyle(grid).gridTemplateColumns`
+   to get the natural, unassisted column count at the current width.
+2. If the item count divides evenly into it, or is exactly one short, stop —
+   the row already satisfies "at most one empty cell".
+3. Otherwise, search downward from `natural - 1` to `1` for the largest
+   column count that does satisfy it, and set `grid-template-columns:
+   repeat(<count>, minmax(min(var(--dds-grid-min), 100%), 1fr))` — the exact
+   same sizing formula as the unmodified rule, just a fixed count instead of
+   `auto-fit`, so `--dds-grid-min` still means what it always meant.
+
+Re-run on load, on the grid's own `ResizeObserver` (not the window's — a
+grid inside a narrower ancestor, a sidebar or a dialog, needs this
+independently of the viewport, the same reasoning `contentnav` and the
+table's scroll-shadow above already apply), **and on a `MutationObserver`
+watching the grid's own `childList`.** Width is not the only thing that
+changes the right column count: a grid whose items are filtered, paginated
+or streamed in changes item count with no resize to trigger a recompute —
+found by testing item counts synthetically rather than only the two
+originally-reported instances, both of which happened to be static. **Only
+ever reduces**: the search starts below the natural count and a satisfying
+count always exists (1 column trivially always satisfies it), so this can
+never force more columns than `auto-fit` would already use on its own.
+
+**Without JavaScript**, `.dds-grid` is exactly what it always was: fully
+responsive, and — at an unlucky item count — occasionally short a row. The
+same standard `toc`'s own highlight is held to: the primitive stays fully
+functional, only the refinement is lost.
+
 ### A track's minimum is its content, and that is how one wide thing widens a page
 
 A grid track sized `auto`, and any grid or flex item, cannot be narrower than its

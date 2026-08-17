@@ -352,6 +352,20 @@ the utilities cannot reach is a step half the system cannot use.
 
 ---
 
+## Layout
+
+`.dds-grid`'s column count is `auto-fit`-driven — a pure function of
+container width, not item count (`dds/css/layout.css`). A partial last row
+can therefore leave more than one empty cell at an unlucky item count
+(ticket #126), and since no CSS selector can read the column count
+`auto-fit` produced, the correction is a small runtime enhancement (`grid`,
+`dds/js/components.js`) that measures it and reduces the column count —
+never increases it — to leave at most one empty trailing cell. Without
+JavaScript, `.dds-grid` is unchanged: fully responsive, occasionally short a
+row. Full mechanism: `agent/responsive.md` → "A grid's trailing row".
+
+---
+
 ## Radius, borders, containers
 
 `--dds-radius-none` · `sm` (4px) · `md` (8px) · `lg` (14px) · `pill` · `circle`

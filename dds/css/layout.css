@@ -116,7 +116,22 @@
        - the count drops as the container narrows, with no media query,
        - and the inner `min(…, 100%)` stops a single item from overflowing a
          container narrower than the minimum, which is the classic failure of
-         this pattern at 320px. */
+         this pattern at 320px.
+
+     What it deliberately does not know: item count. The column count is a
+     pure function of container width, so a partial last row inherits full
+     column widths from a fully-populated earlier row and can leave several
+     empty cells — invisible when every row is full or fully empty, wrong and
+     silent otherwise. There is no selector for "which track auto-fit
+     produced", so the fix is a small runtime enhancement (`grid` in
+     `dds/js/components.js`, #126): it measures the natural column count and,
+     when the last row would leave more than one empty cell, overrides only
+     the column COUNT — never this sizing formula — down to the largest
+     count that leaves at most one. Never more columns than `auto-fit` would
+     already use, only ever fewer. See `agent/responsive.md` → "A grid's
+     trailing row" for the full mechanism and `agent/foundations.md` for the
+     summary. Without that script the grid is exactly this rule, unchanged:
+     fully responsive, and occasionally short a row. */
   .dds-grid {
     --dds-grid-min: 16rem;
     --dds-grid-space: var(--dds-space-md);
