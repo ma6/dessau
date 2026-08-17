@@ -355,6 +355,14 @@
     font-size: var(--dds-font-size-sm);
   }
 
+  /* `display: flex` above beats the base sheet's `[hidden]` rule — a later
+     layer wins regardless of specificity. results.js toggles `hidden` to
+     show and hide this; without this override it would stay in the layout,
+     dimmed instead of gone (#24). */
+  .dds-results-loading[hidden] {
+    display: none;
+  }
+
   /* ==========================================================================
      Empty state
      ==========================================================================
@@ -379,6 +387,14 @@
     background-color: var(--dds-color-surface-sunken);
     border: var(--dds-border-thin) dashed var(--dds-color-border-default);
     border-radius: var(--dds-radius-lg);
+  }
+
+  /* `display: flex` above beats the base sheet's `[hidden]` rule — a later
+     layer wins regardless of specificity. Load-bearing now that results.js
+     toggles `hidden` on an in-page `.dds-empty` instance (#24); without this
+     it would stay in the layout instead of disappearing. */
+  .dds-empty[hidden] {
+    display: none;
   }
 
   .dds-empty > .dds-icon {

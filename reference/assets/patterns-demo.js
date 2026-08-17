@@ -133,30 +133,127 @@
     });
   };
 
+  /* =========================================================================
+     Search and results demo
+     =========================================================================
+     A deliberately tiny in-memory table, harbour-themed to match the fixed
+     example this page used to show as four separate static snapshots.
+
+     "error" reaching every query it appears in is what makes the failed
+     state reachable on demand rather than by chance — the same reason the
+     address-search demo above has a `failing` profile instead of relying on
+     an unreliable connection to happen to be unreliable during a walkthrough.
+     ========================================================================= */
+
+  var PROJECTS = [
+    { label: 'Harbour redevelopment', secondary: 'Eastern quay · Approved · 47 documents', href: '#results' },
+    { label: 'Harbour drainage survey', secondary: 'Eastern quay · In progress · 8 documents', href: '#results' },
+    { label: 'Harbour access consultation', secondary: 'Public engagement · Needs review · 1,204 documents', href: '#results' },
+    { label: 'Kalvebod bridge maintenance', secondary: 'Structural · Approved · 12 documents', href: '#results' },
+    { label: 'Quayside lighting upgrade', secondary: 'Eastern quay · Planning · 3 documents', href: '#results' },
+  ];
+
+  function resultsSource(query, context) {
+    return new Promise(function (resolve, reject) {
+      var timer = setTimeout(function () {
+        if (query.toLowerCase().indexOf('error') !== -1) {
+          reject(new Error('simulated search failure'));
+          return;
+        }
+
+        var needle = query.toLowerCase();
+        resolve(
+          PROJECTS.filter(function (item) {
+            return item.label.toLowerCase().indexOf(needle) !== -1;
+          })
+        );
+      }, 500);
+
+      if (context && context.signal) {
+        context.signal.addEventListener(
+          'abort',
+          function () {
+            clearTimeout(timer);
+            reject(new DOMException('Aborted', 'AbortError'));
+          },
+          { once: true }
+        );
+      }
+    });
+  }
+
+  function resultsRenderItem(item) {
+    var li = document.createElement('li');
+    li.className = 'dds-card dds-card-compact';
+
+    var heading = document.createElement('h3');
+    heading.className = 'dds-text-md';
+    var link = document.createElement('a');
+    link.href = item.href;
+    link.textContent = item.label;
+    heading.appendChild(link);
+    li.appendChild(heading);
+
+    var secondary = document.createElement('p');
+    secondary.className = 'dds-text-sm dds-text-muted dds-mbs-2xs';
+    secondary.textContent = item.secondary;
+    li.appendChild(secondary);
+
+    return li;
+  }
+
+  /* =========================================================================
+     Upload flow demo
+     =========================================================================
+     `DDS.uploadFlow.simulate` (upload-flow.js) already reproduces progress
+     over time with no network. Wrapped here to also fail roughly one upload
+     in five AFTER it starts, so the "failed mid-upload" recovery path is
+     reachable without waiting for a real connection to drop — the
+     size-rejection path is already reachable directly, by choosing a file
+     over the 2 MB the markup sets.
+     ========================================================================= */
+
+  function uploadFlowUpload(file, ctx) {
+    return DDS.uploadFlow.simulate(file, ctx).then(function () {
+      if (Math.random() < 0.2) throw new Error('simulated upload failure');
+    });
+  }
+
   function init() {
     var buttons = Array.prototype.slice.call(
       document.querySelectorAll('[data-ref-provider]')
     );
     var status = document.getElementById('ref-provider-status');
-    if (!buttons.length) return;
 
-    buttons.forEach(function (button) {
-      button.addEventListener('click', function () {
-        var profile = button.getAttribute('data-ref-provider');
-        if (!PROFILES[profile]) return;
+    if (buttons.length) {
+      buttons.forEach(function (button) {
+        button.addEventListener('click', function () {
+          var profile = button.getAttribute('data-ref-provider');
+          if (!PROFILES[profile]) return;
 
-        active = DDS.mockAddressProvider(PROFILES[profile]);
+          active = DDS.mockAddressProvider(PROFILES[profile]);
 
-        // `aria-pressed` on a set of toggles, so the active one is announced
-        // rather than only tinted.
-        buttons.forEach(function (other) {
-          other.setAttribute('aria-pressed', other === button ? 'true' : 'false');
+          // `aria-pressed` on a set of toggles, so the active one is announced
+          // rather than only tinted.
+          buttons.forEach(function (other) {
+            other.setAttribute('aria-pressed', other === button ? 'true' : 'false');
+          });
+
+          if (status) status.textContent = 'Provider: ' + LABELS[profile] + '.';
+          DDS.announce('Address provider set to ' + LABELS[profile]);
         });
-
-        if (status) status.textContent = 'Provider: ' + LABELS[profile] + '.';
-        DDS.announce('Address provider set to ' + LABELS[profile]);
       });
-    });
+    }
+
+    var resultsRoot = document.getElementById('ref-results');
+    if (resultsRoot && DDS.results) {
+      DDS.results(resultsRoot, { source: resultsSource, renderItem: resultsRenderItem });
+    }
+
+    var uploadFlowRoot = document.getElementById('ref-uploadflow');
+    if (uploadFlowRoot && DDS.uploadFlow) {
+      DDS.uploadFlow(uploadFlowRoot, { upload: uploadFlowUpload });
+    }
   }
 
   /* DOMContentLoaded, not `readyState === 'loading'` — a deferred script is

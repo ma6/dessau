@@ -151,6 +151,8 @@ platform does not provide — the shell above loads the first three.
 | `js/components-content.js` | Lightbox, consent embed |
 | `js/patterns/combobox.js` | Autocomplete |
 | `js/patterns/address-search.js` | Address search — **needs `combobox.js`** |
+| `js/patterns/results.js` | Search and results: loading, results, nothing found, request failed |
+| `js/patterns/upload-flow.js` | Per-file upload progress, cancel, and recovering from a rejection |
 | `js/patterns/form-validation.js` | Accessible validation and error summary |
 | `js/patterns/conditional-fields.js` | Fields revealed by an earlier answer |
 | `js/patterns/wizard.js` | Multi-step form |

@@ -1308,6 +1308,19 @@
       "css": "dds/css/patterns.css",
       "spec": "## Search and results — `.dds-results`",
       "reference": "reference/patterns.html#results",
+      "js": "dds/js/patterns/results.js",
+      "hooks": [
+        "data-dds-results",
+        "data-dds-results-clear",
+        "data-dds-results-empty",
+        "data-dds-results-empty-title",
+        "data-dds-results-error",
+        "data-dds-results-items",
+        "data-dds-results-list",
+        "data-dds-results-loading",
+        "data-dds-results-retry",
+        "data-dds-results-summary"
+      ],
       "accessibility": "aria-busy while loading; count announced politely. Failed is worded differently from nothing found. The list carries role=\"list\": Safari drops list semantics from a styled list outside <nav> (agent/accessibility.md).",
       "responsive": "none — nothing about it changes with width"
     },
@@ -1455,7 +1468,14 @@
       ],
       "css": "dds/css/patterns-flows.css",
       "spec": "## Upload flow — `.dds-uploadflow`",
-      "reference": "reference/patterns.html#results",
+      "reference": "reference/patterns.html#upload-flow",
+      "js": "dds/js/patterns/upload-flow.js",
+      "hooks": [
+        "data-dds-uploadflow-input",
+        "data-dds-uploadflow-max-bytes",
+        "data-dds-uploadflow-summary",
+        "data-dds-uploadflow-trigger"
+      ],
       "accessibility": "A rejection says why and what to do. One failure does not discard the others.",
       "responsive": "none — nothing about it changes with width"
     }

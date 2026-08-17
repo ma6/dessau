@@ -2270,3 +2270,57 @@ that the month of a release is more informative to consumers than its
 compatibility class — which would also mean semantic version bumps had
 stopped being meaningful, the same condition under which 050's reasoning
 would need revisiting too.
+
+---
+
+## 053 — Search-and-results and upload flow, built to the combobox standard (#24)
+
+**Decision.** `dds/js/patterns/results.js` and `dds/js/patterns/
+upload-flow.js` give both patterns real behaviour — debounce, abort,
+announcement, every documented state reachable, degrading to something
+that works without JavaScript — closing the gap #24 found: CSS and a
+specification for both, and no script behind either.
+
+**Deviation from the ticket's own wording: upload-flow has no `DDS.register`
+entry.** #24 asked for "both registered enhancements." `results.js` has
+one, the same declarative path `combobox.js` offers for a static array.
+`upload-flow.js` does not, on purpose — the one thing every instance
+needs, the `upload` function itself, cannot come from a data attribute,
+so there is no sensible zero-config default to register against. Adding a
+`DDS.register` entry with nothing meaningful for it to do would be the
+false-completeness this repository's own tooling exists to catch, not
+progress toward it. `check-enhancement-coverage.mjs` cannot track an
+enhancement that was never registered, so `tests/upload-flow.spec.mjs`
+carries `@covers none` with that reasoning rather than a name the checker
+would rightly reject.
+
+**Two recovery paths for upload-flow, not one — found while testing, not
+anticipated when the ticket was filed.** A client-side rejection (too
+large, wrong type) and a failure after the upload was accepted (dropped
+connection, server error) both land the item in `failed`, and the first
+version offered "Replace" for both. That is wrong for the second case: the
+file was never the problem, so forcing a new pick throws away a perfectly
+good file over a transient failure. `failed` now carries which cause it
+was, and shows Replace only for a rejection, Retry — re-sending the
+identical file — for everything else.
+
+**Progressive enhancement found broken while walking `definition-of-done.md`
+against upload-flow specifically, not assumed correct.** The first
+markup shipped the file input `hidden` in the AUTHORED markup, with only a
+`type="button"` trigger to reveal it — meaning no JavaScript, no way to
+reach the input at all, since that button does nothing on its own. Fixed
+by inverting which element starts hidden: the input (and the form's own
+submit button) start visible, and `upload-flow.js` hides them — and
+reveals the trigger — only once it can actually hand both jobs to itself.
+The same check found a second real bug in passing: a focused Cancel button
+removed by `item.action.replaceChildren()` when its upload finished
+mid-focus dropped focus to `<body>` with no visual sign anything happened;
+`setItemState` now checks whether focus was inside the item before
+rebuilding it, and hands focus to the new state's own button, or to the
+item itself when the new state has none.
+
+**Reversal condition.** A real, common enough need for a zero-config
+`upload` default emerges — a same-origin `fetch` helper that most products
+could use unmodified, the way `arraySource` serves most static lists —
+in which case upload-flow gets the declarative path #24 originally
+expected, and this entry's first deviation no longer holds.

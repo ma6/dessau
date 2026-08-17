@@ -1002,6 +1002,14 @@
     background-color: var(--dds-color-surface-sunken);
   }
 
+  /* `display: flex` above beats the base sheet's `[hidden]` rule — a later
+     layer wins regardless of specificity. Load-bearing now that results.js
+     toggles `hidden` on an in-page `.dds-notice-error` instance (#24);
+     without this it would stay in the layout instead of disappearing. */
+  .dds-notice[hidden] {
+    display: none;
+  }
+
   .dds-notice-title {
     font-weight: var(--dds-font-weight-semibold);
   }

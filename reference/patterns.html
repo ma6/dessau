@@ -16,7 +16,7 @@
 <link rel="preload" href="assets/fonts/SpaceGrotesk-Variable-latin-ext.woff2" as="font"
       type="font/woff2" crossorigin>
 <link rel="stylesheet" href="assets/fonts.css?v=7ed937e9">
-<link rel="stylesheet" href="../dds/dds.css?v=24fadf46">
+<link rel="stylesheet" href="../dds/dds.css?v=dc76f49b">
 <link rel="stylesheet" href="assets/reference.css?v=61af2a38">
 </head>
 <body>
@@ -322,6 +322,7 @@
               <li><a href="#combobox">Autocomplete</a></li>
               <li><a href="#validation">Form validation</a></li>
               <li><a href="#results">Search and results</a></li>
+              <li><a href="#upload-flow">Upload flow</a></li>
               <li><a href="#wizard">Multi-step form</a></li>
               <li><a href="#derived">Derived output</a></li>
               <li><a href="#auth">Authentication</a></li>
@@ -699,94 +700,65 @@
           <h2>Search and results</h2>
           <p class="dds-text-subtle dds-measure-default dds-mbs-xs">
             Four states, all part of the pattern: loading, results, nothing found,
-            request failed. The one most often skipped is “failed”, and it is the
-            one where the user most needs to be told what to do next.
+            request failed. Live — type below. The one most often skipped is
+            “failed”, and it is the one where the user most needs to be told what
+            to do next.
           </p>
         </div>
 
         <div class="dds-stack dds-stack-md">
           <div class="ref-specimen">
-            <p class="ref-specimen-label">Results, with a count</p>
-            <div class="dds-results">
-              <p class="dds-results-summary" role="status">3 projects match “harbour”.</p>
-              <ul class="dds-results-list" role="list">
-                <li class="dds-card dds-card-compact">
-                  <h3 class="dds-text-md"><a href="#results">Harbour redevelopment</a></h3>
-                  <p class="dds-text-sm dds-text-muted dds-mbs-2xs">Eastern quay · Approved · 47 documents</p>
-                </li>
-                <li class="dds-card dds-card-compact">
-                  <h3 class="dds-text-md"><a href="#results">Harbour drainage survey</a></h3>
-                  <p class="dds-text-sm dds-text-muted dds-mbs-2xs">Eastern quay · In progress · 8 documents</p>
-                </li>
-                <li class="dds-card dds-card-compact">
-                  <h3 class="dds-text-md"><a href="#results">Harbour access consultation</a></h3>
-                  <p class="dds-text-sm dds-text-muted dds-mbs-2xs">Public engagement · Needs review · 1,204 documents</p>
-                </li>
-              </ul>
-            </div>
-          </div>
+            <p class="ref-specimen-label">Search and results — live</p>
+            <div class="dds-results" id="ref-results">
+              <form class="dds-field" method="get" action="#results">
+                <label class="dds-label" for="ref-results-input">Search projects</label>
+                <input class="dds-input" type="search" id="ref-results-input" name="q"
+                       placeholder="Try “harbour”, “error”, or something with no match">
+              </form>
 
-          <div class="ref-specimen">
-            <p class="ref-specimen-label">Loading — previous results kept, dimmed and unclickable</p>
-            <div class="dds-results" aria-busy="true">
-              <p class="dds-results-loading">
+              <p class="dds-results-summary" role="status" data-dds-results-summary></p>
+
+              <p class="dds-results-loading" hidden data-dds-results-loading>
                 <span class="dds-spinner" aria-hidden="true"></span>
                 <span role="status">Searching…</span>
               </p>
-              <ul class="dds-results-list" role="list">
-                <li class="dds-card dds-card-compact">
-                  <h3 class="dds-text-md"><a href="#results">Harbour redevelopment</a></h3>
-                  <p class="dds-text-sm dds-text-muted dds-mbs-2xs">Eastern quay · Approved</p>
-                </li>
-                <li class="dds-card dds-card-compact">
-                  <h3 class="dds-text-md"><a href="#results">Harbour drainage survey</a></h3>
-                  <p class="dds-text-sm dds-text-muted dds-mbs-2xs">Eastern quay · In progress</p>
-                </li>
-              </ul>
-            </div>
-            <p class="dds-text-sm dds-text-muted dds-mbs-md dds-measure-default">
-              Keeping the stale list on screen preserves the user’s context and
-              avoids a layout collapse on every keystroke. It is made unclickable,
-              because acting on data that is about to be replaced is worse than
-              waiting.
-            </p>
-          </div>
 
-          <div class="ref-specimen">
-            <p class="ref-specimen-label">Nothing found — confirm the query, offer a way to broaden it</p>
-            <div class="dds-empty">
-              <svg class="dds-icon" aria-hidden="true"><use href="#dds-icon-search"/></svg>
-              <h3 class="dds-empty-title">No projects match “kalvebod bridge 2019”</h3>
-              <p class="dds-empty-body">
-                Try fewer words, or search by owner instead. Archived projects are
-                excluded unless you include them.
-              </p>
-              <div class="dds-cluster dds-cluster-sm">
-                <button type="button" class="dds-button dds-button-secondary dds-button-sm">Include archived</button>
-                <button type="button" class="dds-button dds-button-subtle dds-button-sm">Clear search</button>
+              <ul class="dds-results-list" role="list" data-dds-results-list></ul>
+
+              <div class="dds-empty" hidden data-dds-results-empty>
+                <svg class="dds-icon" aria-hidden="true"><use href="#dds-icon-search"/></svg>
+                <h3 class="dds-empty-title" data-dds-results-empty-title></h3>
+                <p class="dds-empty-body">
+                  Try fewer words, or search by owner instead.
+                </p>
+                <div class="dds-cluster dds-cluster-sm">
+                  <button type="button" class="dds-button dds-button-subtle dds-button-sm" data-dds-results-clear>Clear search</button>
+                </div>
+              </div>
+
+              <div class="dds-notice dds-notice-error" role="alert" hidden data-dds-results-error>
+                <svg class="dds-icon" aria-hidden="true"><use href="#dds-icon-error"/></svg>
+                <div>
+                  <p class="dds-notice-title"><span class="dds-sr-only">Error: </span>Search is unavailable</p>
+                  <p class="dds-text-sm dds-mbs-2xs">
+                    We could not reach the search service. Your query is still in
+                    the box — try again in a moment.
+                  </p>
+                  <p class="dds-mbs-xs">
+                    <button type="button" class="dds-button dds-button-secondary dds-button-sm" data-dds-results-retry>Try again</button>
+                  </p>
+                </div>
               </div>
             </div>
-          </div>
-
-          <div class="ref-specimen">
-            <p class="ref-specimen-label">Request failed — different from nothing found</p>
-            <div class="dds-notice dds-notice-error" role="alert">
-              <svg class="dds-icon" aria-hidden="true"><use href="#dds-icon-error"/></svg>
-              <div>
-                <p class="dds-notice-title"><span class="dds-sr-only">Error: </span>Search is unavailable</p>
-                <p class="dds-text-sm dds-mbs-2xs">
-                  We could not reach the search service. Your query is still in the
-                  box — try again in a moment.
-                </p>
-                <p class="dds-mbs-xs">
-                  <button type="button" class="dds-button dds-button-secondary dds-button-sm">Try again</button>
-                </p>
-              </div>
-            </div>
-            <p class="dds-text-sm dds-text-muted dds-mbs-md dds-measure-default">
-              “The service is down” and “there is no such project” need different
-              messages: one says try again, the other says check the spelling.
-              Collapsing them into one leaves the user guessing.
+            <p class="ref-note">
+              <svg class="dds-icon" aria-hidden="true"><use href="#dds-icon-info"/></svg>
+              Keeping the stale list on screen while loading preserves context and
+              avoids a layout collapse on every keystroke; it is made unclickable,
+              because acting on data about to be replaced is worse than waiting.
+              Type “error” to reach the failed state, and “try again” to recover
+              from it — “the service is down” and “there is no such project” need
+              different messages, and collapsing them into one leaves the user
+              guessing.
             </p>
           </div>
 
@@ -805,52 +777,46 @@
               </button>
             </div>
           </div>
+        </div>
+      </section>
 
-          <div class="ref-specimen" data-ref-code>
-            <p class="ref-specimen-label">Upload flow — in progress, done, and rejected</p>
+      <!-- ========================================================= upload-flow -->
+      <section class="ref-section" id="upload-flow">
+        <div class="ref-section-head">
+          <h2>Upload flow</h2>
+          <p class="dds-text-subtle dds-measure-default dds-mbs-xs">
+            Choosing files, seeing them checked, and recovering from a rejection.
+            Live — choose a file; anything over 2&nbsp;MB is rejected, and roughly
+            one upload in five fails partway through, so both recovery paths are
+            reachable without waiting for a real server to misbehave.
+          </p>
+        </div>
 
-            <div class="dds-uploadflow" style="max-inline-size: 34rem" lang="de">
-              <p class="dds-results-summary" role="status">
-                2 von 3 Dateien übertragen. Eine Datei wurde abgelehnt.
-              </p>
-
-              <div class="dds-uploadflow-item" data-dds-state="done">
-                <svg class="dds-icon" aria-hidden="true" focusable="false" style="color: var(--dds-color-text-success)"><use href="#dds-icon-check-circle"/></svg>
-                <span>
-                  <span class="dds-weight-medium">bebauungsplan-nord.pdf</span>
-                  <span class="dds-text-sm dds-text-muted">· 4,2 MB</span>
-                </span>
-                <span class="dds-text-sm dds-text-success">Fertig</span>
-              </div>
-
-              <div class="dds-uploadflow-item" data-dds-state="uploading">
-                <span class="dds-progress-ring" style="--dds-progress-ring-value: 46" aria-hidden="true"></span>
-                <span>
-                  <span class="dds-weight-medium">lageplan-2026.dwg</span>
-                  <span class="dds-text-sm dds-text-muted">· 18,7 MB</span>
-                </span>
-                <button type="button" class="dds-button dds-button-subtle dds-button-sm">
-                  Abbrechen<span class="dds-sr-only"> — Übertragung von lageplan-2026.dwg</span>
+        <div class="dds-stack dds-stack-md">
+          <div class="ref-specimen">
+            <p class="ref-specimen-label">Upload flow — live, 2 MB limit</p>
+            <div class="dds-uploadflow" id="ref-uploadflow"
+                 data-dds-uploadflow-max-bytes="2097152"
+                 style="max-inline-size: 34rem" lang="de">
+              <p class="dds-results-summary" role="status" data-dds-uploadflow-summary></p>
+              <!-- Hidden here — a button with no listener yet is a dead
+                   control sitting beside the real one below, not a helpful
+                   extra. upload-flow.js reveals it exactly when it un-hides
+                   the input's own job to it, below. -->
+              <button type="button" class="dds-button dds-button-secondary dds-button-sm"
+                      data-dds-uploadflow-trigger hidden>
+                Dateien auswählen
+              </button>
+              <!-- NOT hidden here — upload-flow.js hides it once it knows it
+                   can hand the job to the trigger button above. Without
+                   JavaScript this is a real, visible file input inside a
+                   real form: select, then submit. -->
+              <form method="post" enctype="multipart/form-data" action="#upload-flow">
+                <input type="file" multiple data-dds-uploadflow-input>
+                <button type="submit" class="dds-button dds-button-subtle dds-button-sm">
+                  Hochladen
                 </button>
-                <progress class="dds-progress dds-uploadflow-progress" max="100" value="46">
-                  46&nbsp;%
-                </progress>
-              </div>
-
-              <div class="dds-uploadflow-item" data-dds-state="failed">
-                <svg class="dds-icon" aria-hidden="true" focusable="false" style="color: var(--dds-color-text-error)"><use href="#dds-icon-error"/></svg>
-                <span>
-                  <span class="dds-weight-medium">luftbild-gesamt.tif</span>
-                  <span class="dds-text-sm dds-text-muted">· 42,1 MB</span>
-                </span>
-                <button type="button" class="dds-button dds-button-secondary dds-button-sm">
-                  Ersetzen<span class="dds-sr-only"> — luftbild-gesamt.tif</span>
-                </button>
-                <p class="dds-uploadflow-reason">
-                  42,1 MB — das Maximum sind 10 MB. Speichern Sie das Bild als JPEG
-                  oder laden Sie einen Ausschnitt hoch.
-                </p>
-              </div>
+              </form>
             </div>
 
             <div class="ref-note">
@@ -858,11 +824,11 @@
               <p class="dds-text-sm dds-text-subtle dds-mbs-2xs">
                 “Upload fehlgeschlagen” tells the user nothing they can act on. The
                 message names the actual number, the actual limit, and a way forward.
-                Someone who has just waited through a 42 MB upload on a phone
+                Someone who has just waited through a large upload on a phone
                 connection has earned that much.
               </p>
               <p class="dds-text-sm dds-text-subtle dds-mbs-xs">
-                One failure never discards the others. The two that worked stay
+                One failure never discards the others. The ones that worked stay
                 uploaded — a flow that throws away successful work because the last
                 file was too large makes the user redo all of it.
               </p>
@@ -1595,6 +1561,8 @@
 <script src="../dds/js/components-navigation.js?v=9ac8644e" defer></script>
 <script src="../dds/js/components-forms.js?v=3c3f273b" defer></script>
 <script src="../dds/js/patterns/combobox.js?v=bfe84c14" defer></script>
+<script src="../dds/js/patterns/results.js?v=6380ddcb" defer></script>
+<script src="../dds/js/patterns/upload-flow.js?v=1b4178dd" defer></script>
 <script src="../dds/js/patterns/form-validation.js?v=d78559dc" defer></script>
 <script src="../dds/js/patterns/conditional-fields.js?v=a4027025" defer></script>
 <script src="../dds/js/patterns/wizard.js?v=4be31a39" defer></script>
@@ -1604,6 +1572,6 @@
 <script src="../dds/js/patterns/address-search.js?v=7f0f1a24" defer></script>
 <script src="assets/reference.js?v=bbdd8f75" defer></script>
 <script src="assets/reference-tools.js?v=cb237f74" defer></script>
-<script src="assets/patterns-demo.js?v=601ce590" defer></script>
+<script src="assets/patterns-demo.js?v=18c61295" defer></script>
 </body>
 </html>

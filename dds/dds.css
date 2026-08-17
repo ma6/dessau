@@ -98,13 +98,13 @@
 /* Reusable UI building blocks, split by concern so no single file becomes
    unnavigable. All four land in the same `dds.components` layer — the split is
    for the reader, not for the cascade. */
-@import url("./css/components.css?v=89b4aee3");
+@import url("./css/components.css?v=e532d2aa");
 @import url("./css/components-forms.css?v=5c491018");
 @import url("./css/components-navigation.css?v=64c5cd0d");
 @import url("./css/components-content.css?v=7073ee51");
 
 /* Compositions that solve a user task. */
-@import url("./css/patterns.css?v=14549856");
+@import url("./css/patterns.css?v=932f9146");
 @import url("./css/patterns-flows.css?v=3f9d309c");
 
 /* Single-purpose helpers. Last, so they win inside DDS. */

@@ -221,6 +221,31 @@ where, and must walk the whole form again.
 
 **For:** a query and its outcome.
 
+**Behaviour:** `dds/js/patterns/results.js`
+
+```html
+<div class="dds-results">
+  <input type="search" class="dds-input" ...>
+  <p class="dds-results-summary" role="status" data-dds-results-summary></p>
+  <p class="dds-results-loading" hidden data-dds-results-loading>…</p>
+  <ul class="dds-results-list" role="list" data-dds-results-list></ul>
+  <div class="dds-empty" hidden data-dds-results-empty>…product-authored…</div>
+  <div class="dds-notice dds-notice-error" role="alert" hidden data-dds-results-error>…product-authored…</div>
+</div>
+```
+
+```js
+DDS.results(root, { source, renderItem });
+```
+
+`source(query, { signal })` returns a promise of items; `renderItem(item)`
+renders one `<li>`. The empty and error regions are authored markup this
+file only shows and hides — what "nothing found" and "request failed"
+should say and offer is product-specific, the same reason a combobox's
+option is rendered by the caller rather than built here. Debounced input and
+every in-flight request aborted the moment a newer one starts, same shape as
+the combobox.
+
 Four states, all part of the pattern:
 
 | State | Treatment |
@@ -489,6 +514,33 @@ button steps through decisions rather than through keystrokes.
 ## Upload flow — `.dds-uploadflow`
 
 **For:** choosing files, seeing them checked, and recovering from a rejection.
+
+**Behaviour:** `dds/js/patterns/upload-flow.js`
+
+```html
+<div class="dds-uploadflow" id="my-uploads" data-dds-uploadflow-max-bytes="10485760">
+  <p role="status" data-dds-uploadflow-summary></p>
+  <button type="button" data-dds-uploadflow-trigger>Choose files</button>
+  <input type="file" multiple hidden data-dds-uploadflow-input>
+</div>
+```
+
+```js
+DDS.uploadFlow(document.getElementById('my-uploads'), { upload });
+```
+
+`upload(file, { signal, onProgress })` returns a promise — resolve on
+success, reject on failure, and honour `signal` so the cancel button can
+actually abort an in-flight request. No declarative path and no bare
+`data-dds-uploadflow` marker: the one thing every instance needs, the
+`upload` function itself, cannot come from an attribute, unlike a
+combobox's `arraySource` or results' plain filter.
+
+**Two recovery paths, not one, and they are not interchangeable.** A
+client-side rejection (too large, wrong type) offers **Replace** — the
+identical file will fail again, so only a different one helps. An upload
+that failed after being accepted offers **Retry** — the file was never the
+problem, so it re-sends the same one rather than asking for a new pick.
 
 The upload component handles selection and listing. The flow adds:
 
