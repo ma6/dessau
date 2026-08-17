@@ -205,6 +205,12 @@
       <path d="M165.78,233.66a2,2,0,0,0-3.38,1,96,96,0,0,0,115,115,2,2,0,0,0,1-3.38Z"/>
     </symbol>
 
+    <!-- Ionicons: copy-outline -->
+    <symbol id="dds-icon-copy" viewBox="0 0 512 512" fill="currentColor">
+      <rect x="128" y="128" width="336" height="336" rx="57" ry="57" style="fill:none;stroke:currentColor;stroke-linejoin:round;stroke-width:32px"/>
+      <path d="M383.5,128l.5-24a56.16,56.16,0,0,0-56-56H112a64.19,64.19,0,0,0-64,64V328a56.16,56.16,0,0,0,56,56h24" style="fill:none;stroke:currentColor;stroke-linecap:round;stroke-linejoin:round;stroke-width:32px"/>
+    </symbol>
+
     <!-- Objects ----------------------------------------------------------- -->
 
     <!-- Ionicons: location-outline -->
@@ -344,6 +350,7 @@
               <li><a href="#tooltip">Tooltip</a></li>
               <li><a href="#sheet">Bottom sheet</a></li>
               <li><a href="#toast">Toast</a></li>
+              <li><a href="#copy">Copy</a></li>
               <li><a href="#progress">Progress</a></li>
               <li><a href="#spinner">Spinner</a></li>
               <li><a href="#skeleton">Skeleton</a></li>
@@ -2008,6 +2015,40 @@
           </div>
 
           </div>
+      </section>
+
+      <!-- ============================================================== copy -->
+      <section class="ref-section" id="copy">
+        <div class="ref-section-head">
+          <h2>Copy</h2>
+          <p class="dds-text-subtle dds-measure-default dds-mbs-xs">
+            Puts a short value on the clipboard from an ordinary button. No
+            dedicated class of its own — <code class="dds-code">data-dds-copy</code>
+            attaches to whatever button markup is already there.
+          </p>
+        </div>
+
+        <div class="dds-stack dds-stack-lg">
+          <div class="ref-specimen">
+            <p class="ref-specimen-label">Copy — a reference value beside its button</p>
+            <p class="dds-cluster dds-cluster-sm">
+              <code class="dds-code" id="ref-copy-value">DSS-2026-04-1180</code>
+              <button type="button" class="dds-button dds-button-subtle dds-button-sm"
+                      data-dds-copy="#ref-copy-value">
+                Copy
+                <svg class="dds-icon" aria-hidden="true"><use href="#dds-icon-copy"/></svg>
+              </button>
+            </p>
+            <p class="ref-note">
+              <svg class="dds-icon" aria-hidden="true"><use href="#dds-icon-info"/></svg>
+              Both outcomes are announced and toasted — a copy that silently
+              succeeds leaves the user unsure whether to press it again. Where
+              the async Clipboard API is unavailable, the button hides itself
+              and the value stays selectable as ordinary text, rather than
+              offering a control that does nothing.
+            </p>
+          </div>
+        </div>
       </section>
 
       <!-- ============================================================ progress -->

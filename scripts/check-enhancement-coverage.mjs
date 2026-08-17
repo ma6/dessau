@@ -93,7 +93,6 @@ const KNOWN_GAPS = new Map([
   ['tabs', 'roving tabindex and the arrow-key contract'],
   ['lightbox', 'opens, traps, restores focus to the thumbnail'],
   ['embed', 'the consent gate: nothing is requested before the click'],
-  ['copy', 'clipboard write, and the announcement when it is refused'],
   ['format', 'input masking without destroying the caret'],
   ['charcount', 'the live count and its threshold'],
   ['stepper', 'increment, decrement, clamping, and the announcement'],

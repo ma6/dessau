@@ -150,6 +150,7 @@ const ICON_MAP = [
          button's hover state. */
       ['eye', 'eye-outline'],
       ['eye-off', 'eye-off-outline'],
+      ['copy', 'copy-outline'],
     ],
   },
   {

@@ -76,9 +76,9 @@ a `.ref-note` on the rendered page. This is the index of it.
 | `toolbar` | wraps when it runs out of room |
 | `upload` | shrinks rather than pushing its neighbours out |
 
-**Nothing changes with width** — 31
+**Nothing changes with width** — 32
 
-`accordion` · `appnav` · `avatar` · `badge` · `button` · `card` · `charcount` · `chip` · `choice` · `disclosure` · `divider` · `embed` · `field` · `figure` · `icon` · `kbd` · `lightbox` · `media` · `notice` · `progress` · `progress-ring` · `quote` · `range` · `segmented` · `skeleton` · `spinner` · `stepper` · `switch` · `teaser` · `toast` · `tooltip`
+`accordion` · `appnav` · `avatar` · `badge` · `button` · `card` · `charcount` · `chip` · `choice` · `copy` · `disclosure` · `divider` · `embed` · `field` · `figure` · `icon` · `kbd` · `lightbox` · `media` · `notice` · `progress` · `progress-ring` · `quote` · `range` · `segmented` · `skeleton` · `spinner` · `stepper` · `switch` · `teaser` · `toast` · `tooltip`
 <!-- DDS_RESPONSIVE_TABLE:END -->
 
 ---
@@ -593,6 +593,36 @@ status fills, identical in both themes.
 show above it. A toast already showing at body level when a dialog opens over
 it is not moved, and a dialog-scoped toast closes with its dialog rather than
 migrating back — both documented limits, not silent gaps (DECISIONS.md #049).
+
+---
+
+## Copy — `data-dds-copy`
+
+**For:** putting a short value — a code, an ID, a reference number — on the
+clipboard from an ordinary button.
+
+```html
+<button class="dds-button dds-button-subtle" data-dds-copy="#reference-value">
+  Copy
+</button>
+<code class="dds-code" id="reference-value">DSS-2026-04-1180</code>
+```
+
+The attribute is a selector: whatever it points at, its `value` if it has
+one, otherwise its `textContent`. No dedicated class of its own — it
+attaches to whatever button markup the page already has.
+
+**Confirms, on both outcomes.** A copy that silently succeeds leaves the
+user unsure whether to press it again, so success and failure each get an
+announcement (`DDS.announce`) and a toast, in the page's language via the
+same `[lang]`-lookup wording pattern as the rest of `dds/js/`. Failure is
+not styled as an error state on the button — it's a denied permission or a
+non-secure context, not something wrong with the value.
+
+**No async Clipboard API, no button.** Rather than a control that silently
+does nothing, the button is hidden (`hidden = true`) and the value is left
+selectable as ordinary text — the same "let the user do it by hand" fallback
+`.dds-password`'s reveal takes when the platform can't help.
 
 ---
 

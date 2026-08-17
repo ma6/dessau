@@ -342,6 +342,21 @@
       "responsive": "container — dds-contentnav (inline-size >= 64rem)"
     },
     {
+      "name": "copy",
+      "purpose": "Put a short value on the clipboard from an ordinary button.",
+      "notFor": "A value that needs confirming before it's captured — this copies immediately on click, with no confirmation step.",
+      "classes": [],
+      "css": "dds/css/components.css",
+      "spec": "## Copy — `data-dds-copy`",
+      "reference": "reference/components.html#copy",
+      "js": "dds/js/components.js",
+      "hooks": [
+        "data-dds-copy"
+      ],
+      "accessibility": "Both outcomes announced (DDS.announce) and toasted, in the page's language. No async Clipboard API: the button hides itself rather than doing nothing, leaving the value selectable as ordinary text.",
+      "responsive": "none — nothing about it changes with width"
+    },
+    {
       "name": "cta",
       "purpose": "A prominent block inviting one specific next step.",
       "notFor": "A menu of options.",
