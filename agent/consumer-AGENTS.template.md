@@ -16,24 +16,29 @@ Stated for the same reason `recipes/new-product.md` states it: "these instructio
 have never been run" was silently true of that recipe for long enough to be worth
 never letting it be true silently again (#5).
 
-**Not executed.** Nobody has copied this file into a product repository and watched
-an agent work from it. Every line below is a claim about behaviour in a repository
-that is not this one, and no check reaches it — `check-adoption.mjs` gates the
-mechanical half of `new-product.md`, and nothing gates this at all. A script can
-confirm that a path named here exists; it cannot confirm that an agent reading
-this behaves differently from one that did not, which is the only thing this file
-is for.
+**Executed.** Copied into `dessau.dev` (#55), a separate repository with Dessau
+as a submodule, and an agent built a real UI from it — a single-page site (hero,
+facts strip, six-layer card grid, rules list, get-started walkthrough, footer)
+from the reference markup this file points at, not improvised.
 
-**What executing it would mean**, so the gap is not mistaken for a smaller one: a
-separate repository with Dessau as a submodule, an agent given this file as its
-only Dessau context, and one real UI task. Not a demo page in this repository —
-that consumes Dessau by relative path, so it would test neither the submodule nor
-the absolute `/libs/dessau/…` paths nor the sprite landing in a foreign tree, and
-it would duplicate `reference/`, which is already verified.
+**What it found, written back rather than left in a session transcript:**
 
-Until somebody does that, treat the rules below as reasoned rather than tested.
-They are read out of the implementation, not recalled — but that is a different
-claim. Tracked as #55; when it is executed, this section says what was found.
+- The `modern-web-guidance` setup here was two things, not one — copying
+  config alone left the skill unavailable on a machine where the plugin itself
+  was never installed. Fixed (#129), and this section's own instructions above
+  now say so.
+- The six-decisions recipe this file points to let an agent decide-and-record
+  rather than ask the person present (#123).
+- `.dds-cluster`, `.dds-icon`'s `vertical-align`, `.dds-facts`'s value sizing,
+  and the `data-dds-copy` component's total absence from `agent/index.json` each
+  cost time working out by hand what the documentation should have said (#130,
+  #131, #133).
+
+**What is still open.** Whether the `modern-web-guidance` fix above resolves
+cleanly in a **fresh** session — the session that found it broken necessarily
+tested the broken state, not the fix. And whether this list is complete: it is
+built from one execution, not an exhaustive audit, and the next product to
+follow this file is the next chance to find out what it missed.
 
 ---
 

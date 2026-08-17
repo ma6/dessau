@@ -305,12 +305,22 @@ because a table row had quietly stopped being true — `patterns/auth.js` was
 documented as the password reveal long after the reveal moved to
 `components-forms.js`.
 
-**Not tested.** Whether the steps read correctly to somebody meeting Dessau for
-the first time, and whether their order makes sense before you know what any of
-it is for. Steps 2 and 5 through 8 have been read for accuracy but not executed
-end to end.
-A check can tell you the recipe points at things that exist; it cannot tell you
-the recipe is followable.
+**Executed further, end to end.** `dessau.dev` (#27) walked every step,
+including the ones above that were previously only read for accuracy —
+locale (step 5, hit the exact `defer`-on-inline-script trap the current
+text now warns about before it did), agent context (step 6), the three
+decisions (step 7), and the before-shipping checklist (step 8, verified
+with Playwright rather than assumed: both themes, keyboard order, 320px,
+JavaScript disabled). Step 2 (modern-web-guidance) was exercised in its
+**broken** form — the config-only setup that predated the fix — which is
+how that gap was found in the first place (#129); it has not yet been
+re-run against a fresh session with that fix in place.
+
+**Not tested.** Whether the steps read correctly to somebody meeting Dessau
+for the first time, with no prior context to fall back on, and whether the
+step 2 fix actually resolves cleanly in a fresh session rather than the one
+that found it broken. A check can tell you the recipe points at things that
+exist; it cannot tell you the recipe is followable.
 
 The honest test for that is one real product, built by somebody who did not write
 this, with everything that turns out to be wrong or missing written back into
