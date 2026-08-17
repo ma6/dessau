@@ -258,6 +258,17 @@ never mixed within an interface.
 - **Domain vocabulary:** `[the nouns of this product's subject matter, and the
   terms that must never be used for them]`
 
+### Workflow
+
+Dessau files a GitHub Issue before building anything, references it in every
+commit subject (`[#42] fix(…): …`), and closes it with `Closes #42` in the
+commit that finishes it (`[PATH]/agent/recipes/new-requirement.md`). Optional
+here — nothing about consuming Dessau requires it (`new-product.md` #6) — so
+state the choice rather than leaving an agent to guess it from this section's
+silence:
+
+- **Issue-first workflow:** `[adopted, same as Dessau / not adopted — requirements tracked elsewhere / not adopted — no tracking]`
+
 ### Stack and commands
 
 ```

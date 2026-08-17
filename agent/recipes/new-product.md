@@ -202,7 +202,7 @@ product's root, or it silently is not there (#122). CLAUDE.md and AGENTS.md
 both call this skill mandatory for CSS/JS/component work; a product that
 skips this step is building without it and nothing says so.
 
-## 6. Decide two things, and write them down
+## 6. Decide three things, and write them down
 
 If an agent is building this and the person it is building for is reachable,
 these are asked, not assumed — the same rule `derive-a-design-system.md`
@@ -212,6 +212,15 @@ states for its own six (#123).
   is therefore a deliberate decision to record, not a silent omission.
 - **Form of address.** German *Sie* or *Du*; one choice, never mixed. See
   `agent/ux-writing.md` → level 3.
+- **The issue-first workflow.** Dessau files a GitHub Issue before building
+  anything (`agent/recipes/new-requirement.md`), commits reference the ticket
+  in the subject (`[#42] fix(…): …`), and every commit that finishes one ends
+  with `Closes #42`. This is genuinely optional for a product — nothing about
+  consuming Dessau requires it — but it is not the default anywhere else, so a
+  product that wants it has to say so, the same way dark mode and form of
+  address do. If adopted, say so in this product's own `AGENTS.md`, in the
+  product-specific section below the Dessau one — an agent reading only the
+  Dessau section has no reason to expect it.
 
 ## 7. Before shipping
 
