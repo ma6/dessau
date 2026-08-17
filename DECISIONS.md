@@ -2201,3 +2201,46 @@ and "is done" are not the same claim.
 a real product has actually been built against Dessau and reported back what
 broke — that is what moves the number to 1.0, not a further round of
 internal review.
+
+---
+
+## 051 — Space Grotesk's fallback `size-adjust` is 108%, not 101% (#124)
+
+**Decision.** `"Space Grotesk Fallback"` in `reference/assets/fonts.css` ships
+`size-adjust: 108%`, `ascent-override: 91%`, `descent-override: 27%`.
+
+**Two prior values, both measured and both wrong, for the same reason.** A
+cap-height-ratio derivation (10.6% width error) and, replacing it, an
+eight-string average glyph-width ratio (101.4%, still 5–8% error once
+shipped) were each checked against real Space Grotesk headings and both
+underperformed doing nothing. The common flaw wasn't the ratio math — it was
+the baseline both compared against: `"Helvetica Neue"` queried **by family
+name directly**. A fallback stack never does that; it only ever reaches
+Helvetica Neue through the `@font-face { src: local("Helvetica Neue"), … }`
+wrapper the fallback declares. Measured directly, that wrapper resolves
+`bold` to a narrower face than the family name does when queried straight
+(633px vs 675px on a 48px sample) — a genuine Chromium behaviour, present
+with every descriptor stripped out, so neither prior `size-adjust` value nor
+the overrides caused it. Re-run against the wrapper itself, the real ratio is
+108%, not 101%.
+
+**Why this is likely also true of Inter, unexamined until now.** 108% lands
+within a point of Inter's own long-shipped 107% — the same correction for
+the same underlying behaviour, on the same `local("Helvetica Neue")` source,
+arrived at independently for Inter well before this ticket and never
+previously explained in this file. That is corroboration, not proof: nobody
+re-derived Inter's 107% from first principles here, only checked that the
+`ascent-override`/`descent-override` formula reproduces its shipped vertical
+values when run backwards (see 050's neighbour, the block comment in
+`fonts.css` itself).
+
+**Measured outcome.** Against seven representative heading strings at 48px
+bold, matched-fallback width error is 0.4–3.9% (one short-word outlier
+aside), against 5–8% for the unmatched `system-ui` fallback it replaces.
+
+**Reversal condition.** A future measurement on a different Chromium version,
+or on Firefox/WebKit's own `local()` weight-resolution behaviour, finds the
+633-vs-675 gap has changed or does not hold — the 108% is a measured
+constant for a specific, observed browser behaviour, not a typographic
+property of Space Grotesk itself, and would need re-deriving if that
+behaviour changes.

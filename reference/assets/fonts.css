@@ -104,13 +104,60 @@
    -----------------------------------------------------------------------------
 
    Reduces the layout shift when the real face swaps in, by adjusting the
-   fallback's metrics to match Inter's. Without it, a page of text visibly
+   fallback's metrics to match the real face's. Without it, text visibly
    reflows on font load — which is a Cumulative Layout Shift problem and, more
    simply, annoying to read.
 
-   Only done for the body face: it renders first and everywhere, so it is the one
-   whose shift is actually noticeable.
-   ----------------------------------------------------------------------------- */
+   Originally done for the body face only, on the reasoning that it renders
+   first and everywhere so its shift is the one that's actually noticeable.
+   Measured rather than assumed once a consuming product asked why the
+   display face — Space Grotesk, `.dds-display`, the largest heading size in
+   the system, and literally the first thing on this page's own hero — did
+   not get the same treatment: at 48px bold, a representative headline came
+   out 7.5% wider in Space Grotesk than in the `system-ui` fallback
+   (`ctx.measureText`, not eyeballed) — enough to move a line break, not a
+   sub-pixel nudge. "Renders first and everywhere" turned out to describe
+   the hero heading more precisely than it described body text (#124).
+
+   JetBrains Mono stays unmatched: it renders inline, smaller, and never as
+   the first or largest thing on a page — the original reasoning actually
+   holds there, checked rather than assumed by extension from the other two.
+
+   Space Grotesk's `size-adjust` went through three attempts before the real
+   variable surfaced. Cap-height ratio (`sCapHeight / unitsPerEm`, from the
+   font file, against Helvetica/Arial's own published cap-height) gave 10.6%
+   width error against 7.0% unmatched — cap-height governs visual weight,
+   and this is about advance width, a related but different property. A
+   glyph-width ratio averaged across eight representative heading strings
+   (101.4%) still measured 5–8% error once shipped.
+
+   Both attempts compared real Space Grotesk against `"Helvetica Neue"`
+   queried **by family name directly** — which is not what the fallback
+   stack actually renders. Wrapping `local("Helvetica Neue")` in an
+   `@font-face` and asking that wrapper for `bold` resolves, in Chromium, to
+   a measurably narrower face than asking `"Helvetica Neue"` for `bold`
+   directly (633px vs 675px on a 48px sample — a 6% gap, present with every
+   descriptor stripped out, so it is not `size-adjust` or the overrides
+   causing it). A fallback stack never reaches the family name directly; it
+   only ever reaches it through the `@font-face` wrapper, so that was the
+   wrong baseline both times, independent of which ratio fed `size-adjust`.
+
+   Re-measured against the wrapper itself — the same eight-string method,
+   same page, `"Space Grotesk"` vs a same-page `@font-face { src:
+   local("Helvetica Neue"), … }` reference with no other descriptors —
+   the average ratio is 108%, not 101%. That number is not a coincidence:
+   it lands within a point of Inter's own long-shipped 107%, which is the
+   same correction for the same Chromium behaviour, arrived at for Inter
+   long before this ticket existed and never previously explained.
+
+   `ascent-override`/`descent-override` come from the real face's own
+   `sTypoAscender`/`sTypoDescender` ratios (read from the font file: Inter
+   96.9%/24.1%, Space Grotesk 98.4%/29.2%), divided by `size-adjust` — the
+   override percentages apply to the fallback's ALREADY-scaled em, not its
+   raw one. Checked against Inter's own shipped values first: 96.9%/24.1%
+   divided by 107% reproduces 90%/22.5%, matching the shipped 90%/22%
+   closely enough to trust the formula; Inter's 107% itself predates this
+   entry and was not derived by it. */
 @font-face {
   font-family: "Inter Fallback";
   src: local("Helvetica Neue"), local("Arial"), local("Liberation Sans");
@@ -121,9 +168,20 @@
   line-gap-override: 0%;
 }
 
-/* Slot the metric-matched fallback in directly after the real face. The rest of
-   the stack stays exactly as the tokens define it. */
+@font-face {
+  font-family: "Space Grotesk Fallback";
+  src: local("Helvetica Neue"), local("Arial"), local("Liberation Sans");
+  size-adjust: 108%;
+  ascent-override: 91%;
+  descent-override: 27%;
+  line-gap-override: 0%;
+}
+
+/* Slot each metric-matched fallback in directly after its real face. The
+   rest of each stack stays exactly as the tokens define it. */
 :root {
   --dds-font-body: Inter, "Inter Fallback", system-ui, -apple-system, "Segoe UI",
     Roboto, "Helvetica Neue", sans-serif;
+  --dds-font-display: "Space Grotesk", "Space Grotesk Fallback", system-ui,
+    -apple-system, "Segoe UI", Roboto, sans-serif;
 }
