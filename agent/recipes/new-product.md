@@ -204,6 +204,10 @@ skips this step is building without it and nothing says so.
 
 ## 6. Decide two things, and write them down
 
+If an agent is building this and the person it is building for is reachable,
+these are asked, not assumed — the same rule `derive-a-design-system.md`
+states for its own six (#123).
+
 - **Dark mode.** It works automatically once semantic values are used. Skipping it
   is therefore a deliberate decision to record, not a silent omission.
 - **Form of address.** German *Sie* or *Du*; one choice, never mixed. See

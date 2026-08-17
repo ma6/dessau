@@ -26,6 +26,16 @@ the question, the default if you decline to answer it, and where the answer goes
 default, so a half-finished pass leaves a product that runs — just one that has
 made fewer decisions of its own.
 
+**If you are an agent walking this recipe for someone, and that someone is
+reachable, ask.** Six real questions, one at a time, and wait for six real
+answers before writing anything down. The default exists for the run where
+nobody is present to ask — not as a shortcut past asking someone who is. "The
+reasoning is recorded in DECISIONS.md" describes a decision that was made; it
+does not make one, and a person who was never asked six questions did not make
+six decisions no matter how the record reads afterward. This went wrong once
+already (#123) — six defaults taken and written up as answered, for a person
+who had not been asked any of them.
+
 ---
 
 ## How an override works, once
