@@ -1992,3 +1992,60 @@ question.
 **Reversal condition.** A second component independently wants to advance on
 Enter, which would turn "a bespoke convention for one component" into "an
 emerging pattern," and change the trade this entry weighs.
+
+---
+
+## 047 — The toast stays `position: fixed`; `popover="manual"` does not fix it (#115)
+
+**Decision.** `.dds-toast-region` keeps its current `position: fixed` and a
+z-index nobody can reach a `<dialog>` through. It does not move to
+`popover="manual"`, despite that being both `modern-web-guidance`'s
+`persistent-toast-notifications` guide's own recommendation and this
+ticket's own working hypothesis going in.
+
+**The bug is real.** `--dds-z-toast`'s comment claimed "above a dialog," and
+that was false whenever a toast fired while a `<dialog>` was open — a
+`<dialog>` opened with `showModal()` is promoted to the browser's top layer,
+which no z-index reaches, so a toast fired from inside a dialog (`data-dds-copy`
+is one call site that could do this) is announced to a screen reader and
+invisible to everyone else. That part of #115 is confirmed, not in question.
+
+**The proposed remedy was measured, and it does not work.** The hypothesis —
+promote the toast region to the top layer too, via `popover="manual"`, called
+lazily so the region enters the top layer *after* whatever dialog is
+currently open — was built and tested directly, across Chromium, Firefox and
+WebKit, both orders (dialog opened before the popover shown, and the reverse).
+**A modal `<dialog>` outranks a `popover="manual"` element in every case,
+regardless of which entered the top layer more recently.** Two popovers shown
+in sequence stack in insertion order exactly as expected — confirmed as a
+sanity check, so this is not a general top-layer misunderstanding — but a
+modal dialog is not an ordinary top-layer citizen: browsers give it elevated
+stacking specifically so that a *blocking* dialog cannot be visually covered
+by anything else in the top layer, popovers included. That is the correct
+behaviour for the dialog's own job (true modality would break if something
+else could sit on top of it) and it is exactly what defeats this fix.
+
+**What this means for the guidance.** `persistent-toast-notifications`'s
+`popover="manual"` recommendation is not wrong in general — it is the right
+answer for a toast competing with ordinary page content, which is the case
+the guide is written for. It does not cover the specific case this ticket is
+about: a toast that needs to outrank a *currently open modal dialog*, which
+is a narrower and harder problem the guide doesn't address. Declined for that
+reason, not because the guide's general advice is bad.
+
+**What would actually work, and why it is not done here.** The only way for a
+toast to visually outrank an open dialog is to render *inside* that dialog's
+own top-layer box — reparenting the toast (or a dialog-scoped toast region)
+into the currently-open `<dialog>` while one is open, and back to `<body>`
+once it closes. That is a real, buildable fix, but it is a different and
+larger piece of work than this ticket measured: it needs to track dialog
+open/close state, decide what happens to a toast already showing when a
+dialog opens over it, and re-verify focus and `role="status"` announcement
+behaviour in the reparented case specifically. Filed separately as #121
+rather than built here, so this measurement's answer — `popover="manual"`
+alone does not solve it — doesn't get conflated with the different question
+of whether the reparenting approach does.
+
+**Reversal condition.** #121 lands with a working reparenting fix, which
+supersedes this entry rather than contradicting it — this entry is about why
+the *simpler* fix fails, not a claim that no fix exists.
