@@ -851,7 +851,25 @@ product that hides it in a settings page has broken that decision.
 **Not for:** a specific number — a slider cannot be operated precisely with a
 trackpad and is very hard to operate with a tremor. Use a number field.
 
-The current value is always shown as text beside it, and announced.
+```html
+<div class="dds-range-row">
+  <input class="dds-range" id="threshold" type="range" min="0" max="100" step="5"
+         value="70" data-dds-range-unit=" %">
+  <output for="threshold">70 %</output>
+</div>
+```
+
+**Self-wiring, on `input.dds-range`** (#116): the current value is always shown
+as text in the `<output for>` beside it, and announced — a slider alone says
+nothing to anyone who cannot see the thumb. The visible number updates every
+keystroke or drag step; the **announcement** is separately debounced, the same
+split character count uses, because dragging fires `input` continuously and
+nobody needs the value spoken dozens of times a second while the pointer is
+still moving.
+
+No default unit — "%", "kg", "px" and a bare number are all legitimate, and a
+wrong guess is worse than none. `data-dds-range-unit` on the input opts in,
+inserted verbatim: `" %"` for a leading space, `"px"` for none.
 
 ---
 

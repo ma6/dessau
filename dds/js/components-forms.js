@@ -380,6 +380,66 @@
   });
 
   /* =========================================================================
+     Range
+     =========================================================================
+     Markup:
+       <div class="dds-range-row">
+         <input class="dds-range" id="threshold" type="range" min="0" max="100" step="5" value="70">
+         <output for="threshold">70</output>
+       </div>
+
+     The `<output for>` is what makes the value real text beside the slider —
+     a slider alone says nothing to anyone who cannot see where the thumb is
+     (agent/components.md). No default unit: "%", "kg", "px" and a bare number
+     are all legitimate and a wrong guess is worse than none, so
+     `data-dds-range-unit` on the INPUT opts in — verbatim, with whatever
+     spacing or symbol the caller wants ("70 %" needs a leading space in the
+     attribute, "70px" does not).
+
+     Behaviour: js/components-forms.js */
+
+  var RANGE_WORDING = {
+    en: { value: 'Value' },
+    de: { value: 'Wert' },
+  };
+
+  DDS.register('range', 'input.dds-range', function (input) {
+    var output = input.id && document.querySelector('output[for="' + input.id + '"]');
+
+    if (!output) {
+      console.error('[DDS] range needs an <output for="' + input.id + '"> beside it', input);
+      return;
+    }
+
+    var unit = input.getAttribute('data-dds-range-unit') || '';
+
+    function format(value) {
+      return value + unit;
+    }
+
+    function paint() {
+      output.textContent = format(input.value);
+    }
+
+    /* Announced separately from the visible update, and debounced: dragging
+       fires `input` continuously, and nobody needs the value spoken dozens of
+       times a second while the pointer is still moving. The same split
+       charcount uses its live count for, and the same reason. */
+    var announceValue = DDS.utils.debounce(function () {
+      var words = DDS.utils.wording(input, RANGE_WORDING);
+      var label = input.labels && input.labels[0] ? input.labels[0].textContent.trim() : words.value;
+      DDS.announce(label + ': ' + format(input.value), { from: input });
+    }, 700);
+
+    input.addEventListener('input', function () {
+      paint();
+      announceValue();
+    });
+
+    paint();
+  });
+
+  /* =========================================================================
      File upload
      =========================================================================
      Markup:
