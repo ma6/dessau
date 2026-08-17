@@ -193,14 +193,31 @@ Without this, an agent working in that repository does not know Dessau exists an
 will invent a second button style, use raw hex values and write its own ARIA.
 
 **Also carry the `modern-web-guidance` setup, at the product's own root — not
-inside `libs/dessau/`.** Two files, both tracked in Dessau's own repository and
-copyable as-is: `skills-lock.json` (declares the skill's source and a content
-hash) and `.claude/settings.json` (`"enabledPlugins": {"modern-web-guidance@
-googlechrome": true}`). A submodule's own `.claude/` config does not extend to
-the checkout that contains it — the skill has to be enabled again, at the
-product's root, or it silently is not there (#122). CLAUDE.md and AGENTS.md
-both call this skill mandatory for CSS/JS/component work; a product that
-skips this step is building without it and nothing says so.
+inside `libs/dessau/`.** A submodule's own `.claude/` config does not extend to
+the checkout that contains it, so this is genuinely two things, not one, and
+skipping either leaves the skill silently unavailable:
+
+1. **Install the plugin**, once per machine, if it is not already:
+
+   ```text
+   /plugin marketplace add GoogleChrome/modern-web-guidance
+   /plugin install modern-web-guidance@googlechrome
+   /reload-plugins
+   ```
+
+   This is the part #122's fix left out (#129) — copying config alone was
+   tried, against a machine that already had the plugin installed, which is
+   exactly why the gap did not show up until someone tried it on one that
+   did not.
+2. **Enable it for this project.** Copy `skills-lock.json` (declares the
+   skill's source and a content hash) and `.claude/settings.json`
+   (`"enabledPlugins": {"modern-web-guidance@googlechrome": true}`) from
+   Dessau's own root, unedited. This step presumes step 1 already happened —
+   it scopes an installed plugin to this repository, it does not install one.
+
+CLAUDE.md and AGENTS.md both call this skill mandatory for CSS/JS/component
+work; a product that skips either step is building without it and nothing
+says so.
 
 ## 6. Decide three things, and write them down
 

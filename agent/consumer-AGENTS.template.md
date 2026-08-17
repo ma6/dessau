@@ -50,11 +50,23 @@ recurring tasks.
 **Rendered reference:** `[PATH]/reference/` — serve it and look at it when unsure
 how something should behave.
 
-**Also copy `skills-lock.json` and `.claude/settings.json` from `[PATH]` to this
-product's own root**, unedited. A submodule's `.claude/` config does not extend
-to the repository that contains it, so the `modern-web-guidance` skill this file
-requires below is silently unavailable here until those two files exist at the
-product's own root too (#122).
+**The `modern-web-guidance` skill this file requires below needs two things, not
+one, or it is silently unavailable here** (#122, corrected by #129 after the
+first fix was tried only on a machine that already had it installed):
+
+1. **The plugin installed**, once per machine:
+
+   ```text
+   /plugin marketplace add GoogleChrome/modern-web-guidance
+   /plugin install modern-web-guidance@googlechrome
+   /reload-plugins
+   ```
+
+2. **`skills-lock.json` and `.claude/settings.json` copied from `[PATH]` to
+   this product's own root**, unedited. A submodule's `.claude/` config does
+   not extend to the repository that contains it, so this step alone does
+   not install anything — it scopes an already-installed plugin to this
+   repository.
 
 ### Before building any UI
 
