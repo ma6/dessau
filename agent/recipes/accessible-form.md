@@ -55,7 +55,7 @@ later.
 
 **What is wrong**, then **what to do**.
 
-> "Gib eine E-Mail-Adresse ein, zum Beispiel name@example.org"
+> "Gib eine E-Mail-Adresse ein, zum Beispiel name@gmx.net"
 
 Not "Ungültige Eingabe". Say whether their input survived. Override per field with
 `data-dds-error-<constraint>`.

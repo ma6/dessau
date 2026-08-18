@@ -69,7 +69,7 @@
     en: {
       valueMissing: 'Enter {label}',
       typeMismatch: 'Enter {label} in the correct format',
-      typeMismatchEmail: 'Enter an email address, for example name@example.org',
+      typeMismatchEmail: 'Enter an email address, for example name@gmail.com',
       typeMismatchUrl: 'Enter a full web address, starting with https://',
       tooShort: '{label} must be at least {minlength} characters',
       tooLong: '{label} must be {maxlength} characters or fewer',
@@ -92,7 +92,7 @@
     de: {
       valueMissing: '{label} eingeben',
       typeMismatch: '{label} im richtigen Format eingeben',
-      typeMismatchEmail: 'E-Mail-Adresse eingeben, zum Beispiel name@example.org',
+      typeMismatchEmail: 'E-Mail-Adresse eingeben, zum Beispiel name@gmx.net',
       typeMismatchUrl: 'Vollständige Webadresse eingeben, beginnend mit https://',
       tooShort: '{label} muss mindestens {minlength} Zeichen lang sein',
       tooLong: '{label} darf höchstens {maxlength} Zeichen lang sein',

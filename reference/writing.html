@@ -651,7 +651,7 @@
               <tbody>
                 <tr>
                   <td class="dds-text-error">“Invalid input”</td>
-                  <td>Enter an email address, for example name@example.org</td>
+                  <td>Enter an email address, for example name@gmail.com</td>
                 </tr>
                 <tr>
                   <td class="dds-text-error">“Please match the requested format”</td>
@@ -667,7 +667,7 @@
                 </tr>
                 <tr>
                   <td class="dds-text-error" lang="de">“Ungültige Eingabe”</td>
-                  <td lang="de">Gib eine E-Mail-Adresse ein, zum Beispiel name@example.org</td>
+                  <td lang="de">Gib eine E-Mail-Adresse ein, zum Beispiel name@gmx.net</td>
                 </tr>
               </tbody>
             </table>
@@ -851,8 +851,8 @@
               <li>Deliberately include diacritics and non-ASCII: ø, ä, ç, ł, ș, ü, å, İ.</li>
               <li>Vary the length. A long street name and a long surname are what find truncation.</li>
               <li>Include the awkward-but-real case: an address with no house number, a single-character surname.</li>
-              <li>Use the reserved <code>example.org</code> for addresses that must not resolve.</li>
-              <li>Give an invented email a real consumer domain — gmail.com, gmx.net, outlook.com, web.de, orange.fr — with an invented local part.</li>
+              <li>Reserve <code>example.org</code> for an address that is technically live — a mailto default, an href, a value that could actually be submitted.</li>
+              <li>Everywhere an email is only read — demo data, format examples in error copy — use a real consumer domain: gmail.com, gmx.net, outlook.com, web.de, orange.fr, with an invented local part.</li>
             </ul>
           </div>
           <div class="ref-dont">
@@ -862,7 +862,7 @@
               <li>Lorem ipsum — it has the wrong word lengths and no diacritics at all.</li>
               <li>Real personal data, in demos, tests, fixtures, screenshots or commit messages.</li>
               <li>A placeholder domain that could become real.</li>
-              <li>A table of demo users all sharing <code>example.org</code> — it reads as staged data.</li>
+              <li>An <code>example.org</code> address in text a person only reads — a demo table, an error message — it reads as a leftover placeholder.</li>
             </ul>
           </div>
         </div>
@@ -880,12 +880,15 @@
         <div class="ref-note dds-mbs-md">
           <h3 class="dds-text-sm dds-weight-semibold"><code>example.org</code> vs. a real provider</h3>
           <p class="dds-text-sm dds-text-subtle dds-mbs-2xs">
-            <code>example.org</code> is reserved for an address with no person behind
-            it — a syntax example in error copy (<code>name@example.org</code>), a
-            mailto default, a link. A demo user list is a different case: the domain can
-            be a real consumer provider, because the local part is invented and
-            identifies nobody. Mixing the two rules up is how a row of demo users ends up
-            all sharing <code>example.org</code>, which reads as staged the way "Max
+            <code>example.org</code> is reserved for an address that is technically
+            live — a mailto default, an href, a value that could actually be submitted or
+            dialed. That is the only case the resolve-guarantee buys anything. Everywhere
+            else the address is only read — a demo user list, the format example inside
+            an error message — invent it on a real consumer domain instead. Nobody dials
+            "name@gmail.com" in an error message; the realistic domain is what makes it
+            recognisable, where <code>example.org</code> reads as a leftover placeholder
+            to a reader who has never heard of the reserved TLD. A demo table or an error
+            message that uses <code>example.org</code> reads as staged the way "Max
             Mustermann" does.
           </p>
         </div>

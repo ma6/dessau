@@ -173,11 +173,11 @@ The highest-value writing in any product. Structure:
 
 | Instead of | Write |
 | --- | --- |
-| "Invalid input" | "Enter an email address, for example name@example.org" |
+| "Invalid input" | "Enter an email address, for example name@gmail.com" |
 | "Please match the requested format" | "Enter the reference code as four characters, a hyphen, then four more — for example 7K4M-92QX" |
 | "Error 500" | "We could not save your changes. Your text is still in the form — try again in a moment." |
 | "Field required" | "Enter your full name" |
-| "Ungültige Eingabe" | "Gib eine E-Mail-Adresse ein, zum Beispiel name@example.org" |
+| "Ungültige Eingabe" | "Gib eine E-Mail-Adresse ein, zum Beispiel name@gmx.net" |
 
 Rules:
 
@@ -287,15 +287,18 @@ Demo, placeholder and test content is part of the product's quality.
   broken for the people who have them.
 - **Never real personal data**, in demos, tests, fixtures, screenshots or commit
   messages.
-- **Never a placeholder domain that could become real.** Use the reserved
-  `example.org` / `example.com` / `.example` for addresses that must not resolve.
-- **A person's invented email reads as real when the domain is a real consumer
-  provider** — gmail.com, gmx.net, outlook.com, web.de, orange.fr — with an
-  invented local part. That is different from the previous rule: `example.org`
-  is for an address with no person behind it — a syntax example in error copy
-  (`name@example.org`), a mailto default, a link. A table of demo *users* all
-  sharing `example.org` reads as staged data, the way a form full of "Max
-  Mustermann" does.
+- **Reserve `example.org` / `example.com` / `.example` for an address that is
+  technically live** — a `mailto:` default, an `href`, a value that could
+  actually be submitted or dialed. That is the only case the resolve-guarantee
+  buys anything.
+- **Everywhere the address is only read, invent it on a real consumer domain**
+  — gmail.com, gmx.net, outlook.com, web.de, orange.fr — with an invented local
+  part. That covers demo data *and* the format example inside an error message
+  (`"Enter an email address, for example name@gmail.com"`): nobody dials that
+  string, so the realistic domain is what makes it recognisable rather than
+  `example.org`, which most readers do not know is a reserved TLD and reads as
+  a leftover placeholder. A table of demo users, or an error message, that uses
+  `example.org` reads as staged the way "Max Mustermann" does.
 - **No vocabulary from one industry.** Category labels, form fields, table rows and
   wizard steps stay in words any product recognises — a topic, a document, a
   department. Dessau is a foundation, and a specimen written in one sector's terms
