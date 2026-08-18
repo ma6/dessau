@@ -2522,3 +2522,39 @@ and asking "does this number relate to any other step" should have been the firs
 check, not an afterthought after matching a spoken approximation.
 
 **Reversal condition.** None.
+
+---
+
+## 059 — Release cadence: at most one version per day, unless a bugfix or a major
+
+**Decision.** Cut at most one tagged version in a calendar day. Two exceptions,
+independent of each other: a bugfix release, and a release for which there is
+reason to bump the MAJOR version. Everything else that would otherwise justify
+a same-day second release waits for the next day instead.
+
+**Why.** This session cut `v0.10.1` and `v0.10.2` back to back, minutes apart —
+the second correcting a value (`--dds-space-4xl`) the first had gotten wrong.
+Each release on its own was reasonable; the pair reads as churn, and a reader
+watching the tag list sees two releases where one, arrived at correctly the
+first time or held for a day, would have. The gate this adds is on cadence, not
+on quality — `DECISIONS.md` #057 and #058 already show the reasoning behind
+which patch each was; this entry is about not shipping two of them the same day
+without one of the two exceptions applying.
+
+**Why bugfixes are exempt.** A real, shipped bug is actively wrong for every
+day it is not fixed. Holding a fix for cadence's sake trades a correctness
+problem for a process tidiness preference, and correctness wins.
+
+**Why a MAJOR reason is exempt.** `1.0.0` — the gate `DECISIONS.md` #050 and
+#054 describe — is a rare, deliberate milestone, not a number that happens to
+come up in the day's batch of patches. If the conditions for it are actually
+met, the day it happens is not the day to make it wait for a quota it was
+never competing against.
+
+**How to apply.** Before cutting a tag, check whether one was already cut
+today. If yes, and the release in hand is neither a bugfix nor MAJOR-worthy,
+batch it with tomorrow's work instead of tagging immediately — the commits
+still land on `main` right away; only the tag and GitHub Release wait.
+
+**Reversal condition.** None stated; revisit if the one-a-day cap itself
+turns out to be the wrong shape for a real recurring need.
