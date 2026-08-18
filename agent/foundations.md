@@ -327,7 +327,7 @@ that needs 14px is a layout that has not decided yet.
 | `--dds-space-xl` | 32px | Between blocks |
 | `--dds-space-2xl` | 48px | Between sections |
 | `--dds-space-3xl` | 72px | Between major regions |
-| `--dds-space-4xl` | 100px | Hero-scale headroom, above any named region |
+| `--dds-space-4xl` | 96px | Hero-scale headroom, above any named region |
 
 Reaching for a step that does not exist silently invalidates the whole
 declaration — it falls back to `inherit`/`initial`, not to the previous
@@ -360,12 +360,14 @@ that size was needed. Considered and rejected as part of the same ticket: shifti
 the whole ramp up a step so the existing defaults read as more generous — see
 DECISIONS.md.
 
-`--dds-space-4xl` (100px) plus `.dds-stack-4xl` / `.dds-mbs-4xl` / `.dds-mbe-4xl`
-(#137) is a step above any named region. Unlike every other step in this ramp it was
-not added because a specific layout needed it — no page has adopted it yet — but at
-the maintainer's explicit direction after wanting roughly this much space on
-separate past occasions. See DECISIONS.md for the reasoning and how this differs
-from the "wait for a concrete case" default the rest of this ramp follows.
+`--dds-space-4xl` (96px, exactly 2x `--dds-space-2xl`) plus `.dds-stack-4xl` /
+`.dds-mbs-4xl` / `.dds-mbe-4xl` (#137) is a step above any named region. Unlike
+every other step in this ramp it was not added because a specific layout needed
+it — no page has adopted it yet — but at the maintainer's explicit direction after
+wanting roughly this much space on separate past occasions. Shipped first as 100px
+(6.25rem), then corrected to 96px (6rem) once the maintainer pointed out that 96px
+— not 100px — is what actually fits the ramp's multiplicative relationships. See
+DECISIONS.md for both the original reasoning and the correction.
 
 ---
 

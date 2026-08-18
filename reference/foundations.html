@@ -16,7 +16,7 @@
 <link rel="preload" href="assets/fonts/SpaceGrotesk-Variable-latin-ext.woff2" as="font"
       type="font/woff2" crossorigin>
 <link rel="stylesheet" href="assets/fonts.css?v=7ed937e9">
-<link rel="stylesheet" href="../dds/dds.css?v=aea8e5f7">
+<link rel="stylesheet" href="../dds/dds.css?v=486af77d">
 <link rel="stylesheet" href="assets/reference.css?v=61af2a38">
 </head>
 <body>
@@ -1199,12 +1199,15 @@
             that size was needed (#136).
           </p>
           <p class="dds-text-sm dds-text-subtle dds-mbs-xs">
-            <code class="dds-code">--dds-space-4xl</code> (100px) goes one step
-            further, with matching <code class="dds-code">.dds-stack-4xl</code>,
+            <code class="dds-code">--dds-space-4xl</code> (96px, exactly 2x
+            <code class="dds-code">--dds-space-2xl</code>) goes one step further,
+            with matching <code class="dds-code">.dds-stack-4xl</code>,
             <code class="dds-code">.dds-mbs-4xl</code> and
             <code class="dds-code">.dds-mbe-4xl</code> utilities (#137) — hero-scale
             headroom above any named region, added ahead of a specific page adopting
-            it.
+            it. Shipped first at 100px, then corrected to 96px for fitting the
+            ramp's multiplicative relationships better than a value chosen for
+            being close to a round number.
           </p>
         </div>
       </section>

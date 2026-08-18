@@ -227,7 +227,7 @@
   --dds-space-xl:  2rem;     /* 32px — between blocks */
   --dds-space-2xl: 3rem;     /* 48px — between sections */
   --dds-space-3xl: 4.5rem;   /* 72px — between major regions */
-  --dds-space-4xl: 6.25rem;  /* 100px — hero-scale headroom, above any named region */
+  --dds-space-4xl: 6rem;     /* 96px — hero-scale headroom, above any named region; 2x --dds-space-2xl */
 
   /* ---------------------------------------------------------------------------
      Radius. Two functional stops plus a pill and a circle. `sm` is for things

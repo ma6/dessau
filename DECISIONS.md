@@ -2490,3 +2490,35 @@ reclassification of "missing utility" as "always a bug."
 **Reversal condition.** None — this is a record of a judgement call made once, not
 a standing rule to reapply. The next version decision is evaluated on its own
 terms against 054, not against this entry's outcome.
+
+---
+
+## 058 — `--dds-space-4xl` corrected to 96px (was 100px in v0.10.1)
+
+**Decision.** `--dds-space-4xl` is `6rem` (96px), not `6.25rem` (100px) as shipped
+in `v0.10.1`.
+
+**Why 056 got this wrong.** 056 chose `6.25rem` to stay literally close to "etwa
+100px," and explicitly noted the trade-off it was making: the step's ratio to
+`3xl` (100/72 ≈ 1.39x) is narrower than the `2xl→3xl` jump (1.5x), breaking the
+ramp's own documented "ratio widens as values grow" shape. It justified accepting
+that break by reusing `--dds-space-ml`'s "quarter-rem" precedent — but `ml`'s
+1.25rem exists to *fix* a ratio problem (the widest relative jump in the ramp sat
+in its most-used region), not to license an arbitrary quarter-rem value chosen for
+being close to a spoken number. Borrowing that precedent for the opposite purpose
+was the actual mistake, not the rounding itself.
+
+Martin asked directly why `96px` wasn't used, since it fits the rhythm — and it
+does, more concretely than 056's ratio argument gave it credit for: 96 is exactly
+`2 × --dds-space-2xl` (48px), and a clean multiple of `--dds-space-lg` (24px, 4x)
+and `--dds-space-xl` (32px, 3x) as well. `100px` has no such relationship to any
+other step in the ramp; its only virtue was proximity to a number said in
+conversation, not fit with the system it was joining.
+
+**What this does not claim.** Not that "close to what was said" never matters —
+it mattered enough to get a first answer shipped. This entry exists because the
+better answer was available from the ramp's own existing values the whole time,
+and asking "does this number relate to any other step" should have been the first
+check, not an afterthought after matching a spoken approximation.
+
+**Reversal condition.** None.

@@ -455,7 +455,7 @@
             "value": "4.5rem"
           },
           "--dds-space-4xl": {
-            "value": "6.25rem"
+            "value": "6rem"
           }
         },
         "radius": {
