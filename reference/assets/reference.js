@@ -333,16 +333,49 @@
   /* =========================================================================
      Motion — play the real transition, not a description of it
 
-     Every dot's `transition-duration`/`transition-timing-function` already
-     points at the token being demonstrated (set inline in the HTML, read by
-     the CSS above) — this function's only jobs are to print the resolved
-     value beside each token name, the same way `renderRulers` does, and to
-     wire each track's own `Play` button to that track's own dot. Each track
-     plays independently — there is no shared "play everything" control,
-     because the question a token-by-token comparison actually raises is
-     "what does THIS one look like on its own."
+     Each row names the one token it demonstrates in `data-ref-motion-token`
+     — nowhere else. Everything else is derived from it: the resolved value
+     printed in the Value column, which of `--ref-motion-duration` /
+     `--ref-motion-ease` the row's dot needs pointed at that token (a
+     `--dds-duration-*` row plays at the shared standard easing; a
+     `--dds-ease-*` row plays at the shared slow duration, long enough for its
+     curve to actually be visible), and the Play button's accessible name.
+     Nothing here or in the CSS hard-codes a millisecond figure or a curve, so
+     if a token's value ever changes, this changes with it — the same
+     guarantee every other live specimen on this page already makes.
+
+     Each row plays independently — there is no shared "play everything"
+     control, because the question a token-by-token comparison actually
+     raises is "what does THIS one look like on its own."
      ========================================================================= */
-  function playMotionDot(dot) {
+  var MOTION_RETURN_HOLD_MS = 900;
+
+  /**
+   * Run `callback` once, the next time `dot`'s position transition ends.
+   *
+   * Filtered to this exact element, not just anything bubbling through it —
+   * `transitionend` bubbles, and a table cell has other transitioning
+   * descendants (the button's own hover state, for one). Not filtered by
+   * `event.propertyName`: the dot only ever transitions one property, but
+   * the event reports it under whatever PHYSICAL longhand the logical
+   * `inset-inline-start` resolved to (`left` in every engine tested, for
+   * this page's `lang="en"` — never the logical name itself), so matching
+   * on the logical string here silently never fires.
+   */
+  function onceMotionSettled(dot, callback) {
+    function handler(event) {
+      if (event.target !== dot) return;
+      dot.removeEventListener('transitionend', handler);
+      callback();
+    }
+    dot.addEventListener('transitionend', handler);
+  }
+
+  function playMotionDot(dot, button) {
+    // Disabled for the full play-hold-return cycle: a second click mid-cycle
+    // would race the reset below against a still-running return trip.
+    if (button) button.disabled = true;
+
     /* Restarting a transition that is already at its end value takes care:
        toggling the attribute straight back off then on does not work, because
        the browser can batch both style changes into the same frame, and a
@@ -361,31 +394,49 @@
       dot.style.transitionDuration = '';
       requestAnimationFrame(function () {
         dot.setAttribute('data-ref-motion-run', '');
+
+        // Arrived: hold at the end so it can actually be seen, then let the
+        // same transition carry it back — otherwise the demo is left
+        // pointing at Play while showing you nothing to play.
+        onceMotionSettled(dot, function () {
+          setTimeout(function () {
+            dot.removeAttribute('data-ref-motion-run');
+            onceMotionSettled(dot, function () {
+              if (button) button.disabled = false;
+            });
+          }, MOTION_RETURN_HOLD_MS);
+        });
       });
     });
   }
 
   function wireMotionDemo(container) {
-    Array.prototype.slice.call(container.querySelectorAll('.ref-motion-track')).forEach(function (track) {
-      var dot = track.querySelector('[data-ref-motion-dot]');
-      if (!dot) return;
+    Array.prototype.slice.call(container.querySelectorAll('[data-ref-motion-row]')).forEach(function (row) {
+      var token = row.dataset.refMotionToken;
+      var dot = row.querySelector('[data-ref-motion-dot]');
+      if (!token || !dot) return;
 
       // Safe to redo on every theme change, same as every other renderer in
       // this file.
-      var readout = track.querySelector('[data-ref-motion-readout]');
-      var name = dot.dataset.refMotionToken;
-      if (readout && name) {
-        readout.textContent = tokenValue(name, dot);
+      var readout = row.querySelector('[data-ref-motion-readout]');
+      if (readout) readout.textContent = tokenValue(token, row);
+
+      if (token.indexOf('--dds-duration-') === 0) {
+        row.style.setProperty('--ref-motion-duration', 'var(' + token + ')');
+      } else {
+        row.style.setProperty('--ref-motion-ease', 'var(' + token + ')');
+        row.style.setProperty('--ref-motion-duration', 'var(--dds-duration-slow)');
       }
 
       // The click listener must only ever be attached once, or playing would
       // restart the animation once per past render pass instead of once.
-      var button = track.querySelector('[data-ref-motion-play]');
+      var button = row.querySelector('[data-ref-motion-play]');
       if (!button || button.dataset.refMotionBound) return;
       button.dataset.refMotionBound = 'true';
+      button.setAttribute('aria-label', 'Play ' + token);
 
       button.addEventListener('click', function () {
-        playMotionDot(dot);
+        playMotionDot(dot, button);
       });
     });
   }

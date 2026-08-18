@@ -654,7 +654,13 @@
 
 /* ------------------------------------------------------------------- motion */
 /* A duration or an easing curve read as a number does not say how it feels.
-   This plays the real token — actual `transition-duration` /
+   One table, not two: the token list and its live demo used to be separate
+   blocks stating the same seven values twice — this folds the animated rail
+   and its own Play control into the Demo column of the token table itself,
+   so a token's name, value, use and feel are all read in one row rather than
+   assembled across two places.
+
+   The dot plays the real token — actual `transition-duration` /
    `transition-timing-function`, not a hand-tuned approximation — so what is
    seen is what a component actually does, never an artist's impression of it.
 
@@ -665,52 +671,29 @@
    are ordinary `transition-duration`/`transition-timing-function`, already
    collapsed to ~0 for anyone with reduced motion set, by the same global rule
    in base.css every real component relies on. */
-.ref-motion-demo {
-  display: flex;
-  flex-direction: column;
-  gap: var(--dds-space-lg);
-}
-
-.ref-motion-group-label {
-  font-size: var(--dds-font-size-xs);
-  color: var(--dds-color-text-muted);
-  margin-block-end: var(--dds-space-sm);
-}
-
-.ref-motion-track {
+.ref-motion-demo-cell {
   display: flex;
   align-items: center;
+  flex-wrap: wrap;
   gap: var(--dds-space-sm);
-}
-
-.ref-motion-track + .ref-motion-track {
-  margin-block-start: var(--dds-space-xs);
-}
-
-.ref-motion-name {
-  font-family: var(--dds-font-mono);
-  font-size: var(--dds-font-size-2xs);
-  color: var(--dds-color-text-muted);
-  min-inline-size: 11rem;
-  white-space: nowrap;
 }
 
 .ref-motion-rail {
   position: relative;
-  inline-size: 100%;
-  max-inline-size: 12rem;
+  inline-size: 8rem;
   block-size: 1.75rem;
   background-color: var(--dds-color-surface-sunken);
   border-radius: var(--dds-radius-pill);
   flex-shrink: 0;
 }
 
-/* The dot's own transition reads the SAME two custom properties every track
-   sets inline — `--ref-motion-duration` and `--ref-motion-ease` — pointed at
-   whichever `--dds-duration-*`/`--dds-ease-*` token that row is demonstrating.
-   Nothing here hard-codes a millisecond figure or a curve; if a token's value
-   ever changes, this changes with it, the same guarantee every other live
-   specimen on this page already makes. */
+/* The dot's own transition reads the SAME two custom properties every row
+   sets — `--ref-motion-duration` and `--ref-motion-ease` — pointed at
+   whichever `--dds-duration-*`/`--dds-ease-*` token that row demonstrates.
+   reference.js derives both from the row's own `data-ref-motion-token`;
+   nothing here or there hard-codes a millisecond figure or a curve, so if a
+   token's value ever changes, this changes with it — the same guarantee
+   every other live specimen on this page already makes. */
 .ref-motion-dot {
   position: absolute;
   inset-block: 0.1875rem;
@@ -726,32 +709,6 @@
 
 .ref-motion-dot[data-ref-motion-run] {
   inset-inline-start: calc(100% - 1.375rem - 0.1875rem);
-}
-
-.ref-motion-readout {
-  white-space: nowrap;
-  flex-shrink: 0;
-}
-
-/* Own trigger per track rather than one shared control: a single "play
-   everything" button cannot answer "what does THIS one look like on its
-   own", which is the actual question a token-by-token comparison raises. */
-.ref-motion-track > [data-ref-motion-play] {
-  flex-shrink: 0;
-  margin-inline-start: auto;
-}
-
-/* Same reasoning as the ruler's own mobile stack: name and readout together
-   leave the rail almost nothing to animate across on a phone, so the name
-   takes its own line and the rail gets the width back underneath it. */
-@media (max-width: 47.999rem) {
-  .ref-motion-track {
-    flex-wrap: wrap;
-  }
-
-  .ref-motion-name {
-    min-inline-size: 100%;
-  }
 }
 
 /* -------------------------------------------------------------------- layers */
