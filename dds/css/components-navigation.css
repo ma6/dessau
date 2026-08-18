@@ -850,6 +850,40 @@
     color: var(--dds-color-text-muted);
   }
 
+  /* Disabled item: `aria-disabled`, not `disabled` (#142) — a menu mixes
+     `<button>` and `<a>` items, and `disabled` only exists on the former. Using
+     `aria-disabled` for both keeps the item focusable, so a reader tabbing
+     through learns it exists and why it's unavailable, rather than the item
+     silently vanishing from the tab order. It does not, by itself, stop a click
+     or Enter/Space from firing — the consumer's own handler must check the
+     attribute before acting, the same convention already documented for a
+     disabled form-submit button (agent/components.md). */
+  .dds-menu-item:disabled,
+  .dds-menu-item[aria-disabled="true"] {
+    color: var(--dds-color-text-muted);
+    cursor: not-allowed;
+  }
+
+  .dds-menu-item:disabled:hover,
+  .dds-menu-item[aria-disabled="true"]:hover {
+    background-color: transparent;
+    color: var(--dds-color-text-muted);
+  }
+
+  /* Trigger chevron: rotates open/closed with no JavaScript, the same
+     no-script constraint the menu itself is built under (#142). The button and
+     `.dds-menu` are siblings, not parent/child, so this needs `:has()` with the
+     next-sibling combinator rather than the `[open] > summary` shape
+     `.dds-disclosure-marker` uses — which only works because the menu is
+     authored as the trigger's very next sibling in every reference instance. */
+  .dds-menu-marker {
+    transition: rotate var(--dds-duration-fast) var(--dds-ease-standard);
+  }
+
+  [popovertarget]:has(+ .dds-menu:popover-open) .dds-menu-marker {
+    rotate: 180deg;
+  }
+
   /* ==========================================================================
      Filter bar
      ==========================================================================

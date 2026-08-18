@@ -157,6 +157,11 @@ German is the default. Produced by `DDS.format`; never assembled by hand.
 - The label answers "what will happen if I press this?" — so a dialog's confirm
   button repeats the action, not the dialog's title.
 - Destructive actions name the thing: "Delete project", not "Delete".
+- **A trailing ellipsis means a further step follows** — a dialog, a form —
+  before anything happens: "Rename…" opens a rename field, it does not rename
+  on the spot. Leave the ellipsis off an action that runs immediately, even a
+  destructive one ("Delete project", not "Delete project…") — otherwise the
+  reader cannot tell an immediate action from one that pauses for a decision.
 
 ### Hints
 

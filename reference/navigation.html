@@ -16,7 +16,7 @@
 <link rel="preload" href="assets/fonts/SpaceGrotesk-Variable-latin-ext.woff2" as="font"
       type="font/woff2" crossorigin>
 <link rel="stylesheet" href="assets/fonts.css?v=7ed937e9">
-<link rel="stylesheet" href="../dds/dds.css?v=e8428cd2">
+<link rel="stylesheet" href="../dds/dds.css?v=02076d70">
 <link rel="stylesheet" href="assets/reference.css?v=ebbf1c5d">
 </head>
 <body>
@@ -702,17 +702,21 @@
             <button type="button" class="dds-button dds-button-secondary"
                     popovertarget="demo-standalone-menu">
               Actions
-              <svg class="dds-icon" aria-hidden="true"><use href="#dds-icon-chevron-down"/></svg>
+              <svg class="dds-icon dds-menu-marker" aria-hidden="true"><use href="#dds-icon-chevron-down"/></svg>
             </button>
             <div class="dds-menu" id="demo-standalone-menu" popover>
               <ul role="list">
                 <li><button type="button" class="dds-menu-item">
                   <svg class="dds-icon" aria-hidden="true"><use href="#dds-icon-edit"/></svg>
-                  Rename
+                  Rename…
                 </button></li>
                 <li><button type="button" class="dds-menu-item">
                   <svg class="dds-icon" aria-hidden="true"><use href="#dds-icon-download"/></svg>
                   Export as CSV
+                </button></li>
+                <li><button type="button" class="dds-menu-item" aria-disabled="true">
+                  <svg class="dds-icon" aria-hidden="true"><use href="#dds-icon-copy"/></svg>
+                  Duplicate
                 </button></li>
                 <li><hr class="dds-menu-separator"></li>
                 <li><button type="button" class="dds-menu-item dds-menu-item-danger">
@@ -735,6 +739,18 @@
               viewport less a gutter. 20rem is 320px — the whole of the narrowest
               supported screen — and being <code class="dds-code">position: fixed</code>
               nothing else would have constrained it.
+            </p>
+            <p class="ref-note">
+              <svg class="dds-icon" aria-hidden="true"><use href="#dds-icon-info"/></svg>
+              The chevron rotates via <code class="dds-code">:has(+ .dds-menu:popover-open)</code>
+              — no JavaScript, and no <code class="dds-code">aria-expanded</code> to keep
+              in sync by hand.
+              <strong>Duplicate</strong> shows the disabled state:
+              <code class="dds-code">aria-disabled="true"</code> keeps it focusable — a
+              reader tabbing through learns it exists and why it is unavailable —
+              but it does not, by itself, stop the click. The consumer's own handler
+              checks the attribute before acting, same as a disabled form-submit
+              button.
             </p>
           </div>
         </div>

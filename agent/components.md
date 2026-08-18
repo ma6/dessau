@@ -1132,6 +1132,21 @@ the menu in a corner of the screen (#48):
 Without anchor positioning at all the menu is centred — the UA default, stated
 explicitly rather than half-inherited.
 
+**Disabled item:** `aria-disabled="true"`, not `disabled` — a menu mixes
+`<button>` and `<a>` items, and `disabled` only exists on the former. Stays
+focusable, same reasoning as a disabled form-submit button above: a reader
+tabbing through learns the item exists and why it is unavailable. Neither
+attribute stops the click on its own; the consumer's click handler checks it
+before acting.
+
+**Open/close chevron (`.dds-menu-marker`):** the trigger button and `.dds-menu`
+are siblings, not parent/child, so the rotate cannot use the `[open] > summary`
+shape `.dds-disclosure-marker` uses. Instead: `[popovertarget]:has(+
+.dds-menu:popover-open) .dds-menu-marker { rotate: 180deg; }` — no JavaScript,
+no `aria-expanded` to keep in sync by hand, and it only works because the menu
+is authored as the trigger's very next sibling (true in every reference
+instance).
+
 ## Filter bar — `.dds-filterbar` · Toolbar — `.dds-toolbar`
 
 Applied filters **must** be visible as removable chips. A short list with three

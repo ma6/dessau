@@ -736,13 +736,14 @@
         ".dds-menu-item",
         ".dds-menu-item-danger",
         ".dds-menu-label",
-        ".dds-menu-separator"
+        ".dds-menu-separator",
+        ".dds-menu-marker"
       ],
       "css": "dds/css/components-navigation.css",
       "spec": "## Menu — `.dds-menu`",
       "reference": "reference/navigation.html#menu",
       "native": "popover",
-      "accessibility": "popover + popovertarget, no JS. Buttons/links in a list, NOT role=menu. The list carries role=\"list\": Safari drops list semantics from a styled list outside <nav> (agent/accessibility.md).",
+      "accessibility": "popover + popovertarget, no JS. Buttons/links in a list, NOT role=menu. The list carries role=\"list\": Safari drops list semantics from a styled list outside <nav> (agent/accessibility.md). Disabled item: aria-disabled, not disabled, so it stays focusable; the consumer's click handler must check it.",
       "responsive": "self — capped to the viewport less a gutter, so it cannot be wider than the screen"
     },
     {
