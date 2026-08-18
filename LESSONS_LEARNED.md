@@ -723,3 +723,54 @@ cross-reference is the point.
 releases — a rebase deep enough to fix all of them would force-push over
 published tags. The stray timeline mentions are cosmetic and land on closed
 issues; left alone rather than traded for that.
+
+---
+
+## `getComputedStyle()` can report a stale value for an attribute selector, in one engine, for no visible reason
+
+The Motion reference demo (#138) plays a token by adding `data-ref-motion-run`
+to a dot, which a CSS rule matches to set its end position:
+
+```css
+.ref-motion-dot[data-ref-motion-run] {
+  inset-inline-start: calc(100% - 1.375rem - 0.1875rem);
+}
+```
+
+Passed in every local browser, every time. Failed on CI's Linux WebKit
+specifically, deterministically, on the same row, across three separate fix
+attempts that each targeted a different plausible cause — a `requestAnimationFrame`
+chain that CI's headless tab might throttle, a fixed wait too short for a
+resource-constrained single-worker run, then `expect.poll` instead of a fixed
+wait at all. None of them changed the outcome, because none of them were the
+actual problem, and each round cost a real CI run (~8–10 minutes) to learn that.
+
+What ended it was refusing a fourth guess and adding a diagnostics dump to the
+failing assertion itself instead — the row's inline style, the dot's own
+inline style, `getComputedStyle(dot).transitionDuration`, `.insetInlineStart`,
+and the geometry, all folded into the failure message so the answer would
+appear directly in the CI log rather than needing another trace download.
+The answer: `--ref-motion-duration` had resolved to exactly the right value
+(`0.14s`, matching the token), `dot.hasAttribute('data-ref-motion-run')` was
+`true` — and `getComputedStyle(dot).insetInlineStart` still reported the REST
+value, never the `[data-ref-motion-run]` rule's. The attribute existed. Every
+custom property fed by it was correct. The one thing that depended on an
+*attribute selector specifically* matching was the only thing wrong, and nothing
+in the DOM said so — `hasAttribute` and the CSSOM computed value simply
+disagreed with each other, in one engine, on one build.
+
+**Do:** when a CSS rule and everything upstream of it check out correct in
+isolation, and the failure is confined to one CI-only browser build with no
+local reproduction (checked here with `--workers=1` too, to rule out
+parallelism), suspect the *mechanism*, not the logic. Attribute-selector-driven
+style changes route through a different invalidation path than an inline style
+write. Switching this demo to set `dot.style.insetInlineStart` directly —
+computed from live rail/dot geometry, not a duplicated constant — sidesteps
+whatever the actual invalidation bug is, rather than finding and reporting it
+upstream to WebKit.
+
+**Do:** dump real state into the failure message before trying a fourth fix.
+Three attempts each replaced a plausible-sounding mechanism with another
+plausible-sounding mechanism, on reasoning that was individually sound and
+collectively no closer to the actual answer. One `evaluate()` call, read once,
+answered it.
