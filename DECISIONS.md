@@ -2324,3 +2324,46 @@ item itself when the new state has none.
 could use unmodified, the way `arraySource` serves most static lists —
 in which case upload-flow gets the declarative path #24 originally
 expected, and this entry's first deviation no longer holds.
+
+---
+
+## 054 — 0.10.0: real new capability, still not the 1.0 gate
+
+**Decision.** The version after this batch of work is `0.10.0`, not `0.9.1`
+and not `1.0.0`.
+
+**Why not a patch.** `0.9.0` (050) was internal audit and CI, complete.
+Since then: two patterns that had CSS and a specification and nothing
+behind them — `results.js`, `upload-flow.js` — now have real behaviour,
+to the same standard `combobox.js` already set (#24). The `copy` component
+went from completely undocumented to indexed, demoed and tested (#130). A
+real, measured rendering bug shipped and got fixed (#134). None of that is
+"things were slightly wrong and are now correct" — it is capability that
+did not exist before existing now. SemVer's own definition of a minor
+version is exactly this: added functionality in a backward-compatible
+manner.
+
+**Why not 1.0.** 050's own reversal condition is unchanged and still not
+met: `#27`, `#55` and `#72` (or their equivalent) all landing is what
+moves the number to 1.0, and `#72` — `derive-a-standalone-system.md`
+walked against a real derived system — is still open. `#27` and `#55`
+themselves *did* land in this window: `dessau.dev`, a real product, was
+built by following `new-product.md` and the consumer template, and
+everything it found wrong came back as fixes (#122, #123, #129–#134).
+Two of three is real, measurable progress toward 1.0 — it is not 1.0,
+because 050 was explicit that the gate is *all three*, not a majority,
+and the reasoning for that has not changed: a derived system substitutes
+the foundation rather than layering over it, which is a different kind of
+integration than a product's, and untested until #72 says otherwise.
+
+**What `0.10.0` is not a claim about.** Not that `#72` is close, or next,
+or scheduled — no cadence exists to schedule against (052). Not that
+every pattern in `agent/index.json` now has real behaviour behind it;
+`check-enhancement-coverage.mjs`'s own "registered, never seen working in
+a browser" list is shorter than it was, not empty.
+
+**Reversal condition.** Same as 050's, restated because it still holds
+unchanged: `#72` lands, meaning a derived system has actually been
+built by walking that recipe and reported what broke, and the number
+moves to `1.0.0` — not a further round of internal audit, and not simply
+accumulating more minor versions of new capability.
