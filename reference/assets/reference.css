@@ -730,14 +730,15 @@
 
 .ref-motion-readout {
   white-space: nowrap;
+  flex-shrink: 0;
 }
 
-.ref-motion-actions {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: var(--dds-space-sm);
-  padding-block-start: var(--dds-space-xs);
+/* Own trigger per track rather than one shared control: a single "play
+   everything" button cannot answer "what does THIS one look like on its
+   own", which is the actual question a token-by-token comparison raises. */
+.ref-motion-track > [data-ref-motion-play] {
+  flex-shrink: 0;
+  margin-inline-start: auto;
 }
 
 /* Same reasoning as the ruler's own mobile stack: name and readout together
