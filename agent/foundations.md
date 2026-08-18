@@ -327,6 +327,7 @@ that needs 14px is a layout that has not decided yet.
 | `--dds-space-xl` | 32px | Between blocks |
 | `--dds-space-2xl` | 48px | Between sections |
 | `--dds-space-3xl` | 72px | Between major regions |
+| `--dds-space-4xl` | 100px | Hero-scale headroom, above any named region |
 
 Reaching for a step that does not exist silently invalidates the whole
 declaration — it falls back to `inherit`/`initial`, not to the previous
@@ -358,6 +359,13 @@ had no utility reaching it until #136, which forced an inline style anywhere a g
 that size was needed. Considered and rejected as part of the same ticket: shifting
 the whole ramp up a step so the existing defaults read as more generous — see
 DECISIONS.md.
+
+`--dds-space-4xl` (100px) plus `.dds-stack-4xl` / `.dds-mbs-4xl` / `.dds-mbe-4xl`
+(#137) is a step above any named region. Unlike every other step in this ramp it was
+not added because a specific layout needed it — no page has adopted it yet — but at
+the maintainer's explicit direction after wanting roughly this much space on
+separate past occasions. See DECISIONS.md for the reasoning and how this differs
+from the "wait for a concrete case" default the rest of this ramp follows.
 
 ---
 

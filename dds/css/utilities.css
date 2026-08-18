@@ -31,6 +31,7 @@
   .dds-mbs-xl  { margin-block-start: var(--dds-space-xl); }
   .dds-mbs-2xl { margin-block-start: var(--dds-space-2xl); }
   .dds-mbs-3xl { margin-block-start: var(--dds-space-3xl); }
+  .dds-mbs-4xl { margin-block-start: var(--dds-space-4xl); }
 
   .dds-mbe-0   { margin-block-end: 0; }
   .dds-mbe-2xs { margin-block-end: var(--dds-space-2xs); }
@@ -42,6 +43,7 @@
   .dds-mbe-xl  { margin-block-end: var(--dds-space-xl); }
   .dds-mbe-2xl { margin-block-end: var(--dds-space-2xl); }
   .dds-mbe-3xl { margin-block-end: var(--dds-space-3xl); }
+  .dds-mbe-4xl { margin-block-end: var(--dds-space-4xl); }
 
   /* ------------------------------------------------------------ visibility */
   /* Hidden from everyone, including assistive technology. Prefer the `hidden`

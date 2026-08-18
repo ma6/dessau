@@ -83,6 +83,7 @@
   .dds-stack-xl  { --dds-stack-space: var(--dds-space-xl); }
   .dds-stack-2xl { --dds-stack-space: var(--dds-space-2xl); }
   .dds-stack-3xl { --dds-stack-space: var(--dds-space-3xl); }
+  .dds-stack-4xl { --dds-stack-space: var(--dds-space-4xl); }
 
   /* ---------------------------------------------------------------- cluster */
   /* A horizontal group that wraps onto more lines when it runs out of room:

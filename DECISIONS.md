@@ -2405,3 +2405,45 @@ reads as cramped for its documented meaning ("between sections") specifically, r
 than a case that actually wanted "between major regions" and can reach for `3xl` now
 that it is exposed. Two independent complaints about the same step is a ramp problem;
 one is a missing utility.
+
+---
+
+## 056 — `--dds-space-4xl` (100px), added without a concrete case (#137)
+
+**Decision.** `--dds-space-4xl` (100px) was added above `--dds-space-3xl`, with
+`.dds-stack-4xl`, `.dds-mbs-4xl` and `.dds-mbe-4xl` reaching it — the same utility
+shape every other step has.
+
+**Why this is a deliberate exception, not a reversal of 055.** 055's standard —
+wait for a real layout to demonstrate the need — was restated to the maintainer
+directly before this step was added, on the grounds that a token with no consumer
+is exactly the anti-pattern 055 argued against. The maintainer heard that and asked
+for it anyway: roughly 100px of vertical spacing is something they have wanted on
+separate past occasions, without a single page currently pinning down the value.
+That is weaker evidence than 3xl had (#136, one concrete page) but it is not no
+evidence — a preference that has recurred independently more than once across real
+work is a different thing from a hypothetical "might need it someday," and the
+maintainer is the one person in this repository positioned to know which of those
+it is (`AGENTS.md` §6, one maintainer, no invented process). 055's own reasoning
+does not apply retroactively to overrule a direct, informed instruction; it applies
+to cases where no one has asked.
+
+**Why 100px / 6.25rem.** Stated directly as "etwa 100px." `6.25rem` keeps the same
+quarter-rem granularity `--dds-space-ml` (1.25rem) already uses, rather than
+rounding to a `0.5rem`-clean 6rem or 6.5rem that would drift from the number
+actually asked for. The step's ratio to `3xl` (100/72 ≈ 1.39×) is narrower than the
+`2xl→3xl` jump (1.5×), which breaks the ramp's documented "ratio widens as values
+grow" shape (`--dds-space-ml` note, primitives.css) — accepted rather than rounded
+away, because matching the stated value took priority over ramp symmetry for a step
+that exists as reserved headroom rather than a tuned, load-bearing default.
+
+**What this does not claim.** Not that any page needs 100px today — none does.
+Not that the ramp-shift question from 055 is reopened; that reasoning about
+`--dds-space-2xl` specifically is unchanged. This is a new, additional step, not a
+renumbering of existing ones.
+
+**Reversal condition.** If `--dds-space-4xl` sits unused long enough that it looks
+like dead weight rather than reserved headroom, that is grounds to remove it —
+unlike a tuned default, an unused reserved step has no cost to leaving it, but also
+none to pruning it once it is clear it was not the recurring need it was expected
+to be.
