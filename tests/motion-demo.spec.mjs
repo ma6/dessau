@@ -105,9 +105,38 @@ test('playing one row moves only that row\'s dot, not the others', async ({ page
 
   const after = await dots.evaluateAll((els) => els.map((el) => el.getBoundingClientRect().left));
 
+  // DEBUG (#138): CI's Linux WebKit alone has shown zero movement here three
+  // times running, deterministically, with no local reproduction on macOS
+  // WebKit even matching CI's --workers=1. Everything upstream of this point
+  // has already been confirmed to run (the attribute assertion above
+  // passed), so if this still fails the diagnostics below go straight into
+  // the CI log instead of costing another trace-archaeology round trip.
+  const diagnostics = await playedRow.locator('[data-ref-motion-dot]').evaluate((dot) => {
+    const row = dot.closest('[data-ref-motion-row]');
+    const rail = dot.closest('.ref-motion-rail');
+    const dotStyle = getComputedStyle(dot);
+    return {
+      rowInlineStyle: row.getAttribute('style'),
+      rowToken: row.dataset.refMotionToken,
+      dotHasRunAttr: dot.hasAttribute('data-ref-motion-run'),
+      dotInlineStyle: dot.getAttribute('style'),
+      computedTransitionProperty: dotStyle.transitionProperty,
+      computedTransitionDuration: dotStyle.transitionDuration,
+      computedTransitionTimingFunction: dotStyle.transitionTimingFunction,
+      computedInsetInlineStart: dotStyle.insetInlineStart,
+      computedLeft: dotStyle.left,
+      railWidth: rail.getBoundingClientRect().width,
+      dotWidth: dot.getBoundingClientRect().width,
+      dotRectLeft: dot.getBoundingClientRect().left,
+    };
+  });
+
   for (let i = 0; i < dotCount; i += 1) {
     if (i === 1) {
-      expect(after[i], 'the played row\'s dot should have moved').toBeGreaterThan(before[i]);
+      expect(
+        after[i],
+        'the played row\'s dot should have moved. Diagnostics: ' + JSON.stringify(diagnostics, null, 2)
+      ).toBeGreaterThan(before[i]);
     } else {
       expect(after[i], `row ${i} should not move when a different row is played`).toBeCloseTo(before[i], 0);
     }
