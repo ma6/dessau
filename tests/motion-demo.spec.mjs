@@ -90,8 +90,18 @@ test('playing one row moves only that row\'s dot, not the others', async ({ page
   const before = await dots.evaluateAll((els) => els.map((el) => el.getBoundingClientRect().left));
 
   // Play only the second row (--dds-duration-fast), not the first.
-  await page.locator('[data-ref-motion-row]').nth(1).locator('[data-ref-motion-play]').click();
-  await page.waitForTimeout(400);
+  const playedRow = page.locator('[data-ref-motion-row]').nth(1);
+  await playedRow.locator('[data-ref-motion-play]').click();
+
+  // Wait for the actual signal the animation started, rather than a fixed
+  // timeout sized against an ordinary machine's speed. CI's single-worker,
+  // resource-constrained WebKit run needs more slack than a 140ms transition
+  // suggests: this exact fixed-400ms wait deterministically saw zero
+  // movement there while a >1s margin elsewhere in this file did not.
+  await expect(playedRow.locator('[data-ref-motion-dot]')).toHaveAttribute('data-ref-motion-run', '');
+  // The attribute lands the instant the transition starts; give the paint a
+  // moment to actually catch up before reading positions.
+  await page.waitForTimeout(200);
 
   const after = await dots.evaluateAll((els) => els.map((el) => el.getBoundingClientRect().left));
 
