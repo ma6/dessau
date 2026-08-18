@@ -95,6 +95,8 @@
     "agent/ux-writing.md:example.com": "Recommends the RFC 2606 reserved domains for addresses that must not resolve.",
     "reference/writing.html:Lorem ipsum": "A do-not rule on the writing page. The cliché has to be named to be prohibited — and the reason given: it has the wrong word lengths and no diacritics, so it hides the bugs real example data exposes.",
     "history:Mustermann": "The wording of the example-data / example.org rules (#139, #140) was revised across several commits. Every historical version used the term only as the same named prohibition, never as real content.",
-    "history:example.com": "Same reason as history:Mustermann — the example.org/example.com/.example sentence was reworded in #140, the term itself was never anything but part of that recommendation."
+    "history:example.com": "Same reason as history:Mustermann — the example.org/example.com/.example sentence was reworded in #140, the term itself was never anything but part of that recommendation.",
+    "commit:Mustermann": "A commit message explaining a fix to the example-data rule or this audit's own exception list necessarily names the term it is about.",
+    "commit:example.com": "Same reason as commit:Mustermann."
   }
 }
