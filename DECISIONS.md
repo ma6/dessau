@@ -2447,3 +2447,40 @@ like dead weight rather than reserved headroom, that is grounds to remove it —
 unlike a tuned default, an unused reserved step has no cost to leaving it, but also
 none to pruning it once it is clear it was not the recurring need it was expected
 to be.
+
+---
+
+## 057 — 0.10.1: the maintainer's call, against this file's own precedent
+
+**Decision.** The version after #136 and #137 is `0.10.1`, a patch — not `0.11.0`.
+
+**Why this looks wrong by 054's own reasoning, and is the maintainer's call anyway.**
+054 set the standard this repository has been using: added, backward-compatible
+functionality is a MINOR bump, full stop — that is SemVer's own definition, not
+just this repository's gloss on it. #136 and #137 added new utility classes and a
+new primitive token, which is exactly that category, not a bug fix. Claude flagged
+this directly before bumping the number. Martin's answer was `0.10.1`, stated as
+"aus meiner sicht" — his view, not a request for a recalculation.
+
+Two things distinguish this from simply ignoring 054. First, the project is
+pre-`1.0.0`; SemVer §4 says explicitly that anything MAY change at any time in a
+`0.y.z` series, so there is no version-scheme violation here, only a departure
+from this repository's own past practice of applying MINOR strictly anyway.
+Second, and more to the point: unlike #054's batch — two patterns that gained real
+runtime behaviour, a component that went from undocumented to indexed and tested,
+a measured rendering bug fixed — nothing in #136 or #137 changes what any existing
+consumer sees. Both added a token and utilities with zero adopting call sites so
+far, reachable capability rather than delivered behaviour. That is a real
+distinction, even if 054's own text does not carve out an exception for it, and
+it is consistent with treating `--dds-space-4xl` as reserved headroom rather than
+a tuned default in #056.
+
+**What this does not claim.** Not that 054's MINOR-for-new-capability rule is
+retired — the next feature with an actual consumer follows it as before. This
+entry exists so a future reader comparing `0.10.1` against `0.11.0`-worthy changes
+elsewhere in the history sees the reasoning rather than an inconsistency with no
+explanation.
+
+**Reversal condition.** None — this is a record of a judgement call made once, not
+a standing rule to reapply. The next version decision is evaluated on its own
+terms against 054, not against this entry's outcome.
