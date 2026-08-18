@@ -686,3 +686,40 @@ with `showPopover()`. There is no invoker on that path and therefore no implicit
 anchor, so it reproduced the symptom for a reason that had nothing to do with the
 bug and nearly sent the fix towards WebKit. A probe has to exercise the real entry
 point, or it is measuring itself.
+
+---
+
+## Any `#<number>` in a commit message links to that issue, whether meant to or not
+
+`DECISIONS.md` numbers its entries sequentially — `#054`, `#057`, `#058` — and a
+commit landing one reads naturally as `docs(decisions): #059 — …` or `… see
+DECISIONS.md #057`. GitHub does not know the difference between that and a real
+ticket reference. Its autolinker matches `#` followed by digits anywhere in a
+commit message, subject or body, and turns it into a link to the issue or PR with
+that number in the same repository — unconditionally, with no way to tell it
+"this one isn't a ticket." Every one of `#043` through `#059` used this way
+across this repository's history landed on a real, unrelated issue and left a
+"mentioned this in a commit" entry on its timeline — found only because the
+maintainer happened to notice `#59` rendered as a link in a screenshot of a commit
+that had nothing to do with issue 59.
+
+The two numbering schemes collide by construction: `DECISIONS.md` started at 001
+specifically to mirror how issues are numbered, so a decision number and a ticket
+number are the same shape and frequently the same magnitude at the same point in
+the project's life.
+
+Nothing short of not writing `#<digits>` prevents it — the issue does not need to
+exist for GitHub to try the match, and prefixing with a word (`DECISIONS.md
+#057`) does not help, because the autolinker doesn't care what comes before the
+`#`, only that a word boundary does.
+
+**Do:** write a `DECISIONS.md` entry number as `DECISIONS.md entry 057` or
+`decision 057` in commit messages — no `#`. Reserve `#<number>` in a commit
+message for an actual GitHub issue or PR in this repository, where the
+cross-reference is the point.
+
+**Not attempted:** rewriting the affected history. The references go back to
+`#043`, long before this was noticed, spanning commits behind already-tagged
+releases — a rebase deep enough to fix all of them would force-push over
+published tags. The stray timeline mentions are cosmetic and land on closed
+issues; left alone rather than traded for that.
