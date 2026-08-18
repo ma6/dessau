@@ -473,7 +473,11 @@
 
      The current value must always be shown as text beside it, and announced. */
   .dds-range {
-    inline-size: 100%;
+    /* Not inline-size: 100% — the row already sizes it via flex-basis, and
+       sizing both a flex item and its container to fill each other is what
+       squeezed .dds-range-value below its own content width (#141). */
+    flex: 1 1 0%;
+    min-inline-size: 0;
     /* A comfortable target height around the thin track. */
     min-block-size: 2.75rem;
   }
@@ -485,6 +489,10 @@
   }
 
   .dds-range-value {
+    /* flex-shrink: 0 — the explicit min-inline-size below is a floor for
+       short values, not a ceiling. Without this the row can still shrink
+       the box past a longer value's content width and wrap it (#141). */
+    flex-shrink: 0;
     min-inline-size: 4ch;
     text-align: end;
     font-variant-numeric: tabular-nums;

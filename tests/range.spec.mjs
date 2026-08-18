@@ -99,6 +99,28 @@ test('rapid steps do not each get their own announcement', async ({ page }) => {
   expect(announced[0]).toContain('90');
 });
 
+test('the value stays on one line at the widest value the track allows', async ({ page }) => {
+  await page.goto(COMPONENTS);
+
+  const input = page.locator('#threshold');
+  const output = page.locator('output[for="threshold"]');
+
+  // 70 % is short enough to fit no matter how the flex row is sized — the
+  // single-line height it renders at is the baseline every other value is
+  // compared against.
+  const singleLineHeight = (await output.boundingBox()).height;
+
+  await input.focus();
+  await input.press('End'); // jumps the native range to its max: 100 %
+  await expect(output).toHaveText('100 %');
+
+  // A row that squeezes the output below its content width wraps "100 %"
+  // onto two lines, which is invisible in the DOM (no <br>) but doubles the
+  // rendered box height.
+  const wrappedHeight = (await output.boundingBox()).height;
+  expect(wrappedHeight).toBeCloseTo(singleLineHeight, 0);
+});
+
 test('a unit is only added where the input opts in', async ({ page }) => {
   await page.goto(COMPONENTS);
 
