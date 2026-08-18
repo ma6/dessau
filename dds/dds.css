@@ -93,7 +93,7 @@
 @import url("./css/typography.css?v=31f7bcf8");
 
 /* Layout primitives. */
-@import url("./css/layout.css?v=8ebdaea9");
+@import url("./css/layout.css?v=d2a5a531");
 
 /* Reusable UI building blocks, split by concern so no single file becomes
    unnavigable. All four land in the same `dds.components` layer — the split is
@@ -108,4 +108,4 @@
 @import url("./css/patterns-flows.css?v=3f9d309c");
 
 /* Single-purpose helpers. Last, so they win inside DDS. */
-@import url("./css/utilities.css?v=d4ff0250");
+@import url("./css/utilities.css?v=90545f6c");

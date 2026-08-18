@@ -350,6 +350,15 @@ an exception; two are a naming scheme that has stopped working.
 `.dds-stack-ml`, `.dds-mbs-ml` and `.dds-mbe-ml` exist alongside it, because a step that
 the utilities cannot reach is a step half the system cannot use.
 
+### The top of the ramp
+
+`.dds-stack-3xl`, `.dds-mbs-3xl` and `.dds-mbe-3xl` exist for the same reason: `72px`
+was defined in the primitive layer for "between major regions" from the start, but
+had no utility reaching it until #136, which forced an inline style anywhere a gap
+that size was needed. Considered and rejected as part of the same ticket: shifting
+the whole ramp up a step so the existing defaults read as more generous — see
+DECISIONS.md.
+
 ---
 
 ## Layout

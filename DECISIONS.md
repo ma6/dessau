@@ -2367,3 +2367,41 @@ unchanged: `#72` lands, meaning a derived system has actually been
 built by walking that recipe and reported what broke, and the number
 moves to `1.0.0` — not a further round of internal audit, and not simply
 accumulating more minor versions of new capability.
+
+---
+
+## 055 — The `--dds-space-*` ramp keeps its values; the gap was a missing utility (#136)
+
+**Decision.** `dds-stack-3xl`, `dds-mbs-3xl` and `dds-mbe-3xl` were added, reaching
+the ramp's existing top step (`--dds-space-3xl`, 72px). The ramp itself — every
+`--dds-space-*` value, and the default gaps `.dds-stack`, `.dds-cluster`, `.dds-grid`,
+`.dds-sidebar` and `.dds-split` fall back to — is unchanged.
+
+**Why not a shift.** Building the dessau.dev hero, the gap between a CTA row and a
+`.dds-facts` block needed 72px and `.dds-stack-2xl` (48px) — the largest stack/mbs/mbe
+utility that existed — still read as cramped, forcing an inline style. The ticket
+asked whether that meant the whole ramp should move up a step so "between sections"
+defaults read as more generous without being asked.
+
+One hero's spacing need is a single data point about one relationship — a button row
+next to a visually distinct fact block — not evidence that every default in the ramp
+is wrong. `--dds-space-2xl` alone is the fallback or default gap in `base.css` (scroll
+padding/margin), `components-navigation.css` (two off-canvas panel heights),
+`patterns.css` (a whole pattern's block padding) and dozens of `.dds-stack-lg`/`-xl`
+calls across every reference page — moving the ramp would re-tune all of that from one
+hero, not fix the hero. It would also break the ramp's own documented shape: the
+primitives.css note on `ml` records that the widest *relative* jump was deliberately
+placed at 16→24px, the most-used region: a flat shift preserves relative spacing and
+fixes nothing, and a non-flat reshaping is a bigger, riskier redesign than one cramped
+gap justifies.
+
+The actual defect was narrower: `--dds-space-3xl` already existed, already meant
+"between major regions", and simply had no utility class reaching it — the same gap
+`.dds-stack-ml` closed for the ramp's midpoint (`agent/foundations.md` §Space). Rule 8
+(extend before duplicating) points at closing that gap, not at re-deriving the ramp.
+
+**Reversal condition.** A second, independent case turns up where `--dds-space-2xl`
+reads as cramped for its documented meaning ("between sections") specifically, rather
+than a case that actually wanted "between major regions" and can reach for `3xl` now
+that it is exposed. Two independent complaints about the same step is a ramp problem;
+one is a missing utility.
