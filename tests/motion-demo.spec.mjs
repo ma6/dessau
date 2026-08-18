@@ -101,9 +101,9 @@ test('a played dot holds at the end, then returns to its start position on its o
   const held = await dot.evaluate((el) => el.getBoundingClientRect().left);
   expect(held, 'dot should still be held at the end shortly after arriving').toBeGreaterThan(start);
 
-  // The hold is 900ms; well after it plus the (short) return trip, the dot
+  // The hold is 1600ms; well after it plus the (short) return trip, the dot
   // should be back where it started.
-  await page.waitForTimeout(900);
+  await page.waitForTimeout(1600);
   const returned = await dot.evaluate((el) => el.getBoundingClientRect().left);
   expect(returned, 'dot should have returned to its start position').toBeCloseTo(start, 0);
 });

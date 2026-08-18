@@ -678,11 +678,18 @@
   gap: var(--dds-space-sm);
 }
 
+/* `surface-active` rather than `surface-sunken`: sunken is defined equal to
+   the page background in dark mode (semantic.css), which made the track this
+   dot travels along nearly disappear against the card behind it — exactly
+   the range the demo exists to show. `-active` is a clearly distinct step
+   from `-default` (the card's own surface) in both themes, and the border
+   gives the pill a crisp edge even against a background close to its own. */
 .ref-motion-rail {
   position: relative;
   inline-size: 8rem;
   block-size: 1.75rem;
-  background-color: var(--dds-color-surface-sunken);
+  background-color: var(--dds-color-surface-active);
+  border: var(--dds-border-thin) solid var(--dds-color-border-subtle);
   border-radius: var(--dds-radius-pill);
   flex-shrink: 0;
 }

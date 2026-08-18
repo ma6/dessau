@@ -348,7 +348,7 @@
      control, because the question a token-by-token comparison actually
      raises is "what does THIS one look like on its own."
      ========================================================================= */
-  var MOTION_RETURN_HOLD_MS = 900;
+  var MOTION_RETURN_HOLD_MS = 1600;
 
   /**
    * Run `callback` once, the next time `dot`'s position transition ends.
