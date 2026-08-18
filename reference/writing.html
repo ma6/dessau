@@ -852,6 +852,7 @@
               <li>Vary the length. A long street name and a long surname are what find truncation.</li>
               <li>Include the awkward-but-real case: an address with no house number, a single-character surname.</li>
               <li>Use the reserved <code>example.org</code> for addresses that must not resolve.</li>
+              <li>Give an invented email a real consumer domain — gmail.com, gmx.net, outlook.com, web.de, orange.fr — with an invented local part.</li>
             </ul>
           </div>
           <div class="ref-dont">
@@ -861,6 +862,7 @@
               <li>Lorem ipsum — it has the wrong word lengths and no diacritics at all.</li>
               <li>Real personal data, in demos, tests, fixtures, screenshots or commit messages.</li>
               <li>A placeholder domain that could become real.</li>
+              <li>A table of demo users all sharing <code>example.org</code> — it reads as staged data.</li>
             </ul>
           </div>
         </div>
@@ -872,6 +874,18 @@
             glyphs — every one of those is invisible in ASCII test data and obvious the
             moment the data contains ø and İ. Choosing bland example data is choosing not
             to find those bugs.
+          </p>
+        </div>
+
+        <div class="ref-note dds-mbs-md">
+          <h3 class="dds-text-sm dds-weight-semibold"><code>example.org</code> vs. a real provider</h3>
+          <p class="dds-text-sm dds-text-subtle dds-mbs-2xs">
+            <code>example.org</code> is reserved for the one address that must never
+            resolve — a mailto default, a link. A demo user list is a different case: the
+            domain can be a real consumer provider, because the local part is invented and
+            identifies nobody. Mixing the two rules up is how a row of demo users ends up
+            all sharing <code>example.org</code>, which reads as staged the way "Max
+            Mustermann" does.
           </p>
         </div>
       </section>

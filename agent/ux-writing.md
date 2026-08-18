@@ -289,6 +289,12 @@ Demo, placeholder and test content is part of the product's quality.
   messages.
 - **Never a placeholder domain that could become real.** Use the reserved
   `example.org` / `example.com` / `.example` for addresses that must not resolve.
+- **A person's invented email reads as real when the domain is a real consumer
+  provider** — gmail.com, gmx.net, outlook.com, web.de, orange.fr — with an
+  invented local part. That is different from the previous rule: `example.org`
+  is for the one address that must never resolve (a mailto default, a link); a
+  table of demo users all sharing `example.org` reads as staged data, the way a
+  form full of "Max Mustermann" does.
 - **No vocabulary from one industry.** Category labels, form fields, table rows and
   wizard steps stay in words any product recognises — a topic, a document, a
   department. Dessau is a foundation, and a specimen written in one sector's terms
