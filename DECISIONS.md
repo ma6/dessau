@@ -2450,36 +2450,42 @@ to be.
 
 ---
 
-## 057 — 0.10.1: the maintainer's call, against this file's own precedent
+## 057 — 0.10.1: gaps in the ramp, not new capability
 
 **Decision.** The version after #136 and #137 is `0.10.1`, a patch — not `0.11.0`.
 
-**Why this looks wrong by 054's own reasoning, and is the maintainer's call anyway.**
-054 set the standard this repository has been using: added, backward-compatible
-functionality is a MINOR bump, full stop — that is SemVer's own definition, not
-just this repository's gloss on it. #136 and #137 added new utility classes and a
-new primitive token, which is exactly that category, not a bug fix. Claude flagged
-this directly before bumping the number. Martin's answer was `0.10.1`, stated as
-"aus meiner sicht" — his view, not a request for a recalculation.
+**Why 054's MINOR-for-new-capability rule does not apply here.** Claude first read
+#136 and #137 as new, backward-compatible functionality — the category 054 defines
+as MINOR — and flagged that `0.10.1` looked inconsistent with that precedent.
+Martin's correction: from his side these were bugs, not missing features. That
+reframes both, and on reflection it holds up better than the "new capability"
+reading did.
 
-Two things distinguish this from simply ignoring 054. First, the project is
-pre-`1.0.0`; SemVer §4 says explicitly that anything MAY change at any time in a
-`0.y.z` series, so there is no version-scheme violation here, only a departure
-from this repository's own past practice of applying MINOR strictly anyway.
-Second, and more to the point: unlike #054's batch — two patterns that gained real
-runtime behaviour, a component that went from undocumented to indexed and tested,
-a measured rendering bug fixed — nothing in #136 or #137 changes what any existing
-consumer sees. Both added a token and utilities with zero adopting call sites so
-far, reachable capability rather than delivered behaviour. That is a real
-distinction, even if 054's own text does not carve out an exception for it, and
-it is consistent with treating `--dds-space-4xl` as reserved headroom rather than
-a tuned default in #056.
+`--dds-space-3xl` (#136) already existed and already meant "between major
+regions"; every other step in the ramp had a `.dds-stack-*`/`.dds-mbs-*`/`.dds-mbe-*`
+triplet reaching it, and this one did not. That is an inconsistency in an already-
+committed-to system, not a new idea — indistinguishable in kind from any other
+"this should have worked and did not" defect. `--dds-space-4xl` (#137) is the
+harder case, because the value itself is new — nothing was silently broken before
+it existed. But the need behind it was not new: it is the same roughly-100px gap
+Martin had hit on separate real occasions before this ticket, each time with no
+way to reach it. A design system that cannot produce a spacing value its own
+maintainer has repeatedly needed has failed at its actual job, whether or not a
+token existed to point at — closing that is a defect fix aimed at the ramp's
+completeness, not a speculative feature added because it seemed nice to have.
 
-**What this does not claim.** Not that 054's MINOR-for-new-capability rule is
-retired — the next feature with an actual consumer follows it as before. This
-entry exists so a future reader comparing `0.10.1` against `0.11.0`-worthy changes
-elsewhere in the history sees the reasoning rather than an inconsistency with no
-explanation.
+That distinguishes both from #054's batch, where the point was explicitly that
+*capability* had grown — patterns gaining runtime behaviour nobody could get
+before, a component going from undocumented to demoed and tested. #136 and #137
+gave existing, already-intended values a way to be reached; they did not expand
+what the ramp is for.
+
+**What this does not claim.** Not that every "the ramp doesn't reach X yet" report
+is automatically a bug rather than a feature request — that judgement stays
+case-by-case, and 054's MINOR-for-new-capability rule still governs the ordinary
+case where something genuinely new is being added. This entry records why these
+two specific tickets read as defects once actually looked at, not a general
+reclassification of "missing utility" as "always a bug."
 
 **Reversal condition.** None — this is a record of a judgement call made once, not
 a standing rule to reapply. The next version decision is evaluated on its own
