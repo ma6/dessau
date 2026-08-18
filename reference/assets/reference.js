@@ -380,33 +380,38 @@
        toggling the attribute straight back off then on does not work, because
        the browser can batch both style changes into the same frame, and a
        transition that never left its start value has nothing to transition
-       FROM. So the reset removes the transition entirely for one frame
-       (`transitionDuration = '0s'`), forces layout with a read that cannot be
-       answered from a stale style, then restores the transition and
-       re-triggers it a frame later — by which point the instant reset has
-       actually painted. */
+       FROM. The classic fix — set to `0s`, remove the attribute, force layout
+       with a read that cannot be answered from a stale style, then restore
+       the real duration and re-add the attribute — needs no
+       `requestAnimationFrame` at all: the forced reflow is a synchronous
+       point the browser must have already resolved styles up to, so the very
+       next line is seen as a genuine change from a committed state, not
+       batched away with the change before it.
+
+       An earlier version of this wrapped the restore-and-retrigger in two
+       nested `requestAnimationFrame` calls, on the reasoning that a paint
+       needed to happen first. It did not need to, and CI's headless WebKit
+       (unlike every browser this was checked in locally) went on to prove it
+       mattered: a chain of rAFs is exactly the kind of thing a headless,
+       possibly-unfocused tab can throttle or never fire, and when it did not
+       fire there, the dot simply never moved — passing in every local
+       browser and failing the same deterministic way on every CI retry. */
     dot.style.transitionDuration = '0s';
     dot.removeAttribute('data-ref-motion-run');
-
     void dot.offsetWidth;
+    dot.style.transitionDuration = '';
+    dot.setAttribute('data-ref-motion-run', '');
 
-    requestAnimationFrame(function () {
-      dot.style.transitionDuration = '';
-      requestAnimationFrame(function () {
-        dot.setAttribute('data-ref-motion-run', '');
-
-        // Arrived: hold at the end so it can actually be seen, then let the
-        // same transition carry it back — otherwise the demo is left
-        // pointing at Play while showing you nothing to play.
+    // Arrived: hold at the end so it can actually be seen, then let the same
+    // transition carry it back — otherwise the demo is left pointing at Play
+    // while showing you nothing to play.
+    onceMotionSettled(dot, function () {
+      setTimeout(function () {
+        dot.removeAttribute('data-ref-motion-run');
         onceMotionSettled(dot, function () {
-          setTimeout(function () {
-            dot.removeAttribute('data-ref-motion-run');
-            onceMotionSettled(dot, function () {
-              if (button) button.disabled = false;
-            });
-          }, MOTION_RETURN_HOLD_MS);
+          if (button) button.disabled = false;
         });
-      });
+      }, MOTION_RETURN_HOLD_MS);
     });
   }
 

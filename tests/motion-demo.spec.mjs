@@ -29,8 +29,26 @@ import { test, expect } from '@playwright/test';
 
 const FOUNDATIONS = '/reference/foundations.html';
 
-test('each row reads its resolved value from the live computed style', async ({ page }) => {
+/**
+ * `page.goto` plus a settled layout: waits for every web font to finish
+ * loading and swapping in.
+ *
+ * Every test below reads `getBoundingClientRect().left` before and after an
+ * action and compares the two. A font that is still loading on first paint
+ * — the ordinary case on a fresh CI browser install with no font cache, and
+ * not something a warm local machine ever reproduces — swaps in and reflows
+ * the row sometime after that first paint, shifting the very coordinates
+ * these tests compare. That is a real, separate failure mode from anything
+ * `reference.js` does, and it would otherwise show up as the dot appearing
+ * to move (or move the wrong amount) with no code change responsible.
+ */
+async function gotoSettled(page) {
   await page.goto(FOUNDATIONS);
+  await page.evaluate(() => document.fonts.ready);
+}
+
+test('each row reads its resolved value from the live computed style', async ({ page }) => {
+  await gotoSettled(page);
 
   const readouts = await page.evaluate(() => {
     return Array.from(document.querySelectorAll('[data-ref-motion-row]')).map((row) => {
@@ -50,7 +68,7 @@ test('each row reads its resolved value from the live computed style', async ({ 
 });
 
 test('each row has its own Play control, named for the token it plays', async ({ page }) => {
-  await page.goto(FOUNDATIONS);
+  await gotoSettled(page);
 
   const rows = page.locator('[data-ref-motion-row]');
   const count = await rows.count();
@@ -65,7 +83,7 @@ test('each row has its own Play control, named for the token it plays', async ({
 });
 
 test('playing one row moves only that row\'s dot, not the others', async ({ page }) => {
-  await page.goto(FOUNDATIONS);
+  await gotoSettled(page);
 
   const dots = page.locator('[data-ref-motion-dot]');
   const dotCount = await dots.count();
@@ -87,7 +105,7 @@ test('playing one row moves only that row\'s dot, not the others', async ({ page
 });
 
 test('a played dot holds at the end, then returns to its start position on its own', async ({ page }) => {
-  await page.goto(FOUNDATIONS);
+  await gotoSettled(page);
 
   const row = page.locator('[data-ref-motion-row]').first(); // --dds-duration-instant: 80ms
   const dot = row.locator('[data-ref-motion-dot]');
@@ -110,7 +128,7 @@ test('a played dot holds at the end, then returns to its start position on its o
 
 test('reduced motion collapses a played row\'s transition to effectively instant', async ({ page }) => {
   await page.emulateMedia({ reducedMotion: 'reduce' });
-  await page.goto(FOUNDATIONS);
+  await gotoSettled(page);
 
   const row = page.locator('[data-ref-motion-row]').last(); // --dds-ease-emphasis
   const dot = row.locator('[data-ref-motion-dot]');
