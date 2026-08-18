@@ -701,6 +701,18 @@
    nothing here or there hard-codes a millisecond figure or a curve, so if a
    token's value ever changes, this changes with it — the same guarantee
    every other live specimen on this page already makes. */
+/* The end (played) position is set directly as an inline style by
+   reference.js, computed from live geometry rather than a second copy of
+   these numbers — not toggled through an attribute selector. CI's Linux
+   WebKit was found, by direct diagnostic evidence, to sometimes leave
+   getComputedStyle() reporting the pre-attribute value even after
+   `data-ref-motion-run` was confirmably present on the element: the
+   attribute existed, the custom properties it drove resolved correctly,
+   and the position simply never picked up the `[data-ref-motion-run]`
+   rule — a missed style invalidation specific to that engine, not
+   anything wrong upstream of it. An inline style write doesn't route
+   through attribute-selector invalidation at all, so it isn't exposed to
+   that bug. */
 .ref-motion-dot {
   position: absolute;
   inset-block: 0.1875rem;
@@ -712,10 +724,6 @@
   transition-property: inset-inline-start;
   transition-duration: var(--ref-motion-duration, var(--dds-duration-base));
   transition-timing-function: var(--ref-motion-ease, var(--dds-ease-standard));
-}
-
-.ref-motion-dot[data-ref-motion-run] {
-  inset-inline-start: calc(100% - 1.375rem - 0.1875rem);
 }
 
 /* -------------------------------------------------------------------- layers */

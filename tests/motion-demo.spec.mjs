@@ -90,53 +90,28 @@ test('playing one row moves only that row\'s dot, not the others', async ({ page
   const before = await dots.evaluateAll((els) => els.map((el) => el.getBoundingClientRect().left));
 
   // Play only the second row (--dds-duration-fast), not the first.
-  const playedRow = page.locator('[data-ref-motion-row]').nth(1);
-  await playedRow.locator('[data-ref-motion-play]').click();
+  const playedDot = page.locator('[data-ref-motion-row]').nth(1).locator('[data-ref-motion-dot]');
+  await page.locator('[data-ref-motion-row]').nth(1).locator('[data-ref-motion-play]').click();
 
-  // Wait for the actual signal the animation started, rather than a fixed
-  // timeout sized against an ordinary machine's speed. CI's single-worker,
-  // resource-constrained WebKit run needs more slack than a 140ms transition
-  // suggests: this exact fixed-400ms wait deterministically saw zero
-  // movement there while a >1s margin elsewhere in this file did not.
-  await expect(playedRow.locator('[data-ref-motion-dot]')).toHaveAttribute('data-ref-motion-run', '');
-  // The attribute lands the instant the transition starts; give the paint a
-  // moment to actually catch up before reading positions.
-  await page.waitForTimeout(200);
+  // Poll for the actual thing under test — the dot having moved — rather
+  // than a fixed timeout sized against an ordinary machine's speed, or an
+  // implementation-detail attribute. Both were tried and both went
+  // deterministically wrong on CI's Linux WebKit specifically (#138):
+  // a fixed 400ms wait saw zero movement despite a >1s margin elsewhere in
+  // this file being fine, and that engine was separately caught leaving
+  // getComputedStyle() reporting the rest position even once the attribute
+  // this used to wait on was confirmably present. Polling the real position
+  // is correct regardless of which of those (or something else again) is
+  // responsible.
+  await expect
+    .poll(() => playedDot.evaluate((el) => el.getBoundingClientRect().left))
+    .toBeGreaterThan(before[1]);
 
   const after = await dots.evaluateAll((els) => els.map((el) => el.getBoundingClientRect().left));
 
-  // DEBUG (#138): CI's Linux WebKit alone has shown zero movement here three
-  // times running, deterministically, with no local reproduction on macOS
-  // WebKit even matching CI's --workers=1. Everything upstream of this point
-  // has already been confirmed to run (the attribute assertion above
-  // passed), so if this still fails the diagnostics below go straight into
-  // the CI log instead of costing another trace-archaeology round trip.
-  const diagnostics = await playedRow.locator('[data-ref-motion-dot]').evaluate((dot) => {
-    const row = dot.closest('[data-ref-motion-row]');
-    const rail = dot.closest('.ref-motion-rail');
-    const dotStyle = getComputedStyle(dot);
-    return {
-      rowInlineStyle: row.getAttribute('style'),
-      rowToken: row.dataset.refMotionToken,
-      dotHasRunAttr: dot.hasAttribute('data-ref-motion-run'),
-      dotInlineStyle: dot.getAttribute('style'),
-      computedTransitionProperty: dotStyle.transitionProperty,
-      computedTransitionDuration: dotStyle.transitionDuration,
-      computedTransitionTimingFunction: dotStyle.transitionTimingFunction,
-      computedInsetInlineStart: dotStyle.insetInlineStart,
-      computedLeft: dotStyle.left,
-      railWidth: rail.getBoundingClientRect().width,
-      dotWidth: dot.getBoundingClientRect().width,
-      dotRectLeft: dot.getBoundingClientRect().left,
-    };
-  });
-
   for (let i = 0; i < dotCount; i += 1) {
     if (i === 1) {
-      expect(
-        after[i],
-        'the played row\'s dot should have moved. Diagnostics: ' + JSON.stringify(diagnostics, null, 2)
-      ).toBeGreaterThan(before[i]);
+      expect(after[i], 'the played row\'s dot should have moved').toBeGreaterThan(before[i]);
     } else {
       expect(after[i], `row ${i} should not move when a different row is played`).toBeCloseTo(before[i], 0);
     }

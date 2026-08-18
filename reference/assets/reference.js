@@ -376,30 +376,45 @@
     // would race the reset below against a still-running return trip.
     if (button) button.disabled = true;
 
-    /* Restarting a transition that is already at its end value takes care:
-       toggling the attribute straight back off then on does not work, because
-       the browser can batch both style changes into the same frame, and a
-       transition that never left its start value has nothing to transition
-       FROM. The classic fix — set to `0s`, remove the attribute, force layout
-       with a read that cannot be answered from a stale style, then restore
-       the real duration and re-add the attribute — needs no
-       `requestAnimationFrame` at all: the forced reflow is a synchronous
-       point the browser must have already resolved styles up to, so the very
-       next line is seen as a genuine change from a committed state, not
-       batched away with the change before it.
+    // The travel distance is measured, not a second copy of the rail/dot
+    // sizes already authored in CSS: read the resting inset once, then how
+    // much room is left is rail minus dot minus that inset on both ends.
+    var rail = dot.parentElement;
+    var restInset = parseFloat(getComputedStyle(dot).insetInlineStart);
+    var endInset = restInset + (rail.clientWidth - dot.offsetWidth - restInset * 2) + 'px';
 
-       An earlier version of this wrapped the restore-and-retrigger in two
-       nested `requestAnimationFrame` calls, on the reasoning that a paint
-       needed to happen first. It did not need to, and CI's headless WebKit
-       (unlike every browser this was checked in locally) went on to prove it
-       mattered: a chain of rAFs is exactly the kind of thing a headless,
-       possibly-unfocused tab can throttle or never fire, and when it did not
-       fire there, the dot simply never moved — passing in every local
-       browser and failing the same deterministic way on every CI retry. */
+    /* Restarting a transition that is already at its end value takes care:
+       jumping straight back to the start value then straight back to the end
+       does not work, because the browser can batch both style changes into
+       the same frame, and a transition that never left its start value has
+       nothing to transition FROM. The classic fix — set to `0s`, reset the
+       position, force layout with a read that cannot be answered from a
+       stale style, then restore the real duration and set the end position
+       again — needs no `requestAnimationFrame` at all: the forced reflow is
+       a synchronous point the browser must have already resolved styles up
+       to, so the very next line is seen as a genuine change from a
+       committed state, not batched away with the change before it.
+
+       The position is set as a direct inline style, not through an
+       attribute selector (`[data-ref-motion-run]` used to carry the end
+       value in the CSS). `data-ref-motion-run` is kept below purely as a
+       state marker — mid-cycle vs at rest — with nothing in the CSS keyed
+       off it any more, after CI's Linux WebKit was caught, with a
+       diagnostic evaluate() rather than a guess, reporting the REST
+       position from getComputedStyle() even once `data-ref-motion-run` was
+       confirmably present on the element and every custom property it fed
+       had resolved correctly. That is a missed style invalidation specific
+       to attribute-selector-driven changes on that engine — every browser
+       this was checked in locally, including the same WebKit on macOS,
+       applied the rule correctly every time. An inline style write doesn't
+       route through attribute-selector invalidation, so it isn't exposed to
+       whatever that bug actually is. */
     dot.style.transitionDuration = '0s';
+    dot.style.insetInlineStart = '';
     dot.removeAttribute('data-ref-motion-run');
     void dot.offsetWidth;
     dot.style.transitionDuration = '';
+    dot.style.insetInlineStart = endInset;
     dot.setAttribute('data-ref-motion-run', '');
 
     // Arrived: hold at the end so it can actually be seen, then let the same
@@ -407,6 +422,7 @@
     // while showing you nothing to play.
     onceMotionSettled(dot, function () {
       setTimeout(function () {
+        dot.style.insetInlineStart = '';
         dot.removeAttribute('data-ref-motion-run');
         onceMotionSettled(dot, function () {
           if (button) button.disabled = false;
