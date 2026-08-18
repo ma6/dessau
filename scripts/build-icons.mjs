@@ -151,6 +151,9 @@ const ICON_MAP = [
       ['eye', 'eye-outline'],
       ['eye-off', 'eye-off-outline'],
       ['copy', 'copy-outline'],
+      /* The plain triangle (`play-outline`), not `play-circle-outline` — the
+         circle is its own affordance and `.dds-button` already draws one. */
+      ['play', 'play-outline'],
     ],
   },
   {
