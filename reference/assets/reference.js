@@ -331,6 +331,71 @@
   }
 
   /* =========================================================================
+     Motion — replay the real transition, not a description of it
+
+     Every dot's `transition-duration`/`transition-timing-function` already
+     points at the token being demonstrated (set inline in the HTML, read by
+     the CSS above) — this function's only jobs are to print the resolved
+     value beside each token name, the same way `renderRulers` does, and to
+     restart the transition on demand.
+
+     Restarting is the part that needs care. Simply toggling the attribute
+     back off then on does not work: the browser can batch both style changes
+     into the same frame, and a transition that never left its start value has
+     nothing to transition FROM. So the reset removes the transition entirely
+     for one frame (`transitionDuration = '0s'`), forces layout with a read
+     that cannot be answered from a stale style, then restores the transition
+     and re-triggers it a frame later — by which point the instant reset has
+     actually painted.
+     ========================================================================= */
+  function wireMotionDemo(container) {
+    var dots = Array.prototype.slice.call(
+      container.querySelectorAll('[data-ref-motion-dot]')
+    );
+
+    dots.forEach(function (dot) {
+      var track = dot.closest('.ref-motion-track');
+      var readout = track && track.querySelector('[data-ref-motion-readout]');
+      var name = dot.dataset.refMotionToken;
+      if (readout && name) {
+        readout.textContent = tokenValue(name, dot);
+      }
+    });
+
+    // The value readouts above are safe to redo on every theme change, same
+    // as every other renderer in this file — but the click listener below
+    // must only ever be attached once, or replaying would restart the
+    // animation once per past render pass instead of once.
+    if (container.dataset.refMotionBound) return;
+    container.dataset.refMotionBound = 'true';
+
+    var button = container.querySelector('[data-ref-motion-replay]');
+    if (!button || !dots.length) return;
+
+    button.addEventListener('click', function () {
+      dots.forEach(function (dot) {
+        dot.style.transitionDuration = '0s';
+        dot.removeAttribute('data-ref-motion-run');
+      });
+
+      // Force layout so the instant reset above is what the browser measures
+      // next, not a queued style change it hasn't applied yet.
+      void container.offsetWidth;
+
+      requestAnimationFrame(function () {
+        dots.forEach(function (dot) {
+          dot.style.transitionDuration = '';
+        });
+        requestAnimationFrame(function () {
+          dots.forEach(function (dot) {
+            dot.setAttribute('data-ref-motion-run', '');
+          });
+        });
+      });
+    });
+  }
+
+  /* =========================================================================
      The icon set — read from the sprite
 
      Rendered from the `<symbol>` elements actually present in the page, so the
@@ -551,6 +616,7 @@
     scope.querySelectorAll('[data-ref-rulers]').forEach(renderRulers);
     scope.querySelectorAll('[data-ref-breakpoints]').forEach(renderBreakpoints);
     scope.querySelectorAll('[data-ref-icons]').forEach(renderIcons);
+    scope.querySelectorAll('[data-ref-motion]').forEach(wireMotionDemo);
     scope.querySelectorAll('[data-ref-locale-switch]').forEach(wireLocaleSwitch);
   }
 

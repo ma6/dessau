@@ -652,6 +652,107 @@
   }
 }
 
+/* ------------------------------------------------------------------- motion */
+/* A duration or an easing curve read as a number does not say how it feels.
+   This plays the real token — actual `transition-duration` /
+   `transition-timing-function`, not a hand-tuned approximation — so what is
+   seen is what a component actually does, never an artist's impression of it.
+
+   Static at rest and only moves when played: modern-web-guidance's own
+   accessibility guidance is to default auto-animating content to a static
+   view and let motion be opted into, and nothing here needed a manual
+   `prefers-reduced-motion` check on top of that — the transitions this uses
+   are ordinary `transition-duration`/`transition-timing-function`, already
+   collapsed to ~0 for anyone with reduced motion set, by the same global rule
+   in base.css every real component relies on. */
+.ref-motion-demo {
+  display: flex;
+  flex-direction: column;
+  gap: var(--dds-space-lg);
+}
+
+.ref-motion-group-label {
+  font-size: var(--dds-font-size-xs);
+  color: var(--dds-color-text-muted);
+  margin-block-end: var(--dds-space-sm);
+}
+
+.ref-motion-track {
+  display: flex;
+  align-items: center;
+  gap: var(--dds-space-sm);
+}
+
+.ref-motion-track + .ref-motion-track {
+  margin-block-start: var(--dds-space-xs);
+}
+
+.ref-motion-name {
+  font-family: var(--dds-font-mono);
+  font-size: var(--dds-font-size-2xs);
+  color: var(--dds-color-text-muted);
+  min-inline-size: 11rem;
+  white-space: nowrap;
+}
+
+.ref-motion-rail {
+  position: relative;
+  inline-size: 100%;
+  max-inline-size: 12rem;
+  block-size: 1.75rem;
+  background-color: var(--dds-color-surface-sunken);
+  border-radius: var(--dds-radius-pill);
+  flex-shrink: 0;
+}
+
+/* The dot's own transition reads the SAME two custom properties every track
+   sets inline — `--ref-motion-duration` and `--ref-motion-ease` — pointed at
+   whichever `--dds-duration-*`/`--dds-ease-*` token that row is demonstrating.
+   Nothing here hard-codes a millisecond figure or a curve; if a token's value
+   ever changes, this changes with it, the same guarantee every other live
+   specimen on this page already makes. */
+.ref-motion-dot {
+  position: absolute;
+  inset-block: 0.1875rem;
+  inset-inline-start: 0.1875rem;
+  inline-size: 1.375rem;
+  border-radius: var(--dds-radius-circle);
+  background-color: var(--dds-color-accent);
+
+  transition-property: inset-inline-start;
+  transition-duration: var(--ref-motion-duration, var(--dds-duration-base));
+  transition-timing-function: var(--ref-motion-ease, var(--dds-ease-standard));
+}
+
+.ref-motion-dot[data-ref-motion-run] {
+  inset-inline-start: calc(100% - 1.375rem - 0.1875rem);
+}
+
+.ref-motion-readout {
+  white-space: nowrap;
+}
+
+.ref-motion-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--dds-space-sm);
+  padding-block-start: var(--dds-space-xs);
+}
+
+/* Same reasoning as the ruler's own mobile stack: name and readout together
+   leave the rail almost nothing to animate across on a phone, so the name
+   takes its own line and the rail gets the width back underneath it. */
+@media (max-width: 47.999rem) {
+  .ref-motion-track {
+    flex-wrap: wrap;
+  }
+
+  .ref-motion-name {
+    min-inline-size: 100%;
+  }
+}
+
 /* -------------------------------------------------------------------- layers */
 /* The cascade-layer stack, weakest at the top. Each step is inset a little further
    so the order reads as a progression rather than as a plain list. */
