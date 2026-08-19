@@ -1,6 +1,6 @@
 {
   "name": "dessau",
-  "version": "0.10.2",
+  "version": "1.0.0",
   "license": "MIT",
   "private": true,
   "description": "A base for design systems, and for the products built on them. The DDS design system, its reference, and structured context for coding agents.",

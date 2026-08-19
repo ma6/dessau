@@ -2558,3 +2558,77 @@ still land on `main` right away; only the tag and GitHub Release wait.
 
 **Reversal condition.** None stated; revisit if the one-a-day cap itself
 turns out to be the wrong shape for a real recurring need.
+
+---
+
+## 060 — 1.0.0: all three legs of 050's gate landed
+
+**Decision.** `package.json` and `DDS.version` move to `1.0.0`.
+
+**What 050 asked for, restated.** `1.0.0` was tied to one specific claim from
+the start, not to a further round of internal review or a cadence of minor
+versions: `#27` (a real product built on Dessau), `#55` (the consumer
+template executed in that product, not just read for accuracy) and `#72`
+(the derived-system recipe walked against a real derived system) all
+landing. `#27` and `#55` landed in `0.10.0` (054), with `dessau.dev` built
+and its findings returned as fixes. `#72` was the last leg, and it closed
+today: `caberpunky-ds`, a real derived design system, with Dessau
+substituted rather than layered, all six gates repointed and each proven
+able to fail, and a full reference covering every inherited component and
+pattern.
+
+**What the third leg actually cost, because "landed" undersells it.** `#72`
+did not confirm the recipe and stop. It ran for the length of a full
+session, ten commits' worth of real, separate findings across both recipes
+and three verification scripts, and every one of them was written back or
+fixed before this entry, not filed for later:
+
+- Two genuine Dessau bugs, not recipe gaps — the accent-separation floor's
+  thin margin against a status-adjacent re-hue (#144), and a hand-written
+  hex pair in `semantic.css` that broke the file's own "primitives are the
+  only literal-value source" pattern (#145) — both fixed, not just
+  documented.
+- A second, unrelated gate failure on `main` itself, found while confirming
+  green rather than assuming it: stale `?v=` cache-busting hashes across
+  ten files, caught by CI on an earlier commit and not previously acted on.
+- Process gaps the recipe's *content* could not have caught by being read
+  more carefully — accent hues decided and shown for approval rather than
+  asked, status hues needing re-examination as a consequence of re-hueing
+  everything around them, `check-reference.mjs` passing without the
+  reference being complete (confirmed twice, on two different non-indexed
+  pages), and a whole recipe (`new-product.md`) that a paste-ready prompt
+  depended on and nobody had written.
+- Two content bugs found by Martin directly, not by the walking agent: the
+  Square roundness snippet repeating a literal `0` instead of pointing at
+  `--dds-radius-none`, and `--dds-radius-none`/`--dds-radius-circle`
+  missing from Dessau's own foundations reference — which, followed to its
+  conclusion, also surfaced border-width and the type-scale sub-primitives
+  (weight, line-height, letter-spacing) as undemonstrated anywhere on the
+  page, now fixed too.
+
+**Why this is the honest shape of "a derived system substitutes the
+foundation rather than layering over it, which is a different kind of
+integration than a product's" (054's own words).** A different kind of
+integration surfaces a different kind of bug — not "the CSS is wrong" but
+"the instructions for building the CSS assumed things about this
+integration that were never true," which is exactly what a guidance audit,
+however thorough, cannot find from inside the repository (050). A full
+session's worth of findings from one real walk is the evidence 050 said
+this gate was waiting for, not a formality being cleared.
+
+**What `1.0.0` is not a claim about.** Not that Dessau is finished — nothing
+in SemVer's own definition says that, and `agent/index.json` will keep
+growing. Not that every gap of this shape is now closed everywhere;
+`derive-a-standalone-system.md`'s own retrospective names the ones still
+open (a systemic audit of every primitive against the reference was run for
+radius and typography, not yet for every token family). What it *is* a
+claim about is the one 050 made explicit: something outside this repository
+has now been built against all three of Dessau's onboarding paths — a
+product, a product using the consumer template, and a derived system — and
+reported back what broke, in each case with the report acted on rather than
+filed.
+
+**Reversal condition.** None — this is the gate closing, not a value that
+gets revisited. A future breaking change to the contract in DECISIONS 037
+is a new MAJOR version on its own merits, the same as it would be for any
+other release.
