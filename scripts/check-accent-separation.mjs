@@ -60,6 +60,15 @@ const ACCENTS = [1, 2, 3, 4, 5];
  * The shipped set's worst pair is accent 2 against accent 5 in dark mode, at 0.109.
  * The gap between that and this number is the room a future re-tune has before it
  * has taken something away.
+ *
+ * THIS CHECK AND check-contrast.mjs PULL AGAINST EACH OTHER. Darkening a
+ * replacement accent to clear WCAG moves it in OKLab, and if that accent is a
+ * yellow-green or otherwise sits near an unchanged status hue (green, cyan —
+ * accents 3 and 4 are never yours to replace, see derive-a-design-system.md §1),
+ * the move can go straight toward it. A derived system's first honest attempt
+ * landed a lime accent at 0.061 against this floor — a contrast fix that had
+ * quietly spent a status-shared accent's separation budget (#72, #144). Run this
+ * check again after any contrast-driven adjustment, not just once before it.
  */
 const MINIMUM = 0.07;
 
