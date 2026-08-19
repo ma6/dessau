@@ -244,6 +244,31 @@ You are a design system now, so you owe what Dessau owes:
   that applies to standing yourself up. Only `new-product.md` is both
   product-facing and path-sensitive, which is what makes it the one that
   needs an adapted copy rather than a pointer.
+
+  **Your adapted `consumer-init.prompt.md` points a product at two rendered
+  references, not one, and that is the shape to write in from the start.**
+  You substituted tokens, not markup — so your own `reference/` shows the
+  right *appearance* and Dessau's, one level down through the nested
+  submodule, is the one that independently re-proves markup and ARIA are
+  still correct, because your own reference does not re-verify what you
+  never touched. Neither reference is a fallback for the other; a product
+  agent needs both, and the prompt should say so:
+
+  ```
+  <your-reference-url>
+    <Your system>'s own tokens — copy colour, spacing and depth from here.
+
+  <dessau-reference-url>
+    Dessau's. Markup and ARIA are correct there; the visual values are not
+    — <your system> substitutes those.
+  ```
+
+  One URL per line, its explanation on the line below rather than trailing
+  and hand-aligned against it — a trailing explanation long enough to need
+  alignment is the shape that overflows the first time it renders somewhere
+  narrower than the editor it was written in. Found by hitting exactly this
+  going from Dessau's one-reference original to a derived system's
+  necessarily-two-reference version.
 - **Your own reference.** Every component you ship is rendered on it, from your own
   markup and in your own values. You inherit Dessau's rule rather than the softer
   product version: `check-reference.mjs` exists because an earlier version verified
