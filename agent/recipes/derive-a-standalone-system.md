@@ -227,6 +227,17 @@ You are a design system now, so you owe what Dessau owes:
   that the reference *page* existed, which every entry passed while twelve
   components had no demo anywhere.
 
+  **`check-reference.mjs` passing is not the same claim as "the reference is
+  done."** The script verifies `agent/index.json`'s catalogue against the
+  pages — components and patterns, the indexed entries. `writing.html`, the
+  UX-writing standard, is neither, so it is invisible to the script in both
+  directions: leave it pointed at Dessau's own copy and the gate has nothing
+  to say about it. One derived system declared its reference finished on a
+  green `check-reference.mjs` with exactly this page still unrepointed. The
+  gate covers the indexed catalogue; the reference is everything a consumer
+  needs to see, and the second is not provably the first just because the
+  first passed.
+
   The rule for *what* goes in it is the same one your own consumers will follow,
   and it is written once in `consumer-AGENTS.template.md` → "This product keeps its
   own reference": used unchanged needs no entry, **built differently needs one, and

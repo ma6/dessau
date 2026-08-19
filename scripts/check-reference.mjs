@@ -31,6 +31,17 @@
  * verified that the reference *page* existed, which every entry passed while
  * twelve components had no demo anywhere in the repository.
  *
+ * WHAT PASSING HERE DOES NOT MEAN. This checks `agent/index.json`'s catalogue
+ * against the pages — every indexed component and pattern. It has nothing to
+ * say about a reference page that documents something outside that catalogue,
+ * because there is nothing in the index to check it against: `writing.html`
+ * (the UX-writing standard) is neither a component nor a pattern, so a derived
+ * system that repoints every other page and leaves that one aimed at Dessau's
+ * own copy still gets a clean run here. "This check passes" verifies the
+ * indexed catalogue; "the reference is done" is a claim about the whole
+ * directory, and the first is not proof of the second (#72, derive-a-standalone-
+ * system.md step 6).
+ *
  * Zero dependencies, Node stdlib only. Exit code 1 on any finding.
  * @catches A documented component with no rendered example, an anchor or in-page
  *   link that does not resolve, a token name no stylesheet declares, an asset

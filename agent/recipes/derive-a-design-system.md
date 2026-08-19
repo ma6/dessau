@@ -112,8 +112,21 @@ are not theme-dependent, so a single unlayered `:root` is right for those.
 ## 1. Colour
 
 **The questions.** What is your action colour? Is your neutral warm, cool or
-true? How many decorative accents do you need, and what do *you* call them? Does
-dark mode ship?
+true? **What should your decorative accents actually be** — not just how many
+and what you call them, but the hues themselves, and whether one of them
+doubles as your brand's default — and how many decorative accents do you need?
+Does dark mode ship?
+
+**Ask the accent hues, do not pick them and show the result.** It is easy to
+treat "five decorative accents" as covered by the default and fill in hues
+yourself as part of delivering the package — the accent section below spends
+real space on naming precisely because this is "the one place... the product
+is expected to add a name rather than change a value," which makes it sound
+like the client's call by design. If the hues themselves are chosen for them
+rather than asked, that promise is broken quietly: a person who sees five
+finished hues and says "actually, not that one" after the fact was shown a
+result, not asked a question, no matter how the record reads afterward — the
+same distinction #123 already drew for the other five decisions.
 
 **The default.** Indigo action, a hue-free grey neutral, five decorative accents
 led by a muted terracotta, dark mode on. Four status hues you almost certainly
@@ -137,6 +150,20 @@ inherited ones is not a ramp.
 are four unmistakably different hues on purpose, so status survives being read by
 somebody who sees hue differently — and the amber is olive-leaning specifically
 so it cannot be confused with the accents or the error red.
+
+**Re-hueing action and most of your accents is itself a reason to re-examine
+status — a different class of reason than taste.** "Unless you have a reason
+better than taste" was written for status considered on its own; it was not
+written for the case where everything *around* status has already moved. Move
+action and accents 1/2/5 to an unrelated palette (a neon system replacing an
+indigo-and-terracotta one, say) and the untouched status hues can start
+reading as a mismatch sitting inside an otherwise coherent system — a real
+internal-consistency problem the recipe's own recommended sequence produces,
+not a taste preference somebody brought to it separately. If you re-hue status
+for this reason, the same cost applies as any status change: re-verify with
+both `check-contrast.mjs` and `check-accent-separation.mjs`, since status
+hues sit under accent slots 3 and 4 and a status move re-hues two accents as
+a side effect.
 
 **Yours to replace: accents 1, 2, 5. Not yours: accents 3 and 4 — they share a
 ramp with status.** That is the whole accent-sharing model in one line; the table
