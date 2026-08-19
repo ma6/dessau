@@ -87,6 +87,13 @@ async function docs() {
  */
 const NOT_OURS = new Map([
   ['assets/product.css', "the product's own stylesheet, created by the reader"],
+  [
+    'dds/js/README.md',
+    'derive-a-standalone-system.md step 5: a stub a derived system creates in ' +
+      'its own repository so check-css.mjs and check-agent-index.mjs have a ' +
+      "directory to read when the system hasn't inherited dds/js — not a file " +
+      'Dessau itself ships',
+  ],
   ['dist/dds.css', 'built artefact; dist/ is git-ignored (DECISIONS 023, 030)'],
   ['dist/dds.min.css', 'built artefact; dist/ is git-ignored'],
   ['agent/consumer-AGENTS.template.md', 'exists — kept here so the name is checked below'],

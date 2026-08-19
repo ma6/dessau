@@ -856,8 +856,8 @@
           "--dds-color-action-secondary-active": {
             "reference": "var(--dds-indigo-100)",
             "light": "#e4e7fb",
-            "dark": "#2c2c5c",
-            "darkReference": "#2c2c5c"
+            "dark": "#2a2b5e",
+            "darkReference": "var(--dds-indigo-900)"
           },
           "--dds-color-action-danger": {
             "reference": "var(--dds-red-700)",
