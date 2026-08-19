@@ -530,6 +530,16 @@
   max-inline-size: var(--dds-measure-wide);
 }
 
+/* 1.5rem is 24px, the WCAG 2.2 2.5.8 minimum — dds-text-sm's line height
+   alone measures 22px at 320px. Same shape and same fix as .dds-breadcrumb
+   a in components-navigation.css: not exempt as an inline target, since it
+   sits beside a button rather than inside a sentence. */
+.ref-prompt-file-link {
+  display: inline-flex;
+  align-items: center;
+  min-block-size: 1.5rem;
+}
+
 /* A grid of state variations. */
 .ref-matrix {
   display: grid;
