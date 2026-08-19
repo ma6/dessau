@@ -715,6 +715,54 @@
   }
 
   /* =========================================================================
+     The consumer prompt, fetched live rather than duplicated
+
+     Markup:
+       <div data-ref-prompt-fetch="../agent/consumer-init.prompt.md">
+         <pre><code id="…">Loading…</code></pre>
+       </div>
+
+     `agent/consumer-init.prompt.md` is the paste-ready artefact a product
+     actually starts from. Writing its contents into this page as static HTML
+     would be exactly the kind of copy every other specimen on this page
+     refuses to keep (see the file header) — the prompt changes, the page
+     forgets, and the thing a reader pastes into an agent is quietly wrong.
+     Fetched instead, so it cannot drift.
+
+     The file is prose wrapping a single fenced ```text block — that fence is
+     the paste-ready part, the prose around it is written for a human reading
+     the recipe repository, not for a coding agent starting cold. Extracted
+     with a regular expression rather than a markdown parser: one fence, one
+     match, and a parser would be a dependency for a problem four lines of
+     JavaScript already solves.
+     ========================================================================= */
+  function wireConsumerPrompt(root) {
+    var hosts = root.querySelectorAll('[data-ref-prompt-fetch]');
+    for (var i = 0; i < hosts.length; i++) {
+      fetchConsumerPrompt(hosts[i]);
+    }
+  }
+
+  function fetchConsumerPrompt(host) {
+    var target = host.querySelector('code');
+    if (!target) return;
+
+    fetch(host.getAttribute('data-ref-prompt-fetch'))
+      .then(function (response) {
+        if (!response.ok) throw new Error(String(response.status));
+        return response.text();
+      })
+      .then(function (markdown) {
+        var fence = /```text\n([\s\S]*?)```/.exec(markdown);
+        target.textContent = (fence ? fence[1] : markdown).trim();
+      })
+      .catch(function () {
+        target.textContent =
+          'Could not load the prompt here — open agent/consumer-init.prompt.md directly.';
+      });
+  }
+
+  /* =========================================================================
      The header knows whether the page has been scrolled
 
      Sets `data-ref-scrolled` on `.ref-header` once the page has moved off the
@@ -766,6 +814,7 @@
 
   function init() {
     wireHeaderScrollState();
+    wireConsumerPrompt(document);
 
     whenTokensResolve(function () {
       renderAll(document);
