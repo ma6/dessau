@@ -22,6 +22,22 @@
 # Deliberately cheap: the gates are zero-dependency Node, Playwright is the only
 # devDependency, and the test server is Python's own — already on the runner,
 # and the same command README.md tells a reader to use.
+#
+# -----------------------------------------------------------------------------
+# Why the browser matrix only runs on a tag, not on every push
+# -----------------------------------------------------------------------------
+#
+# It did run on every push once. The Gates job stayed there — it is Node only,
+# no browsers, seconds not minutes — but three browsers on every commit in a
+# session of many small commits is the expensive half of this file for the
+# cheap half's benefit, and Playwright's own Docker image
+# (`mcr.microsoft.com/playwright`, pinned to the same version this repository's
+# `package.json` resolves) reproduces the same Linux rendering locally at no
+# marginal cost per commit. Gates on every push catches a silent failure the
+# moment it is written; the full matrix now runs where it earns its keep — a
+# tag, which is the point nobody should ship past without every engine having
+# reported — and is still one `workflow_dispatch` away on any ordinary commit
+# that genuinely needs it.
 # -----------------------------------------------------------------------------
 
 name: CI
@@ -29,6 +45,7 @@ name: CI
 on:
   push:
     branches: ['**']
+    tags: ['v*']
   pull_request:
   workflow_dispatch:
 
@@ -90,6 +107,9 @@ jobs:
   test:
     name: Browser (${{ matrix.engine }})
     runs-on: ubuntu-latest
+    # Tag pushes and manual runs only — see "Why the browser matrix only runs
+    # on a tag" above.
+    if: startsWith(github.ref, 'refs/tags/v') || github.event_name == 'workflow_dispatch'
 
     strategy:
       # Every engine reports. A Chromium failure must not hide a WebKit or a
