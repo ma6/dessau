@@ -2682,3 +2682,52 @@ sign `1.0.0` shipped broken.
 
 **Reversal condition.** None stated; the version number is a description of
 what changed, not a commitment.
+
+---
+
+## 062 — CI's browser matrix moves to tag pushes; Docker replaces it for everyday work
+
+**Decision.** `ci.yml`'s Gates job (the zero-dependency `npm run check`
+scripts, no browsers) still runs on every push, as before. The three-browser
+Playwright matrix no longer does — it runs only on a tag push or a manual
+`workflow_dispatch`. Verifying an ordinary commit against real browsers now
+means running `mcr.microsoft.com/playwright`, pinned to the exact version
+`package.json` resolves, locally.
+
+**What prompted it.** The `ma6` account's GitHub budget for Actions is set
+to $0 with usage stopped at 100%, blocking every job in every workflow —
+found mid-session as a run failure ("recent account payments have failed or
+your spending limit needs to be increased"), not a code problem. That
+stopped CI outright rather than merely making it expensive, which is what
+surfaced the question — but the change below is argued on its own merits,
+not as a workaround for a budget setting that could be raised instead.
+
+**Why the split holds independent of the budget.** A session doing real,
+iterative work produces many small commits — eleven landed between `1.0.0`
+and `1.0.1` alone. Gates is seconds, Node only, and catches a silent
+failure (a stale generated file, a broken cross-reference) the moment it is
+written; running it on every one of those commits costs almost nothing and
+loses nothing by being frequent. The three-engine matrix is minutes, and
+what it buys — confidence the *rendered* result is correct across Chromium,
+Firefox and WebKit — does not compound the same way across many small
+commits touching the same feature. Docker gives that confidence locally,
+on demand, at the exact version CI would have used, for the marginal cost
+of one `docker run` rather than a queued remote job. Verified working
+end to end this session: `docker pull mcr.microsoft.com/playwright:v1.62.1-noble`
+(matching `@playwright/test`'s resolved version exactly) against the
+`1.0.1` tree, full suite, `733 passed, 2 skipped, 0 failed` — the same
+result the GitHub matrix would have reported, had it run.
+
+**What this costs.** A regression only the browser suite would catch, on a
+commit that is not a tag, is no longer caught automatically — it is caught
+only if Docker (or `npx playwright test` locally) is actually run, which is
+now a discipline rather than a guarantee. The tag is the point nobody
+should ship past without every engine having reported, and that guarantee
+is unchanged: the matrix still runs there, every time, whether or not
+anyone remembered to run it locally first.
+
+**Reversal condition.** The everyday cost of running Docker locally turns
+out to be higher than it looked this session — slow enough, or unreliable
+enough across environments, that it stops being run — in which case the
+matrix goes back to every push and the cost is paid in Actions minutes
+instead of attention.
