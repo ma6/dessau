@@ -316,6 +316,18 @@ focusable and in the accessibility tree.
 Under forced colours the on state gains a thicker border, because the fill is
 stripped.
 
+**Icon variant — `.dds-switch-icon`.** The thumb carries an icon that swaps
+between an "off" and an "on" glyph as the state changes, instead of a plain
+circle — add the modifier class and put both icons, as real `<svg>` elements,
+inside `.dds-switch-track`. A `::after` cannot hold an `<svg>`, so this variant
+replaces the generated thumb with whichever icon matches the current state; CSS
+does the choosing, so there is no JavaScript icon swap and no flash of the
+wrong icon on load. The visible label stays constant — the icon carries the
+state, the same division of labour the plain switch already has between track
+fill and label text. Generic: not tied to any one setting. Demonstrated in the
+reference page with a sun/moon pair; that is one example use, not a rewiring of
+the theme toggle, which stays the separate action-button control it already is.
+
 ---
 
 ## Fieldset group — `.dds-fieldgroup`

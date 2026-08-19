@@ -1013,12 +1013,15 @@
       "notFor": "A value submitted with a form — use a checkbox.",
       "classes": [
         ".dds-switch",
-        ".dds-switch-track"
+        ".dds-switch-track",
+        ".dds-switch-icon",
+        ".dds-switch-icon-off",
+        ".dds-switch-icon-on"
       ],
       "css": "dds/css/components.css",
       "spec": "## Switch — `.dds-switch`",
       "reference": "reference/components.html#switch",
-      "accessibility": "role=\"switch\" over a real checkbox. Forced colours: border weight changes.",
+      "accessibility": "role=\"switch\" over a real checkbox. Forced colours: border weight changes. Icon variant (.dds-switch-icon): both state icons are real <svg> elements inside .dds-switch-track (aria-hidden, same as the track), CSS shows the one matching the checked state and positions it as the thumb; the visible label stays constant, the icon carries the state.",
       "responsive": "none — nothing about it changes with width"
     },
     {

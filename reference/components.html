@@ -913,6 +913,32 @@
               saved”. Users read the difference, so it should be true.
             </p>
           </div>
+
+          <div class="ref-specimen" data-ref-code>
+            <p class="ref-specimen-label">Icon variant — the thumb carries the state</p>
+            <div class="dds-stack dds-stack-xs">
+              <label class="dds-switch dds-switch-icon">
+                <input type="checkbox" role="switch">
+                <span class="dds-switch-track" aria-hidden="true">
+                  <svg class="dds-icon dds-switch-icon-off" aria-hidden="true"><use href="#dds-icon-sun"/></svg>
+                  <svg class="dds-icon dds-switch-icon-on" aria-hidden="true"><use href="#dds-icon-moon"/></svg>
+                </span>
+                <span>Dark theme</span>
+              </label>
+            </div>
+            <p class="dds-text-sm dds-text-muted dds-mbs-sm dds-measure-default">
+              Both icons are in the markup; CSS shows the one that matches the
+              current state and positions it as the thumb, so there is no
+              JavaScript icon swap and no flash of the wrong icon on load. The
+              label stays constant — the icon carries the state, same as the
+              track fill does on the plain switch. This is a generic switch
+              capability, demonstrated here with a sun/moon pair; it is not
+              wired to the page theme and does not replace the
+              <a href="#theme-toggle">theme toggle</a> below, which is a
+              deliberately different control (an action button styled as a
+              text link, for a header or footer utility row).
+            </p>
+          </div>
         </div>
       </section>
 

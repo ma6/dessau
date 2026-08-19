@@ -933,6 +933,82 @@
     }
   }
 
+  /* --------------------------------------------------------------------------
+     Switch — icon variant
+     --------------------------------------------------------------------------
+     A thumb that carries an icon instead of a plain circle, swapping between an
+     "off" and an "on" glyph as the switch moves — the pattern behind Bahn's
+     theme switcher. Both icons live in the markup as real elements, not on the
+     track's generated content, because a `::after` cannot hold an `<svg>`. CSS
+     shows the one that matches the current state and positions it as the thumb,
+     so there is no JavaScript icon swap and no flash of the wrong icon before
+     any script runs.
+
+     Markup, on top of the base `.dds-switch` contract:
+
+       <label class="dds-switch dds-switch-icon">
+         <input type="checkbox" role="switch">
+         <span class="dds-switch-track" aria-hidden="true">
+           <svg class="dds-icon dds-switch-icon-off" aria-hidden="true"><use href="#…"/></svg>
+           <svg class="dds-icon dds-switch-icon-on" aria-hidden="true"><use href="#…"/></svg>
+         </span>
+         <span>Label — stays constant; the icon carries the state, the text
+         does not need to</span>
+       </label>
+
+     The track grows slightly over the plain switch so a 1em icon has room
+     inside the thumb without crowding it. */
+  .dds-switch-icon .dds-switch-track {
+    inline-size: 3rem;
+    block-size: 1.75rem;
+  }
+
+  /* The generated thumb is replaced by whichever icon is current. */
+  .dds-switch-icon .dds-switch-track::after {
+    content: none;
+  }
+
+  .dds-switch-icon-off,
+  .dds-switch-icon-on {
+    position: absolute;
+    inset-block-start: 50%;
+    inset-inline-start: 2px;
+    translate: 0 -50%;
+
+    inline-size: 1.5rem;
+    block-size: 1.5rem;
+    padding: 0.25rem;
+    box-sizing: border-box;
+
+    background-color: var(--dds-color-surface-default);
+    border-radius: var(--dds-radius-circle);
+    box-shadow: var(--dds-elevation-sm);
+    color: var(--dds-color-text-default);
+
+    transition: translate var(--dds-duration-fast) var(--dds-ease-standard);
+  }
+
+  .dds-switch-icon-on {
+    display: none;
+  }
+
+  .dds-switch-icon:has(> input:checked) .dds-switch-icon-off {
+    display: none;
+  }
+
+  .dds-switch-icon:has(> input:checked) .dds-switch-icon-on {
+    display: inline-block;
+    /* Logical translate so the icon moves the correct way in right-to-left —
+       track inline-size minus icon inline-size minus the border on both
+       sides minus the inset on both sides: 48 - 24 - 2 - 4 = 18px. */
+    translate: 1.125rem -50%;
+  }
+
+  .dds-switch-icon:has(> input:disabled) .dds-switch-icon-off,
+  .dds-switch-icon:has(> input:disabled) .dds-switch-icon-on {
+    color: var(--dds-color-text-disabled);
+  }
+
   /* ==========================================================================
      Fieldset group
      ==========================================================================
