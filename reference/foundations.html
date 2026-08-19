@@ -893,15 +893,80 @@
 
           <div class="ref-specimen dds-stack dds-stack-md">
             <p class="ref-specimen-label">Scale</p>
-            <p class="dds-text-4xl dds-font-display dds-weight-bold">4xl — Display</p>
-            <p class="dds-text-3xl dds-font-display dds-weight-semibold">3xl — Section heading</p>
-            <p class="dds-text-2xl dds-font-display dds-weight-semibold">2xl — Subsection</p>
-            <p class="dds-text-xl dds-font-display dds-weight-semibold">xl — Card title</p>
-            <p class="dds-text-lg">lg — Lead paragraph</p>
-            <p class="dds-text-md">md — Body. The default, and the minimum size for a form control.</p>
-            <p class="dds-text-sm">sm — Hints, table cells, secondary detail.</p>
-            <p class="dds-text-xs">xs — Badges, metadata.</p>
-            <p class="dds-text-2xs">2xs — Never body copy.</p>
+            <p class="dds-text-4xl dds-font-display dds-weight-bold">4xl — Display <span class="dds-text-xs dds-text-muted dds-font-body">--dds-font-size-4xl</span></p>
+            <p class="dds-text-3xl dds-font-display dds-weight-semibold">3xl — Section heading <span class="dds-text-xs dds-text-muted dds-font-body">--dds-font-size-3xl</span></p>
+            <p class="dds-text-2xl dds-font-display dds-weight-semibold">2xl — Subsection <span class="dds-text-xs dds-text-muted dds-font-body">--dds-font-size-2xl</span></p>
+            <p class="dds-text-xl dds-font-display dds-weight-semibold">xl — Card title <span class="dds-text-xs dds-text-muted dds-font-body">--dds-font-size-xl</span></p>
+            <p class="dds-text-lg">lg — Lead paragraph <span class="dds-text-xs dds-text-muted">--dds-font-size-lg</span></p>
+            <p class="dds-text-md">md — Body. The default, and the minimum size for a form control. <span class="dds-text-xs dds-text-muted">--dds-font-size-md</span></p>
+            <p class="dds-text-sm">sm — Hints, table cells, secondary detail. <span class="dds-text-xs dds-text-muted">--dds-font-size-sm</span></p>
+            <p class="dds-text-xs">xs — Badges, metadata. <span class="dds-text-muted">--dds-font-size-xs</span></p>
+            <p class="dds-text-2xs">2xs — Never body copy. <span class="dds-text-muted">--dds-font-size-2xs</span></p>
+          </div>
+
+          <div>
+            <h3>Weight, line-height and letter-spacing</h3>
+            <p class="dds-text-sm dds-text-subtle dds-measure-default dds-mbs-2xs dds-mbe-md">
+              None of the three has a semantic alias — nothing here is theme-
+              dependent, so there is nothing for a semantic layer to re-point.
+              Use the primitive directly, the same as radius or spacing.
+            </p>
+            <div class="ref-specimen">
+              <div class="ref-matrix">
+                <div>
+                  <p class="ref-specimen-label">--dds-font-weight-regular (400)</p>
+                  <p class="dds-weight-regular">Set in type</p>
+                </div>
+                <div>
+                  <p class="ref-specimen-label">--dds-font-weight-medium (500)</p>
+                  <p class="dds-weight-medium">Set in type</p>
+                </div>
+                <div>
+                  <p class="ref-specimen-label">--dds-font-weight-semibold (600)</p>
+                  <p class="dds-weight-semibold">Set in type</p>
+                </div>
+                <div>
+                  <p class="ref-specimen-label">--dds-font-weight-bold (700)</p>
+                  <p class="dds-weight-bold">Set in type</p>
+                </div>
+              </div>
+            </div>
+            <div class="ref-specimen dds-mbs-md">
+              <div class="ref-matrix">
+                <div>
+                  <p class="ref-specimen-label">--dds-line-height-tight (1.15) · display sizes</p>
+                  <p style="line-height: var(--dds-line-height-tight)">Two lines set at the tight leading used for the largest display sizes, where lines sit close.</p>
+                </div>
+                <div>
+                  <p class="ref-specimen-label">--dds-line-height-snug (1.3) · headings</p>
+                  <p style="line-height: var(--dds-line-height-snug)">Two lines set at the snug leading used for headings and single-line UI text.</p>
+                </div>
+                <div>
+                  <p class="ref-specimen-label">--dds-line-height-normal (1.55) · body copy</p>
+                  <p style="line-height: var(--dds-line-height-normal)">Two lines set at the normal leading used for ordinary body copy throughout.</p>
+                </div>
+                <div>
+                  <p class="ref-specimen-label">--dds-line-height-loose (1.7) · long-form reading</p>
+                  <p style="line-height: var(--dds-line-height-loose)">Two lines set at the loose leading used for long-form reading passages.</p>
+                </div>
+              </div>
+            </div>
+            <div class="ref-specimen dds-mbs-md">
+              <div class="ref-matrix">
+                <div>
+                  <p class="ref-specimen-label">--dds-letter-spacing-tight (-0.02em) · large display only</p>
+                  <p style="letter-spacing: var(--dds-letter-spacing-tight)" class="dds-text-2xl">Tighter</p>
+                </div>
+                <div>
+                  <p class="ref-specimen-label">--dds-letter-spacing-normal (0)</p>
+                  <p style="letter-spacing: var(--dds-letter-spacing-normal)" class="dds-text-2xl">Normal</p>
+                </div>
+                <div>
+                  <p class="ref-specimen-label">--dds-letter-spacing-wide (0.02em) · small caps-ish UI labels</p>
+                  <p style="letter-spacing: var(--dds-letter-spacing-wide)" class="dds-text-2xl">Wider</p>
+                </div>
+              </div>
+            </div>
           </div>
 
           <div>
@@ -1850,6 +1915,24 @@
           independent zeroes. <code class="dds-code">--dds-radius-circle</code>
           is geometry rather than taste: avatars, the progress ring and the
           step marker are circles regardless of the roundness decision.
+        </p>
+
+        <div class="ref-specimen dds-mbs-md">
+          <div class="ref-matrix">
+            <div>
+              <p class="ref-specimen-label">--dds-border-thin (1px)</p>
+              <div style="block-size: 4rem; background: var(--dds-color-surface-default); border: var(--dds-border-thin) solid var(--dds-color-border-default); border-radius: var(--dds-radius-md)"></div>
+            </div>
+            <div>
+              <p class="ref-specimen-label">--dds-border-thick (2px)</p>
+              <div style="block-size: 4rem; background: var(--dds-color-surface-default); border: var(--dds-border-thick) solid var(--dds-color-border-default); border-radius: var(--dds-radius-md)"></div>
+            </div>
+          </div>
+        </div>
+        <p class="dds-text-sm dds-text-subtle dds-mbs-xs">
+          <code class="dds-code">--dds-border-thick</code> exists so emphasis
+          never depends on colour alone — a selected card gains weight, not
+          just hue.
         </p>
 
         <div class="ref-specimen ref-specimen-plain dds-mbs-md">
