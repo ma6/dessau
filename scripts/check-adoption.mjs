@@ -94,6 +94,13 @@ const NOT_OURS = new Map([
       "directory to read when the system hasn't inherited dds/js — not a file " +
       'Dessau itself ships',
   ],
+  [
+    'dds/css/fonts.css',
+    'derive-a-standalone-system.md step 3: the hypothetical path a derived ' +
+      "system's own self-hosted-font stylesheet would live at if it reversed " +
+      'DECISIONS 006/009 — Dessau itself self-hosts fonts only in reference/, ' +
+      'never inside dds/, so this file does not and should not exist here',
+  ],
   ['dist/dds.css', 'built artefact; dist/ is git-ignored (DECISIONS 023, 030)'],
   ['dist/dds.min.css', 'built artefact; dist/ is git-ignored'],
   ['agent/consumer-AGENTS.template.md', 'exists — kept here so the name is checked below'],

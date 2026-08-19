@@ -119,6 +119,25 @@ to have them — or take that script too and let it own your entry file. Do not 
 Dessau's hashes in place pointing at your files; they are hashes of somebody else's
 content and will be wrong from the first edit.
 
+**If you take `bundle.mjs` too, and your own `dds/` ever gets a real `@font-face`
+`url()` in it — not just in `reference/` — the bundle breaks quietly.** The
+minifier is deliberately timid: it inlines every imported file's content
+byte-for-byte and never rewrites a `url()` inside it (documented in the
+script's own header — correctness over compression). That costs nothing for
+Dessau itself, because nothing in `dds/` references a binary asset; fonts are
+only self-hosted in `reference/`, which the bundle never touches. It stops
+being free the moment your own foundation self-hosts something — a font,
+most plausibly, if you reverse DECISIONS 006/009's "zero self-hosting"
+default. `dds/css/fonts.css`'s `url(../fonts/…)` resolves correctly relative
+to itself when linked directly, and resolves to the wrong directory once
+inlined into `dist/your-system.css`, which sits one level up from where
+`dds/css/` does. Nothing announces this; the build succeeds and the fonts
+404 in whatever consumes the bundled file. If you self-host inside `dds/`,
+either rebase the `url()` to be correct from `dist/`'s position too (it
+cannot be correct from both at once, so pick which one you ship) or verify
+the built output directly rather than trusting that a successful build means
+a working one.
+
 ## 4. What to copy from `semantic.css`, and what not to
 
 `primitives.css` is yours outright — it is the ramps, and the ramps are the
