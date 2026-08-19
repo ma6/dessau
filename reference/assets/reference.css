@@ -517,6 +517,17 @@
   margin-block-end: var(--dds-space-xs);
 }
 
+/* The fetched-prompt specimen reads as prose, not code — .ref-code's own
+   full-width default is correct for a genuine code sample (a long line
+   legitimately needs the room) but wrong here. Capped on the OUTER
+   specimen wrapper, not the <pre> inside it: capping only the <pre> leaves
+   the button row above it full-width, so the button drifts away from the
+   box it acts on. One shared width keeps the header row, the code box and
+   the note below it reading as a single column. */
+.ref-specimen[data-ref-prompt-fetch] {
+  max-inline-size: var(--dds-measure-wide);
+}
+
 /* A grid of state variations. */
 .ref-matrix {
   display: grid;
