@@ -229,14 +229,35 @@ You are a design system now, so you owe what Dessau owes:
 
   **`check-reference.mjs` passing is not the same claim as "the reference is
   done."** The script verifies `agent/index.json`'s catalogue against the
-  pages — components and patterns, the indexed entries. `writing.html`, the
-  UX-writing standard, is neither, so it is invisible to the script in both
-  directions: leave it pointed at Dessau's own copy and the gate has nothing
-  to say about it. One derived system declared its reference finished on a
-  green `check-reference.mjs` with exactly this page still unrepointed. The
-  gate covers the indexed catalogue; the reference is everything a consumer
-  needs to see, and the second is not provably the first just because the
-  first passed.
+  pages — components and patterns, the indexed entries. Dessau's own
+  `reference/` directory has pages that are neither: `foundations.html`,
+  `writing.html` (the UX-writing standard), `architecture.html` (the layer
+  model and consumption story). All three are invisible to the script in both
+  directions — leave one pointed at Dessau's own copy and the gate has
+  nothing to say about it. One derived system missed `writing.html` and then
+  `architecture.html` on two separate passes, both times behind an already-
+  green `check-reference.mjs`; twice on the same root cause is a pattern, not
+  a one-off. **Copy the whole directory's shape, not the indexed subset**:
+  every page in `reference/` gets read and repointed, whether or not
+  `agent/index.json` knows it exists.
+
+  `architecture.html` carries its own trap inside the trap: most of the page
+  (the layer model, the component/pattern test, the JS model, browser
+  support) is genuinely generic and needs no rewrite, but its "how a product
+  consumes this" section is consumption-specific content — Dessau's version
+  names `new-product.md`, yours names your own equivalent (see below), and
+  copying the section verbatim describes onboarding onto the wrong system.
+  The markup-vs-prose split from earlier in this step isn't only a
+  per-page decision; it can run within a single page too.
+
+  **The root overview page (`index.html`) carries real weight, not a redirect
+  stub.** Dessau's own is a six-decisions summary, the layer model, component-
+  vs-pattern guidance, agent-context pointers and a real integration example
+  — not a landing page that defers everything to `reference/`. A derived
+  system owes the same depth, adapted: its own decisions, its own position in
+  the layer model, its own consumer path. Check 5b (above) only asks that
+  root not be a dead end; this is a separate, higher bar this step is asking
+  for regardless of what that check verifies.
 
   The rule for *what* goes in it is the same one your own consumers will follow,
   and it is written once in `consumer-AGENTS.template.md` → "This product keeps its

@@ -35,11 +35,13 @@
  * against the pages — every indexed component and pattern. It has nothing to
  * say about a reference page that documents something outside that catalogue,
  * because there is nothing in the index to check it against: `writing.html`
- * (the UX-writing standard) is neither a component nor a pattern, so a derived
- * system that repoints every other page and leaves that one aimed at Dessau's
- * own copy still gets a clean run here. "This check passes" verifies the
- * indexed catalogue; "the reference is done" is a claim about the whole
- * directory, and the first is not proof of the second (#72, derive-a-standalone-
+ * (the UX-writing standard) and `architecture.html` (the layer model and
+ * consumption story) are neither a component nor a pattern, so a derived
+ * system that repoints every other page and leaves either of those aimed at
+ * Dessau's own copy still gets a clean run here — confirmed twice, on two
+ * separate pages, in the same walk. "This check passes" verifies the indexed
+ * catalogue; "the reference is done" is a claim about the whole directory,
+ * and the first is not proof of the second (#72, derive-a-standalone-
  * system.md step 6).
  *
  * Zero dependencies, Node stdlib only. Exit code 1 on any finding.
