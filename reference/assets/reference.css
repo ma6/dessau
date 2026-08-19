@@ -517,14 +517,16 @@
   margin-block-end: var(--dds-space-xs);
 }
 
-/* The fetched-prompt specimen reads as prose, not code — .ref-code's own
-   full-width default is correct for a genuine code sample (a long line
-   legitimately needs the room) but wrong here. Capped on the OUTER
-   specimen wrapper, not the <pre> inside it: capping only the <pre> leaves
-   the button row above it full-width, so the button drifts away from the
-   box it acts on. One shared width keeps the header row, the code box and
-   the note below it reading as a single column. */
-.ref-specimen[data-ref-prompt-fetch] {
+/* The "Using it" section reads as prose with two code samples in it, not a
+   page of code — .ref-code's own full-width default is correct for a
+   genuine code sample elsewhere on the site (a long line legitimately
+   needs the room) but wrong for a section this short. Capped on the
+   section's own OUTER wrapper, not on the fetched-prompt specimen alone:
+   capping one specimen fixes it and leaves every neighbour (the HTML
+   integration example, the notice boxes) full-width beside it, which reads
+   as more inconsistent than capping nothing at all. One shared width on
+   the wrapper means everything inside inherits it by construction. */
+[data-ref-using-it] {
   max-inline-size: var(--dds-measure-wide);
 }
 
