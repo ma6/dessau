@@ -2640,3 +2640,45 @@ filed.
 gets revisited. A future breaking change to the contract in DECISIONS 037
 is a new MAJOR version on its own merits, the same as it would be for any
 other release.
+
+---
+
+## 061 — 1.0.1: fixes and documentation, not new capability
+
+**Decision.** `package.json` and `DDS.version` move to `1.0.1`, not `1.1.0`.
+
+**Why a patch.** Checked the diff against `1.0.0` rather than going by
+feel: `dds/css/semantic.css`'s only change is a comment, clarifying
+without altering `#145`'s already-shipped fix; `dds/dds.css`'s two-line
+diff is a cache-busting hash. Nothing else in `dds/` or `dds/js/` moved —
+no new component, token, class or `data-dds-*` hook, and the built
+artefact is functionally identical to `1.0.0` bar the query string. Real
+work landed since the tag, but it landed in `reference/` (a new
+consumer-prompt feature, two real layout-alignment bugs found and fixed)
+and in `agent/`'s recipes and prompts (several findings from `caberpunky-ds`
+consuming the `1.0.0` release for real, folded back in). Both are
+`DECISIONS 037`'s *implementation* side, explicitly not the contract, the
+same distinction `057`/`058` already draw between a minor's new capability
+and a patch's fixes.
+
+**Why today, against `059`'s one-release-per-day cap.** Bugfix releases are
+the cap's stated exception. Two of the changes since `1.0.0` are exactly
+that — real layout bugs in the new consumer-prompt specimen, found and
+fixed the same day they were introduced, not batched churn accumulated to
+justify a release.
+
+**What prompted the question in the first place.** `caberpunky-ds` updating
+its pin to `1.0.0` and reporting back — per `037`'s own now-corrected
+"tested once" line — surfaced most of what's in this release: a stale
+`DECISIONS 037` line contradicting `060` itself, two real width-alignment
+bugs in a feature built the same session, and several recipe gaps
+(`consumer-init.prompt.md`'s two-reference formatting, the brand-logo mask
+trap, `bundle.mjs`'s `url()` limitation, and the issue-first ask being
+binary where it should offer a third option — found in the copy before
+being traced back to `new-product.md`'s own original wording carrying the
+same gap). A pinned consumer reporting back what it found, the day after
+the tag it updated to, is `037`'s contract working as intended — not a
+sign `1.0.0` shipped broken.
+
+**Reversal condition.** None stated; the version number is a description of
+what changed, not a commitment.
