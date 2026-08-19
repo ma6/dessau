@@ -1455,10 +1455,18 @@ consumers. Renaming a class for clarity, restructuring a component's markup to
 simplify it, or moving a component to a different radius step were all free before
 this entry and are not any more.
 
-**Untested.** No derived system exists yet, so no part of this list has been
-checked against one. It is derived from how the system is built rather than from
-experience of maintaining several, and the first real derived system is what will
-show which line is in the wrong place.
+**Tested once (#72), against `caberpunky-ds`.** The list held: nothing on the
+contract side moved, and the one real concrete-value change in the same
+session — `#145`'s fix to `--dds-color-action-secondary-active` in
+`semantic.css`, a genuine hex shift, not a no-op — had exactly the effect
+this entry predicts for an implementation-side change. `caberpunky-ds`
+substitutes its own `semantic.css` rather than importing Dessau's, so the
+change reached it not at all; updating the pin to `1.0.0` and diffing the
+range showed zero content difference on its side. One confirmation is not
+the same claim as "every line has been checked" — the list is still
+derived from how the system is built more than from experience of
+maintaining several derived systems over time, and a second one is what
+would show whether any line is in the wrong place.
 
 ---
 

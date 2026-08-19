@@ -298,8 +298,10 @@
   --dds-color-action-secondary: var(--dds-indigo-300);
   /* Hover sits deliberately off the ramp, between indigo-900 and indigo-950 —
      the ghost button's hover wash needs to read as barely-there against a dark
-     page, and no single ramp step lands there. Active was a near-duplicate of
-     indigo-900 in hex rather than in name (#145); now written as var(). */
+     page, and no single ramp step lands there. This is the intended final
+     state, not a first pass: a hand-written value here is not the same
+     defect #145 found. Active WAS that defect — a near-duplicate of
+     indigo-900 in hex rather than in name — and is fixed, as var(). */
   --dds-color-action-secondary-hover: #22224a;
   --dds-color-action-secondary-active: var(--dds-indigo-900);
 
