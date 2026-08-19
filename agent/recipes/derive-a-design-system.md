@@ -422,10 +422,10 @@ times, by whoever built each one.
 ```css
 /* Square — Bauhaus, engineering, dense data. Nothing is softened. */
 :root {
-  --dds-radius-sm: 0;
-  --dds-radius-md: 0;
-  --dds-radius-lg: 0;
-  --dds-radius-pill: 0;
+  --dds-radius-sm:   var(--dds-radius-none);
+  --dds-radius-md:   var(--dds-radius-none);
+  --dds-radius-lg:   var(--dds-radius-none);
+  --dds-radius-pill: var(--dds-radius-none);
 }
 
 /* Dessau's default — softened. */
@@ -688,7 +688,26 @@ back into §1 above:
 - **The accent-sharing model (slots 1/2/5 replaceable, 3/4 status-shared) was
   stated once, in a table, ~230 lines into a long section**, and was missed on
   a first read. Now stated twice — once as a standalone line.
-- Section order and the traps held up otherwise: the cascade trap, the
+- **Accent hues were being decided and shown for approval, not asked.** "The
+  questions" named action, neutral warmth and dark mode but left accent hue
+  implicit in "here's the default" — inconsistent with §1's own framing of
+  the accent layer as the client's to name. Now its own question, asked
+  alongside the other three.
+- **Re-hueing action and most accents turned out to be its own reason to
+  re-examine status** — a real internal-consistency problem once everything
+  *around* status had moved, surfacing only after a person reacted to the
+  finished palette rather than while reading the recipe. "Unless you have a
+  reason better than taste" now names this case explicitly.
+- **The Square snippet repeated the literal `0` four times instead of
+  pointing at `--dds-radius-none`**, which sits one line above it in
+  `primitives.css` as its own primitive. Copied faithfully into a real
+  derived system before Martin caught it directly. Same shape as the
+  hand-written-hex trap in the plumbing recipe: an example that is
+  individually correct but doesn't use a value that already exists beside
+  it, copied as faithfully as the rest of the snippet. Fixed to
+  `var(--dds-radius-none)` on all four; Round's four values have no
+  equivalent shared constant to point at, so it is unchanged.
+- The rest of section order and the traps held up: the cascade trap, the
   radius/containment rule, and the reduced-motion floor all matched what the
   walk needed, in the order it needed them.
 
