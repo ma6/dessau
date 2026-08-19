@@ -315,6 +315,16 @@ You are a design system now, so you owe what Dessau owes:
   header, because `check-css.mjs` and `check-reference.mjs` have no way to
   know a `mask-image` rule with nothing to mask is a bug.
 
+  **If you drop the block, drop the `<span class="ref-brand-logo">` markup
+  too — on every copied page, not just the ones you wrote from scratch.** An
+  unstyled span left in place is not neutral: it is still a flex child of
+  `.ref-brand`, so the row's `gap` still applies before the name, and the
+  text sits a few pixels further right than on a page that never had the
+  span at all. One derived system built its root `index.html` clean and
+  copied the other seven pages from Dessau's — same brand, two different
+  header x-positions, found only by comparing bounding rects across pages
+  rather than looking at either one alone.
+
   **The root overview page (`index.html`) carries real weight, not a redirect
   stub.** Dessau's own is a six-decisions summary, the layer model, component-
   vs-pattern guidance, agent-context pointers and a real integration example
