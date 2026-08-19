@@ -36,10 +36,25 @@ gates can fail) — so the fenced block below no longer restates them inline.
 It did once; that stopped being anything but a second copy the moment the
 recipes said it themselves, read before the agent would reach any of it.
 
-**Not executed.** Nobody has pasted this into an agent, and no derived system
-exists. Its paths are gated by `scripts/check-adoption.mjs`; that they exist is not
-the same claim as that an agent given this produces a working system. Tracked with
-the recipe's own gap as #72.
+**Executed once (#72).** Pasted into an agent working in an empty repository
+(`caberpunky-ds`), which produced a working, dependency-free derived system —
+confirmed by grep: zero `@import`/`url()` references to `libs/dessau` survive
+in the built artefact. What that run found is recorded in
+`derive-a-standalone-system.md` and `derive-a-design-system.md`'s own
+retrospective sections, not repeated here — this prompt routes to those
+recipes rather than restating them, and that held for the writeback too. Two
+things specific to *this file*, not the recipes it routes to:
+
+- **Step 7's confirm-before-writing instruction worked as intended.** The
+  clone URL and `libs/<name>` directory name were proposed as candidates and
+  confirmed before being written into the derived system's own
+  `consumer-init.prompt.md`, rather than read off `git remote` and assumed.
+- **The six-questions-one-at-a-time instruction in step 4's target recipe met
+  a tool that caps question batches at four.** Answered with two batched
+  calls (4 then 2) rather than six serial round-trips; six individually
+  selected answers were still collected. `derive-a-design-system.md` now
+  says this is not the violation "one at a time" guards against — deciding
+  for the person being asked is.
 
 ---
 

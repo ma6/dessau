@@ -36,6 +36,12 @@ six decisions no matter how the record reads afterward. This went wrong once
 already (#123) — six defaults taken and written up as answered, for a person
 who had not been asked any of them.
 
+If your question tool caps how many questions fit in one call, batching within
+that cap is not the violation "one at a time" guards against — six individually
+selected answers from a person who was actually asked are what matters, not
+whether they arrived over one round-trip or six. The violation is deciding for
+them, batched or not.
+
 ---
 
 ## How an override works, once
@@ -130,10 +136,13 @@ inherited ones is not a ramp.
 **Leave the status hues alone** unless you have a reason better than taste. They
 are four unmistakably different hues on purpose, so status survives being read by
 somebody who sees hue differently — and the amber is olive-leaning specifically
-so it cannot be confused with the accents or the error red. Note the last column
-above: two of the five accents *share* their ramp with a status hue. Repointing
-`--dds-green-*` because accent 4 should be teal also repaints every success
-message you have.
+so it cannot be confused with the accents or the error red.
+
+**Yours to replace: accents 1, 2, 5. Not yours: accents 3 and 4 — they share a
+ramp with status.** That is the whole accent-sharing model in one line; the table
+above says it too, but say it twice because it is easy to skim past once.
+Repointing `--dds-green-*` because accent 4 should be teal also repaints every
+success message you have.
 
 ### Strongly recommended: your brand is not your action or status colour
 
@@ -299,6 +308,15 @@ and is covered above, but separation is the one that bites here: seven colours i
 a circle with indigo and four status hues cut out of it is precisely the case
 where two of them converge. The shipped five already sit at ΔE 0.109 at their
 closest, against a floor of 0.07. That headroom is what you are spending.
+
+**Run separation again after any contrast-driven adjustment, not just once.** The
+two checks pull against each other whenever a replacement hue sits near an
+unchanged status-shared accent (green or cyan): darkening a yellow-green ramp
+until it clears WCAG at `sm` moves it in OKLab straight toward an untouched
+green, and the first derived system to try this landed at ΔE 0.061 against the
+0.07 floor — a contrast fix that had quietly spent the separation budget of a
+ramp it never touched. Treat the two checks as a loop, not a sequence: contrast,
+separation, and back to contrast if separation moved you.
 
 **And keep the brand accent on one slot.** If you extend the set for charts,
 decide separately which slot is the product's identity. A brand accent that is
@@ -630,11 +648,23 @@ Stated for the same reason `new-product.md` states it: "these instructions have
 never been run" was true of that recipe for long enough to be worth never letting
 be true silently again (#5).
 
-**Not yet executed.** This document was written from the implementation — every
-token name, path and default in it was read out of the source rather than
-recalled, and the cascade trap in *How an override works* was derived from how
-`semantic.css` declares its themes. But nobody has yet sat down with an empty
-product and worked through all six sections.
+**Executed once (#72),** deriving `caberpunky-ds`: all six sections answered as
+real decisions rather than defaults, none skipped. What the walk found, folded
+back into §1 above:
 
-Until somebody has, treat the section order as a proposal and the traps as the
-tested part. When somebody does, this section says what they found.
+- **The two checks pull against each other and the recipe only said to run
+  both, not to re-run them.** Fixing WCAG contrast on a replacement accent
+  (darkening a lime ramp) silently spent the separation budget of an untouched
+  status-shared accent (green), landing at ΔE 0.061 against the 0.07 floor —
+  found only by running `check-accent-separation.mjs` after the contrast fix,
+  which the recipe did not prompt for. Now says so.
+- **The accent-sharing model (slots 1/2/5 replaceable, 3/4 status-shared) was
+  stated once, in a table, ~230 lines into a long section**, and was missed on
+  a first read. Now stated twice — once as a standalone line.
+- Section order and the traps held up otherwise: the cascade trap, the
+  radius/containment rule, and the reduced-motion floor all matched what the
+  walk needed, in the order it needed them.
+
+The plumbing side of the same walk — repointing the gates, what a derived
+system owes its own consumers — is `derive-a-standalone-system.md`'s to record,
+and does, separately.
