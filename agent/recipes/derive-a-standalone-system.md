@@ -172,18 +172,39 @@ Copy them, change the paths, and **prove each one can still fail** — break a v
 on purpose, see the report, put it back. A check that cannot fail is worse than no
 check, because it is trusted.
 
-**They are not equally mechanical.** `check-contrast.mjs`,
-`check-accent-separation.mjs` and `build-foundations.mjs` read exactly two
-hardcoded files each — a path edit, or nothing at all if you mirrored Dessau's
-shape per step 1. `check-css.mjs` and `check-agent-index.mjs` additionally
-**assume the repository owns a full `dds/js/` directory and a fully-documented
-component catalogue** (`agent/components.md`, `agent/patterns.md`) and crash on
-a missing one rather than degrading gracefully — a token-only substitution,
-which step 4 treats as the common case, owns neither. Give them something to
-find: an empty `dds/js/README.md` so the directory read does not throw, and an
-`agent/index.json` with `components: []` / `patterns: []` plus stub `.md`
-files so their loops check zero entries honestly instead of erroring. That is
-still "repointing," but it is not just a path edit for these two.
+**They are not equally mechanical, and it is three scripts, not two.**
+`check-contrast.mjs`, `check-accent-separation.mjs` and `build-foundations.mjs`
+read exactly two hardcoded files each — a path edit, or nothing at all if you
+mirrored Dessau's shape per step 1. `check-css.mjs`, `check-agent-index.mjs`
+**and `check-reference.mjs`** assume the repository owns a full `dds/js/`
+directory and a fully-documented, fully-populated component catalogue
+(`agent/components.md`, `agent/patterns.md`, `agent/index.json`), and behave
+badly at both ends of populating that catalogue:
+
+- **Empty index.** All three crash on a missing `dds/js/` or catalogue file
+  rather than degrading gracefully. If you are genuinely not building the
+  full reference — step 6 says when that argument is yours to make — give
+  them something to find instead: an empty `dds/js/README.md` so the
+  directory read does not throw, and `agent/index.json` with `components: []`
+  / `patterns: []` plus stub `.md` files so their loops check zero entries
+  honestly instead of erroring.
+- **Populated index — the more likely outcome, and the one to plan for.**
+  Once `agent/index.json` actually lists your inherited components (all of
+  them, if you inherited all of them unchanged), `check-css.mjs` and
+  `check-agent-index.mjs` need to search for those classes and that JS
+  **across your own CSS and `libs/dessau/dds/{css,js}` both**, not just the
+  two files your own repository owns — the implementations live in Dessau,
+  not in your token substitution. Scoping the search to only your own `dds/`
+  reports every inherited entry as "class not defined": one derived system
+  hit this directly, going from 0 findings against an empty index to 384
+  against a real one, entirely from search-path scope rather than actual
+  drift.
+
+`check-reference.mjs`'s own check 5b — that the root `index.html` is a
+zero-delay meta-refresh — assumes Dessau's specific redirect convention. A
+derived system with a real landing page rather than a redirect stub needs
+that check widened to accept either shape; the requirement being verified is
+"root is not a dead end," not "root redirects."
 
 ## 6. What you owe your own consumers
 
@@ -217,6 +238,17 @@ You are a design system now, so you owe what Dessau owes:
   explicitly rather than the default to assume — an agent building products
   against you cannot verify a colour claim it cannot see rendered, and "trust the
   CSS cascade" is not the same guarantee as a page.
+
+  **Markup is safe to copy verbatim. Prose is not.** Dessau's reference pages
+  read colour and spacing values live from the tokens (`data-ref-swatches` and
+  the like), so copied markup renders correctly against your substitution with
+  no edits — but Dessau's reference *prose* names specific values that are
+  Dessau's, not architecture: a webfont table naming Space Grotesk and Inter,
+  a line describing elevation as a two-part shadow, "action indigo." Copying
+  that verbatim ships a reference that renders right and reads wrong —
+  accurate swatches next to a description of a different system's choices.
+  Read every paragraph that names a font, a shadow, a hue or a number, and
+  rewrite the ones that are actually about yours.
 - **A statement of what you promise**, in the shape of DECISIONS 037. Your
   consumers need to know what may change under them, and you now have Dessau's
   contract *and* whatever you added on top.
@@ -250,10 +282,18 @@ folded into the steps above; summarised here:
   pair in Dessau's own file is hand-written hex rather than a `var()` reference.
   Now flagged in step 4.
 - **Step 5's six scripts were presented as equivalently mechanical and are
-  not.** Two of the six (`check-css.mjs`, `check-agent-index.mjs`) assume the
-  repository owns a full `dds/js/` directory and a documented component
-  catalogue, and crash rather than degrade when a token-only system owns
-  neither. Now flagged in step 5, with the workaround.
+  not.** Three of the six (`check-css.mjs`, `check-agent-index.mjs`,
+  `check-reference.mjs`) assume the repository owns a full `dds/js/`
+  directory and a fully-populated component catalogue, and misbehave at both
+  ends of populating one: they crash on an empty catalogue, and once the
+  catalogue is genuinely populated with inherited entries, `check-css.mjs`
+  and `check-agent-index.mjs` need to search Dessau's own `dds/css` and
+  `dds/js` too — not just the derived system's own two files — or every
+  inherited entry reports as missing (one run went from 0 findings on an
+  empty index to 384 on a real one, purely from search-path scope, zero
+  actual drift). `check-reference.mjs`'s own check 5b additionally assumes
+  Dessau's specific root-redirect convention and needed widening for a
+  derived system with a real landing page. All now flagged in step 5.
 - **Step 1's suggested layout works against step 5's repointing ask.** Mirroring
   Dessau's own `dds/`-shaped directory layout turns "repoint five scripts" into
   a directory copy, because every script's hardcoded paths are relative to its
@@ -271,13 +311,29 @@ folded into the steps above; summarised here:
   colour. See `derive-a-design-system.md`'s own retrospective, and #144 for the
   Dessau-side question of whether the floor itself needs revisiting.
 - **A hand-written hex pair in Dessau's own `semantic.css`** broke the
-  ramp-swap-by-find-and-replace assumption step 4 relied on. Filed as #145.
+  ramp-swap-by-find-and-replace assumption step 4 relied on. Filed as #145 —
+  and fixed, along with #144, before this recipe's own writeback was
+  considered done. A found gap that stays a filed issue is not the same claim
+  as a recipe actually surviving contact with a real run.
+- **Copied reference markup renders correctly against a substituted
+  foundation; copied reference prose does not read correctly.** Dessau's
+  reference pages pull colour and spacing live from tokens, so the markup
+  needed no edits — but the prose around it names Dessau's specific choices
+  (font names, a shadow description, a hue), and copying that verbatim ships
+  a reference that renders right and reads wrong. ~250 lines of `foundations.
+  html` prose needed an actual read-through and rewrite, not a mechanical
+  copy. Now flagged in step 6.
 
-Steps 4 and 5 were, as suspected, the ones most likely to be wrong — both held
-real gaps, now closed. `check-reference.mjs` was the one script left unproven
-mid-walk — building a full reference was initially treated as out of scope for
-exercising the recipe, then reversed once it became clear a foundations-only
-reference was not enough for a product agent to build against. That reversal is
-itself worth recording: the recipe's "assume you are showing all of it" line in
+All six gates are proven for `caberpunky-ds` (commit `2d4c150`):
+`check-reference.mjs` was the one left unproven mid-walk — building a full
+reference was initially treated as out of scope for exercising the recipe,
+then reversed once it became clear a foundations-only reference was not
+enough for a product agent to build against (#72). That reversal is itself
+worth recording: the recipe's "assume you are showing all of it" line in
 step 6 was right, and the instinct to treat a token-only system as exempt was
-the thing to distrust, not the line.
+the thing to distrust, not the line. The finished reference covers all 64
+components and 13 patterns Dessau ships, across five pages, with zero
+`check-reference.mjs` findings.
+
+Steps 4, 5 and 6 were, as suspected, the ones most likely to be wrong — all
+three held real gaps, now closed.
