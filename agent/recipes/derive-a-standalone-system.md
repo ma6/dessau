@@ -298,6 +298,23 @@ You are a design system now, so you owe what Dessau owes:
   The markup-vs-prose split from earlier in this step isn't only a
   per-page decision; it can run within a single page too.
 
+  **`reference/assets/reference.css`'s header logo assumes you have one, and
+  breaks silently if you don't.** The `@supports (mask-image: …)` block that
+  masks `dds-logo.svg` over `.ref-brand-logo` also hides `.ref-brand-name`
+  unconditionally *within that same block* — deliberately, so the text stays
+  visible in a browser without mask-image support and only disappears where
+  the logo is guaranteed to draw in its place. That guarantee holds for
+  Dessau, which always renders a `.ref-brand-logo` element. It does not hold
+  for a derived system with no brand mark, which is the ordinary case — you
+  substitute tokens, not necessarily a logo. Copy the stylesheet without
+  adding your own `.ref-brand-logo` markup and every reference page's header
+  text is masked to 1×1px in any current browser, with nothing drawn in its
+  place: not a missing logo, a blank header, and no error anywhere. Either
+  add your own mark as `.ref-brand-logo`, or delete the `@supports` block so
+  the name stays visible — check which by loading a page and looking at the
+  header, because `check-css.mjs` and `check-reference.mjs` have no way to
+  know a `mask-image` rule with nothing to mask is a bug.
+
   **The root overview page (`index.html`) carries real weight, not a redirect
   stub.** Dessau's own is a six-decisions summary, the layer model, component-
   vs-pattern guidance, agent-context pointers and a real integration example
