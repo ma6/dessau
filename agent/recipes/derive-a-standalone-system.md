@@ -379,7 +379,29 @@ You are a design system now, so you owe what Dessau owes:
   consumers need to know what may change under them, and you now have Dessau's
   contract *and* whatever you added on top.
 
-## 7. Updating Dessau
+## 7. Decide whether this repository itself is issue-first
+
+Not about your consumers — about how *this* repository's own development
+works, while you are the one building it.
+
+`new-product.md` step 7 asks a future product three things, not assumed but
+asked: dark mode, form of address, and the issue-first workflow. The first
+two are about a product's own UI and do not translate here — a derived
+system is not "a form of address" the way a product's copy is. The third
+does translate, cleanly: any repository under active development either
+files a ticket before building and references it in every commit
+(`agent/recipes/new-requirement.md`, unforked — process, not a path or a
+value, the same reasoning `override-a-component.md` gets in step 6), or it
+does not, and neither is the default. `new-product.md` only asks this of a
+*product consuming* a derived system — nobody asks it of the derived
+system's own repository while it is being stood up, which is exactly the
+gap `derive-a-design-system.md`'s six decisions and `new-product.md`'s
+three both exist to close one level down. If an agent is building this and
+the person it is for is reachable, ask, the same rule as everywhere else in
+this lineage (#123). If adopted, record it in this repository's own
+`AGENTS.md`.
+
+## 8. Updating Dessau
 
 ```bash
 git submodule update --remote libs/dessau
