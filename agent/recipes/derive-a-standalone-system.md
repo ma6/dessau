@@ -398,7 +398,24 @@ system's own repository while it is being stood up, which is exactly the
 gap `derive-a-design-system.md`'s six decisions and `new-product.md`'s
 three both exist to close one level down. If an agent is building this and
 the person it is for is reachable, ask, the same rule as everywhere else in
-this lineage (#123). If adopted, record it in this repository's own
+this lineage (#123).
+
+**Ask it as three options, not two.** "Adopt Dessau's workflow or don't" was
+tried first and the person being asked pointed out the gap directly: a
+maintainer with an existing tracking convention of their own is a real,
+likely case, not the absence of one, and a binary framing quietly treats
+"not Dessau's way" as "no way." Offer:
+
+1. **Adopt Dessau's issue-first workflow as-is** — ticket before building,
+   `[#N]` in the subject, `Closes #N` on the commit that finishes it.
+2. **Explicitly decline** — commit directly, no ticketing, and say so rather
+   than leaving it undecided.
+3. **Something specific to this repository** — a different tracker, a
+   different trailer convention, whatever the maintainer already uses.
+   Naming it is the point; "we have our own process" is an answer, not a
+   placeholder for one.
+
+If adopted (option 1 or 3), record which in this repository's own
 `AGENTS.md`.
 
 ## 8. Updating Dessau
