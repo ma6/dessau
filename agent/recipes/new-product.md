@@ -260,9 +260,25 @@ states for its own six (#123).
   with `Closes #42`. This is genuinely optional for a product — nothing about
   consuming Dessau requires it — but it is not the default anywhere else, so a
   product that wants it has to say so, the same way dark mode and form of
-  address do. If adopted, say so in this product's own `AGENTS.md`, in the
-  product-specific section below the Dessau one — an agent reading only the
-  Dessau section has no reason to expect it.
+  address do.
+
+  **Ask this as three options, not two.** "Adopt Dessau's workflow or don't"
+  quietly treats "not Dessau's way" as "no way" — a product's maintainer
+  with an existing tracking convention of their own is a real, likely case,
+  not the absence of one. Offer:
+
+  1. **Adopt Dessau's issue-first workflow as-is** — ticket before building,
+     `[#N]` in the subject, `Closes #N` on the commit that finishes it.
+  2. **Explicitly decline** — commit directly, no ticketing, and say so
+     rather than leaving it undecided.
+  3. **Something specific to this product** — a different tracker, a
+     different trailer convention, whatever the maintainer already uses.
+     Naming it is the point; "we have our own process" is an answer, not a
+     placeholder for one.
+
+  If adopted (option 1 or 3), say so in this product's own `AGENTS.md`, in
+  the product-specific section below the Dessau one — an agent reading only
+  the Dessau section has no reason to expect it.
 
 ## 8. Before shipping
 
