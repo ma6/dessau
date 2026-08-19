@@ -221,6 +221,29 @@ You are a design system now, so you owe what Dessau owes:
   copy (the exact silent drift `consumer-init.prompt.md` exists to prevent) or
   gets no prompt at all. `derived-system-init.prompt.md` asks for this as part of
   step 7.
+
+  **This one does not stand alone — `consumer-init.prompt.md`'s own stated
+  philosophy is that it routes to a recipe rather than repeating one**, the
+  same reason `derived-system-init.prompt.md` gives for routing to *this*
+  file instead of restating it. That recipe is `new-product.md`, and it is
+  unconditional: copy it too, paths one layer deeper than yours (a product
+  consuming you sees `libs/<you>/libs/dessau/...`, not `libs/dessau/...`
+  directly), or your `consumer-init.prompt.md` inherits Dessau's philosophy
+  in name only and repeats the plumbing steps inline — the exact second copy
+  that line exists to prevent, and it will not be obvious from reading the
+  prompt alone that the recipe it claims to route to was never built.
+
+  **Not every recipe needs this treatment, and the recipe does not currently
+  say which is which.** `override-a-component.md` is pure mechanism — cascade
+  layers, container queries, the ARIA contract — with no path assumptions or
+  Dessau-specific values, so point your own `AGENTS.md` at Dessau's copy
+  directly rather than forking it. `new-component.md`, `new-pattern.md` and
+  `new-requirement.md` are about extending the design system itself, or
+  Dessau's own maintainer workflow — not a product's concern, and out of
+  scope for you too under the same "do not build components" instruction
+  that applies to standing yourself up. Only `new-product.md` is both
+  product-facing and path-sensitive, which is what makes it the one that
+  needs an adapted copy rather than a pointer.
 - **Your own reference.** Every component you ship is rendered on it, from your own
   markup and in your own values. You inherit Dessau's rule rather than the softer
   product version: `check-reference.mjs` exists because an earlier version verified
