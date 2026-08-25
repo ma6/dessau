@@ -174,13 +174,14 @@
       "notFor": "A sequence of steps — use step progress.",
       "classes": [
         ".dds-breadcrumb",
-        ".dds-breadcrumb-scroll"
+        ".dds-breadcrumb-scroll",
+        ".dds-breadcrumb-scroll-track"
       ],
       "css": "dds/css/components-navigation.css",
       "spec": "## Breadcrumb — `.dds-breadcrumb`",
       "reference": "reference/navigation.html#breadcrumb",
       "accessibility": "ol in a named nav. Separator is a pseudo-element (li:has(> a), not tied to list position, since the scrollable middle nests a second ol). Last entry not a link. Every level stays a real link at every width — nothing is ever hidden.",
-      "responsive": "self — .dds-breadcrumb-scroll's nested ol scrolls (overflow-x: auto, no query) once the middle no longer fits; first and last carry flex-shrink: 0 and never give up space"
+      "responsive": "self — .dds-breadcrumb-scroll-track's nested ol scrolls (overflow-x: auto, no query) once the middle no longer fits; first and last carry flex-shrink: 0 and never give up space. .dds-breadcrumb-scroll (the never-scrolling li) and .dds-breadcrumb-scroll-track (its one child, the actual overflow box) are split apart specifically so the fixed chevron between them and the current page can be ordinary flow content rather than position: sticky, which does not paint correctly before the track's first scroll"
     },
     {
       "name": "button",

@@ -1004,34 +1004,39 @@ current page: **not a link**, and `aria-current="page"`.
 
 **Scrollable middle (`.dds-breadcrumb-scroll`, #146):** once a trail has more than
 one level between the root and the current page, the consumer nests them in their
-own `<ol>` inside `<li class="dds-breadcrumb-scroll">`:
+own `<ol>` inside `.dds-breadcrumb-scroll-track`, which sits inside
+`<li class="dds-breadcrumb-scroll">`:
 
 ```html
 <nav class="dds-breadcrumb" aria-label="Breadcrumb">
   <ol>
     <li><a href="/projects">Projects</a></li>
     <li class="dds-breadcrumb-scroll">
-      <ol>
-        <li><a href="/projects/harbour">Harbour redevelopment</a></li>
-        <li><a href="/projects/harbour/documents">Documents</a></li>
-      </ol>
+      <div class="dds-breadcrumb-scroll-track">
+        <ol>
+          <li><a href="/projects/harbour">Harbour redevelopment</a></li>
+          <li><a href="/projects/harbour/documents">Documents</a></li>
+        </ol>
+      </div>
     </li>
     <li><span aria-current="page">Drainage survey</span></li>
   </ol>
 </nav>
 ```
 
-`overflow-x: auto` on that wrapper needs no query and no JavaScript: wherever the
-middle content already fits, it is simply inert, and scrolling appears only once
-it does not — the same technique `.dds-pagination`'s own numbers strip already
-uses below a width, except the breadcrumb's goal is narrower and absolute (never
-wrap the row at all) rather than switching over at a measured threshold, so it
-scrolls unconditionally instead of conditionally. First and last carry
-`flex-shrink: 0` and never give up space, so the whole squeeze always lands on
-the middle — the two ends are what matter most for orientation (the root of the
-hierarchy, and where the user is now), and a breadcrumb that let either one
-shrink away would answer "where am I" worse than one that hides nothing but
-requires a scroll to see all of it.
+Two elements, not one, because they do two jobs that turned out to conflict. The
+`<li>` never scrolls; `.dds-breadcrumb-scroll-track`, its one child, is the actual
+`overflow-x: auto` box. `overflow-x: auto` needs no query and no JavaScript:
+wherever the middle content already fits, it is simply inert, and scrolling
+appears only once it does not — the same technique `.dds-pagination`'s own
+numbers strip already uses below a width, except the breadcrumb's goal is
+narrower and absolute (never wrap the row at all) rather than switching over at a
+measured threshold, so it scrolls unconditionally instead of conditionally. First
+and last carry `flex-shrink: 0` and never give up space, so the whole squeeze
+always lands on the middle — the two ends are what matter most for orientation
+(the root of the hierarchy, and where the user is now), and a breadcrumb that let
+either one shrink away would answer "where am I" worse than one that hides
+nothing but requires a scroll to see all of it.
 
 No tab stop of its own, unlike the table's scroll region: every child is a link,
 and focusing a link scrolls it into view natively — a keyboard user reaches every
@@ -1049,10 +1054,19 @@ The one chevron drawn on the scrollable list's own last item would be carried ou
 of view along with everything else in the strip once it scrolls — the mark that
 answers "where does the scrollable part end and the current page begin" is
 exactly the one a reader needs regardless of scroll position. It is switched off
-there and redrawn on `.dds-breadcrumb-scroll` itself instead, which never
-scrolls (only its content does), `position: sticky` and pinned to that element's
-trailing edge so it stays exactly where the boundary is, however far the strip
-has been scrolled.
+there and redrawn on `.dds-breadcrumb-scroll` instead — the outer `<li>`, which
+never scrolls, unlike `.dds-breadcrumb-scroll-track`, which is what does. A first
+attempt drew that mark inside the scrolling track itself, `position: sticky`,
+reasoning that it would stay in the flex flow while its *painted* position
+clamped to the track's own trailing edge. It does — once the track has been
+scrolled at least once. On the initial, never-scrolled render, which is the
+ordinary case since most trails never need to scroll at all, every engine tested
+(Chromium, Firefox, WebKit) instead painted the mark at its unclamped flow
+position: off the end of content wider than the visible track, which is to say
+not visible at all. An element cannot reliably be both the scrolling box and the
+positioning context a sticky descendant clamps against on first paint. Splitting
+the never-scrolling mark from the always-scrolling track into two elements
+answers that rather than timing around it.
 
 **Without JavaScript:** identical. This was already a CSS-only component, and
 still is — nothing here needed a script.

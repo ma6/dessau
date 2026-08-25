@@ -16,7 +16,7 @@
 <link rel="preload" href="assets/fonts/SpaceGrotesk-Variable-latin-ext.woff2" as="font"
       type="font/woff2" crossorigin>
 <link rel="stylesheet" href="assets/fonts.css?v=7ed937e9">
-<link rel="stylesheet" href="../dds/dds.css?v=e0a64745">
+<link rel="stylesheet" href="../dds/dds.css?v=0f437ba5">
 <link rel="stylesheet" href="assets/reference.css?v=3bc01e22">
 </head>
 <body>
@@ -478,10 +478,12 @@
               <ol>
                 <li><a href="#breadcrumb">Projects</a></li>
                 <li class="dds-breadcrumb-scroll">
-                  <ol>
-                    <li><a href="#breadcrumb">Harbour redevelopment</a></li>
-                    <li><a href="#breadcrumb">Documents</a></li>
-                  </ol>
+                  <div class="dds-breadcrumb-scroll-track">
+                    <ol>
+                      <li><a href="#breadcrumb">Harbour redevelopment</a></li>
+                      <li><a href="#breadcrumb">Documents</a></li>
+                    </ol>
+                  </div>
                 </li>
                 <li><span aria-current="page">Drainage survey</span></li>
               </ol>
@@ -499,37 +501,15 @@
               <strong>Scrollable middle (#146):</strong> once there is more than
               one level between the root and the current page, they sit in their
               own nested <code class="dds-code">&lt;ol&gt;</code> inside
-              <code class="dds-code">.dds-breadcrumb-scroll</code>. Nothing
-              measures or decides anything —
-              <code class="dds-code">overflow-x: auto</code> is simply inert
-              wherever the middle already fits, exactly the way
-              <code class="dds-code">.dds-pagination</code>’s own numbers strip
-              already scrolls below a width. First and last never shrink, so the
-              whole squeeze always lands on the middle rather than on the two
-              levels that matter most for orientation.
-            </p>
-            <p class="ref-note">
-              <svg class="dds-icon" aria-hidden="true"><use href="#dds-icon-info"/></svg>
-              <strong>Narrow:</strong> the middle scrolls instead of the row
-              wrapping, and nothing is hidden — every level is still a real
-              link, reachable exactly as before. It needs no tab stop of its
-              own: focusing a link scrolls it into view natively, so a keyboard
-              user reaches every level in the same tab order, with no popover or
-              extra control to open first. A partially visible label at the
-              trailing edge is its own affordance — the same cut-off cue
-              <code class="dds-code">.dds-pagination</code>’s numbers strip
+              <code class="dds-code">.dds-breadcrumb-scroll-track</code> —
+              <code class="dds-code">overflow-x: auto</code>, inert wherever the
+              middle already fits, the same way <code class="dds-code">.dds-pagination</code>’s
+              own numbers strip scrolls below a width. First and last never
+              shrink or hide. No tab stop of its own: focusing a link scrolls it
+              into view natively, so a keyboard user reaches every level in the
+              same tab order. A partially visible label at the trailing edge is
+              its own affordance, the same cut-off cue the pagination strip
               below relies on.
-            </p>
-            <p class="ref-note">
-              <svg class="dds-icon" aria-hidden="true"><use href="#dds-icon-info"/></svg>
-              Scroll the middle to the end: the separator before “Drainage
-              survey” stays exactly where it is rather than travelling with the
-              rest of the strip. Drawn on the scrollable list's own last item it
-              would be carried out of view along with everything else once
-              scrolled — the mark showing where the scrollable part ends is
-              switched off there and redrawn, <code class="dds-code">position:
-              sticky</code>, on <code class="dds-code">.dds-breadcrumb-scroll</code>
-              itself, which never scrolls even though its content does.
             </p>
           </div>
 

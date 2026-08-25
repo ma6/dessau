@@ -357,13 +357,26 @@
      last child and which does not.
 
      `.dds-breadcrumb-scroll::after` shares this same shape for a different
-     reason (#146): the mark between the scrollable middle and the current
-     page is the one boundary a reader needs no matter where the strip is
-     scrolled to, so it is drawn on the WRAPPER — which never scrolls, only
-     its content does — rather than on the last scrollable item, whose own
-     mark would otherwise be carried out of view with everything else in the
-     strip. That item's own chevron is switched off immediately below so the
-     two do not draw twice when nothing needs scrolling yet. */
+     reason (#146): the mark between the scrollable middle and the current page
+     is the one boundary a reader needs no matter where the strip is scrolled
+     to, so it is drawn on `.dds-breadcrumb-scroll` — an ordinary, never-scrolling
+     `<li>` — rather than inside `.dds-breadcrumb-scroll-track` (below), which is
+     the element that actually scrolls. A first attempt drew it there instead,
+     `position: sticky`, reasoning that the mark would stay in the flex flow
+     while its PAINTED position clamped to the scrolling box's own edge. It
+     does — once the box has been scrolled at least once. On the initial,
+     never-scrolled render — the common case, since most trails never need
+     scrolling at all — Chromium, Firefox and WebKit alike render that sticky
+     mark at its unclamped flow position, off the end of the (wider than
+     visible) unscrolled content, which is to say not visible at all (caught
+     from a screenshot sent mid-review, the second time this exact mark went
+     missing). An element cannot reliably be both the scrolling box and the
+     positioning context a sticky descendant clamps against on first paint —
+     nesting the actual scrolling behind its own element, with the mark
+     outside it in ordinary flow, sidesteps the question rather than
+     answering it, and does not depend on which engine or scroll state got
+     there first. That item's own chevron is switched off immediately below
+     so the two do not draw twice when nothing needs scrolling. */
   .dds-breadcrumb li:has(> a)::after,
   .dds-breadcrumb-scroll::after {
     content: "";
@@ -376,24 +389,8 @@
     color: var(--dds-color-text-muted);
   }
 
-  .dds-breadcrumb-scroll > ol > li:last-child::after {
+  .dds-breadcrumb-scroll-track > ol > li:last-child::after {
     content: none;
-  }
-
-  /* Sticky, not static: `.dds-breadcrumb-scroll` is itself the scrolling box
-     (see below), so its `::after` is ordinary flow content and would scroll
-     away with the rest unless pinned. `position: sticky` keeps it in the flex
-     flow — sized and gapped exactly like every other chevron — while clamping
-     its painted position to the scroll container's own trailing edge once
-     scrolling moves it there. `flex-shrink: 0` stops it being the one thing
-     that gives up space when `.dds-breadcrumb-scroll` itself is squeezed by
-     the outer row, which would shrink the mark into an odd sliver rather than
-     the scrollable content shrinking, which is the whole point of this
-     component. */
-  .dds-breadcrumb-scroll::after {
-    position: sticky;
-    inset-inline-end: 0;
-    flex-shrink: 0;
   }
 
   .dds-breadcrumb [aria-current="page"] {
@@ -402,9 +399,19 @@
   }
 
   /* Scrollable middle (#146): the levels between the root and the current page,
-     in their own nested `<ol>` — authored by the consumer once a trail has more
-     than one of them, the same call `.dds-pagination-gap`'s numbers strip
-     already makes for the same reason.
+     in their own nested `<ol>` inside `.dds-breadcrumb-scroll-track` —
+     authored by the consumer once a trail has more than one of them, the same
+     call `.dds-pagination-gap`'s numbers strip already makes for the same
+     reason.
+
+     `.dds-breadcrumb-scroll` (the `<li>`) and `.dds-breadcrumb-scroll-track`
+     (its one child) split what would otherwise be one element's two
+     conflicting jobs. The track is the thing that actually scrolls
+     (`overflow-x: auto`) and shrinks within the outer row — the mechanism
+     `.dds-pagination`'s own strip uses too. The `<li>` around it never
+     scrolls and never shrinks its own generated content, which is the only
+     reason the fixed chevron above can be ordinary, unpositioned flow content
+     and still always be exactly where it belongs.
 
      `overflow-x: auto` needs no query, unlike the pagination strip's: at any
      width where the middle content already fits, it is simply inert, and
@@ -424,20 +431,38 @@
      extra control to operate first. A partially visible label at the trailing
      edge is its own affordance — the same "there is more this way" cue the
      pagination strip already relies on. */
-  .dds-breadcrumb-scroll {
+  .dds-breadcrumb-scroll-track {
+    /* `flex`, not the block this element defaults to: its own child `<ol>`
+       relies on being a flex ITEM to size itself by CONTENT (`flex-basis:
+       auto`) and hold that size regardless of `flex-shrink: 0` below.
+       A plain block box gives a block child none of that — width:auto on a
+       block simply fills the parent, at whatever the parent has been
+       shrunk to, which is exactly backwards: it collapses the nested `<ol>`
+       to the track's own (already narrow) width instead of letting it stay
+       full width and overflow. Caught the same way as the flex-basis/wrap
+       interaction below: assumed harmless, then a two-line trail at rest
+       said otherwise. */
+    display: flex;
+    align-items: center;
+
     overflow-x: auto;
     overscroll-behavior-x: contain;
+    /* Same reason as the generic `li` rule below: without it, this shrinks no
+       further than its own content and drags the outer row's fit calculation
+       down with it instead of scrolling internally. Not inherited from that
+       rule because this is a `<div>`, not a list item. */
+    min-inline-size: 0;
   }
 
   /* `flex-shrink: 0` here, not only `min-inline-size: auto` on its own items
      below, is what actually keeps this list at its full content width.
-     `.dds-breadcrumb-scroll` is this list's flex CONTAINER as well as the
-     outer row's flex ITEM — without opting this list itself out of shrinking,
-     the wrapper shrinking (which is the whole mechanism `overflow-x: auto`
+     `.dds-breadcrumb-scroll-track` is this list's flex CONTAINER as well as
+     the track's flex ITEM — without opting this list itself out of shrinking,
+     the track shrinking (which is the whole mechanism `overflow-x: auto`
      depends on) drags this list down with it, and its own items — even
      un-shrinkable ones — end up laid out in less room than they need and wrap
      their text instead of the list overflowing whole. */
-  .dds-breadcrumb-scroll > ol {
+  .dds-breadcrumb-scroll-track > ol {
     flex-wrap: nowrap;
     flex-shrink: 0;
     /* Land on a whole level rather than halfway through one. */
@@ -452,7 +477,7 @@
      grows wide enough to need scrolling at all. Restoring the default
      (content-based) minimum here is what makes the strip overflow its box
      instead of each word inside it wrapping to stay within one. */
-  .dds-breadcrumb-scroll > ol > li {
+  .dds-breadcrumb-scroll-track > ol > li {
     min-inline-size: auto;
     scroll-snap-align: center;
   }
