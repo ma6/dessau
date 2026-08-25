@@ -2731,3 +2731,58 @@ out to be higher than it looked this session — slow enough, or unreliable
 enough across environments, that it stops being run — in which case the
 matrix goes back to every push and the cost is paid in Actions minutes
 instead of attention.
+
+---
+
+## 063 — 1.1.0: the breadcrumb's scrollable middle, a real new capability
+
+**Decision.** `package.json` and `DDS.version` move to `1.1.0`, not `1.0.2`.
+
+**Why a minor, not a patch.** `dds/css/components-navigation.css` and
+`dds/js/components-navigation.js` gain the breadcrumb's `.dds-breadcrumb-scroll`
+/ `.dds-breadcrumb-scroll-track` split (#146): once a trail has more than one
+level between the root and the current page, the middle scrolls instead of
+wrapping the row, with the first and last levels pinned via `flex-shrink: 0`
+so orientation never gets squeezed away. That is new capability by any
+reading — a component that previously only wrapped can now do something it
+could not before. It is not, however, a breaking change to anything a
+consumer has actually pinned: the class and the markup contract it needs
+were introduced and refined entirely within this same unreleased range (one
+`feat` commit, three `fix` commits against bugs in that same unshipped
+feature, none of it ever having reached a tag). There is no prior contract
+for `1.1.0` to break.
+
+**`DDS.version` was stuck at `0.9.0` through two releases.** `060` and `061`
+both record moving it to `1.0.0` and `1.0.1` respectively — neither actually
+touched `dds/js/dds.js`, whose `VERSION` constant had not moved since `8a6bb9d`
+set it to `0.9.0`. Found while preparing this tag, not reported by a
+consumer; corrected here to `1.1.0`, genuinely this time. Worth a note
+because it is exactly the kind of silent drift this project builds check
+scripts to catch elsewhere, and this one had no check watching it — filed
+as a follow-up (see "What this leaves open" below) rather than fixed with a
+script in the same sitting as a version bump.
+
+**What else is in this tag.** Landed since `1.0.1` and riding along without
+changing the classification above: "Dessau DS" adopted as the project's
+short form and "Dessau Design System" as the full name, throughout the
+README, the reference site and `docs/brand.md`, with a "DS" tag added to
+the logo (`#147`) — `reference/`, `docs/` and the brand asset only, per
+`037`'s implementation/contract line, so it does not move the number on its
+own. Also: CI's browser matrix moved to tag pushes only, Docker taking over
+day-to-day verification (`062`) — this is the first tag built under that
+split. Verified locally rather than by the GitHub matrix, which the
+account's ongoing Actions billing block would fail before it started, the
+same symptom `062` describes: `npx playwright test`, full suite,
+`733 passed, 2 skipped, 0 failed`. The release workflow's own bundle-and-attach
+step was run locally for the same reason — `npm run build`, `npm run
+check:css`, then `gh release upload` by hand — rather than left to a CI run
+that cannot start; a rerun once billing is restored will simply re-attach
+the same files (`--clobber`) and can be ignored if it fails first.
+
+**What this leaves open.** No script compares `dds/js/dds.js`'s `VERSION`
+against `package.json`, so this exact drift can recur silently. Filed as
+`#148` (not a `story` — noticed along the way, not asked for) to add one,
+rather than built here.
+
+**Reversal condition.** None stated; the version number is a description of
+what changed, not a commitment.

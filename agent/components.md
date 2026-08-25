@@ -53,7 +53,7 @@ a `.ref-note` on the rendered page. This is the index of it.
 | --- | --- |
 | `actionbar` | wraps when it runs out of room |
 | `banner` | shrinks rather than pushing its neighbours out |
-| `breadcrumb` | the middle scrolls once it no longer fits |
+| `breadcrumb` | .dds-breadcrumb-scroll-track's nested ol scrolls (overflow-x: auto, no query) once the middle no longer fits; first and last carry flex-shrink: 0 and never give up space. .dds-breadcrumb-scroll (the never-scrolling li) and .dds-breadcrumb-scroll-track (its one child, the actual overflow box) are split apart specifically so the fixed chevron between them and the current page can be ordinary flow content rather than position: sticky, which does not paint correctly before the track's first scroll |
 | `byline` | wraps when it runs out of room |
 | `chart` | the label column is a share of the row and wraps beyond it |
 | `cta` | wraps when it runs out of room |
