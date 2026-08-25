@@ -7,7 +7,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Foundations — Dessau DS</title>
-<meta name="description" content="Dessau design foundations: colour, typography, spacing, radius, elevation, motion and z-index, with contrast verified against WCAG 2.2 AA.">
+<meta name="description" content="Dessau DS design foundations: colour, typography, spacing, radius, elevation, motion and z-index, with contrast verified against WCAG 2.2 AA.">
 <meta name="color-scheme" content="dark light">
 <link rel="icon" href="assets/brand/dessau-icon.svg" type="image/svg+xml">
 <script src="../dds/js/theme-init.js?v=eb2c6b3a"></script>
@@ -366,7 +366,7 @@
           <h2>Cascade layers</h2>
           <p class="dds-text-subtle dds-measure-default dds-mbs-xs">
             The override contract, and the reason there is not a single
-            <code class="dds-code">!important</code> anywhere in Dessau. All of DDS is
+            <code class="dds-code">!important</code> anywhere in Dessau DS. All of DDS is
             inside <code class="dds-code">@layer</code>; your product's CSS is not.
             Unlayered styles beat every layered style, regardless of specificity.
           </p>
@@ -593,10 +593,10 @@
 
             <p class="ref-note">
               <svg class="dds-icon" aria-hidden="true"><use href="#dds-icon-info"/></svg>
-              <strong>Why the second one is allowed and Dessau’s was not.</strong>
+              <strong>Why the second one is allowed and Dessau DS’s was not.</strong>
               It is the same name — but in your stylesheet you own the ramp
               <em>and</em> the name, so they move in one commit, by one person, in
-              one file. Dessau could not promise that: it owned the name while the
+              one file. Dessau DS could not promise that: it owned the name while the
               ramp was yours to replace, so a slot called <code class="dds-code">clay</code>
               went on saying clay after you had made it grey. The rename was never
               “hue names are bad” — it was that a hue name belongs to whoever can
@@ -716,7 +716,7 @@
 
           <!-- no binaries -->
           <div>
-            <h3>Dessau ships no font binaries</h3>
+            <h3>Dessau DS ships no font binaries</h3>
             <div class="dds-notice dds-notice-success">
               <svg class="dds-icon" aria-hidden="true"><use href="#dds-icon-check-circle"/></svg>
               <div>
@@ -732,7 +732,7 @@
                   That is the point of the arrangement: <strong>DDS itself ships no
                   font binaries</strong>, and the reference site is a product that
                   consumes it and wants the full identity. So it follows the exact
-                  recipe Dessau recommends — variable files, self-hosted, never a
+                  recipe Dessau DS recommends — variable files, self-hosted, never a
                   CDN, <code class="dds-code">font-display: swap</code>, the fallback
                   stack kept, and the OFL notice alongside the files. See
                   <code class="dds-code">reference/assets/fonts.css</code>, which is
@@ -782,7 +782,7 @@
                 repository publishes TTF covering every script the family supports;
                 these are subset to Latin and Latin Extended-A/-B and converted to
                 WOFF2, one <code class="dds-code">pyftsubset</code> command per face,
-                run by hand. That tooling is not a dependency of Dessau and is not
+                run by hand. That tooling is not a dependency of Dessau DS and is not
                 needed to use it &mdash; the commands are in
                 <code class="dds-code">reference/assets/fonts.css</code>, next to the
                 one flag that is easy to get wrong.
@@ -1129,7 +1129,7 @@
           <h2>Vertical spacing</h2>
           <p class="dds-text-subtle dds-measure-default dds-mbs-xs">
             Space between stacked things belongs to the container, not to the
-            things. Every element in Dessau starts with
+            things. Every element in Dessau DS starts with
             <code class="dds-code">margin: 0</code>, and rhythm is applied by a
             parent — which is what lets any component be dropped into any layout
             without a first or last child that needs its margin removed.
@@ -1488,7 +1488,7 @@
             So: adding a line to <code class="dds-code">ICON_MAP</code> in
             <code class="dds-code">scripts/build-icons.mjs</code> and re-running the
             build is the cheap, expected, correct move. Ionicons has around 1,300
-            icons; Dessau ships the handful it names. The constraint is that every
+            icons; Dessau DS ships the handful it names. The constraint is that every
             icon earns a role name and a caller — not that the set stays at its
             current size. A Unicode glyph is not the escape hatch either: a typed
             check mark is <em>announced</em> as “check mark” in the middle of a
@@ -1579,7 +1579,7 @@
             override.
           </p>
           <p class="dds-text-sm dds-text-subtle dds-mbs-xs">
-            Every icon in Dessau is <code class="dds-code">aria-hidden="true"</code>
+            Every icon in Dessau DS is <code class="dds-code">aria-hidden="true"</code>
             and <code class="dds-code">focusable="false"</code>. An icon never carries
             meaning alone: a control's name is real text, visible or in a
             <code class="dds-code">.dds-sr-only</code> span. An icon-only button with
@@ -1664,7 +1664,7 @@
           <p class="dds-text-sm dds-text-subtle dds-mbs-xs">
             Hover thickens the underline as well as changing the colour, so the
             feedback survives for someone who cannot see the hue change. The same
-            reasoning applies throughout Dessau: no state is ever carried by colour
+            reasoning applies throughout Dessau DS: no state is ever carried by colour
             on its own.
           </p>
           <p class="dds-text-sm dds-text-subtle dds-mbs-xs">
@@ -1735,7 +1735,7 @@
             <code class="dds-code">accent-color</code> is bound to the action colour
             for the same reason: checkboxes, radios and range thumbs are painted by
             the platform, and left alone they stay the operating system's blue on
-            every surface Dessau draws.
+            every surface Dessau DS draws.
           </p>
         </div>
       </section>

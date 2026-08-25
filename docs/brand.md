@@ -26,7 +26,7 @@ on the logo is what makes the short form "Dessau DS" rather than plain
 They sit under `reference/`, not under `dds/`, and that placement is the
 argument: **the brand is not part of the design system.** A product that adopts
 DDS takes the components, the tokens and the patterns, and brings its own name.
-A Dessau logo inside `dds/` would be shipped into every consuming product, one
+A Dessau DS logo inside `dds/` would be shipped into every consuming product, one
 `<use>` away from being drawn by accident.
 
 ---
@@ -210,7 +210,7 @@ nobody chose.
 ```html
 <a class="ref-brand" href="index.html">
   <span class="ref-brand-logo" aria-hidden="true"></span>
-  <span class="ref-brand-name">Dessau</span>
+  <span class="ref-brand-name">Dessau DS</span>
   <span class="ref-brand-sub">Foundations for digital products</span>
 </a>
 ```
@@ -272,8 +272,8 @@ the letter fills 78% of its canvas rather than a more composed 60%.
 **Accessible naming.** Each file has `role="img"` and a `<title>`, which is what
 an inlined SVG needs. A mask has no semantics at all: if the mark is the only
 thing naming the brand, put the name on the element (`role="img"` plus
-`aria-label`). Where visible text already says "Dessau" — as in the reference
-header — the mark is decorative and takes `aria-hidden="true"`.
+`aria-label`). Where visible text already says "Dessau DS" — as in the
+reference header — the mark is decorative and takes `aria-hidden="true"`.
 
 **Don't.** Give it a brand colour or a field. Add a gradient or a shadow. Close
 the seam or the notch. Stretch it to a different aspect ratio. Set the wordmark
@@ -284,7 +284,7 @@ in anything but Inter Black, or re-space it by eye.
 ## What is deliberately missing
 
 **A PNG `apple-touch-icon`.** iOS home-screen icons still want a raster file, and
-Dessau has no rasterisation toolchain — adding one means a build step and a
+Dessau DS has no rasterisation toolchain — adding one means a build step and a
 dependency, both of which this project spends real effort not having. Browsers
 get the SVG through `<link rel="icon">`. A product that needs the raster should
 generate it from `dessau-icon.svg` in its own pipeline.

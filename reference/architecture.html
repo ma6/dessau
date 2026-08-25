@@ -7,7 +7,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Architecture — Dessau DS</title>
-<meta name="description" content="How Dessau is put together: the layer model, the test that decides component from pattern, the JavaScript enhancement model, providers for external services, and how a product consumes it.">
+<meta name="description" content="How Dessau DS is put together: the layer model, the test that decides component from pattern, the JavaScript enhancement model, providers for external services, and how a product consumes it.">
 <meta name="color-scheme" content="dark light">
 <link rel="icon" href="assets/brand/dessau-icon.svg" type="image/svg+xml">
 <script src="../dds/js/theme-init.js?v=eb2c6b3a"></script>
@@ -332,7 +332,7 @@
               <li><a href="#javascript">The JavaScript model</a></li>
               <li><a href="#providers">External services</a></li>
               <li><a href="#verification">Verification is part of the architecture</a></li>
-              <li><a href="#consuming">How a product consumes Dessau</a></li>
+              <li><a href="#consuming">How a product consumes Dessau DS</a></li>
             </ul>
             <!-- REF_TOC:END -->
           </nav>
@@ -371,7 +371,7 @@
             </li>
             <li class="ref-layer">
               <code>Derived systems</code>
-              <span class="dds-text-muted">a design system of your own: its foundation, Dessau’s everything else — and no dependency on Dessau at runtime</span>
+              <span class="dds-text-muted">a design system of your own: its foundation, Dessau DS’s everything else — and no dependency on Dessau DS at runtime</span>
             </li>
             <li class="ref-layer ref-layer-yours">
               <strong>Products</strong>
@@ -751,7 +751,7 @@ DDS.theme                             // read / set / observe the theme</code></
       <!-- ======================================================= consumption -->
       <section class="ref-section" id="consuming">
         <div class="ref-section-head">
-          <h2>How a product consumes Dessau</h2>
+          <h2>How a product consumes Dessau DS</h2>
           <p class="dds-text-subtle dds-measure-default dds-mbs-xs">
             Pinned and local. Never loaded at runtime from a shared URL, so a change here
             can never reach a product untested.

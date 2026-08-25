@@ -14,7 +14,7 @@ throughout the code: `.dds-button`, `--dds-color-action-primary`,
 `data-dds-dialog-open`, `window.DDS`.
 
 It reads the other way too, and that is the useful half: **derived design system.**
-Every system built on Dessau keeps the `dds-` prefix, so in a client's codebase it
+Every system built on Dessau DS keeps the `dds-` prefix, so in a client's codebase it
 is not somebody else's name inherited — it is a description of what the thing is.
 (DECISIONS 036.)
 
@@ -22,20 +22,20 @@ is not somebody else's name inherited — it is a description of what the thing 
 Principles → Foundations → Components → Patterns → Derived systems → Products
 ```
 
-**The layer before products is what Dessau is primarily for.** A *derived design
-system* is built on Dessau, works **without** Dessau, and is itself consumed by
+**The layer before products is what Dessau DS is primarily for.** A *derived design
+system* is built on Dessau DS, works **without** Dessau DS, and is itself consumed by
 products — one per client, roughly what a Bootstrap theme was. It supplies its own
 `primitives.css` and `semantic.css` and inherits the other ten imports, so its
 consumers get one value per token and no dependency on this repository.
 
-A product consuming Dessau directly is supported, and is the second case rather
+A product consuming Dessau DS directly is supported, and is the second case rather
 than the first.
 
 ---
 
 ## Set up a development machine
 
-Only for working **on** Dessau. Using it needs no dependencies at all.
+Only for working **on** Dessau DS. Using it needs no dependencies at all.
 
 ```bash
 npm install && npx playwright install chromium webkit firefox
@@ -57,7 +57,7 @@ Then <http://localhost:8000/reference/>.
 
 | Page | Shows |
 | --- | --- |
-| `reference/index.html` | What Dessau is, and how to start |
+| `reference/index.html` | What Dessau DS is, and how to start |
 | `reference/foundations.html` | Colour, typography, space, radius, motion — read live from the CSS |
 | `reference/components.html` | Buttons, fields, choices, dialogs, tables, tabs |
 | `reference/content.html` | Quote, teaser, facts, charts, lightbox, consent embeds |
@@ -80,19 +80,19 @@ Two answers, and they take different routes. Both start with the same hour.
 
 **Everybody: [`agent/recipes/derive-a-design-system.md`](agent/recipes/derive-a-design-system.md)
 first.** Six decisions — colour, type, roundness, density, depth, motion. Skip it
-and you have not chosen neutrality; you have taken Dessau's taste complete and
+and you have not chosen neutrality; you have taken Dessau DS's taste complete and
 unexamined, and roundness in particular is close to unchangeable by the time there
 are forty components.
 
 | You are building | Recipe | Prompt to paste into an agent |
 | --- | --- | --- |
-| **A design system** that ships to a client and works without Dessau | [`derive-a-standalone-system.md`](agent/recipes/derive-a-standalone-system.md) | [`derived-system-init.prompt.md`](agent/derived-system-init.prompt.md) |
-| **A product**, on Dessau or on a derived system | [`new-product.md`](agent/recipes/new-product.md) | [`consumer-init.prompt.md`](agent/consumer-init.prompt.md) |
+| **A design system** that ships to a client and works without Dessau DS | [`derive-a-standalone-system.md`](agent/recipes/derive-a-standalone-system.md) | [`derived-system-init.prompt.md`](agent/derived-system-init.prompt.md) |
+| **A product**, on Dessau DS or on a derived system | [`new-product.md`](agent/recipes/new-product.md) | [`consumer-init.prompt.md`](agent/consumer-init.prompt.md) |
 
 The difference is not scale. A derived system **substitutes** the foundation,
-because it cannot hand its own consumers a dependency on Dessau. A product
+because it cannot hand its own consumers a dependency on Dessau DS. A product
 **overrides**, unlayered, from above. Reading the product route and applying it to
-a system produces something that only works while Dessau is present, which is the
+a system produces something that only works while Dessau DS is present, which is the
 one thing a client deliverable may not do. See
 [`agent/architecture.md`](agent/architecture.md) → Two kinds of consumer.
 
@@ -112,7 +112,7 @@ recipes rather than restating them, and it makes the agent **ask** the six desig
 decisions rather than answer them.
 
 Recipes for the recurring jobs — a new component, a new pattern, an accessible
-form, adapting one Dessau already ships — are in
+form, adapting one Dessau DS already ships — are in
 [`agent/recipes/`](agent/recipes/).
 
 ---
@@ -142,7 +142,7 @@ scripts/     zero-dependency verification tooling
 
 ## Built to be used by coding agents
 
-Dessau does not just publish UI code for a person to browse and copy. Increasingly,
+Dessau DS does not just publish UI code for a person to browse and copy. Increasingly,
 the thing using a design system is an agent — and left to infer the rules it will
 invent a second button style, write raw hex values, guess at ARIA, and rebuild a
 pattern that already exists.
@@ -161,7 +161,7 @@ against the implementation:
 - **[`agent/recipes/`](agent/recipes/)** — step-by-step procedures for the jobs that
   recur.
 - **[`agent/consumer-AGENTS.template.md`](agent/consumer-AGENTS.template.md)** — for
-  a product repository, so an agent working there knows Dessau exists.
+  a product repository, so an agent working there knows Dessau DS exists.
 - **[`agent/consumer-init.prompt.md`](agent/consumer-init.prompt.md)** — the sentence
   that starts it: a prompt to paste into an agent standing in an empty product
   repository. It routes through the recipes rather than restating them, and it makes
@@ -169,7 +169,7 @@ against the implementation:
 
 The test applied to all of it:
 
-> **What does an agent need in order to build a new product correctly with Dessau,
+> **What does an agent need in order to build a new product correctly with Dessau DS,
 > without rediscovering its rules?**
 
 Neither the prompt nor the consumer template has been executed against a real
@@ -259,7 +259,7 @@ The fonts are used by the reference site only. `dds/` ships no font binaries —
 Maintained by one person. No pull request required, no peer approval, no release
 gate, no simulated team roles. Direct commits on `main` are fine.
 
-Small, coherent commits: one purpose each, leave Dessau working, include the
+Small, coherent commits: one purpose each, leave Dessau DS working, include the
 documentation the change needs. A specification that lags behind its code is a
 specification nobody can trust.
 
@@ -268,4 +268,4 @@ expanding the task.
 
 ---
 
-> **Every project should leave Dessau better than it found it.**
+> **Every project should leave Dessau DS better than it found it.**
