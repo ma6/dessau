@@ -12,8 +12,14 @@ All three live in [`reference/assets/brand/`](../reference/assets/brand/).
 | File | What it is | viewBox |
 | --- | --- | --- |
 | `dessau-mark.svg` | the D on its own | `0 0 91.8 100` |
-| `dessau-logo.svg` | the mark as the initial, with "essau" in Inter Black | `0 0 508.89 101.34` |
+| `dessau-logo.svg` | the mark as the initial, with "essau" in Inter Black, plus a "DS" tag in Space Grotesk | `0 0 629.98 101.34` |
 | `dessau-icon.svg` | the mark on a square canvas, for the favicon | `0 0 128 128` |
+
+**Two names, one mark.** "Dessau" is the short, spoken form — the wordmark, the
+thing on a business card. "Dessau Design System" is the full name, the one
+that makes it unambiguous this refers to a design system and not the city of
+Dessau; it is what the README and the reference site's homepage introduce the
+project as. The "DS" tag on the logo is the visual form of that same fact.
 
 They sit under `reference/`, not under `dds/`, and that placement is the
 argument: **the brand is not part of the design system.** A product that adopts
@@ -125,6 +131,43 @@ source was the unsubset `Inter-Variable.ttf` as published by
 
 ---
 
+## The "DS" tag
+
+A tag beside the wordmark, not a suffix on it — set apart by a rule rather than
+appended flush. Unlike a domain-style suffix, "DS" has no reading of its own;
+glued onto "Dessau" it just looks like the word grew two stray capitals. Set
+apart, it reads as what it is: an abbreviation of the full name, "Dessau
+Design System."
+
+**Space Grotesk, on purpose, for the opposite reason the wordmark rejects it.**
+The wordmark above needs a weight that matches the mark's 0.29 stroke, and
+Space Grotesk's axis tops out at 0.19 — too light by a third, which is why the
+wordmark can't use it. The tag isn't trying to match the mark; it's meant to
+read as lighter than the wordmark it sits beside, so the one typeface on this
+site whose heaviest cut is still lighter than Inter Black is exactly what
+belongs here. Set at weight 500.
+
+**Extraction.** Same method as "essau" — instancing the variable font's `wght`
+axis, then drawing the outline — but this time from the local, subsetted
+`reference/assets/fonts/SpaceGrotesk-Variable-latin-ext.woff2`, not an unsubset
+original. That distinction mattered for Inter because subsetting drops
+OpenType features a stylesheet doesn't name (`tnum`, `cv05`, `ss03`); it
+doesn't matter here, because a plain capital D and S invoke none of them.
+
+**Sizing and placement.**
+
+| | value |
+| --- | --- |
+| tag cap height | 46, 0.46 of the wordmark's 100 |
+| tag position | centred on the wordmark's cap band (y=27 to y=73), not baseline-aligned |
+| letter gap, D to S | 6 units, standing in for the tracking outlines can't carry |
+| rule | 2 wide, 62 tall (0.62 of the cap), centred on the cap band, 28% opacity |
+| gap, wordmark–rule–tag | 16 units each side, close to half the mark's stem width |
+
+The tag adds width only — 508.89 to 629.98. Height is unchanged at 101.34.
+
+---
+
 ## The colour rule
 
 **The brand is always the colour of the text beside it.** No brand colour, no
@@ -145,7 +188,7 @@ So the mark is **never** an `<img>`. Two ways to place it:
 .brand-logo {
   display: inline-block;
   block-size: 0.8em;
-  aspect-ratio: 508.89 / 101.34;   /* or 91.8 / 100 for the mark */
+  aspect-ratio: 629.98 / 101.34;   /* or 91.8 / 100 for the mark */
 
   background-color: currentColor;
   mask-image: url("brand/dessau-logo.svg");

@@ -1,15 +1,17 @@
 # Dessau
 
-> **A base for design systems, and for the products built on them**
+> **The Dessau Design System — a base for design systems, and for the products built on them**
 
 A reusable foundation: the principles that do not change, the design foundations
 everything is measured against, a small set of components, the patterns that solve
 recurring tasks — and structured context so a coding agent can use all of it
 correctly without rediscovering the rules.
 
-**DDS** — the Dessau Design System — is the UI layer inside Dessau. `dds` is the
-implementation namespace throughout: `.dds-button`,
-`--dds-color-action-primary`, `data-dds-dialog-open`, `window.DDS`.
+"Dessau" is the short, spoken form; **the Dessau Design System** is the full
+name, and the one worth using where it matters — said in full, there is no
+mistaking this for the city of Dessau. `dds` is the implementation namespace
+throughout the code: `.dds-button`, `--dds-color-action-primary`,
+`data-dds-dialog-open`, `window.DDS`.
 
 It reads the other way too, and that is the useful half: **derived design system.**
 Every system built on Dessau keeps the `dds-` prefix, so in a client's codebase it
