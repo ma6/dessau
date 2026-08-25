@@ -387,6 +387,7 @@
   var RUNTIME_ATTRIBUTES = [
     'data-dds-enhanced',
     'aria-activedescendant',
+    'data-dds-breadcrumb-hidden',
     'data-dds-charcount-state',
     'data-dds-dragging',
     'data-dds-lightbox-ready',

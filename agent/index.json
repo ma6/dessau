@@ -179,8 +179,9 @@
       "css": "dds/css/components-navigation.css",
       "spec": "## Breadcrumb — `.dds-breadcrumb`",
       "reference": "reference/navigation.html#breadcrumb",
-      "accessibility": "ol in a named nav. Separator is a pseudo-element. Last entry not a link. Collapsed-middle trigger is a button with its own aria-label, opening a .dds-menu popover of the hidden levels.",
-      "responsive": "self — the consumer collapses the middle behind .dds-breadcrumb-ellipsis once a trail is long enough to wrap; the list still wraps as a fallback"
+      "js": "dds/js/components-navigation.js",
+      "accessibility": "ol in a named nav. Separator is a pseudo-element. Last entry not a link. Levels the script hides for space carry no ARIA of their own — moved into a .dds-menu popover behind a button whose own aria-label says what it opens, since a bare ellipsis is not a name.",
+      "responsive": "self — JavaScript measures whether the trail fits one line and, if not, collapses the middle (nearest the root first) behind .dds-breadcrumb-ellipsis; without it, or once collapsing is not enough, the list still wraps as a fallback"
     },
     {
       "name": "button",
@@ -734,6 +735,7 @@
       "notFor": "Page navigation.",
       "classes": [
         ".dds-menu",
+        ".dds-menu-align-start",
         ".dds-menu-item",
         ".dds-menu-item-danger",
         ".dds-menu-label",

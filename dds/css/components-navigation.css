@@ -286,18 +286,25 @@
     font-size: var(--dds-font-size-sm);
   }
 
-  /* 1.5rem is 24px: the WCAG 2.2 2.5.8 minimum, measured at 320px and found at
+  /* `>`, not a bare descendant selector: the collapsed-middle enhancement below
+     (#146) puts a `.dds-menu` popover of its own inside this list's `<li>`,
+     complete with its own `<a>`s. An unscoped `.dds-breadcrumb a` would size
+     and colour those as breadcrumb items too, fighting `.dds-menu-item`'s own
+     rules for the same elements. Everything in this section is scoped to the
+     list's own direct children for that reason.
+
+     1.5rem is 24px: the WCAG 2.2 2.5.8 minimum, measured at 320px and found at
      22px. A breadcrumb link is not exempt as an inline target — it is one of a
      row of links, not a word inside a sentence, and the spacing exemption does
      not apply either because the links sit a few pixels apart. */
-  .dds-breadcrumb a,
-  .dds-breadcrumb [aria-current="page"] {
+  .dds-breadcrumb > ol > li > a,
+  .dds-breadcrumb > ol > li > [aria-current="page"] {
     display: inline-flex;
     align-items: center;
     min-block-size: 1.5rem;
   }
 
-  .dds-breadcrumb li {
+  .dds-breadcrumb > ol > li {
     display: flex;
     align-items: center;
     gap: var(--dds-space-2xs);
@@ -307,16 +314,27 @@
     min-inline-size: 0;
   }
 
+  /* Set by the collapsed-middle enhancement (#146) on a level it decided the
+     row has no room for. Needs its own rule because the plain `li` rule above
+     is author-origin and would otherwise outrank the UA stylesheet's own
+     `[hidden] { display: none }` — which is exactly why this is its own
+     attribute rather than the platform's `hidden`; see the long comment on
+     `.dds-breadcrumb-ellipsis` below for the rest of the reasoning. */
+  .dds-breadcrumb > ol > li[data-dds-breadcrumb-hidden] {
+    display: none;
+  }
+
   /* Decorative separator, invisible to assistive technology by virtue of being
      generated content.
 
-     On the item BEFORE the gap, not the one after it — and that is the whole
-     narrow-width behaviour of this component.
+     On the item BEFORE the gap, not the one after it.
      ----------------------------------------------------------------------
-     A breadcrumb wraps: on a phone a four-level trail is two or three lines, and
-     that is correct. Drawn as `li + li::before`, the chevron belongs to the item
-     that follows it, so a wrapped line OPENED with a chevron pointing at
-     nothing — "› Drainage survey" under the line it came from.
+     Drawn as `li + li::before`, the chevron belongs to the item that follows
+     it, so a wrapped line OPENED with a chevron pointing at nothing —
+     "› Drainage survey" under the line it came from. `.dds-breadcrumb-ellipsis`
+     (below) is what keeps a long trail from wrapping in the first place, but
+     the list still wraps as its own fallback — without JavaScript, or when the
+     collapsed trail still does not fit — so the inversion stays.
 
      Moved to the trailing edge of the preceding item, the mark that ends up at a
      line break is at the END of the line, where a chevron means "continues" and
@@ -325,7 +343,7 @@
      The same inversion is applied to the toolbar's group rule, for the same
      reason. Anything that separates two things has to sit on the side that
      survives the break. */
-  .dds-breadcrumb li:not(:last-child)::after {
+  .dds-breadcrumb > ol > li:not(:last-child)::after {
     content: "";
     inline-size: 0.4em;
     block-size: 0.4em;
@@ -336,25 +354,35 @@
     color: var(--dds-color-text-muted);
   }
 
-  .dds-breadcrumb [aria-current="page"] {
+  .dds-breadcrumb > ol > li > [aria-current="page"] {
     color: var(--dds-color-text-muted);
     font-weight: var(--dds-font-weight-medium);
   }
 
-  /* Collapsed middle (#146): a trail long enough to wrap is instead authored
-     with the intermediate levels replaced by one trigger, so the visible
-     trail is always first entry, ellipsis, last entry. That is a decision
-     the CONSUMER makes at authoring time — same convention as
-     `.dds-pagination-gap`'s "…", which is computed server-side rather than
-     measured in the browser — so there is no query here deciding when to
-     collapse.
+  /* Collapsed middle (#146, behaviour in `dds/js/components-navigation.js`):
+     every level is authored as a plain link — first entry, ellipsis trigger,
+     last entry is not something a consumer writes, it is what the script
+     leaves behind once it measures that the full list does not fit one line.
+     Nothing here decides WHEN to collapse; no CSS query can ask "did my
+     siblings' text make this row wrap", only actual layout can, so the
+     decision is JavaScript's alone. Levels closest to the current page are
+     kept longest — the ones dropped first are the ones nearest the root, kept
+     last is the immediate parent, which is what a shortened trail is read for.
 
      The trigger is a real `<button>`, not decoration: it opens a `.dds-menu`
-     popover holding the hidden levels as ordinary links. Wired exactly like
-     the menu's own trigger — `popovertarget`, and the popover authored as
-     the button's very next sibling so it becomes the popover's implicit
-     anchor (see the Menu section below). A visible "…" is not an accessible
-     name by itself, so the reference instance carries `aria-label`. */
+     popover holding a CLONE of each hidden level's link — duplicated, not
+     moved, which is safe here because only one copy is ever exposed to
+     assistive technology: the original is `[data-dds-breadcrumb-hidden]`
+     (out of the tree), the clone lives inside a closed popover (also out of
+     the tree, same as any `.dds-menu` before it opens). Wired exactly like
+     the menu's own trigger — `popovertarget`, and the popover authored as the
+     button's very next sibling so it becomes the popover's implicit anchor
+     (see the Menu section below) — with `.dds-menu-align-start`, because a
+     breadcrumb sits at the start of the content rather than in the corner a
+     right-aligned menu is tuned for.
+
+     Without JavaScript: every level renders as a working link and the list
+     wraps, exactly as `.dds-breadcrumb` already behaved before this existed. */
   .dds-breadcrumb-ellipsis {
     display: inline-flex;
     align-items: center;
@@ -826,6 +854,19 @@
       inset-inline-end: anchor(right, 35%);
       margin-block-start: var(--dds-space-3xs);
       position-try-fallbacks: flip-block, flip-inline;
+    }
+  }
+
+  /* Left-aligned instead of right-aligned (#146): for a trigger that sits at
+     the START of a row — the breadcrumb's collapsed-middle ellipsis — rather
+     than in a corner a right-aligned menu is tuned for, like the user menu at
+     the end of a header. Same anchor, same fallback reasoning as the base
+     rule above; only which edge is pinned changes, so `position-try-fallbacks`
+     and everything else about the popover is inherited unchanged. */
+  @supports (anchor-name: --dds-probe) and (position-anchor: auto) {
+    .dds-menu-align-start {
+      inset-inline-end: auto;
+      inset-inline-start: anchor(left, 35%);
     }
   }
 

@@ -1002,15 +1002,35 @@ An `<ol>` inside a named `<nav>`; the sequence is the meaning. The separator is 
 CSS pseudo-element, so it is not in the accessibility tree. The last entry is the
 current page: **not a link**, and `aria-current="page"`.
 
-**Collapsed middle (`.dds-breadcrumb-ellipsis`, #146):** for a trail long enough
-to wrap, the consumer authors first entry, ellipsis trigger, last entry instead of
-every level — the same call `.dds-pagination-gap`'s "…" makes, decided by the page
-rather than measured in the browser. The trigger is a real `<button>` opening a
-`.dds-menu` popover of the hidden levels as links, wired exactly like the menu's
-own trigger: `popovertarget`, and the popover authored as the button's very next
-sibling so it becomes the popover's implicit anchor — no JavaScript. The visible
-"…" is not an accessible name by itself, so the trigger needs its own
-`aria-label` (e.g. "Show full path").
+**Collapsed middle (`.dds-breadcrumb-ellipsis`, #146):** the consumer authors
+every level as a plain link — first entry, ellipsis trigger, last entry is not
+markup anyone writes, it is what `dds/js/components-navigation.js` leaves behind
+once it measures that the full list does not fit one line. No CSS query can ask
+"did my siblings' text make this row wrap" — only actual layout can, so unlike
+`.dds-pagination-gap`'s "…", which the page computes ahead of time, this decision
+belongs to the script and only the script.
+
+Only levels that do not fit are hidden, and levels closest to the current page are
+kept longest: a shortened trail is read for "where under X am I", which
+"… › Documents › Drainage survey" answers and "Projects › … › Drainage survey" —
+root kept, immediate parent hidden — does not. First and last are never
+collapsed.
+
+The trigger is a real `<button>`, not decoration: activating it opens a
+`.dds-menu` popover holding the hidden levels as ordinary links, **moved** there
+rather than duplicated — so nothing is ever exposed to assistive technology
+twice. Wired exactly like the menu's own trigger (`popovertarget`, the popover
+authored as the button's very next sibling so it becomes the popover's implicit
+anchor, no JavaScript for open/close/dismiss) but with `.dds-menu-align-start`:
+left-aligned under the trigger rather than the menu's own right alignment, which
+is tuned for a control tucked into a header's corner, not one sitting at the
+start of a row. The visible "…" is not an accessible name by itself, so the
+trigger carries its own `aria-label` ("Show full path" / "Vollständigen Pfad
+anzeigen", via `DDS.utils.wording`).
+
+**Without JavaScript:** every level renders as a working link and the list
+wraps — exactly how `.dds-breadcrumb` behaved before this existed, and still the
+fallback once collapsing everything between first and last is still not enough.
 
 ## Pagination — `.dds-pagination`
 
@@ -1153,6 +1173,14 @@ the menu in a corner of the screen (#48):
 
 Without anchor positioning at all the menu is centred — the UA default, stated
 explicitly rather than half-inherited.
+
+**`.dds-menu-align-start`:** right-aligned under the invoker by default, which is
+right for a control tucked into a header's corner — the user menu, a row's
+overflow menu. A trigger at the **start** of a row instead (the breadcrumb's
+collapsed-middle ellipsis, #146) adds this modifier to pin the popover's
+inline-start edge to the invoker's left rather than its inline-end edge to the
+invoker's right. Same anchor, same `position-try-fallbacks`; only which edge is
+pinned changes.
 
 **Disabled item:** `aria-disabled="true"`, not `disabled` — a menu mixes
 `<button>` and `<a>` items, and `disabled` only exists on the former. Stays
