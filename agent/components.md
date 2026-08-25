@@ -1002,6 +1002,16 @@ An `<ol>` inside a named `<nav>`; the sequence is the meaning. The separator is 
 CSS pseudo-element, so it is not in the accessibility tree. The last entry is the
 current page: **not a link**, and `aria-current="page"`.
 
+**Collapsed middle (`.dds-breadcrumb-ellipsis`, #146):** for a trail long enough
+to wrap, the consumer authors first entry, ellipsis trigger, last entry instead of
+every level — the same call `.dds-pagination-gap`'s "…" makes, decided by the page
+rather than measured in the browser. The trigger is a real `<button>` opening a
+`.dds-menu` popover of the hidden levels as links, wired exactly like the menu's
+own trigger: `popovertarget`, and the popover authored as the button's very next
+sibling so it becomes the popover's implicit anchor — no JavaScript. The visible
+"…" is not an accessible name by itself, so the trigger needs its own
+`aria-label` (e.g. "Show full path").
+
 ## Pagination — `.dds-pagination`
 
 Real links with real `href`s, so a page is bookmarkable, shareable and openable in

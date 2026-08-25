@@ -16,7 +16,7 @@
 <link rel="preload" href="assets/fonts/SpaceGrotesk-Variable-latin-ext.woff2" as="font"
       type="font/woff2" crossorigin>
 <link rel="stylesheet" href="assets/fonts.css?v=7ed937e9">
-<link rel="stylesheet" href="../dds/dds.css?v=9cca753b">
+<link rel="stylesheet" href="../dds/dds.css?v=542c1384">
 <link rel="stylesheet" href="assets/reference.css?v=3bc01e22">
 </head>
 <body>
@@ -477,8 +477,16 @@
             <nav class="dds-breadcrumb" aria-label="Breadcrumb">
               <ol>
                 <li><a href="#breadcrumb">Projects</a></li>
-                <li><a href="#breadcrumb">Harbour redevelopment</a></li>
-                <li><a href="#breadcrumb">Documents</a></li>
+                <li>
+                  <button type="button" class="dds-breadcrumb-ellipsis"
+                          popovertarget="demo-breadcrumb-path" aria-label="Show full path">…</button>
+                  <div class="dds-menu" id="demo-breadcrumb-path" popover>
+                    <ul role="list">
+                      <li><a class="dds-menu-item" href="#breadcrumb">Harbour redevelopment</a></li>
+                      <li><a class="dds-menu-item" href="#breadcrumb">Documents</a></li>
+                    </ul>
+                  </div>
+                </li>
                 <li><span aria-current="page">Drainage survey</span></li>
               </ol>
             </nav>
@@ -492,11 +500,16 @@
             </p>
             <p class="ref-note">
               <svg class="dds-icon" aria-hidden="true"><use href="#dds-icon-info"/></svg>
-              <strong>Narrow:</strong> the trail wraps, and the chevron sits on
-              the trailing edge of the item before the gap rather than the leading
-              edge of the one after it. Drawn the other way round, a wrapped line
-              opened with a chevron pointing at nothing. At the end of a line the
-              same mark reads as “continues”.
+              <strong>Collapsed middle (#146):</strong> authored, not measured.
+              Once a trail is long enough to wrap, the consumer replaces the
+              levels between first and last with one trigger — the same
+              decision <code class="dds-code">.dds-pagination-gap</code>'s “…”
+              makes below, computed by the page rather than the browser. The
+              trigger opens a <code class="dds-code">.dds-menu</code> popover of
+              the hidden levels the declarative way the Menu section further
+              down builds one: <code class="dds-code">popovertarget</code>, no
+              JavaScript. A bare “…” is not an accessible name, so the trigger
+              carries its own <code class="dds-code">aria-label</code>.
             </p>
           </div>
 

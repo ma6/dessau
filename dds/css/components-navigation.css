@@ -341,6 +341,40 @@
     font-weight: var(--dds-font-weight-medium);
   }
 
+  /* Collapsed middle (#146): a trail long enough to wrap is instead authored
+     with the intermediate levels replaced by one trigger, so the visible
+     trail is always first entry, ellipsis, last entry. That is a decision
+     the CONSUMER makes at authoring time — same convention as
+     `.dds-pagination-gap`'s "…", which is computed server-side rather than
+     measured in the browser — so there is no query here deciding when to
+     collapse.
+
+     The trigger is a real `<button>`, not decoration: it opens a `.dds-menu`
+     popover holding the hidden levels as ordinary links. Wired exactly like
+     the menu's own trigger — `popovertarget`, and the popover authored as
+     the button's very next sibling so it becomes the popover's implicit
+     anchor (see the Menu section below). A visible "…" is not an accessible
+     name by itself, so the reference instance carries `aria-label`. */
+  .dds-breadcrumb-ellipsis {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-inline-size: 1.5rem;
+    min-block-size: 1.5rem;
+    padding-inline: var(--dds-space-3xs);
+
+    font: inherit;
+    color: var(--dds-color-text-muted);
+    background: none;
+    border: 0;
+    border-radius: var(--dds-radius-sm);
+    cursor: pointer;
+  }
+
+  .dds-breadcrumb-ellipsis:hover {
+    background-color: var(--dds-color-surface-hover);
+  }
+
   /* ==========================================================================
      Pagination
      ==========================================================================

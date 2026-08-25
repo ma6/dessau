@@ -173,13 +173,14 @@
       "purpose": "Where the current page sits in the hierarchy.",
       "notFor": "A sequence of steps — use step progress.",
       "classes": [
-        ".dds-breadcrumb"
+        ".dds-breadcrumb",
+        ".dds-breadcrumb-ellipsis"
       ],
       "css": "dds/css/components-navigation.css",
       "spec": "## Breadcrumb — `.dds-breadcrumb`",
       "reference": "reference/navigation.html#breadcrumb",
-      "accessibility": "ol in a named nav. Separator is a pseudo-element. Last entry not a link.",
-      "responsive": "self — wraps when it runs out of room"
+      "accessibility": "ol in a named nav. Separator is a pseudo-element. Last entry not a link. Collapsed-middle trigger is a button with its own aria-label, opening a .dds-menu popover of the hidden levels.",
+      "responsive": "self — the consumer collapses the middle behind .dds-breadcrumb-ellipsis once a trail is long enough to wrap; the list still wraps as a fallback"
     },
     {
       "name": "button",
