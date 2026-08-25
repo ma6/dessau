@@ -53,7 +53,7 @@ a `.ref-note` on the rendered page. This is the index of it.
 | --- | --- |
 | `actionbar` | wraps when it runs out of room |
 | `banner` | shrinks rather than pushing its neighbours out |
-| `breadcrumb` | wraps when it runs out of room |
+| `breadcrumb` | the middle scrolls once it no longer fits |
 | `byline` | wraps when it runs out of room |
 | `chart` | the label column is a share of the row and wraps beyond it |
 | `cta` | wraps when it runs out of room |
@@ -1002,35 +1002,60 @@ An `<ol>` inside a named `<nav>`; the sequence is the meaning. The separator is 
 CSS pseudo-element, so it is not in the accessibility tree. The last entry is the
 current page: **not a link**, and `aria-current="page"`.
 
-**Collapsed middle (`.dds-breadcrumb-ellipsis`, #146):** the consumer authors
-every level as a plain link — first entry, ellipsis trigger, last entry is not
-markup anyone writes, it is what `dds/js/components-navigation.js` leaves behind
-once it measures that the full list does not fit one line. No CSS query can ask
-"did my siblings' text make this row wrap" — only actual layout can, so unlike
-`.dds-pagination-gap`'s "…", which the page computes ahead of time, this decision
-belongs to the script and only the script.
+**Scrollable middle (`.dds-breadcrumb-scroll`, #146):** once a trail has more than
+one level between the root and the current page, the consumer nests them in their
+own `<ol>` inside `<li class="dds-breadcrumb-scroll">`:
 
-Only levels that do not fit are hidden, and levels closest to the current page are
-kept longest: a shortened trail is read for "where under X am I", which
-"… › Documents › Drainage survey" answers and "Projects › … › Drainage survey" —
-root kept, immediate parent hidden — does not. First and last are never
-collapsed.
+```html
+<nav class="dds-breadcrumb" aria-label="Breadcrumb">
+  <ol>
+    <li><a href="/projects">Projects</a></li>
+    <li class="dds-breadcrumb-scroll">
+      <ol>
+        <li><a href="/projects/harbour">Harbour redevelopment</a></li>
+        <li><a href="/projects/harbour/documents">Documents</a></li>
+      </ol>
+    </li>
+    <li><span aria-current="page">Drainage survey</span></li>
+  </ol>
+</nav>
+```
 
-The trigger is a real `<button>`, not decoration: activating it opens a
-`.dds-menu` popover holding the hidden levels as ordinary links, **moved** there
-rather than duplicated — so nothing is ever exposed to assistive technology
-twice. Wired exactly like the menu's own trigger (`popovertarget`, the popover
-authored as the button's very next sibling so it becomes the popover's implicit
-anchor, no JavaScript for open/close/dismiss) but with `.dds-menu-align-start`:
-left-aligned under the trigger rather than the menu's own right alignment, which
-is tuned for a control tucked into a header's corner, not one sitting at the
-start of a row. The visible "…" is not an accessible name by itself, so the
-trigger carries its own `aria-label` ("Show full path" / "Vollständigen Pfad
-anzeigen", via `DDS.utils.wording`).
+`overflow-x: auto` on that wrapper needs no query and no JavaScript: wherever the
+middle content already fits, it is simply inert, and scrolling appears only once
+it does not — the same technique `.dds-pagination`'s own numbers strip already
+uses below a width, except the breadcrumb's goal is narrower and absolute (never
+wrap the row at all) rather than switching over at a measured threshold, so it
+scrolls unconditionally instead of conditionally. First and last carry
+`flex-shrink: 0` and never give up space, so the whole squeeze always lands on
+the middle — the two ends are what matter most for orientation (the root of the
+hierarchy, and where the user is now), and a breadcrumb that let either one
+shrink away would answer "where am I" worse than one that hides nothing but
+requires a scroll to see all of it.
 
-**Without JavaScript:** every level renders as a working link and the list
-wraps — exactly how `.dds-breadcrumb` behaved before this existed, and still the
-fallback once collapsing everything between first and last is still not enough.
+No tab stop of its own, unlike the table's scroll region: every child is a link,
+and focusing a link scrolls it into view natively — a keyboard user reaches every
+level in the same tab order, with no extra control to operate first. A partially
+visible label at the trailing edge is its own affordance, the same cut-off cue
+the pagination strip relies on.
+
+The chevron separator is tied to "has a link" (`li:has(> a)`) rather than to list
+position, because the nested `<ol>` means the true last level of the trail is not
+always the last child of *a* list, only of the outermost one — and it is, not
+coincidentally, exactly the one level with no direct `<a>` child, since it is
+`[aria-current="page"]` instead.
+
+The one chevron drawn on the scrollable list's own last item would be carried out
+of view along with everything else in the strip once it scrolls — the mark that
+answers "where does the scrollable part end and the current page begin" is
+exactly the one a reader needs regardless of scroll position. It is switched off
+there and redrawn on `.dds-breadcrumb-scroll` itself instead, which never
+scrolls (only its content does), `position: sticky` and pinned to that element's
+trailing edge so it stays exactly where the boundary is, however far the strip
+has been scrolled.
+
+**Without JavaScript:** identical. This was already a CSS-only component, and
+still is — nothing here needed a script.
 
 ## Pagination — `.dds-pagination`
 
@@ -1173,14 +1198,6 @@ the menu in a corner of the screen (#48):
 
 Without anchor positioning at all the menu is centred — the UA default, stated
 explicitly rather than half-inherited.
-
-**`.dds-menu-align-start`:** right-aligned under the invoker by default, which is
-right for a control tucked into a header's corner — the user menu, a row's
-overflow menu. A trigger at the **start** of a row instead (the breadcrumb's
-collapsed-middle ellipsis, #146) adds this modifier to pin the popover's
-inline-start edge to the invoker's left rather than its inline-end edge to the
-invoker's right. Same anchor, same `position-try-fallbacks`; only which edge is
-pinned changes.
 
 **Disabled item:** `aria-disabled="true"`, not `disabled` — a menu mixes
 `<button>` and `<a>` items, and `disabled` only exists on the former. Stays

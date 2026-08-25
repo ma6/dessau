@@ -438,7 +438,7 @@ kind is the part that is checked:
 | --- | --- | --- |
 | `container` | responds to the space it was given, at a stated threshold | `siteheader — dds-siteheader (inline-size >= 48rem)` |
 | `viewport` | genuinely depends on the device | `dialog — (max-width: 30rem)` |
-| `self` | adapts with no threshold at all | `breadcrumb — wraps when it runs out of room` |
+| `self` | adapts with no threshold at all | `breadcrumb — the middle scrolls once it no longer fits` |
 | `none` | nothing about it changes with width, and that is correct | `badge` |
 
 Today that is 9 · 1 · 28 · 38 across seventy-six entries, which is the honest

@@ -274,76 +274,98 @@
 
      The last entry is the current page: not a link, and marked
      `aria-current="page"`. Linking a page to itself is a dead control. */
+  .dds-breadcrumb {
+    font-size: var(--dds-font-size-sm);
+  }
+
   .dds-breadcrumb ol {
     display: flex;
-    flex-wrap: wrap;
     align-items: center;
     gap: var(--dds-space-2xs);
 
     list-style: none;
     margin: 0;
     padding: 0;
-    font-size: var(--dds-font-size-sm);
   }
 
-  /* `>`, not a bare descendant selector: the collapsed-middle enhancement below
-     (#146) puts a `.dds-menu` popover of its own inside this list's `<li>`,
-     complete with its own `<a>`s. An unscoped `.dds-breadcrumb a` would size
-     and colour those as breadcrumb items too, fighting `.dds-menu-item`'s own
-     rules for the same elements. Everything in this section is scoped to the
-     list's own direct children for that reason.
+  /* `nowrap`, not `wrap` (#146) — the row breaking onto a second line is
+     exactly what `.dds-breadcrumb-scroll` below exists to prevent, and
+     `flex-wrap: wrap` does not merely fail to help, it actively defeats the
+     scroll segment's own shrinking: measured rather than assumed, a flex item
+     with `flex-basis: auto` (the scroll segment's own, so its shrinking can
+     start from its natural content size) does not shrink AT ALL — not even
+     with `flex-shrink` raised far past 1 — while its container is
+     `flex-wrap: wrap`, regardless of `min-inline-size`. Switching the row to
+     `nowrap` is what makes that shrink take effect.
 
-     1.5rem is 24px: the WCAG 2.2 2.5.8 minimum, measured at 320px and found at
+     The trade-off this accepts: a first or last level long enough to exceed
+     the row on its own, with `.dds-breadcrumb-scroll` already shrunk to
+     nothing, has nowhere left to go and overflows — the same edge case
+     `agent/components.md` already excludes from scope alongside truncating an
+     individual label, not a new one this introduces. */
+  .dds-breadcrumb > ol {
+    flex-wrap: nowrap;
+  }
+
+  /* 1.5rem is 24px: the WCAG 2.2 2.5.8 minimum, measured at 320px and found at
      22px. A breadcrumb link is not exempt as an inline target — it is one of a
      row of links, not a word inside a sentence, and the spacing exemption does
      not apply either because the links sit a few pixels apart. */
-  .dds-breadcrumb > ol > li > a,
-  .dds-breadcrumb > ol > li > [aria-current="page"] {
+  .dds-breadcrumb a,
+  .dds-breadcrumb [aria-current="page"] {
     display: inline-flex;
     align-items: center;
     min-block-size: 1.5rem;
   }
 
-  .dds-breadcrumb > ol > li {
+  .dds-breadcrumb li {
     display: flex;
     align-items: center;
     gap: var(--dds-space-2xs);
-    /* A long name is allowed to wrap inside its own item rather than push the
-       trail past the edge. Without this the flex item's automatic minimum is its
-       longest word. */
+    /* Without this a flex item's automatic minimum is its longest word, which
+       is what `.dds-breadcrumb-scroll` (below) needs overridden to shrink
+       below its own content at all — the mechanism its scrolling depends on.
+       First and last opt back out via `flex-shrink: 0` below, since they
+       never shrink in the first place and this would otherwise let their own
+       text wrap rather than stay whole. */
     min-inline-size: 0;
   }
 
-  /* Set by the collapsed-middle enhancement (#146) on a level it decided the
-     row has no room for. Needs its own rule because the plain `li` rule above
-     is author-origin and would otherwise outrank the UA stylesheet's own
-     `[hidden] { display: none }` — which is exactly why this is its own
-     attribute rather than the platform's `hidden`; see the long comment on
-     `.dds-breadcrumb-ellipsis` below for the rest of the reasoning. */
-  .dds-breadcrumb > ol > li[data-dds-breadcrumb-hidden] {
-    display: none;
+  /* First and last never give up space (#146): they are the two levels that
+     matter most for orientation — the root of the hierarchy, and where the
+     user is now — so the whole squeeze goes to `.dds-breadcrumb-scroll`
+     instead, which is the only item still allowed to shrink. Scoped to the
+     OUTER list only: the nested one inside `.dds-breadcrumb-scroll` has no
+     "first" or "last" of its own to protect this way. */
+  .dds-breadcrumb > ol > li:first-child,
+  .dds-breadcrumb > ol > li:last-child {
+    flex-shrink: 0;
   }
 
   /* Decorative separator, invisible to assistive technology by virtue of being
-     generated content.
+     generated content. On the item BEFORE the gap, not the one after it — the
+     same inversion applied to the toolbar's group rule, for the same reason:
+     anything that separates two things sits on the side that survives a break.
 
-     On the item BEFORE the gap, not the one after it.
-     ----------------------------------------------------------------------
-     Drawn as `li + li::before`, the chevron belongs to the item that follows
-     it, so a wrapped line OPENED with a chevron pointing at nothing —
-     "› Drainage survey" under the line it came from. `.dds-breadcrumb-ellipsis`
-     (below) is what keeps a long trail from wrapping in the first place, but
-     the list still wraps as its own fallback — without JavaScript, or when the
-     collapsed trail still does not fit — so the inversion stays.
+     Tied to "has a link", not to list position, because `.dds-breadcrumb-scroll`
+     below nests a second `<ol>` for the levels that scroll, and a chevron is
+     wanted after every level that has one, at either depth, except the very
+     last — which happens to be exactly the one level with no direct `<a>`
+     child, since it is `[aria-current="page"]` instead. One rule reaches every
+     case this way rather than one per list, and needs no `:not(:last-child)`
+     that would have to know which list's last child means the trail's own
+     last child and which does not.
 
-     Moved to the trailing edge of the preceding item, the mark that ends up at a
-     line break is at the END of the line, where a chevron means "continues" and
-     reads correctly. Within a line nothing changes but a couple of pixels.
-
-     The same inversion is applied to the toolbar's group rule, for the same
-     reason. Anything that separates two things has to sit on the side that
-     survives the break. */
-  .dds-breadcrumb > ol > li:not(:last-child)::after {
+     `.dds-breadcrumb-scroll::after` shares this same shape for a different
+     reason (#146): the mark between the scrollable middle and the current
+     page is the one boundary a reader needs no matter where the strip is
+     scrolled to, so it is drawn on the WRAPPER — which never scrolls, only
+     its content does — rather than on the last scrollable item, whose own
+     mark would otherwise be carried out of view with everything else in the
+     strip. That item's own chevron is switched off immediately below so the
+     two do not draw twice when nothing needs scrolling yet. */
+  .dds-breadcrumb li:has(> a)::after,
+  .dds-breadcrumb-scroll::after {
     content: "";
     inline-size: 0.4em;
     block-size: 0.4em;
@@ -354,53 +376,85 @@
     color: var(--dds-color-text-muted);
   }
 
-  .dds-breadcrumb > ol > li > [aria-current="page"] {
+  .dds-breadcrumb-scroll > ol > li:last-child::after {
+    content: none;
+  }
+
+  /* Sticky, not static: `.dds-breadcrumb-scroll` is itself the scrolling box
+     (see below), so its `::after` is ordinary flow content and would scroll
+     away with the rest unless pinned. `position: sticky` keeps it in the flex
+     flow — sized and gapped exactly like every other chevron — while clamping
+     its painted position to the scroll container's own trailing edge once
+     scrolling moves it there. `flex-shrink: 0` stops it being the one thing
+     that gives up space when `.dds-breadcrumb-scroll` itself is squeezed by
+     the outer row, which would shrink the mark into an odd sliver rather than
+     the scrollable content shrinking, which is the whole point of this
+     component. */
+  .dds-breadcrumb-scroll::after {
+    position: sticky;
+    inset-inline-end: 0;
+    flex-shrink: 0;
+  }
+
+  .dds-breadcrumb [aria-current="page"] {
     color: var(--dds-color-text-muted);
     font-weight: var(--dds-font-weight-medium);
   }
 
-  /* Collapsed middle (#146, behaviour in `dds/js/components-navigation.js`):
-     every level is authored as a plain link — first entry, ellipsis trigger,
-     last entry is not something a consumer writes, it is what the script
-     leaves behind once it measures that the full list does not fit one line.
-     Nothing here decides WHEN to collapse; no CSS query can ask "did my
-     siblings' text make this row wrap", only actual layout can, so the
-     decision is JavaScript's alone. Levels closest to the current page are
-     kept longest — the ones dropped first are the ones nearest the root, kept
-     last is the immediate parent, which is what a shortened trail is read for.
+  /* Scrollable middle (#146): the levels between the root and the current page,
+     in their own nested `<ol>` — authored by the consumer once a trail has more
+     than one of them, the same call `.dds-pagination-gap`'s numbers strip
+     already makes for the same reason.
 
-     The trigger is a real `<button>`, not decoration: it opens a `.dds-menu`
-     popover holding a CLONE of each hidden level's link — duplicated, not
-     moved, which is safe here because only one copy is ever exposed to
-     assistive technology: the original is `[data-dds-breadcrumb-hidden]`
-     (out of the tree), the clone lives inside a closed popover (also out of
-     the tree, same as any `.dds-menu` before it opens). Wired exactly like
-     the menu's own trigger — `popovertarget`, and the popover authored as the
-     button's very next sibling so it becomes the popover's implicit anchor
-     (see the Menu section below) — with `.dds-menu-align-start`, because a
-     breadcrumb sits at the start of the content rather than in the corner a
-     right-aligned menu is tuned for.
+     `overflow-x: auto` needs no query, unlike the pagination strip's: at any
+     width where the middle content already fits, it is simply inert, and
+     scrolling appears only once it does not. Pagination prefers WRAPPING right
+     up until a specific narrow threshold makes that arrangement worse than
+     scrolling (Previous alone on its own line); a breadcrumb's goal is
+     narrower and absolute — never wrap the row at all, first and last always
+     shown whole — so its middle scrolls unconditionally rather than switching
+     over at a measured point, and the outer list is `flex-wrap: nowrap`
+     rather than pagination's conditional wrap (see the long comment there for
+     why wrap and this shrinking cannot coexist, and what giving up on it
+     costs at the extreme).
 
-     Without JavaScript: every level renders as a working link and the list
-     wraps, exactly as `.dds-breadcrumb` already behaved before this existed. */
-  .dds-breadcrumb-ellipsis {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    min-inline-size: 1.5rem;
-    min-block-size: 1.5rem;
-    padding-inline: var(--dds-space-3xs);
-
-    font: inherit;
-    color: var(--dds-color-text-muted);
-    background: none;
-    border: 0;
-    border-radius: var(--dds-radius-sm);
-    cursor: pointer;
+     No tab stop of its own, unlike the table's scroll region: every child is a
+     link, and focusing a link scrolls it into view on its own, so a keyboard
+     user reaches every level exactly as before, in the same tab order, with no
+     extra control to operate first. A partially visible label at the trailing
+     edge is its own affordance — the same "there is more this way" cue the
+     pagination strip already relies on. */
+  .dds-breadcrumb-scroll {
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
   }
 
-  .dds-breadcrumb-ellipsis:hover {
-    background-color: var(--dds-color-surface-hover);
+  /* `flex-shrink: 0` here, not only `min-inline-size: auto` on its own items
+     below, is what actually keeps this list at its full content width.
+     `.dds-breadcrumb-scroll` is this list's flex CONTAINER as well as the
+     outer row's flex ITEM — without opting this list itself out of shrinking,
+     the wrapper shrinking (which is the whole mechanism `overflow-x: auto`
+     depends on) drags this list down with it, and its own items — even
+     un-shrinkable ones — end up laid out in less room than they need and wrap
+     their text instead of the list overflowing whole. */
+  .dds-breadcrumb-scroll > ol {
+    flex-wrap: nowrap;
+    flex-shrink: 0;
+    /* Land on a whole level rather than halfway through one. */
+    scroll-snap-type: x proximity;
+  }
+
+  /* Overrides the generic `li { min-inline-size: 0 }` above, and has to: that
+     rule exists so a first or last label can wrap its OWN text rather than
+     push the row past its edge, but inside a strip that is meant to overflow
+     and scroll, the same property does the opposite of what is wanted — each
+     item shrinks and wraps its text internally instead, and the strip never
+     grows wide enough to need scrolling at all. Restoring the default
+     (content-based) minimum here is what makes the strip overflow its box
+     instead of each word inside it wrapping to stay within one. */
+  .dds-breadcrumb-scroll > ol > li {
+    min-inline-size: auto;
+    scroll-snap-align: center;
   }
 
   /* ==========================================================================
@@ -854,19 +908,6 @@
       inset-inline-end: anchor(right, 35%);
       margin-block-start: var(--dds-space-3xs);
       position-try-fallbacks: flip-block, flip-inline;
-    }
-  }
-
-  /* Left-aligned instead of right-aligned (#146): for a trigger that sits at
-     the START of a row — the breadcrumb's collapsed-middle ellipsis — rather
-     than in a corner a right-aligned menu is tuned for, like the user menu at
-     the end of a header. Same anchor, same fallback reasoning as the base
-     rule above; only which edge is pinned changes, so `position-try-fallbacks`
-     and everything else about the popover is inherited unchanged. */
-  @supports (anchor-name: --dds-probe) and (position-anchor: auto) {
-    .dds-menu-align-start {
-      inset-inline-end: auto;
-      inset-inline-start: anchor(left, 35%);
     }
   }
 

@@ -16,7 +16,7 @@
 <link rel="preload" href="assets/fonts/SpaceGrotesk-Variable-latin-ext.woff2" as="font"
       type="font/woff2" crossorigin>
 <link rel="stylesheet" href="assets/fonts.css?v=7ed937e9">
-<link rel="stylesheet" href="../dds/dds.css?v=c4cae477">
+<link rel="stylesheet" href="../dds/dds.css?v=e0a64745">
 <link rel="stylesheet" href="assets/reference.css?v=3bc01e22">
 </head>
 <body>
@@ -477,8 +477,12 @@
             <nav class="dds-breadcrumb" aria-label="Breadcrumb">
               <ol>
                 <li><a href="#breadcrumb">Projects</a></li>
-                <li><a href="#breadcrumb">Harbour redevelopment</a></li>
-                <li><a href="#breadcrumb">Documents</a></li>
+                <li class="dds-breadcrumb-scroll">
+                  <ol>
+                    <li><a href="#breadcrumb">Harbour redevelopment</a></li>
+                    <li><a href="#breadcrumb">Documents</a></li>
+                  </ol>
+                </li>
                 <li><span aria-current="page">Drainage survey</span></li>
               </ol>
             </nav>
@@ -492,36 +496,40 @@
             </p>
             <p class="ref-note">
               <svg class="dds-icon" aria-hidden="true"><use href="#dds-icon-info"/></svg>
-              <strong>Collapsed middle (#146):</strong> every level above is a
-              plain link — the ellipsis at narrow widths is not authored, it is
-              what <code class="dds-code">components-navigation.js</code> leaves
-              behind once it measures that the full trail does not fit one line.
-              No CSS query can ask “did my siblings’ text make this row wrap”,
-              only actual layout can, so unlike
-              <code class="dds-code">.dds-pagination-gap</code>’s “…” below,
-              which the page computes ahead of time, this decision belongs to
-              the script alone. Widen the stage back out and every level
-              returns — nothing is lost, only hidden.
+              <strong>Scrollable middle (#146):</strong> once there is more than
+              one level between the root and the current page, they sit in their
+              own nested <code class="dds-code">&lt;ol&gt;</code> inside
+              <code class="dds-code">.dds-breadcrumb-scroll</code>. Nothing
+              measures or decides anything —
+              <code class="dds-code">overflow-x: auto</code> is simply inert
+              wherever the middle already fits, exactly the way
+              <code class="dds-code">.dds-pagination</code>’s own numbers strip
+              already scrolls below a width. First and last never shrink, so the
+              whole squeeze always lands on the middle rather than on the two
+              levels that matter most for orientation.
             </p>
             <p class="ref-note">
               <svg class="dds-icon" aria-hidden="true"><use href="#dds-icon-info"/></svg>
-              <strong>Narrow:</strong> only as many levels are hidden as the row
-              actually needs to lose, and the ones nearest the root go first —
-              the level closest to the current page is kept longest, because
-              “… › Documents › Drainage survey” answers “where under Projects am
-              I” and “Projects › … › Drainage survey” does not. The trigger opens
-              a <code class="dds-code">.dds-menu</code> popover holding a
-              <strong>clone</strong> of each hidden level's link — safe because
-              only one copy is ever exposed to assistive technology, never
-              both: the original is hidden from the tree, the clone sits
-              inside a closed popover, also out of the tree — the same
-              declarative way the Menu section further down builds one —
-              <code class="dds-code">popovertarget</code>, no JavaScript for
-              open, close or dismiss — but left-aligned
-              (<code class="dds-code">.dds-menu-align-start</code>) under a
-              trigger that sits at the start of the row rather than in a
-              corner. A bare “…” is not an accessible name, so the trigger
-              carries its own <code class="dds-code">aria-label</code>.
+              <strong>Narrow:</strong> the middle scrolls instead of the row
+              wrapping, and nothing is hidden — every level is still a real
+              link, reachable exactly as before. It needs no tab stop of its
+              own: focusing a link scrolls it into view natively, so a keyboard
+              user reaches every level in the same tab order, with no popover or
+              extra control to open first. A partially visible label at the
+              trailing edge is its own affordance — the same cut-off cue
+              <code class="dds-code">.dds-pagination</code>’s numbers strip
+              below relies on.
+            </p>
+            <p class="ref-note">
+              <svg class="dds-icon" aria-hidden="true"><use href="#dds-icon-info"/></svg>
+              Scroll the middle to the end: the separator before “Drainage
+              survey” stays exactly where it is rather than travelling with the
+              rest of the strip. Drawn on the scrollable list's own last item it
+              would be carried out of view along with everything else once
+              scrolled — the mark showing where the scrollable part ends is
+              switched off there and redrawn, <code class="dds-code">position:
+              sticky</code>, on <code class="dds-code">.dds-breadcrumb-scroll</code>
+              itself, which never scrolls even though its content does.
             </p>
           </div>
 
@@ -1394,8 +1402,8 @@
 <script src="../dds/js/dds.js?v=9fd0e398" defer></script>
 <script src="../dds/js/format.js?v=8f2e10f1" defer></script>
 <script src="../dds/js/components.js?v=c1e84998" defer></script>
-<script src="../dds/js/components-navigation.js?v=6be5f38e" defer></script>
+<script src="../dds/js/components-navigation.js?v=f86a7add" defer></script>
 <script src="assets/reference.js?v=4390e1aa" defer></script>
-<script src="assets/reference-tools.js?v=ec037604" defer></script>
+<script src="assets/reference-tools.js?v=cb237f74" defer></script>
 </body>
 </html>
