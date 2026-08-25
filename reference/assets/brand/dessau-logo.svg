@@ -51,10 +51,51 @@
 
   currentColor, so it follows the theme when INLINED or used as a mask. As an
   img src it renders black, having nothing to inherit from.
+
+  ===========================================================================
+  The "DS" tag
+  ===========================================================================
+
+  Set apart from the wordmark by a rule, not glued on: unlike a domain suffix
+  such as ".dev", "DS" has no reading of its own — appended flush it looks like
+  the word grew two stray capitals, not like an abbreviation.
+
+  Space Grotesk, not Inter: the opposite reasoning from the wordmark above. The
+  wordmark needed a weight that matched the mark's 0.29 stroke, and Space
+  Grotesk's axis tops out at 0.19 — a third too light, which is why it was
+  rejected there. The tag is not trying to match the mark; it is meant to carry
+  less weight than the wordmark it sits beside, so a family whose heaviest cut
+  is still lighter than Inter Black is exactly what belongs here. Set at 500.
+
+  Extracted the same way as "essau" — instancing the variable font's wght axis
+  and drawing the outline — but this time from the local, subsetted
+  reference/assets/fonts/SpaceGrotesk-Variable-latin-ext.woff2 rather than an
+  unsubset original. That distinction mattered for Inter because the subsetter
+  drops OpenType features a stylesheet didn't name (tnum, cv05, ss03 — see
+  fonts.css); it doesn't matter here, because a plain capital D and S invoke
+  none of them.
+
+      cap height (Space Grotesk, wght 500)   700 of 1000 upm
+      tag cap height, this file                46, 0.46 of the wordmark's 100
+      scale                                    46 / 700 = 0.0657...
+
+  Centred on the wordmark's cap band — its own cap runs from y=27 to y=73,
+  around the midpoint of the 0–100 cap — not baseline-aligned to it. This is a
+  tag beside the word, not a continuation of it.
+
+  Letterfit: D and S keep their own advance widths, plus 6 units between them
+  standing in for the tracking outlines cannot carry. The rule between the
+  wordmark and the tag is 2 units wide, 62 tall (0.62 of the cap, also centred
+  on the cap band), at 28% opacity — present without competing with either
+  side of it. 16 units of gap on each side of the rule, close to half the
+  mark's own stem width.
+
+  The tag adds width only: 508.89 to 629.98. Height is unchanged at 101.34 —
+  everything sits inside the existing vertical band.
 -->
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 508.89 101.34" fill="currentColor"
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 629.98 101.34" fill="currentColor"
      role="img" aria-labelledby="dessau-logo-title">
-  <title id="dessau-logo-title">Dessau</title>
+  <title id="dessau-logo-title">Dessau Design System</title>
 
   <!-- The mark, as the initial. Identical to dessau-mark.svg. -->
   <path d="M0.203 0.203C0.087 0.29 0 22.798 0 50.174L0 99.942L28.679 99.942L28.679 0L14.542 0C6.75 0 0.29 0.087 0.203 0.203Z"/>
@@ -67,4 +108,12 @@
            M372.25 101.208Q365.068 101.208 359.532 98.826Q353.995 96.443 350.907 91.611Q347.82 86.779 347.82 79.329Q347.82 73.154 349.901 68.792Q351.981 64.43 355.74 61.644Q359.498 58.859 364.498 57.349Q369.498 55.839 375.337 55.436Q381.646 54.966 385.438 54.295Q389.23 53.624 390.941 52.315Q392.652 51.007 392.652 48.859L392.652 48.591Q392.652 46.644 391.612 45.302Q390.572 43.96 388.693 43.255Q386.813 42.55 384.196 42.55Q381.646 42.55 379.565 43.289Q377.485 44.027 376.109 45.503Q374.733 46.98 374.263 49.262L349.968 46.846Q351.042 40.537 355.203 35.369Q359.364 30.201 366.713 27.114Q374.062 24.027 384.599 24.027Q392.585 24.027 399.062 25.906Q405.538 27.785 410.136 31.141Q414.733 34.497 417.183 38.96Q419.632 43.423 419.632 48.591L419.632 100L394.397 100L394.397 89.396L393.86 89.396Q391.579 93.624 388.391 96.208Q385.203 98.792 381.176 100Q377.149 101.208 372.25 101.208Z
            M380.975 84.161Q384.062 84.161 386.78 82.886Q389.498 81.611 391.209 79.228Q392.921 76.846 392.921 73.423L392.921 67.248Q391.847 67.651 390.639 68.054Q389.431 68.456 388.055 68.792Q386.679 69.128 385.236 69.396Q383.793 69.664 382.183 69.933Q379.028 70.403 377.048 71.51Q375.068 72.617 374.129 74.195Q373.189 75.772 373.189 77.718Q373.189 79.799 374.196 81.242Q375.203 82.685 376.948 83.423Q378.693 84.161 380.975 84.161Z
            M459.498 100.94Q451.579 100.94 445.672 97.315Q439.766 93.691 436.545 87.315Q433.324 80.94 433.324 72.752L433.324 24.966L460.303 24.966L460.303 67.114Q460.303 72.685 463.122 75.872Q465.941 79.06 471.042 79.06Q474.397 79.06 476.813 77.617Q479.23 76.174 480.572 73.49Q481.914 70.805 481.914 67.114L481.914 24.966L508.894 24.966L508.894 100L483.592 100L483.055 80.805L483.86 80.805Q481.31 89.329 475.572 95.134Q469.834 100.94 459.498 100.94Z"/>
+
+  <!-- The rule between wordmark and tag: 2 wide, 62 tall, centred on the cap
+       band, at reduced opacity so it separates without competing. -->
+  <rect x="524.89" y="19" width="2" height="62" fill-opacity="0.28"/>
+
+  <!-- "DS": Space Grotesk 500 outlines, D then S. -->
+  <path d="M545.959 73V66.711H552.189V33.289H545.959V27H564.379Q573.552 27 578.451 31.653Q583.35 36.305 583.35 45.709V54.314Q583.35 63.718 578.451 68.359Q573.552 73 564.379 73ZM559.299 66.54H564.464Q570.411 66.54 573.326 63.527Q576.24 60.514 576.24 54.554V45.469Q576.24 39.443 573.326 36.463Q570.411 33.483 564.464 33.483H559.299Z
+           M613.034 73.92Q607.849 73.92 603.844 72.072Q599.838 70.224 597.561 66.663Q595.284 63.103 595.284 57.925V56.292H602.309V57.925Q602.309 62.847 605.252 65.262Q608.194 67.677 613.034 67.677Q617.939 67.677 620.451 65.592Q622.963 63.508 622.963 60.265Q622.963 58.06 621.787 56.705Q620.611 55.349 618.426 54.501Q616.241 53.654 613.214 52.951L610.76 52.369Q606.374 51.341 603.139 49.777Q599.904 48.213 598.131 45.665Q596.359 43.116 596.359 39.072Q596.359 35.027 598.34 32.118Q600.321 29.208 603.888 27.644Q607.455 26.08 612.245 26.08Q617.036 26.08 620.811 27.721Q624.586 29.362 626.765 32.589Q628.943 35.816 628.943 40.672V43.034H621.918V40.672Q621.918 37.698 620.704 35.87Q619.49 34.041 617.308 33.182Q615.127 32.323 612.245 32.323Q608.003 32.323 605.693 34.055Q603.384 35.786 603.384 38.901Q603.384 40.977 604.409 42.321Q605.434 43.665 607.404 44.523Q609.373 45.38 612.271 46.041L614.726 46.622Q619.194 47.605 622.623 49.167Q626.052 50.729 628.02 53.343Q629.988 55.957 629.988 60.094Q629.988 64.23 627.898 67.337Q625.809 70.444 622.002 72.182Q618.196 73.92 613.034 73.92Z"/>
 </svg>

@@ -118,9 +118,10 @@
       moves the content underneath it, which is the opposite of getting out of
       the way. `--ref-row` fixes the row's height and both logo sizes fit inside
       it, so only the logo moves.
-   2. **The row must not wrap.** The logo is five times as wide as it is tall, so
-      growing it moves the sub-line sideways. At the sizes below it stays on one
-      line at every width; below 48rem the sub-line is hidden anyway.
+   2. **The row must not wrap.** The logo is over six times as wide as it is
+      tall (wider still since the "DS" tag), so growing it moves the sub-line
+      sideways. At the sizes below it stays on one line at every width; below
+      48rem the sub-line is hidden anyway.
 
    `block-size` rather than `scale`, even though `scale` is the cheaper property:
    a transform would leave the layout at one size, so the logo would either
@@ -138,6 +139,24 @@
   --ref-brand-logo-size: 0.8em;
 }
 
+/* The "DS" tag widened the logo enough to matter at the narrowest viewport
+   this row is asked to fit: at 320px — the standard floor for a mobile
+   viewport, not a value picked to make a test pass — the unscrolled row
+   needs 313px (144 brand + 12 gap + 101 Menu button + 12 gap + 44 theme
+   toggle) against 308px available inside the padding, and the toggle wraps
+   onto its own line at the far left, the exact failure `.ref-brand-sub`
+   above was already written to avoid. The sub-line is gone by this width
+   already, so only the logo itself is left to give back the difference.
+   1.1em keeps real headroom (about 11px) rather than shaving it to the
+   edge; the scrolled state's 0.8em is smaller still and wins on specificity
+   regardless of viewport, so this only ever touches the "large on arrival"
+   size. */
+@media (max-width: 20rem) {
+  .ref-header {
+    --ref-brand-logo-size: 1.1em;
+  }
+}
+
 /* The transition is switched on one frame AFTER the first state is applied, so a
    page that loads already scrolled — arriving on a `#fragment`, reloading
    halfway down — starts at the small size rather than animating down to it in
@@ -152,7 +171,7 @@
     flex-shrink: 0;
 
     block-size: var(--ref-brand-logo-size);
-    aspect-ratio: 508.89 / 101.34;
+    aspect-ratio: 629.98 / 101.34;
 
     background-color: currentColor;
     mask-image: url("brand/dessau-logo.svg");
