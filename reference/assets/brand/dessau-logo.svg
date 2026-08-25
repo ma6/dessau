@@ -95,7 +95,7 @@
 -->
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 629.98 101.34" fill="currentColor"
      role="img" aria-labelledby="dessau-logo-title">
-  <title id="dessau-logo-title">Dessau Design System</title>
+  <title id="dessau-logo-title">Dessau DS</title>
 
   <!-- The mark, as the initial. Identical to dessau-mark.svg. -->
   <path d="M0.203 0.203C0.087 0.29 0 22.798 0 50.174L0 99.942L28.679 99.942L28.679 0L14.542 0C6.75 0 0.29 0.087 0.203 0.203Z"/>

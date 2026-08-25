@@ -15,11 +15,13 @@ All three live in [`reference/assets/brand/`](../reference/assets/brand/).
 | `dessau-logo.svg` | the mark as the initial, with "essau" in Inter Black, plus a "DS" tag in Space Grotesk | `0 0 629.98 101.34` |
 | `dessau-icon.svg` | the mark on a square canvas, for the favicon | `0 0 128 128` |
 
-**Two names, one mark.** "Dessau" is the short, spoken form — the wordmark, the
-thing on a business card. "Dessau Design System" is the full name, the one
-that makes it unambiguous this refers to a design system and not the city of
-Dessau; it is what the README and the reference site's homepage introduce the
-project as. The "DS" tag on the logo is the visual form of that same fact.
+**Two names, one mark.** "Dessau DS" is the short form — the wordmark plus the
+tag, read together, the thing on a business card. "Dessau Design System" is
+the full name, the one that makes it unambiguous this refers to a design
+system and not the city of Dessau; it is what the README and the reference
+site's homepage introduce the project as before shortening it. The "DS" tag
+on the logo is what makes the short form "Dessau DS" rather than plain
+"Dessau" — the mark says in full what the short form only abbreviates.
 
 They sit under `reference/`, not under `dds/`, and that placement is the
 argument: **the brand is not part of the design system.** A product that adopts

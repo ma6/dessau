@@ -1,4 +1,4 @@
-# Dessau
+# Dessau DS
 
 > **The Dessau Design System — a base for design systems, and for the products built on them**
 
@@ -7,7 +7,7 @@ everything is measured against, a small set of components, the patterns that sol
 recurring tasks — and structured context so a coding agent can use all of it
 correctly without rediscovering the rules.
 
-"Dessau" is the short, spoken form; **the Dessau Design System** is the full
+"Dessau DS" is the short form; **the Dessau Design System** is the full
 name, and the one worth using where it matters — said in full, there is no
 mistaking this for the city of Dessau. `dds` is the implementation namespace
 throughout the code: `.dds-button`, `--dds-color-action-primary`,
