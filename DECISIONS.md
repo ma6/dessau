@@ -2786,3 +2786,49 @@ rather than built here.
 
 **Reversal condition.** None stated; the version number is a description of
 what changed, not a commitment.
+
+---
+
+## 064 — 1.1.1: an instruction bug fixed
+
+**Decision.** `package.json` and `DDS.version` move to `1.1.1`. Nothing under
+`dds/` changed in the runtime sense — the bundle a consumer pins is
+byte-for-byte `1.1.0` plus the `VERSION` constant and the one cache-busting hash
+that follows from it.
+
+**Why a patch tag at all, given `037`'s implementation/contract line.** The
+trigger is `#149`: `CLAUDE.md`'s "Run the browser tests" section still carried
+the caveat from when the browsers lived outside the agent sandbox — tests
+"written, left unrun, and reported as unrun", with standing permission to hand a
+test to the maintainer if `npx playwright test` could not launch a browser. That
+stopped being true here after the sandbox gained the browsers, and the stale
+escape hatch was being read by agents in **derived products** — which take
+`AGENTS.md`/`CLAUDE.md` as their starting instruction set — as licence to skip
+the browser suite and report "unrun" as an acceptable outcome. Martin's call was
+that this is a bug in the instructions, not a doc tidy, and a bug fix gets a
+tag. `059`'s cadence rule explicitly exempts a bugfix from the one-version-a-day
+limit, so `1.1.1` two days after `1.1.0` is in order.
+
+The section now says plainly: run the spec while working on its surface, a full
+pass before a significant commit, and "unrun" is not a result you can report in
+its place.
+
+**What rides along.** `#148`'s `scripts/check-version.mjs` — the drift guard
+filed as a follow-up in `063` and built since — is in this tree, wired into
+`npm run check` right after `check:css`, with its row picked up in
+`reference/architecture.html` by `sync-checks.mjs`. It is tooling, not a
+consumer-facing change, and did not move the number on its own; it is named here
+because `1.1.1` is the first tag it guards, and it did its job during this cut —
+the `VERSION` bump and the `package.json` bump were verified in agreement before
+the commit rather than after a release.
+
+**How it was cut.** `npm run build` (regenerated `dist/` and the `dds.js`
+cache-busting hash), `npm run check` clean, `npx playwright test` full suite
+locally — the GitHub matrix still runs only on the tag push (`062`) and the
+account's Actions billing block would fail it before it started, so the
+bundle-and-attach step was again run by hand: `npm run build`, `npm run
+check:css`, `gh release upload --clobber`. GitHub Release created before the tag
+was pushed, per `135`.
+
+**Reversal condition.** None stated; the version number is a description of what
+changed, not a commitment.
