@@ -81,12 +81,10 @@ npx playwright test                       # all three engines
 npx playwright test tests/<file>.spec.mjs
 ```
 
-They run from here. That is worth stating because it was not always true and the
-instructions said so for a while: the browsers were once outside the sandbox and
-the installer was denied, so tests were written, left unrun, and reported as
-unrun. If `npx playwright test` fails to launch a browser, say so plainly and
-leave the test for the maintainer rather than reporting it as passing — but try
-first.
+They run from here. Run them: the specific spec while you work on its surface,
+and a full pass before a significant commit. A browser test that was written but
+not run is not finished, and "unrun" is not a result you can report in its
+place.
 
 **A test for a bug nobody can see is worth nothing until it has been seen to
 fail.** Before keeping a regression test, break the fix and watch the test go
