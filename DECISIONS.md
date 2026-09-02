@@ -2989,11 +2989,16 @@ first real catch-window since `1.1.1`), the affected Playwright specs
 `VERSION` line. The GitHub matrix still runs only on the tag push (`062`); the
 bundle-and-attach step is by hand as in `064`.
 
-**Not from this work.** `tests/reference-nav.spec.mjs:309` ("the theme toggle is
-the last control in the header row") fails deterministically at 320px in the
-local environment during this cut — and reproduces on `2f4f77f`, the commit
-before any of `#151`/`#152`, verified in a clean worktree. It exercises the
-reference page's own chrome header on `components.html`, which none of these
-changes touch. Left for its own issue rather than blocking the tag.
+**Rode along: `#153`.** `tests/reference-nav.spec.mjs`'s 320px case ("the theme
+toggle is the last control in the header row") was failing during this cut —
+deterministically in the local environment, and reproducing on `2f4f77f`, the
+commit before any of `#151`/`#152` (verified in a clean worktree), so not from
+this work: it exercises the reference page's own chrome header on
+`components.html`. It was the knife-edge `#120` described — `--dds-space-sm` for
+`.ref-header-inner`'s gutter and gap left ~4px of margin at 320px, negative once
+a classic scrollbar takes its ~15px. Tightening both to `--dds-space-xs` frees
+~16px more, turning the deficit into ~20px of auto-margin slack on the tightest
+platform. Reference chrome only — nothing under `dds/` — so it does not affect
+the number, but the fix is in `1.2.0` rather than trailing it.
 
 **Reversal condition.** None. The version number describes what changed.

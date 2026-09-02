@@ -249,19 +249,23 @@
     border: 0;
   }
 
-  /* The 320px floor (WCAG 2.2 1.4.10) had only ~4px of margin left after the
-     sub-line fix above, measured on a platform with an overlay scrollbar. On
-     a platform with a classic one — `scrollbar-gutter: stable` reserves it
-     unconditionally, see base.css — the row itself is ~15px narrower at the
-     same nominal viewport width, which is a bigger number than the margin
-     had. Not a font-rendering difference: verified in the actual CI browser
-     image, and the row's own measured width was the tell, not the text.
-     Tightening the gap and this container's own gutter here buys back
-     16px, all of it at a width where nobody notices 4px of breathing room
-     go missing (#120). */
+  /* The 320px floor (WCAG 2.2 1.4.10) is where brand + Menu button + theme
+     toggle have to share one row without the toggle wrapping to a line of its
+     own at the far left, where nobody looks for a utility control (#16).
+
+     `--dds-space-sm` here (#120) left the margin at ~4px on a platform with an
+     overlay scrollbar and negative once a classic one — `scrollbar-gutter:
+     stable`, see base.css — takes its ~15px off the row width. A few px of
+     per-engine text metrics then decided it, and the theme toggle wrapped
+     (#153).
+
+     `--dds-space-xs` for both the gutter and the gap frees another ~16px — two
+     4px gutter edges and two 4px gaps — which turns the ~4px deficit into ~12px
+     of real margin. At 320px nobody misses 4px of edge padding, and the header
+     was already the one place tightened past the default `space-md`. */
   .ref-header-inner {
-    --dds-container-gutter: var(--dds-space-sm);
-    gap: var(--dds-space-sm);
+    --dds-container-gutter: var(--dds-space-xs);
+    gap: var(--dds-space-xs);
   }
 }
 
