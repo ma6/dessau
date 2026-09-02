@@ -41,13 +41,44 @@ const NAVIGATION = '/reference/navigation.html';
 
 const header = (page) => page.locator('.dds-siteheader');
 const toggle = (page) => header(page).locator('.dds-siteheader-toggle');
+const actions = (page) => header(page).locator('.dds-siteheader-actions');
 const nav = (page) => header(page).locator('.dds-primary-nav');
 
-/** Set the width of the container the header sits in, leaving the window alone. */
+/**
+ * Every edge the row-order assertions care about, read in one layout pass so the
+ * numbers are mutually consistent. `edge` is the header's content-box inline-end
+ * — where an item flush against the edge lands, inside `.dds-container`'s
+ * padding.
+ */
+async function rowGeometry(page) {
+  return header(page).evaluate((el) => {
+    const box = (sel) => {
+      const child = el.querySelector(sel);
+      if (!child) return null;
+      const r = child.getBoundingClientRect();
+      return { left: r.left, right: r.right, width: r.width, top: r.top, bottom: r.bottom };
+    };
+    const rect = el.getBoundingClientRect();
+    return {
+      edge: rect.right - parseFloat(getComputedStyle(el).paddingInlineEnd),
+      brand: box('.dds-siteheader-brand'),
+      toggle: box('.dds-siteheader-toggle'),
+      actions: box('.dds-siteheader-actions'),
+      nav: box('.dds-primary-nav'),
+    };
+  });
+}
+
+/** Set the width of the container the header sits in, leaving the window alone.
+ *  Settles fonts and two frames; the geometry tests still `expect.poll` on top,
+ *  because the reference's breakpoint-preview tooling keeps adjusting the stage
+ *  for a beat after the width is set. */
 async function setContainerWidth(page, width) {
-  await page.evaluate((value) => {
+  await page.evaluate(async (value) => {
     const stage = document.querySelector('.dds-siteheader-frame').closest('.ref-bp-stage');
     stage.style.inlineSize = value;
+    await document.fonts.ready;
+    await new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r)));
   }, width);
 }
 
@@ -106,6 +137,84 @@ test('growing past the threshold while collapsed leaves the navigation reachable
   await expect(toggle(page)).toBeHidden();
   await expect(nav(page)).toBeVisible();
   await expect(nav(page).locator('a').first()).toBeVisible();
+});
+
+test('below the threshold the disclosure button is last on the row, flush to the edge', async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 1400, height: 900 });
+  await page.goto(NAVIGATION);
+  await setContainerWidth(page, '600px');
+  await expect(toggle(page)).toBeVisible();
+
+  // Poll: the reference's breakpoint-preview tooling keeps nudging the stage
+  // width for a beat after it is set.
+  await expect
+    .poll(async () => {
+      const g = await rowGeometry(page);
+      return {
+        // Toggle hard against the inline-end edge.
+        toggleFlush: Math.round(g.edge - g.toggle.right) === 0,
+        // Actions are a group immediately left of the toggle, not out past it.
+        actionsLeftOfToggle: g.actions.right <= g.toggle.left + 1,
+        // The free space is between the brand and the group, not inside it.
+        gapIsBeforeGroup:
+          g.actions.left - g.brand.right > g.toggle.left - g.actions.right + 20,
+      };
+    })
+    .toEqual({ toggleFlush: true, actionsLeftOfToggle: true, gapIsBeforeGroup: true });
+});
+
+test('the disclosure button does not move when the actions are absent', async ({ page }) => {
+  await page.setViewportSize({ width: 1400, height: 900 });
+  await page.goto(NAVIGATION);
+  await setContainerWidth(page, '600px');
+  await expect(toggle(page)).toBeVisible();
+
+  // Flush to the edge with the actions present...
+  await expect
+    .poll(async () => {
+      const g = await rowGeometry(page);
+      return Math.round(g.edge - g.toggle.right);
+    })
+    .toBe(0);
+
+  await actions(page).evaluate((el) => el.remove());
+
+  // ...and still flush to the same edge with them gone: the toggle owns the gap
+  // when it is alone, the actions own it when they are present.
+  await expect
+    .poll(async () => {
+      const g = await rowGeometry(page);
+      return Math.round(g.edge - g.toggle.right);
+    })
+    .toBe(0);
+});
+
+test('opening the navigation does not drop the disclosure button onto a lower row', async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 1400, height: 900 });
+  await page.goto(NAVIGATION);
+  await setContainerWidth(page, '600px');
+  await expect(toggle(page)).toBeVisible();
+
+  await toggle(page).click();
+  await expect(nav(page)).toBeVisible();
+
+  // The nav takes its own full-width row *below* the brand row; the toggle stays
+  // on the brand row, flush to the inline-end edge — it does not follow the nav
+  // down. (`order: 100` on the nav is what keeps that row order.)
+  await expect
+    .poll(async () => {
+      const g = await rowGeometry(page);
+      return {
+        toggleFlush: Math.round(g.edge - g.toggle.right) === 0,
+        toggleOnBrandRow: Math.abs(g.toggle.top - g.brand.top) < 40,
+        navBelowToggle: g.nav.top >= g.toggle.bottom - 1,
+      };
+    })
+    .toEqual({ toggleFlush: true, toggleOnBrandRow: true, navBelowToggle: true });
 });
 
 test('the current page marker survives the row layout', async ({ page }) => {

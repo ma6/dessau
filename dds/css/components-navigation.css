@@ -78,21 +78,52 @@
 
   /* The disclosure button. Hidden above the threshold via the container query
      below — not the other way round, so the navigation is reachable when CSS
-     fails to load. */
+     fails to load.
+
+     Below the threshold the row ends `[brand] … [actions][toggle]`: the button
+     is the last item, hard against the inline-end edge, and it stays there
+     whether the nav is open or closed. The DOM order is
+     `brand, toggle, nav, actions` — the toggle precedes the region it discloses,
+     as a disclosure should — so three `order` values rearrange the row without
+     touching the DOM:
+
+       - actions `98`, toggle `99`: the actions sit immediately left of the
+         button as one group, rather than an auto margin on the toggle pushing
+         them out past it;
+       - nav `100`: it sorts *after* the button, so when it wraps to its own row
+         (`flex-basis: 100%`, open state) it does not carry the button down with
+         it — row one stays `[brand] … [actions][toggle]` in both states.
+
+     The free-space gap sits before the right-hand group: the toggle carries it
+     when it is alone, the actions take it over when they are present (the
+     `:has()` rule below). The container query above the threshold resets all
+     three — the toggle is hidden, the actions return to `order: 3` with no
+     margin, and the nav returns to source order. */
   .dds-siteheader-toggle {
+    order: 99;
     margin-inline-start: auto;
+  }
+
+  .dds-siteheader:has(.dds-siteheader-actions) .dds-siteheader-toggle {
+    margin-inline-start: 0;
   }
 
   .dds-siteheader-actions {
     display: flex;
     align-items: center;
     gap: var(--dds-space-2xs);
+
+    order: 98;
+    margin-inline-start: auto;
   }
 
   /* --- the navigation ---------------------------------------------------- */
   .dds-primary-nav {
-    /* Below the threshold: full width on its own row, collapsed unless open. */
+    /* Below the threshold: full width on its own row, collapsed unless open.
+       `order: 100` keeps that row *below* the brand/actions/toggle row instead
+       of between the button and the actions — see the toggle comment above. */
     flex-basis: 100%;
+    order: 100;
   }
 
   .dds-primary-nav[hidden] {
@@ -160,6 +191,9 @@
     .dds-primary-nav {
       flex-basis: auto;
       margin-inline-start: auto;
+      /* Back to source order: the narrow layout parks it last, the wide one
+         wants it between the brand and the actions. */
+      order: 0;
     }
 
     /* Always visible above the threshold, whatever the disclosure state was.
@@ -186,6 +220,10 @@
 
     .dds-siteheader-actions {
       order: 3;
+      /* Cancels the narrow layout's auto margin. Here `.dds-primary-nav` owns
+         the single free-space gap; a second auto margin would split it and the
+         actions would drift away from the nav. */
+      margin-inline-start: 0;
     }
   }
 

@@ -949,6 +949,12 @@ Below 48rem of container width the links collapse behind a disclosure button
 (`aria-expanded` + `aria-controls`, **not** `role="menu"`). Above it they are
 inline and the button is gone.
 
+In the collapsed row the disclosure button is pinned last, hard against the
+inline-end edge, and does not move. The search / avatar actions, when present,
+sit immediately to its left as one right-aligned group; the free space is
+between the brand and that group. When the nav is open it takes its own
+full-width row in flow — it is not a drawer.
+
 The current page carries `aria-current="page"` and colour, weight and a rule.
 Collapsed navigation is hidden with the `hidden` **attribute**, so there are no
 invisible tab stops.
