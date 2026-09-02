@@ -108,6 +108,45 @@
     margin-inline-start: 0;
   }
 
+  /* Menu ⇄ close morph. Both sprite icons sit in the button, stacked in one grid
+     cell; `aria-expanded` cross-fades and quarter-turns between them — the same
+     two-icons-in-one-control idea as the password reveal, animated. The
+     reduced-motion floor in base.css collapses the transition to an instant
+     swap, and the resting state of each icon is already correct, so nothing is
+     left mid-turn. */
+  .dds-siteheader-toggle-icon {
+    display: grid;
+    place-items: center;
+  }
+
+  .dds-siteheader-toggle-menu,
+  .dds-siteheader-toggle-close {
+    grid-area: 1 / 1;
+    transition:
+      opacity var(--dds-duration-fast) var(--dds-ease-standard),
+      rotate var(--dds-duration-fast) var(--dds-ease-standard),
+      scale var(--dds-duration-fast) var(--dds-ease-standard);
+  }
+
+  /* Closed: the close mark waits a quarter-turn back and smaller. */
+  .dds-siteheader-toggle-close {
+    opacity: 0;
+    rotate: -90deg;
+    scale: 0.5;
+  }
+
+  .dds-siteheader-toggle[aria-expanded="true"] .dds-siteheader-toggle-menu {
+    opacity: 0;
+    rotate: 90deg;
+    scale: 0.5;
+  }
+
+  .dds-siteheader-toggle[aria-expanded="true"] .dds-siteheader-toggle-close {
+    opacity: 1;
+    rotate: 0deg;
+    scale: 1;
+  }
+
   .dds-siteheader-actions {
     display: flex;
     align-items: center;

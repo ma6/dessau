@@ -919,6 +919,9 @@
         ".dds-siteheader-brand",
         ".dds-siteheader-frame",
         ".dds-siteheader-toggle",
+        ".dds-siteheader-toggle-icon",
+        ".dds-siteheader-toggle-menu",
+        ".dds-siteheader-toggle-close",
         ".dds-primary-nav"
       ],
       "css": "dds/css/components-navigation.css",
@@ -928,7 +931,7 @@
       "hooks": [
         "data-dds-nav-toggle"
       ],
-      "accessibility": "One nav, one DOM location. aria-expanded + aria-controls, not role=menu. hidden attribute.",
+      "accessibility": "One nav, one DOM location. aria-expanded + aria-controls, not role=menu. hidden attribute. The toggle carries both the menu and close sprite icons; aria-expanded cross-fades between them.",
       "responsive": "container — dds-siteheader (inline-size >= 48rem)"
     },
     {

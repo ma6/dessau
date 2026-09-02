@@ -955,6 +955,12 @@ sit immediately to its left as one right-aligned group; the free space is
 between the brand and that group. When the nav is open it takes its own
 full-width row in flow — it is not a drawer.
 
+The toggle holds **both** the menu and close sprite icons
+(`.dds-siteheader-toggle-menu` / `-close` inside `.dds-siteheader-toggle-icon`).
+`aria-expanded` cross-fades and quarter-turns between them, so the button reads
+as a close control while the nav is open. The reduced-motion floor makes it an
+instant swap.
+
 The current page carries `aria-current="page"` and colour, weight and a rule.
 Collapsed navigation is hidden with the `hidden` **attribute**, so there are no
 invisible tab stops.

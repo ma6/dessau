@@ -238,3 +238,41 @@ test('the current page marker survives the row layout', async ({ page }) => {
 
   expect(marker.shadow, 'no underline on the current entry in the row layout').not.toBe('none');
 });
+
+test('the toggle cross-fades between the menu and close icons on open', async ({ page }) => {
+  await page.setViewportSize({ width: 1400, height: 900 });
+  await page.goto(NAVIGATION);
+  await setContainerWidth(page, '600px');
+  await expect(toggle(page)).toBeVisible();
+
+  const opacities = () =>
+    toggle(page).evaluate((el) => ({
+      menu: Number(getComputedStyle(el.querySelector('.dds-siteheader-toggle-menu')).opacity),
+      close: Number(getComputedStyle(el.querySelector('.dds-siteheader-toggle-close')).opacity),
+    }));
+
+  // Closed: the menu icon is the visible one.
+  await expect.poll(async () => (await opacities()).menu).toBeGreaterThan(0.9);
+  await expect.poll(async () => (await opacities()).close).toBeLessThan(0.1);
+
+  await toggle(page).click();
+  await expect(toggle(page)).toHaveAttribute('aria-expanded', 'true');
+
+  // Open: they have swapped — the button now reads as a close control.
+  await expect.poll(async () => (await opacities()).close).toBeGreaterThan(0.9);
+  await expect.poll(async () => (await opacities()).menu).toBeLessThan(0.1);
+
+  // Both icons share one grid cell, so they are concentric and the button does
+  // not change size as they swap. (Compare centres: the resting icon is scaled,
+  // so its box is smaller but centred on the same point.)
+  const concentric = await toggle(page).evaluate((el) => {
+    const centre = (sel) => {
+      const r = el.querySelector(sel).getBoundingClientRect();
+      return [r.left + r.width / 2, r.top + r.height / 2];
+    };
+    const [mx, my] = centre('.dds-siteheader-toggle-menu');
+    const [cx, cy] = centre('.dds-siteheader-toggle-close');
+    return Math.abs(mx - cx) < 1 && Math.abs(my - cy) < 1;
+  });
+  expect(concentric).toBe(true);
+});
