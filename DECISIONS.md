@@ -2832,3 +2832,66 @@ was pushed, per `135`.
 
 **Reversal condition.** None stated; the version number is a description of what
 changed, not a commitment.
+
+## 065 — a blank reference page for a derived-system-owned component, pattern or rule
+
+**Decision.** Dessau ships `reference/owned-pages.html`: the full reference-page
+shell — header navigation markers, on-this-page markers, the width-switcher
+wiring, the script tags — with one empty `ref-section` and nothing else. A
+derived system (or a product) that owns something Dessau does not — Neon's own
+site header, a pattern of its own — copies that file, replaces the example
+section, and declares where the page belongs with two `<head>` markers:
+
+```html
+<meta name="dds-reference-owner" content="derived">   <!-- or "product" -->
+<meta name="dds-reference-group" content="Components"> <!-- a top-level nav group -->
+```
+
+`scripts/sync-reference-nav.mjs` reads those markers before it renders and slots
+the page into the named group's second row — appending to a group that already
+has one (`Components`, `Foundations`), or growing one on a single-page group
+(`Patterns`, `Writing`) with the inherited page as its first entry. Optional
+`dds-reference-nav-label` and `dds-reference-nav-order` tune the link text and
+position. `sync-reference-toc.mjs` and `sync-icons.mjs` already work off markup
+and needed no change. A marker naming no group is a build error, not a silent
+drop.
+
+**Why.** #150. A derived system owning a component had two bad options: wedge its
+documentation into an inherited page beside a dozen components it never touched
+(Neon did this and undid it), or hand-copy an inherited page and strip it —
+fragile, and every derived system then rebuilds the same shell. The shell, the
+markers and the check behaviour are Dessau's infrastructure, so the blank page is
+Dessau's to ship; a consumer stripping an inherited page is exactly the "every
+consumer finishes the job again" failure the reference tooling exists to prevent.
+Martin's stated bar was that such a page has to be **reachable in the navigation**
+and visible from Dessau's own reference — which is why `owned-pages.html` is not a
+`_template` file off to the side but a real page in `Foundations`, placed there by
+its own markers. That makes it both the thing you copy and the live regression
+guard: `sync-reference-nav.mjs --check` and `tests/reference-nav.spec.mjs` go red
+if the marker path breaks.
+
+**How far it has run.** The marker path is exercised permanently by
+`owned-pages.html` itself (a group that already has a second row). The
+single-page-group path (`Patterns`, `Writing` growing a row) was verified by hand
+— point the page's `dds-reference-group` at `Patterns`, regenerate, confirm
+`patterns.html` grows a `[Patterns, Owned pages]` second row, restore — the same
+break-it-and-watch discipline `#148` used, not yet a standing test. The three
+failure modes (unknown group, missing group, owner marker removed) were each run
+and each produced a named error and exit 1. Neon (`ma6/neon#5`, PR `ma6/neon#6`)
+is the first derived system to use it for real.
+
+**What it cost.** One more page in `reference/`, and `sync-reference-nav.mjs` is
+no longer a pure function of a hard-coded `STRUCTURE` — it now also reads every
+page's head. The single-page-group promotion path has no permanent browser test,
+only the documented manual verification.
+
+**No version bump.** `dds/` is untouched; the bundle a consumer pins is
+byte-for-byte unchanged. Consistent with `#148` (`check-version.mjs`), a new
+script capability plus a reference page plus docs does not move the number on its
+own (`037`'s implementation/contract line).
+
+**Reversal condition.** A derived system finds the one-page-per-owned-thing rule
+produces too many thin pages in practice and would rather have a single
+"Extensions" page per group — at which point the marker still applies, the page
+just carries several sections. The markers themselves would only be wrong if
+`STRUCTURE` stopped being the nav's backbone.

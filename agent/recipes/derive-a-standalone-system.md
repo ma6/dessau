@@ -317,6 +317,26 @@ You are a design system now, so you owe what Dessau owes:
   The markup-vs-prose split from earlier in this step isn't only a
   per-page decision; it can run within a single page too.
 
+  **When you *own* something — a component, a pattern, a writing rule Dessau's
+  standard does not cover — it gets its own page, not a corner of an inherited
+  one.** Neon builds its own site header and footer; those belong on a page of
+  Neon's, not wedged into `navigation.html` beside a dozen components Neon did
+  not touch, and not on a hand-stripped copy of an inherited page (every
+  derived system then rebuilds the same shell). Dessau ships the blank page for
+  exactly this: `reference/owned-pages.html`. Copy it, replace its one example
+  `ref-section` with the thing you own in your own markup, and set two `<meta>`
+  tags in its `<head>` — `dds-reference-owner` (`derived`), and
+  `dds-reference-group` naming the navigation group it joins (`Components`,
+  `Patterns`, `Writing`, `Foundations` — a single-page group like `Patterns`
+  grows a second row on its first owned page). `sync-reference-nav.mjs` reads
+  those markers and slots the page into the navigation with no edit to its
+  `STRUCTURE` list; `sync-reference-toc.mjs` and `sync-icons.mjs` fill the rest.
+  A marker naming no group is a build error, not a silent drop — an unreachable
+  page is the failure this is guarding against. Dessau's own `owned-pages.html`
+  is both the blank template you copy and a worked example: it is a
+  derived-owned page itself, placed in `Foundations` by its markers alone.
+  Neon (`ma6/neon#5`, PR `ma6/neon#6`) is the first derived system to walk this.
+
   **`reference/assets/reference.css`'s header logo assumes you have one, and
   breaks silently if you don't.** The `@supports (mask-image: …)` block that
   masks `dds-logo.svg` over `.ref-brand-logo` also hides `.ref-brand-name`

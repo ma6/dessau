@@ -113,13 +113,28 @@ whatever you are replacing rather than generalising from the header.
 - **Do not delete the accessibility attributes because the styling changed.** They
   are the part that was never about looks.
 
+## 5. Document what you now own
+
+Reaching step 3 — your own class, your own structure — means you own the
+component, and a component you own is documented on a page of yours, not in a
+corner of an inherited one. Copy `libs/dessau/reference/owned-pages.html` into
+your product's reference, replace its example `ref-section` with your component,
+and set `dds-reference-owner` to `product` and `dds-reference-group` to the
+navigation group it belongs in. `sync-reference-nav.mjs` slots it in from those
+markers. The blank page and the marker contract are documented on
+`reference/owned-pages.html` itself.
+
+Steps 1 and 2 change how an inherited component looks; the inherited page still
+describes it. Only step 3 creates something the inherited reference no longer
+covers.
+
 ## The short version
 
 | How far you are going | The move |
 | --- | --- |
 | Colour, tone, elevation | Scope a token to the component (step 1) |
 | Spacing, size, layout | Unlayered declarations (step 2) |
-| Genuinely different structure | Your own class, Dessau's contract (step 3) |
+| Genuinely different structure | Your own class, Dessau's contract (step 3), your own reference page (step 5) |
 
 Escalate only when the cheaper step cannot do it. Each step down the table costs
 more to maintain across updates than the one above it.
