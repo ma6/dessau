@@ -2951,3 +2951,49 @@ default flips and the flag becomes `data-dds-inflow`, recorded as a new entry.
 Or the platform ships a way to have one element be a modal and a static region
 by breakpoint without the dialog `display` fight, and both this and `contentnav`
 move to it together.
+
+---
+
+## 067 — 1.2.0: the site header's opt-in drawer and the menu→close morph
+
+**Decision.** `package.json` and `DDS.version` move to `1.2.0`, not `1.1.2`.
+`#151` adds real capability to `dds/`: new markup hooks (`data-dds-drawer`,
+`data-dds-nav-scrim`, `data-dds-nav-content`), a scoped block of drawer CSS, a
+new class (`.dds-siteheader-scrim`, `.dds-siteheader-toggle-icon` and its two
+icon classes), and a `drawer` branch through the `nav-toggle` enhancement. Per
+`037`'s implementation/contract line that is a minor, not a patch — nothing an
+existing consumer pinned to `1.1.x` breaks, but there is a new thing to opt into.
+
+**What is in the tag.**
+- `#152` `fix(siteheader)` — the collapsed row ends with the disclosure button,
+  actions to its left (`order` 98/99/100, a `:has()` gap hand-off, the wide
+  query restoring the pre-change values explicitly). A patch on its own; it
+  folds into this bump rather than getting a `1.1.2` of its own.
+- `#151` `feat(siteheader)` — the toggle carries both the `menu` and `close`
+  sprite icons and cross-fades between them on `aria-expanded` (both the in-flow
+  disclosure and the drawer); and `data-dds-drawer` + a `.dds-siteheader-scrim`
+  sibling turn the collapsed nav into a modal panel using `contentnav`'s
+  off-canvas machinery. Reasoning in `066`.
+
+**Why one tag for both.** `#152` landed first and is a fix; `#151` is the
+feature. Neither has reached a tag, so there is no consumer sitting on `1.1.2`
+who needs `#152` without `#151`. `059`'s one-version-a-day cadence is not in
+play — there has been no bump today.
+
+**How it was cut.** `npm run check` clean (including `check:version`, which
+verified the `VERSION` and `package.json` bumps agree before the commit — its
+first real catch-window since `1.1.1`), the affected Playwright specs
+(`siteheader`, `siteheader-drawer`, `contentnav`, `landmarks`, `enhancement`,
+`viewport`, `reference-nav`) green on all three engines in isolation.
+`sync-cache-busting.mjs` re-stamped the one `dds.js` hash that follows from the
+`VERSION` line. The GitHub matrix still runs only on the tag push (`062`); the
+bundle-and-attach step is by hand as in `064`.
+
+**Not from this work.** `tests/reference-nav.spec.mjs:309` ("the theme toggle is
+the last control in the header row") fails deterministically at 320px in the
+local environment during this cut — and reproduces on `2f4f77f`, the commit
+before any of `#151`/`#152`, verified in a clean worktree. It exercises the
+reference page's own chrome header on `components.html`, which none of these
+changes touch. Left for its own issue rather than blocking the tag.
+
+**Reversal condition.** None. The version number describes what changed.
