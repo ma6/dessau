@@ -99,7 +99,9 @@ test('inert removes the content from the tab order, it does not merely cover it'
   await page.goto(NAVIGATION);
   await setContainerWidth(page, PANEL);
 
-  const probe = page.locator('[data-ref-inert-probe]');
+  // Scoped to this component's content — the siteheader drawer demo on the same
+  // page has an inert probe of its own.
+  const probe = content(page).locator('[data-ref-inert-probe]');
 
   // Reachable before, so the assertion after means something.
   await probe.focus();
@@ -114,7 +116,7 @@ test('inert removes the content from the tab order, it does not merely cover it'
    * question of the wrong engine, which is half of what went wrong in #9.
    */
   const focusedProbe = await page.evaluate(() => {
-    const link = document.querySelector('[data-ref-inert-probe]');
+    const link = document.querySelector('[data-dds-contentnav-content] [data-ref-inert-probe]');
     link.focus();
     return document.activeElement === link;
   });

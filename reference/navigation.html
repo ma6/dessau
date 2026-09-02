@@ -16,7 +16,7 @@
 <link rel="preload" href="assets/fonts/SpaceGrotesk-Variable-latin-ext.woff2" as="font"
       type="font/woff2" crossorigin>
 <link rel="stylesheet" href="assets/fonts.css?v=7ed937e9">
-<link rel="stylesheet" href="../dds/dds.css?v=b3947858">
+<link rel="stylesheet" href="../dds/dds.css?v=df32f8aa">
 <link rel="stylesheet" href="assets/reference.css?v=a647205b">
 </head>
 <body>
@@ -438,6 +438,60 @@
           </div>
         </div>
 
+        <h3 class="dds-text-sm dds-weight-semibold dds-mbs-lg">Opt-in drawer</h3>
+        <p class="dds-text-subtle dds-measure-default dds-mbs-2xs dds-text-sm">
+          Add <code class="dds-code">data-dds-drawer</code> to the toggle and a
+          sibling <code class="dds-code">.dds-siteheader-scrim</code> and the
+          collapsed nav opens as a modal panel instead of pushing the page down:
+          scrim, scroll-lock, <code class="dds-code">inert</code> content, Escape.
+          Narrow the width switcher below 48rem, open it, then try Tab and Escape.
+        </p>
+
+        <div data-ref-bp>
+          <div class="dds-siteheader-frame" id="siteheader-drawer">
+            <div class="dds-container dds-siteheader">
+              <a class="dds-siteheader-brand" href="#siteheader">
+                <svg class="dds-icon dds-icon-lg" aria-hidden="true"><use href="#dds-icon-inbox"/></svg>
+                Northwind
+              </a>
+
+              <button type="button" class="dds-button dds-button-subtle dds-button-icon dds-siteheader-toggle"
+                      data-dds-nav-toggle="demo-drawer-nav" data-dds-drawer
+                      aria-expanded="false" aria-controls="demo-drawer-nav">
+                <span class="dds-sr-only">Main menu</span>
+                <span class="dds-siteheader-toggle-icon" aria-hidden="true">
+                  <svg class="dds-icon dds-siteheader-toggle-menu"><use href="#dds-icon-menu"/></svg>
+                  <svg class="dds-icon dds-siteheader-toggle-close"><use href="#dds-icon-close"/></svg>
+                </span>
+              </button>
+
+              <nav class="dds-primary-nav" id="demo-drawer-nav" aria-label="Main" hidden>
+                <ul>
+                  <li><a href="#siteheader" aria-current="page">Projects</a></li>
+                  <li><a href="#siteheader">Documents</a></li>
+                  <li><a href="#siteheader">People</a></li>
+                  <li><a href="#siteheader">Reports</a></li>
+                </ul>
+              </nav>
+
+              <div class="dds-siteheader-scrim" data-dds-nav-scrim></div>
+            </div>
+
+            <div data-dds-nav-content>
+              <div class="dds-prose" style="padding: var(--dds-space-md)">
+                <p>
+                  While the drawer is open this text is
+                  <code class="dds-code">inert</code> — out of the tab order and
+                  the accessibility tree, not merely covered.
+                  <a href="#siteheader" data-ref-inert-probe>This link</a> is here
+                  to try it on: reachable now, unreachable while the drawer is
+                  open.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+
         <p class="ref-note">
           <svg class="dds-icon" aria-hidden="true"><use href="#dds-icon-info"/></svg>
           Below 48rem of container width the links collapse behind the menu
@@ -445,7 +499,9 @@
           collapsed row the menu button is pinned last, hard against the
           inline-end edge; the search and account actions sit immediately to its
           left as one group. Opening the nav cross-fades the button from the menu
-          icon to a close icon. The current page is marked with
+          icon to a close icon. By default the open nav takes its own row in
+          flow; <code class="dds-code">data-dds-drawer</code> on the toggle makes
+          it a modal panel instead (above). The current page is marked with
           <code class="dds-code">aria-current="page"</code> and carries colour,
           weight and a rule — three cues.
         </p>
@@ -1386,7 +1442,7 @@
 <script src="../dds/js/dds.js?v=abaa8164" defer></script>
 <script src="../dds/js/format.js?v=8f2e10f1" defer></script>
 <script src="../dds/js/components.js?v=c1e84998" defer></script>
-<script src="../dds/js/components-navigation.js?v=f86a7add" defer></script>
+<script src="../dds/js/components-navigation.js?v=7324bf7f" defer></script>
 <script src="assets/reference.js?v=4390e1aa" defer></script>
 <script src="assets/reference-tools.js?v=cb237f74" defer></script>
 </body>

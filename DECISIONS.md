@@ -2895,3 +2895,59 @@ produces too many thin pages in practice and would rather have a single
 "Extensions" page per group — at which point the marker still applies, the page
 just carries several sections. The markers themselves would only be wrong if
 `STRUCTURE` stopped being the nav's backbone.
+
+---
+
+## 066 — the site header's drawer is opt-in, and the menu→close morph is not
+
+**Decision.** The collapsed site header keeps its in-flow disclosure as the
+default. A modal drawer — slide-in panel, scrim, `.dds-scroll-locked` on
+`<html>`, `inert` page content, Escape / scrim-click to close — is available
+only when the toggle carries `data-dds-drawer` and there is a sibling
+`<div class="dds-siteheader-scrim" data-dds-nav-scrim>`. It reuses `contentnav`'s
+machinery verbatim (`data-dds-open`, the same `<html>` class, the same `inert`
+contract, the same widen-while-open ResizeObserver unwind), pointed at the
+primary nav. Separately, the toggle now holds both the `menu` and `close` sprite
+icons and cross-fades between them on `aria-expanded` — and that applies to
+**both** modes, the in-flow disclosure included, not just the drawer.
+
+**Why opt-in.** Making every collapsed header a modal drawer would change the
+shipped behaviour of every product on Dessau at once, including ones whose short
+nav has no business locking the page. Additive is the safe shape: no flag, no
+scrim element, and the header is byte-for-byte what it was. The consumer that
+needs app-style chrome is the one that asks for it — which is also how
+`ma6/neon#9` framed it when Neon shipped the interim `sitechrome.js` this
+retires.
+
+**Why the morph is not drawer-only.** The state "the disclosure is open" is a
+property of the button, not of which layout the nav took. An in-flow disclosure
+that still shows a static hamburger while its panel is open is telling the user
+the same thing the `aria-expanded` toggle already contradicts. Keying the morph
+on `[aria-expanded="true"]` costs nothing extra and covers both modes; the
+reduced-motion floor in `base.css` collapses it to an instant swap.
+
+**Why not `<dialog>` / `showModal()`.** The same reason `contentnav` gives
+(DECISIONS 057-era note in the component): the element that is a modal panel
+below 48rem is an ordinary inline `<nav>` above it, and the browser hides a
+non-open dialog with `dialog:not([open]) { display: none }` — overriding
+which is exactly what `scripts/check-css.mjs` guards against. `inert` on the
+content plus a scroll lock is what `showModal()` would have provided anyway.
+
+**Cost.** A second `:has(.dds-siteheader-toggle[data-dds-drawer])`-scoped block
+of panel CSS that has to be unwound explicitly in the wide container query, the
+way the contentnav column already is. The `nav-toggle` enhancement is no longer
+a six-line disclosure — it now branches on `drawer` for open/close, focus,
+and the resize unwind. Two sprite icons ride in every siteheader toggle instead
+of one.
+
+**Version.** This adds a capability to `dds/` (new markup hooks, new CSS, new JS
+branch), so unlike `#065` it moves the minor: **1.1.1 → 1.2.0**, in its own
+`chore` commit alongside any other since-1.1.1 changes (the `#152` row-order fix
+is a patch that folds into the same bump).
+
+**Reversal condition.** A pattern emerges where nearly every consumer sets
+`data-dds-drawer` and the in-flow default is dead weight — at which point the
+default flips and the flag becomes `data-dds-inflow`, recorded as a new entry.
+Or the platform ships a way to have one element be a modal and a static region
+by breakpoint without the dialog `display` fight, and both this and `contentnav`
+move to it together.

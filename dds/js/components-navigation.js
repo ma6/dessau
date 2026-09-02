@@ -41,6 +41,28 @@
      Above the wide threshold the CSS forces the nav visible regardless of the
      `hidden` attribute, so a resize while collapsed cannot hide the navigation.
      The attribute is still corrected here, so the DOM and the visuals agree.
+
+     ---------------------------------------------------------------------------
+     Opt-in drawer: `data-dds-drawer` on the toggle
+     ---------------------------------------------------------------------------
+     Adds `data-dds-drawer` to the toggle and a sibling
+     `<div class="dds-siteheader-scrim" data-dds-nav-scrim>` and the collapsed
+     nav becomes a modal off-canvas panel instead of an in-flow disclosure —
+     exactly `contentnav`'s treatment below, applied to the primary nav:
+
+       - `data-dds-open` on the nav and the scrim drive the CSS slide/fade;
+       - `<html>` gets `.dds-scroll-locked`;
+       - the element marked `data-dds-nav-content` (optional; the page's main
+         content) is made `inert`, so the page behind leaves the tab order AND
+         the accessibility tree — what a focus trap only ever approximated;
+       - Escape and a scrim click close and return focus to the toggle; a link
+         inside closes without the focus restore (it goes to another page);
+       - a ResizeObserver unwinds the scroll lock and `inert` if the header
+         grows past 48rem while open — the CSS makes the nav inline again on its
+         own, but cannot undo state set on `<html>` and the content.
+
+     Without the flag and the scrim element none of this runs and the header is
+     the in-flow disclosure, unchanged.
      ========================================================================= */
 
   DDS.register('nav-toggle', '[data-dds-nav-toggle]', function (toggle) {
@@ -52,13 +74,40 @@
       return;
     }
 
+    var frame = toggle.closest('[class*="siteheader-frame"]') || toggle.parentElement;
+
+    // Drawer mode is a per-toggle opt-in. The scrim is looked up once; the
+    // content marker can live anywhere on the page.
+    var drawer = toggle.hasAttribute('data-dds-drawer');
+    var scrim = drawer && frame ? frame.querySelector('[data-dds-nav-scrim]') : null;
+    var content = drawer ? document.querySelector('[data-dds-nav-content]') : null;
+
     function isOpen() {
       return toggle.getAttribute('aria-expanded') === 'true';
     }
 
     function setOpen(open) {
       toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
-      nav.hidden = !open;
+
+      if (drawer) {
+        nav.toggleAttribute('data-dds-open', open);
+        if (scrim) scrim.toggleAttribute('data-dds-open', open);
+        if (content) content.inert = open;
+        document.documentElement.classList.toggle('dds-scroll-locked', open);
+      } else {
+        nav.hidden = !open;
+      }
+    }
+
+    if (drawer) {
+      // The panel is announced when it opens, so it has to be focusable — but
+      // never a tab stop of its own, hence -1.
+      if (!nav.hasAttribute('tabindex')) nav.setAttribute('tabindex', '-1');
+      // Below the threshold a drawer's visibility is the CSS's job (`translate`
+      // + `visibility`, which can animate); the `hidden` attribute cannot, so it
+      // is cleared once enhancement takes over. A server-rendered open state is
+      // re-applied through `data-dds-open` by the setOpen call just below.
+      nav.hidden = false;
     }
 
     // Start from whatever the markup says, so a server-rendered open state is
@@ -66,44 +115,67 @@
     setOpen(isOpen());
 
     toggle.addEventListener('click', function () {
-      setOpen(!isOpen());
+      var next = !isOpen();
+      setOpen(next);
+      // Move focus into the panel so a screen reader announces the labelled nav
+      // that just opened. Only on a real open, never on the initial sync.
+      if (drawer && next) nav.focus();
     });
 
-    // Escape closes and returns focus to the button, which is the standard
-    // disclosure behaviour and the only way back for a keyboard user who opened
-    // it by mistake.
+    // Escape closes and returns focus to the button — the standard disclosure
+    // behaviour and the only way back for a keyboard user who opened it by
+    // mistake. `stopPropagation` so an open nav owns the key rather than sharing
+    // it with, say, a dialog further up.
     nav.addEventListener('keydown', function (event) {
       if (event.key !== 'Escape' || !isOpen()) return;
+      event.stopPropagation();
       setOpen(false);
       toggle.focus();
     });
 
-    // Following a link should not leave the panel open behind the new page — and
-    // on a same-page anchor, the panel would cover what was jumped to.
+    // Following a link should not leave the nav open behind the new page — and
+    // on a same-page anchor it would cover what was jumped to. Focus is not
+    // moved back: that would fight the navigation already under way.
     nav.addEventListener('click', function (event) {
       if (event.target.closest('a') && isOpen()) setOpen(false);
     });
 
+    // Clicking the scrim is clicking "outside": the drawer's other dismiss.
+    if (scrim) {
+      scrim.addEventListener('click', function () {
+        setOpen(false);
+        toggle.focus();
+      });
+    }
+
     /* The header is laid out by container query, so the JS cannot simply read a
        media query to know which layout is active. Instead it observes the
-       computed result: once the nav is displayed inline, `hidden` is meaningless
-       and is cleared so the DOM matches what is on screen. */
-    if (typeof ResizeObserver !== 'undefined') {
-      var frame = toggle.closest('[class*="siteheader-frame"]') || toggle.parentElement;
-      if (frame) {
-        new ResizeObserver(function () {
-          // The toggle is display:none above the threshold. `offsetParent` is the
-          // cheapest reliable test for that, and it needs no duplicated
-          // breakpoint value here.
-          var wide = toggle.offsetParent === null;
-          if (wide) {
+       computed result: once the nav is displayed inline the collapsed-state
+       bookkeeping is meaningless and is undone so the DOM matches the screen —
+       and for a drawer that also means releasing the scroll lock and `inert`,
+       which the CSS cannot do. */
+    if (typeof ResizeObserver !== 'undefined' && frame) {
+      new ResizeObserver(function () {
+        // The toggle is display:none above the threshold. `offsetParent` is the
+        // cheapest reliable test for that, and it needs no duplicated breakpoint
+        // value here.
+        var wide = toggle.offsetParent === null;
+        if (wide) {
+          toggle.setAttribute('aria-expanded', 'false');
+          if (drawer) {
+            // Not setOpen(false): focus must not be yanked to a toggle that is
+            // now hidden, and the nav stays visible (the CSS handles that).
+            nav.removeAttribute('data-dds-open');
+            if (scrim) scrim.removeAttribute('data-dds-open');
+            if (content) content.inert = false;
+            document.documentElement.classList.remove('dds-scroll-locked');
+          } else {
             nav.hidden = false;
-            toggle.setAttribute('aria-expanded', 'false');
-          } else if (!isOpen()) {
-            nav.hidden = true;
           }
-        }).observe(frame);
-      }
+        } else if (!isOpen() && !drawer) {
+          nav.hidden = true;
+        }
+      }).observe(frame);
     }
   });
 

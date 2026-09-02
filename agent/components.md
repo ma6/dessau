@@ -952,8 +952,18 @@ inline and the button is gone.
 In the collapsed row the disclosure button is pinned last, hard against the
 inline-end edge, and does not move. The search / avatar actions, when present,
 sit immediately to its left as one right-aligned group; the free space is
-between the brand and that group. When the nav is open it takes its own
-full-width row in flow — it is not a drawer.
+between the brand and that group. By default, when the nav is open it takes its
+own full-width row in flow.
+
+**Opt-in drawer.** Add `data-dds-drawer` to the toggle and a sibling
+`<div class="dds-siteheader-scrim" data-dds-nav-scrim>` and the collapsed nav
+opens as a modal panel instead: it slides from the inline-end edge, the scrim is
+a real click-to-close target, `<html>` gets `.dds-scroll-locked`, and the
+element marked `data-dds-nav-content` is made `inert`. Escape and a scrim click
+close and restore focus to the toggle; a link inside closes without it. This is
+`contentnav`'s off-canvas machinery pointed at the primary nav — same ARIA
+contract. Without the flag and the scrim element the header is the in-flow
+disclosure, unchanged.
 
 The toggle holds **both** the menu and close sprite icons
 (`.dds-siteheader-toggle-menu` / `-close` inside `.dds-siteheader-toggle-icon`).

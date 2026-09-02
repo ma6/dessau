@@ -216,6 +216,72 @@
     font-weight: var(--dds-font-weight-semibold);
   }
 
+  /* --- opt-in drawer ---------------------------------------------------------
+     `data-dds-drawer` on the toggle, plus a sibling `.dds-siteheader-scrim`,
+     turns the collapsed nav from an in-flow disclosure into a modal panel: it
+     slides in from the inline-end edge, the scrim covers the page as a real
+     click-to-close target, and the JS adds `.dds-scroll-locked` to `<html>` and
+     `inert` to the element marked `data-dds-nav-content`. This is exactly
+     `contentnav`'s off-canvas machinery pointed at the primary nav. Without the
+     flag and the scrim element the header is the in-flow disclosure above,
+     byte-for-byte. Above 48rem it all unwinds (the container query below). */
+  .dds-siteheader:has(.dds-siteheader-toggle[data-dds-drawer]) .dds-primary-nav {
+    position: fixed;
+    inset-block: 0;
+    inset-inline-end: 0;
+    z-index: var(--dds-z-panel);
+
+    /* Out of flow now — the row-wrap sizing has no job here. */
+    flex-basis: auto;
+    inline-size: min(20rem, 85%);
+    padding: var(--dds-space-md);
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    scrollbar-gutter: stable;
+
+    background-color: var(--dds-color-surface-raised);
+    border-inline-start: var(--dds-border-thin) solid var(--dds-color-border-default);
+    box-shadow: var(--dds-elevation-lg);
+
+    /* Closed: slid off the edge. `translate`, so it composites and does not
+       lay out on every frame. */
+    translate: 100% 0;
+    transition: translate var(--dds-duration-base) var(--dds-ease-standard);
+  }
+
+  .dds-siteheader:has(.dds-siteheader-toggle[data-dds-drawer]) .dds-primary-nav[data-dds-open] {
+    translate: 0 0;
+  }
+
+  /* Closed and not animating: genuinely out of the tab order, not merely
+     off-screen — an off-canvas panel that is still tabbable is the classic bug
+     where focus vanishes and Tab appears to do nothing. Mirrors
+     `.dds-contentnav:not([data-dds-open])`. */
+  .dds-siteheader:has(.dds-siteheader-toggle[data-dds-drawer]) .dds-primary-nav:not([data-dds-open]) {
+    visibility: hidden;
+    transition:
+      translate var(--dds-duration-base) var(--dds-ease-standard),
+      visibility 0s var(--dds-duration-base);
+  }
+
+  /* A real element, not a pseudo-element, so it is a click target without the
+     nav having to own the whole viewport. */
+  .dds-siteheader-scrim {
+    position: fixed;
+    inset: 0;
+    z-index: var(--dds-z-scrim);
+
+    background-color: var(--dds-color-overlay);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity var(--dds-duration-base) var(--dds-ease-standard);
+  }
+
+  .dds-siteheader-scrim[data-dds-open] {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
   /* The header's navigation is inline from 48rem and behind a disclosure below
      it. 48rem is also the named tablet breakpoint, which is a coincidence worth
      stating: the header happens to be the one component whose content threshold
@@ -263,6 +329,29 @@
          the single free-space gap; a second auto margin would split it and the
          actions would drift away from the nav. */
       margin-inline-start: 0;
+    }
+
+    /* The drawer unwinds completely into an ordinary inline nav, and the scrim
+       has nothing left to cover. Every panel property is taken back explicitly
+       rather than left to be overridden by accident — the same discipline the
+       contentnav column applies. */
+    .dds-siteheader:has(.dds-siteheader-toggle[data-dds-drawer]) .dds-primary-nav,
+    .dds-siteheader:has(.dds-siteheader-toggle[data-dds-drawer]) .dds-primary-nav:not([data-dds-open]) {
+      position: static;
+      z-index: auto;
+      inline-size: auto;
+      padding: 0;
+      overflow: visible;
+      background: none;
+      border-inline-start: 0;
+      box-shadow: none;
+      visibility: visible;
+      translate: 0 0;
+      transition: none;
+    }
+
+    .dds-siteheader-scrim {
+      display: none;
     }
   }
 

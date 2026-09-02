@@ -39,7 +39,9 @@ import { test, expect } from '@playwright/test';
 
 const NAVIGATION = '/reference/navigation.html';
 
-const header = (page) => page.locator('.dds-siteheader');
+// The reference page carries two siteheader specimens — the in-flow disclosure
+// and the opt-in drawer (`#siteheader-drawer`). These tests are about the first.
+const header = (page) => page.locator('.dds-siteheader').first();
 const toggle = (page) => header(page).locator('.dds-siteheader-toggle');
 const actions = (page) => header(page).locator('.dds-siteheader-actions');
 const nav = (page) => header(page).locator('.dds-primary-nav');
