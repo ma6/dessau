@@ -33,9 +33,29 @@
  * A group whose only child is itself gets no second row, because a row of one is not a
  * choice.
  *
+ * -----------------------------------------------------------------------------
+ * Derived-system-owned pages
+ * -----------------------------------------------------------------------------
+ *
+ * A derived system (or a product) sometimes OWNS a component instead of inheriting it
+ * — Neon ships its own `.dds-siteheader` — and then documents it on a reference page
+ * of its own. That page is not in `STRUCTURE`, which is Dessau's own contents. Instead
+ * it declares where it belongs, in its `<head>`:
+ *
+ *   <meta name="dds-reference-owner" content="derived">        (or "product")
+ *   <meta name="dds-reference-group" content="Components">     a top-level group label
+ *   <meta name="dds-reference-nav-label" content="Site header"> optional; else the <title>
+ *   <meta name="dds-reference-nav-order" content="10">         optional; else appended
+ *
+ * This pass reads those markers and slots the page into the named group before the
+ * checks and the render run — after which it is an ordinary page to every line below.
+ * An owner marker with no resolvable `dds-reference-group` is a NAMED error, never a
+ * silent skip: an unreachable page is the exact failure this generator exists to stop.
+ *
  * @catches A reference page missing from the site navigation, an entry pointing at a
- *   page that does not exist, a page in reference/ that no group claims, and a wrong
- *   or missing `aria-current="page"`.
+ *   page that does not exist, a page in reference/ that no group claims (unless it is
+ *   a `dds-reference-owner` page), a derived-system-owned page whose
+ *   `dds-reference-group` names no group, and a wrong or missing `aria-current="page"`.
  *
  * Zero dependencies, Node stdlib only.
  */
@@ -88,6 +108,80 @@ const STRUCTURE = [
 
 const problems = [];
 
+/* ------------------------------------------- derived-system-owned pages */
+
+/** The `content` of the first `<meta name="…">` in the document head, or null. */
+function metaContent(html, name) {
+  const headEnd = html.indexOf('</head>');
+  const head = headEnd === -1 ? html : html.slice(0, headEnd);
+  for (const [tag] of head.matchAll(/<meta\b[^>]*>/gi)) {
+    if (!new RegExp(`\\bname=["']${name}["']`, 'i').test(tag)) continue;
+    const value = tag.match(/\bcontent=["']([^"']*)["']/i);
+    return value ? value[1].trim() : '';
+  }
+  return null;
+}
+
+/**
+ * Slot every page carrying `dds-reference-owner` into the group its
+ * `dds-reference-group` names, so the lines below treat it as one more child. A
+ * marker with no resolvable group is reported here rather than silently dropped.
+ */
+const ownedByGroup = new Map();
+const ownerMarked = new Set();
+
+for (const name of (await readdir(REFERENCE))
+  .filter((n) => n.endsWith('.html'))
+  .sort()) {
+  const html = await readFile(join(REFERENCE, name), 'utf8');
+  const owner = metaContent(html, 'dds-reference-owner');
+  if (!owner) continue;
+  ownerMarked.add(name);
+
+  const groupLabel = metaContent(html, 'dds-reference-group');
+  const group = groupLabel && STRUCTURE.find((entry) => entry.label === groupLabel);
+
+  if (!group) {
+    problems.push(
+      `reference/${name} carries <meta name="dds-reference-owner" content="${owner}"> ` +
+        `but its dds-reference-group ${
+          groupLabel ? `"${groupLabel}"` : 'is missing, so it'
+        } names no group in STRUCTURE (${STRUCTURE.map((e) => `"${e.label}"`).join(
+          ', '
+        )}) — the page would be unreachable from every other page`
+    );
+    continue;
+  }
+
+  const label =
+    metaContent(html, 'dds-reference-nav-label') ||
+    html.match(/<title>([^<]*)<\/title>/i)?.[1].split(/[—|]/)[0].trim() ||
+    name.replace(/\.html$/, '');
+
+  const orderRaw = metaContent(html, 'dds-reference-nav-order');
+  const order =
+    orderRaw && Number.isFinite(Number(orderRaw)) ? Number(orderRaw) : Infinity;
+
+  if (!ownedByGroup.has(group)) ownedByGroup.set(group, []);
+  ownedByGroup.get(group).push({ label, file: name, order });
+}
+
+for (const [group, owned] of ownedByGroup) {
+  owned.sort((a, b) => a.order - b.order || a.file.localeCompare(b.file));
+  const entries = owned.map(({ label, file }) => ({ label, file }));
+
+  if (group.children) {
+    // A group that already shows a second row (Components, Foundations): the owned
+    // page is appended after the inherited children.
+    group.children.push(...entries);
+  } else {
+    // A single-page group (Patterns, Writing today): it grows a second row, with
+    // its own inherited page as the first entry so that page stays reachable.
+    group.children = [{ label: group.label, file: group.file }, ...entries];
+    delete group.file;
+  }
+}
+
 /** Flatten to `{ file, label, group }` for every page the navigation reaches. */
 const pages = [];
 for (const entry of STRUCTURE) {
@@ -115,6 +209,8 @@ for (const page of pages) {
  */
 const onDisk = (await readdir(REFERENCE)).filter((name) => name.endsWith('.html'));
 for (const name of onDisk) {
+  // An owner-marked page reports its own placement problem, above, in clearer terms.
+  if (ownerMarked.has(name)) continue;
   if (!pages.some((page) => page.file === name)) {
     problems.push(
       `reference/${name} exists but no group in STRUCTURE claims it, so nothing links ` +

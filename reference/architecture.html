@@ -294,6 +294,7 @@
         <nav class="ref-nav-secondary" aria-label="Foundations pages">
             <a href="foundations.html">Values</a>
             <a href="architecture.html" aria-current="page">Architecture</a>
+            <a href="owned-pages.html">Owned pages</a>
         </nav>
       </div>
       <!-- REF_NAV:END -->
@@ -688,7 +689,7 @@ DDS.theme                             // read / set / observe the theme</code></
                 </tr>
                 <tr>
                   <th scope="row"><code class="dds-code">sync-reference-nav.mjs</code><br><span class="dds-text-2xs dds-text-muted">verify only · regenerate to fix</span></th>
-                  <td>A reference page missing from the site navigation, an entry pointing at a page that does not exist, a page in reference/ that no group claims, and a wrong or missing <code class="dds-code">aria-current="page"</code>.</td>
+                  <td>A reference page missing from the site navigation, an entry pointing at a page that does not exist, a page in reference/ that no group claims (unless it is a <code class="dds-code">dds-reference-owner</code> page), a derived-system-owned page whose <code class="dds-code">dds-reference-group</code> names no group, and a wrong or missing <code class="dds-code">aria-current="page"</code>.</td>
                 </tr>
                 <tr>
                   <th scope="row"><code class="dds-code">sync-reference-toc.mjs</code><br><span class="dds-text-2xs dds-text-muted">verify only · regenerate to fix</span></th>
