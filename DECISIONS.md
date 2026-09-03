@@ -2989,13 +2989,18 @@ existing consumer pinned to `1.1.x` breaks, but there is a new thing to opt into
   the first tab stop, because the header's morphed close is behind the scrim once
   the drawer is open. Accessibility fix on `#151`'s own surface, before it ever
   shipped; folded in. Also in `066`.
+- `#156` `fix(a11y)` — the scroll lock moves into `dds.js`
+  (`DDS.lockScroll` / `DDS.unlockScroll`), reference-counted across every modal
+  surface and keeping the scroll offset that `overflow: hidden` on the root can
+  drop; the drawer and `contentnav` restore focus with `preventScroll`. Entry
+  `068`.
 
 (`#153` also rode along — see the note below.)
 
-**Why one tag for all of them.** `#152` is a fix, `#151` the feature, `#154` an
-accessibility fix on `#151`'s surface found straight after. None has reached a
-tag, so there is no consumer sitting on `1.1.2` who needs one without the others.
-`059`'s one-version-a-day cadence is not in play — there has been no bump today.
+**Why one tag for all of them.** `#152` is a fix, `#151` the feature, `#154` and
+`#156` accessibility fixes on `#151`'s surface found straight after. None has
+reached a tag, so there is no consumer sitting on `1.1.2` who needs one without
+the others. `059`'s one-version-a-day cadence is not in play — no bump today.
 
 **How it was cut.** `npm run check` clean (including `check:version`, which
 verified the `VERSION` and `package.json` bumps agree before the commit — its
@@ -3019,3 +3024,53 @@ platform. Reference chrome only — nothing under `dds/` — so it does not affe
 the number, but the fix is in `1.2.0` rather than trailing it.
 
 **Reversal condition.** None. The version number describes what changed.
+
+---
+
+## 068 — one scroll lock, in dds.js, reference-counted and offset-keeping
+
+**Decision.** The page scroll lock — `overflow: hidden` on the root while a modal
+surface is open — is a single implementation in `dds.js`, exposed as
+`DDS.lockScroll()` / `DDS.unlockScroll()`. Every modal surface calls it: the
+dialog and the image viewer (`components.js`, `components-content.js`), the
+site-header drawer and the content navigation panel
+(`components-navigation.js`). It is reference-counted, it reads `window.scrollY`
+before the first lock and writes it back after the last release, and the drawer
+and `contentnav` now restore focus to their toggle with `{ preventScroll: true }`.
+
+**Why.** `#156`. Three things were wrong at once:
+
+- **No shared count.** `components.js` counted its own open dialogs so a dialog
+  opened from a dialog would not unlock early — but the drawer and `contentnav`
+  toggled the class directly, with no count and no knowledge of each other. A
+  dialog open over the drawer, then the drawer closing, unlocked the page with
+  the dialog still up.
+- **The offset.** `overflow: hidden` on the root does not preserve the scroll
+  position in every engine/context: the offset is clamped when the root stops
+  being scrollable and not restored when it returns. `scrollbar-gutter: stable`
+  already handles the *width* side (`037`-era note in `base.css`); the *offset*
+  side had nothing. Measured drops of a few hundred px on open and again on
+  close, reported from `ma6/dessau.dev`.
+- **Focus-restore scrolling.** Closing the drawer/panel returns focus to the
+  toggle. The page was locked the whole time the panel was open, so the toggle
+  has not moved — but a plain `.focus()` still scrolls to it on some engines
+  (reproduced on Firefox with the toggle parked off-screen), which is itself the
+  "the page jumped when I closed it" symptom. `preventScroll` is correct
+  precisely because the lock guarantees there is nothing to scroll to.
+
+**Cost.** `dds.js`'s public surface grows by two functions — the first additions
+since `theme`. One module (`components.js`) loses a local helper it had first;
+the shared version is a strict superset. The `preventScroll` option is Baseline
+but was not previously relied on anywhere in the codebase.
+
+**Not reproduced locally.** The bare `overflow: hidden` offset drop does not show
+in the Playwright browsers as they stand — `scrollY` survived the toggle in all
+three. The reported measurements are real (`ma6/dessau.dev` #11) but from a
+context this repo cannot reproduce. The offset save/restore is kept as correct
+defensive practice — it is what a robust scroll lock does — and the shipped
+regression test guards the reproducible half (the Firefox focus-restore jump),
+seen to fail without `preventScroll`.
+
+**Reversal condition.** The platform ships a real scroll-lock primitive (a
+proposal exists), at which point both this and `scrollbar-gutter: stable` defer
+to it.

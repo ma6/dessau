@@ -150,6 +150,44 @@ test('the close button is the first tab stop inside the drawer', async ({ page }
   expect(firstFocusableIsClose).toBe(true);
 });
 
+test('opening and closing the drawer leaves the page scroll where it was', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 760 });
+  await page.goto(NAVIGATION);
+  await setContainerWidth(page, DRAWER);
+
+  // Drive the whole cycle from inside the page: a Playwright `.click()` would
+  // scroll the toggle into view itself and mask what the component does. The
+  // page is parked far below the drawer's own toggle — the case where a
+  // focus-restore that scrolls to reveal it, or an `overflow: hidden` that drops
+  // the offset, shows up as a jump (#156).
+  const positions = await page.evaluate(() => {
+    const out = [];
+    const t = document.querySelector('#siteheader-drawer .dds-siteheader-toggle');
+    const nav = document.querySelector('#siteheader-drawer .dds-primary-nav');
+    const closeBtn = () => document.querySelector('#siteheader-drawer [data-dds-nav-close]');
+    const y = () => Math.round(window.scrollY);
+
+    window.scrollTo(0, 4000);
+    out.push(y()); // parked
+    t.click();
+    out.push(y()); // drawer open
+    closeBtn().click();
+    out.push(y()); // closed via the in-panel button
+    t.click();
+    out.push(y()); // open again
+    nav.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }));
+    out.push(y()); // closed via Escape
+    return out;
+  });
+
+  expect(positions[0], 'the page did not park far enough down to expose the jump').toBeGreaterThan(
+    2000
+  );
+  expect(new Set(positions).size, `the scroll moved across the cycle: ${positions.join(' → ')}`).toBe(
+    1
+  );
+});
+
 test('the close button is gone once the nav is inline', async ({ page }) => {
   await page.setViewportSize({ width: 1400, height: 900 });
   await page.goto(NAVIGATION);

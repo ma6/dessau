@@ -312,8 +312,10 @@
   }
 
   /* ----------------------------------------------------------- scroll lock */
-  /* Applied to the root element by JavaScript while a modal dialog or a
-     full-screen viewer is open (`dds/js/components.js`).
+  /* Applied to the root element by `DDS.lockScroll()` (dds.js) while a modal
+     dialog, the image viewer, the site-header drawer or the content navigation
+     panel is open — reference-counted, so it survives one modal opening over
+     another.
 
      It is genuinely needed: `showModal()` makes the rest of the document inert,
      but inert does not stop scrolling, and background scroll behind a modal is
@@ -324,7 +326,12 @@
      padding: `scrollbar-gutter: stable` above already reserves the scrollbar's
      space permanently, so removing the scrollbar cannot shift the layout. That is
      what the gutter is for, and it is why the usual
-     `padding-right: <scrollbar-width>` hack is not here. */
+     `padding-right: <scrollbar-width>` hack is not here.
+
+     What it does NOT do on its own is keep the scroll *offset*: an engine clamps
+     `scrollY` when the root stops being scrollable and does not restore it. So
+     `DDS.lockScroll` reads the offset before locking and writes it back after
+     the last release (#156). */
   .dds-scroll-locked {
     overflow: hidden;
   }

@@ -43,22 +43,10 @@
      and the declarative open/close attributes.
      ========================================================================= */
 
-  var SCROLL_LOCK_CLASS = 'dds-scroll-locked';
-  var openDialogCount = 0;
-
-  function lockScroll() {
-    openDialogCount += 1;
-    document.documentElement.classList.add(SCROLL_LOCK_CLASS);
-  }
-
-  function unlockScroll() {
-    openDialogCount = Math.max(0, openDialogCount - 1);
-    // Only release when the last dialog closes — a dialog opened from a dialog
-    // would otherwise unlock the page while one is still open.
-    if (openDialogCount === 0) {
-      document.documentElement.classList.remove(SCROLL_LOCK_CLASS);
-    }
-  }
+  // Scroll lock lives in dds.js now (`DDS.lockScroll` / `DDS.unlockScroll`):
+  // reference-counted across every modal surface, and it keeps the scroll offset
+  // that `overflow: hidden` on the root otherwise drops (#156). "A dialog opened
+  // from a dialog leaves the page locked until both close" is the count's job.
 
   DDS.register('dialog-open', '[data-dds-dialog-open]', function (trigger) {
     trigger.addEventListener('click', function () {
@@ -74,7 +62,7 @@
         return;
       }
 
-      lockScroll();
+      DDS.lockScroll();
       dialog.showModal();
     });
   });
@@ -82,7 +70,7 @@
   DDS.register('dialog', 'dialog.dds-dialog', function (dialog) {
     // Release the lock however the dialog closed: a close button, Escape, a
     // form submit, or `close()` from application code.
-    dialog.addEventListener('close', unlockScroll);
+    dialog.addEventListener('close', DDS.unlockScroll);
 
     /* Light dismiss belongs to `closedby="any"` in the markup, not to this file.
        The browser compares the press and the release, so a drag that starts

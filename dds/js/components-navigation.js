@@ -51,7 +51,8 @@
      exactly `contentnav`'s treatment below, applied to the primary nav:
 
        - `data-dds-open` on the nav and the scrim drive the CSS slide/fade;
-       - `<html>` gets `.dds-scroll-locked`;
+       - `DDS.lockScroll()` holds the page still behind the panel and keeps its
+         scroll offset (`.dds-scroll-locked` on the root, reference-counted);
        - the element marked `data-dds-nav-content` (optional; the page's main
          content) is made `inert`, so the page behind leaves the tab order AND
          the accessibility tree — what a focus trap only ever approximated;
@@ -97,10 +98,14 @@
       toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
 
       if (drawer) {
+        // Only lock/unlock on a real transition — `DDS.lockScroll` is
+        // reference-counted, so an unbalanced call would leave the page stuck.
+        var wasOpen = nav.hasAttribute('data-dds-open');
         nav.toggleAttribute('data-dds-open', open);
         if (scrim) scrim.toggleAttribute('data-dds-open', open);
         if (content) content.inert = open;
-        document.documentElement.classList.toggle('dds-scroll-locked', open);
+        if (open && !wasOpen) DDS.lockScroll();
+        else if (!open && wasOpen) DDS.unlockScroll();
       } else {
         nav.hidden = !open;
       }
@@ -117,6 +122,12 @@
       nav.hidden = false;
     }
 
+    // In drawer mode the page is scroll-locked while the panel is open, so the
+    // toggle has not moved — focus can return to it without the browser
+    // scrolling to reveal it, which on some engines is itself the "the page
+    // jumped when I closed the drawer" bug (#156).
+    var FOCUS_OPTS = drawer ? { preventScroll: true } : undefined;
+
     // Start from whatever the markup says, so a server-rendered open state is
     // respected.
     setOpen(isOpen());
@@ -126,7 +137,7 @@
       setOpen(next);
       // Move focus into the panel so a screen reader announces the labelled nav
       // that just opened. Only on a real open, never on the initial sync.
-      if (drawer && next) nav.focus();
+      if (drawer && next) nav.focus(FOCUS_OPTS);
     });
 
     // Escape closes and returns focus to the button — the standard disclosure
@@ -137,7 +148,7 @@
       if (event.key !== 'Escape' || !isOpen()) return;
       event.stopPropagation();
       setOpen(false);
-      toggle.focus();
+      toggle.focus(FOCUS_OPTS);
     });
 
     // Following a link should not leave the nav open behind the new page — and
@@ -151,7 +162,7 @@
     if (scrim) {
       scrim.addEventListener('click', function () {
         setOpen(false);
-        toggle.focus();
+        toggle.focus(FOCUS_OPTS);
       });
     }
 
@@ -159,7 +170,7 @@
     if (closeButton) {
       closeButton.addEventListener('click', function () {
         setOpen(false);
-        toggle.focus();
+        toggle.focus(FOCUS_OPTS);
       });
     }
 
@@ -180,10 +191,11 @@
           if (drawer) {
             // Not setOpen(false): focus must not be yanked to a toggle that is
             // now hidden, and the nav stays visible (the CSS handles that).
+            var wasOpen = nav.hasAttribute('data-dds-open');
             nav.removeAttribute('data-dds-open');
             if (scrim) scrim.removeAttribute('data-dds-open');
             if (content) content.inert = false;
-            document.documentElement.classList.remove('dds-scroll-locked');
+            if (wasOpen) DDS.unlockScroll();
           } else {
             nav.hidden = false;
           }
@@ -606,13 +618,17 @@
       toggle.setAttribute('aria-expanded', 'true');
 
       // The page behind is genuinely unavailable, to a pointer and to a screen
-      // reader alike.
+      // reader alike. `DDS.lockScroll` also keeps the scroll offset that
+      // `overflow: hidden` on the root otherwise drops (#156). Balanced by the
+      // `isOpen()` guard above and the one in `close()`.
       if (content) content.inert = true;
-      document.documentElement.classList.add('dds-scroll-locked');
+      DDS.lockScroll();
 
       // Focus the panel itself rather than its first link: the panel is labelled,
       // so a screen reader announces what just opened before reading the list.
-      nav.focus();
+      // `preventScroll` — the panel is a fixed overlay and the page is locked, so
+      // there is nothing to scroll to and any scroll here is the #156 jump.
+      nav.focus({ preventScroll: true });
     }
 
     /**
@@ -631,12 +647,14 @@
       toggle.setAttribute('aria-expanded', 'false');
 
       if (content) content.inert = false;
-      document.documentElement.classList.remove('dds-scroll-locked');
+      DDS.unlockScroll();
 
       // Order matters: focus has to move out before the panel becomes
       // `visibility: hidden`, or it lands on `<body>` and the next Tab restarts
-      // from the top of the page.
-      if (restoreFocus) toggle.focus();
+      // from the top of the page. `preventScroll` because the page was locked
+      // while the panel was open — the toggle is exactly where it was left, and
+      // scrolling to it would be the jump #156 is about.
+      if (restoreFocus) toggle.focus({ preventScroll: true });
     }
 
     /* The panel needs to be focusable to be announced, but must never be a tab
@@ -712,7 +730,7 @@
         if (scrim) scrim.removeAttribute('data-dds-open');
         toggle.setAttribute('aria-expanded', 'false');
         if (content) content.inert = false;
-        document.documentElement.classList.remove('dds-scroll-locked');
+        DDS.unlockScroll();
       }
     }).observe(frame);
   });

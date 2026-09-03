@@ -200,6 +200,8 @@ DDS.register(name, selector, setup)   // register an enhancement
 DDS.enhance(root)                     // apply enhancements in a subtree
 DDS.announce(message, options)        // speak to assistive technology
 DDS.theme                             // read / set / observe the theme
+DDS.lockScroll() / DDS.unlockScroll() // hold the page still behind a modal
+                                     // surface — reference-counted, offset kept
 ```
 
 Markup exists first and works first. JavaScript finds elements that opted in via

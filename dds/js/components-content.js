@@ -207,7 +207,7 @@
     });
 
     dialog.addEventListener('close', function () {
-      document.documentElement.classList.remove('dds-scroll-locked');
+      DDS.unlockScroll();
       /* Focus returns to the trigger that OPENED the viewer, not to the one for
          whichever image is showing when it closes.
 
@@ -318,7 +318,7 @@
     build();
     show(group.indexOf(trigger));
 
-    document.documentElement.classList.add('dds-scroll-locked');
+    DDS.lockScroll();
     dialog.showModal();
     dialog.querySelector('.dds-lightbox-close').focus();
   }

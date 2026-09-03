@@ -3,12 +3,14 @@
  *
  *   <script src="/dds/js/dds.js" defer></script>
  *
- * Provides four things and nothing else:
+ * Provides a small fixed surface and nothing else:
  *
  *   DDS.register(name, selector, setup)  register a progressive enhancement
  *   DDS.enhance(root)                    apply enhancements within a subtree
  *   DDS.announce(message, options)       speak to assistive technology
  *   DDS.theme                            read, set and observe the theme
+ *   DDS.lockScroll() / DDS.unlockScroll()  hold the page still behind a modal
+ *                                       surface, reference-counted, offset kept
  *
  * -----------------------------------------------------------------------------
  * The enhancement model
@@ -583,6 +585,45 @@
   }
 
   /* =========================================================================
+     Scroll lock
+     =========================================================================
+     Holds the page still behind a modal surface — a dialog, the image viewer,
+     the site-header drawer, the content navigation panel. `showModal()` makes
+     the rest of the document inert but does not stop it scrolling, and some
+     engines let the background scroll behind a non-dialog panel anyway.
+
+     `overflow: hidden` on the root (`.dds-scroll-locked`, base.css) is the
+     visual mechanism. On its own it also *loses the scroll offset*: an engine
+     clamps `scrollY` the moment the root stops being scrollable and does not put
+     it back when it becomes scrollable again, so the page jumps toward the top
+     on open and again on close (#156). So the offset is read before the first
+     lock and written back after the last release.
+
+     Reference-counted: a dialog can open over the drawer, and the page must stay
+     locked — and keep the one saved offset — until both have closed. The width
+     side needs no compensation because `scrollbar-gutter: stable` (base.css)
+     reserves the scrollbar's space permanently. */
+  var scrollLockCount = 0;
+  var scrollLockY = 0;
+
+  function lockScroll() {
+    if (scrollLockCount === 0) {
+      scrollLockY = window.scrollY;
+      document.documentElement.classList.add('dds-scroll-locked');
+    }
+    scrollLockCount += 1;
+  }
+
+  function unlockScroll() {
+    if (scrollLockCount === 0) return;
+    scrollLockCount -= 1;
+    if (scrollLockCount > 0) return;
+    document.documentElement.classList.remove('dds-scroll-locked');
+    // `instant`, not the page's `scroll-behavior`: this is a restore, not a move.
+    window.scrollTo({ top: scrollLockY, left: 0, behavior: 'instant' });
+  }
+
+  /* =========================================================================
      Public surface
      ========================================================================= */
 
@@ -592,6 +633,8 @@
     enhance: enhance,
     announce: announce,
     theme: theme,
+    lockScroll: lockScroll,
+    unlockScroll: unlockScroll,
     utils: {
       debounce: debounce,
       prefersReducedMotion: prefersReducedMotion,

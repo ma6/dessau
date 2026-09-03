@@ -156,6 +156,41 @@ test('following a link closes the panel without taking focus back', async ({ pag
   await expect(toggle(page)).not.toBeFocused();
 });
 
+test('opening and closing the panel leaves the page scroll where it was', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 760 });
+  await page.goto(NAVIGATION);
+  await setContainerWidth(page, PANEL);
+
+  // Driven from inside the page and parked far from the toggle: a scroll-lock
+  // that drops the offset, or a focus-restore that scrolls to reveal the toggle,
+  // would show as a jump (#156). `.dds-scroll-locked` shares this code.
+  const positions = await page.evaluate(() => {
+    const out = [];
+    const t = document.querySelector('[data-dds-contentnav-toggle]');
+    const nav = document.querySelector('.dds-contentnav');
+    const closeBtn = document.querySelector('[data-dds-contentnav-close]');
+    const y = () => Math.round(window.scrollY);
+
+    window.scrollTo(0, 4000);
+    out.push(y());
+    t.click();
+    out.push(y()); // open
+    closeBtn.click();
+    out.push(y()); // closed via the header close
+    t.click();
+    out.push(y()); // open again
+    nav.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }));
+    out.push(y()); // closed via Escape
+    return out;
+  });
+
+  expect(positions[0], 'the page did not park far enough down').toBeGreaterThan(2000);
+  expect(
+    new Set(positions).size,
+    `the scroll moved across the cycle: ${positions.join(' → ')}`
+  ).toBe(1);
+});
+
 test('growing past the threshold while open clears inert and the scroll lock', async ({ page }) => {
   await openPanel(page);
 
