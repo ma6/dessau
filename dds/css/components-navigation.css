@@ -260,12 +260,21 @@
   /* Closed and not animating: genuinely out of the tab order, not merely
      off-screen — an off-canvas panel that is still tabbable is the classic bug
      where focus vanishes and Tab appears to do nothing. Mirrors
-     `.dds-contentnav:not([data-dds-open])`. */
+     `.dds-contentnav:not([data-dds-open])`.
+
+     `clip-path` as well: a `position: fixed` box translated past the inline-end
+     edge is counted toward the document's scrollable width by some engines when
+     the header is its containing block — ~300px of horizontal scroll on a phone
+     with the drawer never opened (#155). Clipping the resting box to nothing
+     removes that ink from the page; the delay keeps it out of the slide, which
+     is a `translate` and stays composited. */
   .dds-siteheader:has(.dds-siteheader-toggle[data-dds-drawer]) .dds-primary-nav:not([data-dds-open]) {
     visibility: hidden;
+    clip-path: inset(0 0 0 100%);
     transition:
       translate var(--dds-duration-base) var(--dds-ease-standard),
-      visibility 0s var(--dds-duration-base);
+      visibility 0s var(--dds-duration-base),
+      clip-path 0s var(--dds-duration-base);
   }
 
   /* A real element, not a pseudo-element, so it is a click target without the
@@ -367,6 +376,7 @@
       border-inline-start: 0;
       box-shadow: none;
       visibility: visible;
+      clip-path: none;
       translate: 0 0;
       transition: none;
     }

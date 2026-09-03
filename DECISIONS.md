@@ -2943,6 +2943,19 @@ with `data-dds-nav-close`, first in the panel DOM so it is the first tab stop,
 hidden with the rest of the panel furniture above 48rem. The morph stays: at the
 wider drawer sizes the toggle is not occluded and both reads are fine.
 
+**The closed panel's ink (`#155`).** Column-stacking the close button made the
+drawer panel `display: flex` in its closed state too. `contentnav` slides from
+the inline-start edge, where a `translate`-parked fixed box does not extend the
+page's scrollable width; the site-header drawer slides from the inline-**end**
+edge, where it can — and did, ~300px of horizontal scroll on a phone with the
+drawer never opened, whenever the consumer's header is the fixed panel's
+containing block. The fix keeps the composited `translate` slide and adds
+`clip-path: inset(0 0 0 100%)` to the resting closed state (delayed past the
+transition), so the box that sits off-screen paints nothing. Not reproducible in
+this repo's own environment — the reference page's containing-block chain
+differs — so the regression test guards the mechanism (clip present when closed,
+gone when open), not a measured overflow.
+
 **Cost.** A second `:has(.dds-siteheader-toggle[data-dds-drawer])`-scoped block
 of panel CSS that has to be unwound explicitly in the wide container query, the
 way the contentnav column already is. The `nav-toggle` enhancement is no longer
@@ -2994,6 +3007,10 @@ existing consumer pinned to `1.1.x` breaks, but there is a new thing to opt into
   surface and keeping the scroll offset that `overflow: hidden` on the root can
   drop; the drawer and `contentnav` restore focus with `preventScroll`. Entry
   `068`.
+- `#155` `fix(siteheader)` — the closed drawer panel is `clip-path`-ed to
+  nothing, so the `translate`-parked fixed box no longer widens the page on a
+  phone when the consumer's header is its containing block. Follow-up to `#154`,
+  same untagged cut. Also in `066`.
 
 (`#153` also rode along — see the note below.)
 

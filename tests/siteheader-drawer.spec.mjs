@@ -198,6 +198,32 @@ test('the close button is gone once the nav is inline', async ({ page }) => {
   await expect(closeButton(page)).toBeHidden();
 });
 
+test('the closed drawer panel does not widen the page', async ({ page }) => {
+  await page.setViewportSize({ width: 360, height: 760 });
+  await page.goto(NAVIGATION);
+  await setContainerWidth(page, DRAWER);
+
+  // Parked off the inline-end edge with `translate`, the fixed panel is counted
+  // toward the document's scrollable width by some engines when the header is
+  // its containing block (#155). Clipping the resting box removes that ink.
+  const state = await page.evaluate(() => {
+    const n = document.querySelector('#siteheader-drawer .dds-primary-nav');
+    const de = document.documentElement;
+    return {
+      clipped: getComputedStyle(n).clipPath !== 'none',
+      pageOverflowX: Math.round(de.scrollWidth - de.clientWidth),
+    };
+  });
+  expect(state.clipped, 'the closed drawer panel is not clipped').toBe(true);
+  expect(state.pageOverflowX, 'the closed drawer widened the page').toBeLessThanOrEqual(0);
+
+  // Opening clears the clip so the panel renders in full.
+  await toggle(page).click();
+  await expect(nav(page)).toHaveAttribute('data-dds-open', '');
+  const openClip = await nav(page).evaluate((n) => getComputedStyle(n).clipPath);
+  expect(openClip).toBe('none');
+});
+
 test('following a link closes the drawer without taking focus back', async ({ page }) => {
   await openDrawer(page);
 
