@@ -35,6 +35,7 @@ const toggle = (page) => frame(page).locator('.dds-siteheader-toggle');
 const nav = (page) => frame(page).locator('.dds-primary-nav');
 const scrim = (page) => frame(page).locator('.dds-siteheader-scrim');
 const content = (page) => frame(page).locator('[data-dds-nav-content]');
+const closeButton = (page) => nav(page).locator('[data-dds-nav-close]');
 
 /** Below 48rem, so the nav is a drawer. */
 const DRAWER = '600px';
@@ -113,6 +114,50 @@ test('clicking the scrim closes the drawer and returns focus to the toggle', asy
   await expect(nav(page)).not.toHaveAttribute('data-dds-open', '');
   await expect(page.locator('html')).not.toHaveClass(/dds-scroll-locked/);
   await expect(toggle(page)).toBeFocused();
+});
+
+test('the in-panel close button closes the drawer and returns focus to the toggle', async ({
+  page,
+}) => {
+  await openDrawer(page);
+
+  // Visible and inside the panel — the header toggle is behind the scrim, and at
+  // phone widths under the panel entirely (#154).
+  await expect(closeButton(page)).toBeVisible();
+
+  await closeButton(page).click();
+
+  await expect(nav(page)).not.toHaveAttribute('data-dds-open', '');
+  await expect(scrim(page)).not.toHaveAttribute('data-dds-open', '');
+  await expect(content(page)).not.toHaveAttribute('inert', '');
+  await expect(page.locator('html')).not.toHaveClass(/dds-scroll-locked/);
+  await expect(toggle(page)).toBeFocused();
+});
+
+test('the close button is the first tab stop inside the drawer', async ({ page }) => {
+  await openDrawer(page);
+
+  // Structural rather than driving Tab: WebKit's `document.hasFocus()` goes false
+  // under parallel workers and `toBeFocused()` then reports "inactive". The
+  // property is that the close is first among the panel's focusable descendants,
+  // ahead of every nav link — mirroring contentnav.
+  const firstFocusableIsClose = await nav(page).evaluate((navEl) => {
+    const first = navEl.querySelector(
+      'a[href], button:not([disabled]), [tabindex]:not([tabindex="-1"])'
+    );
+    return !!first && first.matches('[data-dds-nav-close]');
+  });
+  expect(firstFocusableIsClose).toBe(true);
+});
+
+test('the close button is gone once the nav is inline', async ({ page }) => {
+  await page.setViewportSize({ width: 1400, height: 900 });
+  await page.goto(NAVIGATION);
+  await setContainerWidth(page, INLINE);
+
+  // A "Close" in an inline nav makes no sense — the wide container query hides it
+  // with the rest of the panel furniture.
+  await expect(closeButton(page)).toBeHidden();
 });
 
 test('following a link closes the drawer without taking focus back', async ({ page }) => {

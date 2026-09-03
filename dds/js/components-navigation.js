@@ -55,8 +55,11 @@
        - the element marked `data-dds-nav-content` (optional; the page's main
          content) is made `inert`, so the page behind leaves the tab order AND
          the accessibility tree — what a focus trap only ever approximated;
-       - Escape and a scrim click close and return focus to the toggle; a link
-         inside closes without the focus restore (it goes to another page);
+       - Escape, a scrim click, and a `data-dds-nav-close` button inside the
+         panel all close and return focus to the toggle; a link inside closes
+         without the focus restore (it goes to another page). The close button
+         mirrors `.dds-contentnav-close` — the header's morphed "close" icon is
+         behind the scrim once the drawer is open, and covered at phone widths;
        - a ResizeObserver unwinds the scroll lock and `inert` if the header
          grows past 48rem while open — the CSS makes the nav inline again on its
          own, but cannot undo state set on `<html>` and the content.
@@ -81,6 +84,10 @@
     var drawer = toggle.hasAttribute('data-dds-drawer');
     var scrim = drawer && frame ? frame.querySelector('[data-dds-nav-scrim]') : null;
     var content = drawer ? document.querySelector('[data-dds-nav-content]') : null;
+    // The in-panel close (mirrors contentnav): the header's morphed "close" is
+    // behind the scrim once the drawer is open, and covered outright at phone
+    // widths (#154).
+    var closeButton = drawer ? nav.querySelector('[data-dds-nav-close]') : null;
 
     function isOpen() {
       return toggle.getAttribute('aria-expanded') === 'true';
@@ -143,6 +150,14 @@
     // Clicking the scrim is clicking "outside": the drawer's other dismiss.
     if (scrim) {
       scrim.addEventListener('click', function () {
+        setOpen(false);
+        toggle.focus();
+      });
+    }
+
+    // The in-panel close: same outcome as Escape, without needing a keyboard.
+    if (closeButton) {
+      closeButton.addEventListener('click', function () {
         setOpen(false);
         toggle.focus();
       });

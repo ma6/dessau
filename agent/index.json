@@ -923,6 +923,7 @@
         ".dds-siteheader-toggle-menu",
         ".dds-siteheader-toggle-close",
         ".dds-siteheader-scrim",
+        ".dds-siteheader-drawer-close",
         ".dds-primary-nav"
       ],
       "css": "dds/css/components-navigation.css",
@@ -933,9 +934,10 @@
         "data-dds-nav-toggle",
         "data-dds-drawer",
         "data-dds-nav-scrim",
-        "data-dds-nav-content"
+        "data-dds-nav-content",
+        "data-dds-nav-close"
       ],
-      "accessibility": "One nav, one DOM location. aria-expanded + aria-controls, not role=menu. hidden attribute. The toggle carries both the menu and close sprite icons; aria-expanded cross-fades between them. With data-dds-drawer the open nav is a modal panel: inert page content, scroll lock, Escape and scrim-click close and restore focus.",
+      "accessibility": "One nav, one DOM location. aria-expanded + aria-controls, not role=menu. hidden attribute. The toggle carries both the menu and close sprite icons; aria-expanded cross-fades between them. With data-dds-drawer the open nav is a modal panel: inert page content, scroll lock, and a data-dds-nav-close button first in the panel; Escape, scrim-click and that button close and restore focus.",
       "responsive": "container — dds-siteheader (inline-size >= 48rem)"
     },
     {

@@ -231,8 +231,12 @@
     inset-inline-end: 0;
     z-index: var(--dds-z-panel);
 
-    /* Out of flow now — the row-wrap sizing has no job here. */
+    /* Out of flow now — the row-wrap sizing has no job here. A column so the
+       close button can sit in the trailing corner above the list. */
     flex-basis: auto;
+    display: flex;
+    flex-direction: column;
+    gap: var(--dds-space-xs);
     inline-size: min(20rem, 85%);
     padding: var(--dds-space-md);
     overflow-y: auto;
@@ -280,6 +284,22 @@
   .dds-siteheader-scrim[data-dds-open] {
     opacity: 1;
     pointer-events: auto;
+  }
+
+  /* The drawer's own close, mirroring `.dds-contentnav-close`: a labelled button
+     in the trailing corner, kept first in the panel's DOM so it is also the
+     first tab stop. It exists because the header's menu→close morph is behind
+     the scrim once the drawer is open — and at phone widths the panel covers the
+     toggle outright (#154). Only drawn inside a `data-dds-drawer` header; the
+     wide container query hides it with the rest of the panel furniture. */
+  .dds-siteheader-drawer-close {
+    display: none;
+  }
+
+  .dds-siteheader:has(.dds-siteheader-toggle[data-dds-drawer]) .dds-siteheader-drawer-close {
+    display: inline-flex;
+    align-self: flex-end;
+    flex-shrink: 0;
   }
 
   /* The header's navigation is inline from 48rem and behind a disclosure below
@@ -339,6 +359,7 @@
     .dds-siteheader:has(.dds-siteheader-toggle[data-dds-drawer]) .dds-primary-nav:not([data-dds-open]) {
       position: static;
       z-index: auto;
+      display: block;
       inline-size: auto;
       padding: 0;
       overflow: visible;
@@ -351,6 +372,12 @@
     }
 
     .dds-siteheader-scrim {
+      display: none;
+    }
+
+    /* Scoped to match the narrow-layout `:has()` rule's specificity, or that
+       rule wins inside the container query too and the close stays visible. */
+    .dds-siteheader:has(.dds-siteheader-toggle[data-dds-drawer]) .dds-siteheader-drawer-close {
       display: none;
     }
   }

@@ -16,7 +16,7 @@
 <link rel="preload" href="assets/fonts/SpaceGrotesk-Variable-latin-ext.woff2" as="font"
       type="font/woff2" crossorigin>
 <link rel="stylesheet" href="assets/fonts.css?v=7ed937e9">
-<link rel="stylesheet" href="../dds/dds.css?v=df32f8aa">
+<link rel="stylesheet" href="../dds/dds.css?v=15e08ecb">
 <link rel="stylesheet" href="assets/reference.css?v=ba64d6f2">
 </head>
 <body>
@@ -443,8 +443,10 @@
           Add <code class="dds-code">data-dds-drawer</code> to the toggle and a
           sibling <code class="dds-code">.dds-siteheader-scrim</code> and the
           collapsed nav opens as a modal panel instead of pushing the page down:
-          scrim, scroll-lock, <code class="dds-code">inert</code> content, Escape.
-          Narrow the width switcher below 48rem, open it, then try Tab and Escape.
+          scrim, scroll-lock, <code class="dds-code">inert</code> content, a
+          <code class="dds-code">data-dds-nav-close</code> button first in the
+          panel, Escape. Narrow the width switcher below 48rem, open it, then try
+          Tab and Escape.
         </p>
 
         <div data-ref-bp>
@@ -466,6 +468,11 @@
               </button>
 
               <nav class="dds-primary-nav" id="demo-drawer-nav" aria-label="Main" hidden>
+                <button type="button" class="dds-siteheader-drawer-close dds-button dds-button-subtle dds-button-sm"
+                        data-dds-nav-close>
+                  <svg class="dds-icon" aria-hidden="true" focusable="false"><use href="#dds-icon-close"/></svg>
+                  Close
+                </button>
                 <ul>
                   <li><a href="#siteheader" aria-current="page">Projects</a></li>
                   <li><a href="#siteheader">Documents</a></li>
@@ -1442,7 +1449,7 @@
 <script src="../dds/js/dds.js?v=0255c6fd" defer></script>
 <script src="../dds/js/format.js?v=8f2e10f1" defer></script>
 <script src="../dds/js/components.js?v=c1e84998" defer></script>
-<script src="../dds/js/components-navigation.js?v=7324bf7f" defer></script>
+<script src="../dds/js/components-navigation.js?v=4a0df101" defer></script>
 <script src="assets/reference.js?v=4390e1aa" defer></script>
 <script src="assets/reference-tools.js?v=cb237f74" defer></script>
 </body>

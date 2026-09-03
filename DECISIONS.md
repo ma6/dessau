@@ -2933,6 +2933,16 @@ non-open dialog with `dialog:not([open]) { display: none }` — overriding
 which is exactly what `scripts/check-css.mjs` guards against. `inert` on the
 content plus a scroll lock is what `showModal()` would have provided anyway.
 
+**The in-panel close (`#154`, added straight after).** The morph makes the
+header toggle read as a close control, but once the drawer is open that toggle
+is behind the scrim, and at phone widths `inline-size: min(20rem, 85%)` leaves
+it fully covered by the panel. Escape / scrim / link still dismiss, but a touch
+user staring at a panel with no visible way out is a real gap. So the drawer
+carries the same in-panel close `contentnav` does — `.dds-siteheader-drawer-close`
+with `data-dds-nav-close`, first in the panel DOM so it is the first tab stop,
+hidden with the rest of the panel furniture above 48rem. The morph stays: at the
+wider drawer sizes the toggle is not occluded and both reads are fine.
+
 **Cost.** A second `:has(.dds-siteheader-toggle[data-dds-drawer])`-scoped block
 of panel CSS that has to be unwound explicitly in the wide container query, the
 way the contentnav column already is. The `nav-toggle` enhancement is no longer
@@ -2974,11 +2984,18 @@ existing consumer pinned to `1.1.x` breaks, but there is a new thing to opt into
   disclosure and the drawer); and `data-dds-drawer` + a `.dds-siteheader-scrim`
   sibling turn the collapsed nav into a modal panel using `contentnav`'s
   off-canvas machinery. Reasoning in `066`.
+- `#154` `fix(siteheader)` — the drawer gains its own in-panel close
+  (`.dds-siteheader-drawer-close` / `data-dds-nav-close`), first in the panel and
+  the first tab stop, because the header's morphed close is behind the scrim once
+  the drawer is open. Accessibility fix on `#151`'s own surface, before it ever
+  shipped; folded in. Also in `066`.
 
-**Why one tag for both.** `#152` landed first and is a fix; `#151` is the
-feature. Neither has reached a tag, so there is no consumer sitting on `1.1.2`
-who needs `#152` without `#151`. `059`'s one-version-a-day cadence is not in
-play — there has been no bump today.
+(`#153` also rode along — see the note below.)
+
+**Why one tag for all of them.** `#152` is a fix, `#151` the feature, `#154` an
+accessibility fix on `#151`'s surface found straight after. None has reached a
+tag, so there is no consumer sitting on `1.1.2` who needs one without the others.
+`059`'s one-version-a-day cadence is not in play — there has been no bump today.
 
 **How it was cut.** `npm run check` clean (including `check:version`, which
 verified the `VERSION` and `package.json` bumps agree before the commit — its

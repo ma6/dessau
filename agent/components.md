@@ -959,8 +959,12 @@ own full-width row in flow.
 `<div class="dds-siteheader-scrim" data-dds-nav-scrim>` and the collapsed nav
 opens as a modal panel instead: it slides from the inline-end edge, the scrim is
 a real click-to-close target, `<html>` gets `.dds-scroll-locked`, and the
-element marked `data-dds-nav-content` is made `inert`. Escape and a scrim click
-close and restore focus to the toggle; a link inside closes without it. This is
+element marked `data-dds-nav-content` is made `inert`. A
+`.dds-siteheader-drawer-close` button carrying `data-dds-nav-close` goes first in
+the panel (its first tab stop), mirroring `.dds-contentnav-close` — the header's
+morphed close icon is behind the scrim once the drawer is open, and covered by
+the panel at phone widths. Escape, a scrim click and that button all close and
+restore focus to the toggle; a link inside closes without it. This is
 `contentnav`'s off-canvas machinery pointed at the primary nav — same ARIA
 contract. Without the flag and the scrim element the header is the in-flow
 disclosure, unchanged.
