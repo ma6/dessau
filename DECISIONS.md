@@ -3022,9 +3022,9 @@ existing consumer pinned to `1.1.x` breaks, but there is a new thing to opt into
 scroll lock centralised into `dds.js`, `068`), and `#155` → `#157` (the closed
 drawer panel collapsed so it does not widen the page — `#155`'s `clip-path` did
 not work, `#157` replaced it, `066`) all landed on `main` *after* `v1.2.0` was
-cut, so they are **not** in the released bundle. They are all `fix`es on the
-drawer / scroll-lock surface `1.2.0` introduced and are batched for the next
-tag, which entry `069` records once it is cut.
+cut, so they are **not** in the `1.2.0` bundle. They are all `fix`es on the
+drawer / scroll-lock surface `1.2.0` introduced and shipped together as `1.2.1`,
+entry `069`.
 
 **Why one tag for `#151`/`#152`.** `#152` is a fix, `#151` the feature. Neither
 had reached a tag, so there was no consumer sitting on `1.1.2` who needed `#152`
@@ -3104,3 +3104,50 @@ seen to fail without `preventScroll`.
 **Reversal condition.** The platform ships a real scroll-lock primitive (a
 proposal exists), at which point both this and `scrollbar-gutter: stable` defer
 to it.
+
+---
+
+## 069 — 1.2.1: the drawer and scroll-lock fixes that missed the 1.2.0 tag
+
+**Decision.** `package.json` and `DDS.version` move to `1.2.1`. The bundle a
+consumer pins is `1.2.0` plus three fixes, all on the surface `1.2.0`'s
+site-header drawer introduced, plus the `VERSION` constant and the one
+cache-busting hash that follows from it.
+
+**What is in the tag.** All landed on `main` after `v1.2.0` was cut at `510e28f`
+(`067`):
+
+- `#154` `fix(siteheader)` — the drawer carries its own in-panel close
+  (`.dds-siteheader-drawer-close` / `data-dds-nav-close`), first in the panel and
+  its first tab stop. The header's morphed close is behind the scrim once the
+  drawer is open, and covered by the panel at phone widths. Reasoning in `066`.
+- `#156` `fix(a11y)` — the page scroll lock is one implementation in `dds.js`
+  (`DDS.lockScroll` / `DDS.unlockScroll`), reference-counted across the dialog,
+  the image viewer, the drawer and the content nav panel, and it keeps the
+  scroll offset that `overflow: hidden` on the root drops on some engines; the
+  drawer and `contentnav` restore focus with `preventScroll`. Reasoning in
+  `068`. This is the one line that could read as a minor — two new functions on
+  `DDS` — but they are the internal refactor the fix required, exposed so the
+  four callers share one lock rather than a headline capability, so it stays a
+  patch. `037`'s implementation/contract line.
+- `#155` → `#157` `fix(siteheader)` — the closed drawer panel is collapsed to a
+  zero-size box (`inline-size`, padding, inline-start border), so the fixed panel
+  parked past the inline-end edge cannot widen the page when the consumer's
+  header is its containing block. `#155` shipped `clip-path` for this in the
+  `v1.2.0`-adjacent window and it did not work — paint-time clip, not the layout
+  box — so `#157` reopened and replaced it. Reasoning in `066`.
+
+**Still open.** Opening the drawer by pointer from a scrolled position can jump
+the page: the browser's native click-focus scrolls the toggle into view against
+the consumer's `scroll-padding`, and that is not one of the component's own
+`.focus()` calls that `#156` fixed. Tracked on `#157`; a `scroll-margin-block: 0`
+on the sticky toggle is the likely fix and did not need to hold up this cut.
+
+**How it was cut.** `npm run check` clean (`check:version` verified the two bumps
+agree). Full Playwright suite green on all three engines. `sync-cache-busting.mjs`
+re-stamped the `dds.js` hash. The GitHub matrix runs only on the tag push
+(`062`) and the account's Actions billing block fails it before it starts, so
+`npm run build` + the release-and-attach are by hand as in `064` — cut at the
+`8e71763` tree.
+
+**Reversal condition.** None. The number describes what changed.
