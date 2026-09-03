@@ -2943,18 +2943,36 @@ with `data-dds-nav-close`, first in the panel DOM so it is the first tab stop,
 hidden with the rest of the panel furniture above 48rem. The morph stays: at the
 wider drawer sizes the toggle is not occluded and both reads are fine.
 
-**The closed panel's ink (`#155`).** Column-stacking the close button made the
-drawer panel `display: flex` in its closed state too. `contentnav` slides from
+**The closed panel's phantom width (`#155` → `#157`).** `contentnav` slides from
 the inline-start edge, where a `translate`-parked fixed box does not extend the
 page's scrollable width; the site-header drawer slides from the inline-**end**
 edge, where it can — and did, ~300px of horizontal scroll on a phone with the
 drawer never opened, whenever the consumer's header is the fixed panel's
-containing block. The fix keeps the composited `translate` slide and adds
-`clip-path: inset(0 0 0 100%)` to the resting closed state (delayed past the
-transition), so the box that sits off-screen paints nothing. Not reproducible in
-this repo's own environment — the reference page's containing-block chain
-differs — so the regression test guards the mechanism (clip present when closed,
-gone when open), not a measured overflow.
+containing block (a `backdrop-filter` header is enough).
+
+`#155` tried `clip-path: inset(0 0 0 100%)` on the resting box. That was wrong
+and `#157` reopened it: `clip-path` clips *paint*, not the layout box, so the
+box still counts toward scrollable overflow — measured 306px on the consumer's
+pin *with the clip applied*. The repo's own reference page never exercised it
+(the `.ref-bp-scroll` wrapper absorbs the overflow before it reaches the
+document), so the first test passed against a bug that was still there.
+
+`#157`'s fix collapses the resting box instead — `inline-size`, padding and the
+inline-start border to zero, delayed past the transition so the composited
+`translate` slide-out still plays at full width. A zero-size box cannot extend
+anything, whatever its containing block. Reproduced this time in a
+consumer-shaped fixture (`backdrop-filter` header, no scrolling wrapper): 306 → 0
+on all three engines, closed; unchanged open. The test measures the resting
+panel's own width (~0 with the fix, ~306 without) rather than document overflow,
+so it does not depend on the page around it.
+
+Still open, noted on `#157`: opening the drawer by pointer from a scrolled
+position can jump the page, because the browser's own click-focus scrolls the
+toggle into view against the consumer's `scroll-padding`. `#156`'s
+`preventScroll` covers the component's own `.focus()` calls (the close path); the
+open path is native and not one of them. A sticky disclosure toggle never needs
+revealing — a `scroll-margin-block: 0` on it, or the consumer setting it — is the
+likely fix, tracked separately.
 
 **Cost.** A second `:has(.dds-siteheader-toggle[data-dds-drawer])`-scoped block
 of panel CSS that has to be unwound explicitly in the wide container query, the
@@ -3001,11 +3019,12 @@ existing consumer pinned to `1.1.x` breaks, but there is a new thing to opt into
 - `#153` `fix(reference)` — reference-chrome only, rode along; the note below.
 
 **After the tag.** `#154` (the drawer's in-panel close, `066`), `#156` (the
-scroll lock centralised into `dds.js`, `068`) and `#155` (the closed drawer
-panel clipped so it does not widen the page, `066`) all landed on `main` *after*
-`v1.2.0` was cut, so they are **not** in the released bundle. They are all
-`fix`es on the drawer / scroll-lock surface `1.2.0` introduced and are batched
-for the next tag, which entry `069` records once it is cut.
+scroll lock centralised into `dds.js`, `068`), and `#155` → `#157` (the closed
+drawer panel collapsed so it does not widen the page — `#155`'s `clip-path` did
+not work, `#157` replaced it, `066`) all landed on `main` *after* `v1.2.0` was
+cut, so they are **not** in the released bundle. They are all `fix`es on the
+drawer / scroll-lock surface `1.2.0` introduced and are batched for the next
+tag, which entry `069` records once it is cut.
 
 **Why one tag for `#151`/`#152`.** `#152` is a fix, `#151` the feature. Neither
 had reached a tag, so there was no consumer sitting on `1.1.2` who needed `#152`

@@ -198,30 +198,25 @@ test('the close button is gone once the nav is inline', async ({ page }) => {
   await expect(closeButton(page)).toBeHidden();
 });
 
-test('the closed drawer panel does not widen the page', async ({ page }) => {
+test('the closed drawer panel is collapsed so it cannot widen the page', async ({ page }) => {
   await page.setViewportSize({ width: 360, height: 760 });
   await page.goto(NAVIGATION);
   await setContainerWidth(page, DRAWER);
 
-  // Parked off the inline-end edge with `translate`, the fixed panel is counted
-  // toward the document's scrollable width by some engines when the header is
-  // its containing block (#155). Clipping the resting box removes that ink.
-  const state = await page.evaluate(() => {
-    const n = document.querySelector('#siteheader-drawer .dds-primary-nav');
-    const de = document.documentElement;
-    return {
-      clipped: getComputedStyle(n).clipPath !== 'none',
-      pageOverflowX: Math.round(de.scrollWidth - de.clientWidth),
-    };
-  });
-  expect(state.clipped, 'the closed drawer panel is not clipped').toBe(true);
-  expect(state.pageOverflowX, 'the closed drawer widened the page').toBeLessThanOrEqual(0);
+  // The fixed panel is parked past the inline-end edge with `translate`, and
+  // some engines count that toward the page's scrollable width when the
+  // consumer's header is its containing block (a `backdrop-filter` header is
+  // enough) — ~300px of phantom horizontal scroll with the drawer never opened.
+  // `clip-path` clips paint, not the layout box, so it did not fix it (#155,
+  // #157). Zeroing the box does: the resting panel measures ~0 wide.
+  const closed = await nav(page).evaluate((n) => n.getBoundingClientRect().width);
+  expect(closed, 'the closed drawer panel still has width to overflow with').toBeLessThan(2);
 
-  // Opening clears the clip so the panel renders in full.
+  // ...and opens to its full size.
   await toggle(page).click();
   await expect(nav(page)).toHaveAttribute('data-dds-open', '');
-  const openClip = await nav(page).evaluate((n) => getComputedStyle(n).clipPath);
-  expect(openClip).toBe('none');
+  const open = await nav(page).evaluate((n) => n.getBoundingClientRect().width);
+  expect(open, 'the drawer did not expand on open').toBeGreaterThan(200);
 });
 
 test('following a link closes the drawer without taking focus back', async ({ page }) => {
