@@ -2987,7 +2987,8 @@ icon classes), and a `drawer` branch through the `nav-toggle` enhancement. Per
 `037`'s implementation/contract line that is a minor, not a patch — nothing an
 existing consumer pinned to `1.1.x` breaks, but there is a new thing to opt into.
 
-**What is in the tag.**
+**What is in the tag.** `v1.2.0` is at `510e28f`. It contains:
+
 - `#152` `fix(siteheader)` — the collapsed row ends with the disclosure button,
   actions to its left (`order` 98/99/100, a `:has()` gap hand-off, the wide
   query restoring the pre-change values explicitly). A patch on its own; it
@@ -2997,36 +2998,29 @@ existing consumer pinned to `1.1.x` breaks, but there is a new thing to opt into
   disclosure and the drawer); and `data-dds-drawer` + a `.dds-siteheader-scrim`
   sibling turn the collapsed nav into a modal panel using `contentnav`'s
   off-canvas machinery. Reasoning in `066`.
-- `#154` `fix(siteheader)` — the drawer gains its own in-panel close
-  (`.dds-siteheader-drawer-close` / `data-dds-nav-close`), first in the panel and
-  the first tab stop, because the header's morphed close is behind the scrim once
-  the drawer is open. Accessibility fix on `#151`'s own surface, before it ever
-  shipped; folded in. Also in `066`.
-- `#156` `fix(a11y)` — the scroll lock moves into `dds.js`
-  (`DDS.lockScroll` / `DDS.unlockScroll`), reference-counted across every modal
-  surface and keeping the scroll offset that `overflow: hidden` on the root can
-  drop; the drawer and `contentnav` restore focus with `preventScroll`. Entry
-  `068`.
-- `#155` `fix(siteheader)` — the closed drawer panel is `clip-path`-ed to
-  nothing, so the `translate`-parked fixed box no longer widens the page on a
-  phone when the consumer's header is its containing block. Follow-up to `#154`,
-  same untagged cut. Also in `066`.
+- `#153` `fix(reference)` — reference-chrome only, rode along; the note below.
 
-(`#153` also rode along — see the note below.)
+**After the tag.** `#154` (the drawer's in-panel close, `066`), `#156` (the
+scroll lock centralised into `dds.js`, `068`) and `#155` (the closed drawer
+panel clipped so it does not widen the page, `066`) all landed on `main` *after*
+`v1.2.0` was cut, so they are **not** in the released bundle. They are all
+`fix`es on the drawer / scroll-lock surface `1.2.0` introduced and are batched
+for the next tag, which entry `069` records once it is cut.
 
-**Why one tag for all of them.** `#152` is a fix, `#151` the feature, `#154` and
-`#156` accessibility fixes on `#151`'s surface found straight after. None has
-reached a tag, so there is no consumer sitting on `1.1.2` who needs one without
-the others. `059`'s one-version-a-day cadence is not in play — no bump today.
+**Why one tag for `#151`/`#152`.** `#152` is a fix, `#151` the feature. Neither
+had reached a tag, so there was no consumer sitting on `1.1.2` who needed `#152`
+without `#151`. `059`'s one-version-a-day cadence was not in play — no earlier
+bump that day.
 
 **How it was cut.** `npm run check` clean (including `check:version`, which
 verified the `VERSION` and `package.json` bumps agree before the commit — its
 first real catch-window since `1.1.1`), the affected Playwright specs
 (`siteheader`, `siteheader-drawer`, `contentnav`, `landmarks`, `enhancement`,
-`viewport`, `reference-nav`) green on all three engines in isolation.
-`sync-cache-busting.mjs` re-stamped the one `dds.js` hash that follows from the
-`VERSION` line. The GitHub matrix still runs only on the tag push (`062`); the
-bundle-and-attach step is by hand as in `064`.
+`viewport`, `reference-nav`) green on all three engines. `sync-cache-busting.mjs`
+re-stamped the one `dds.js` hash that follows from the `VERSION` line. The GitHub
+matrix runs only on the tag push (`062`) and the account's Actions billing block
+fails it before it starts, so the release was created and `dds.css` /
+`dds.min.css` attached by hand as in `064` — the tag at `510e28f`.
 
 **Rode along: `#153`.** `tests/reference-nav.spec.mjs`'s 320px case ("the theme
 toggle is the last control in the header row") was failing during this cut —
