@@ -104,7 +104,7 @@
 @import url("./css/components-content.css?v=7073ee51");
 
 /* Compositions that solve a user task. */
-@import url("./css/patterns.css?v=932f9146");
+@import url("./css/patterns.css?v=cb49e69e");
 @import url("./css/patterns-flows.css?v=3f9d309c");
 
 /* Single-purpose helpers. Last, so they win inside DDS. */

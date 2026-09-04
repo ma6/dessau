@@ -14,7 +14,7 @@
 
    Section index:
      Combobox · Address search · Form · Error summary · Results ·
-     Empty state · Conditional fields
+     Empty state · Conditional fields · Consent gate
    ============================================================================= */
 
 @layer dds.patterns {
@@ -463,6 +463,80 @@
           block-size: 0;
           opacity: 0;
         }
+      }
+    }
+  }
+
+  /* ==========================================================================
+     Consent gate
+     ==========================================================================
+     A page-level, remembered opt-in for something that would otherwise load
+     unasked — a self-hosted analytics script, a marketing tag. The visual is
+     `.dds-banner`; this pattern pins it to the bottom of the viewport, floats
+     it clear of the content, and lets the page carry on behind it.
+
+     `role="dialog"` with `aria-labelledby` on the `.dds-consentgate`, placed at
+     the end of `<body>`. It is NOT modal: it must not block first paint and the
+     page stays usable while the choice is pending — doing nothing has to be a
+     real option, or "decline" is not as easy as "accept". Behaviour, the
+     `DDS.consent` contract and the no-JS path: js/patterns/consent-gate.js */
+  .dds-consentgate {
+    position: fixed;
+    inset-inline: 0;
+    inset-block-end: 0;
+    z-index: var(--dds-z-panel);
+
+    padding: var(--dds-space-sm);
+    /* Keep the card above the home indicator / gesture bar on a phone. */
+    padding-block-end: max(var(--dds-space-sm), env(safe-area-inset-bottom));
+
+    display: flex;
+    justify-content: center;
+
+    /* The fixed layer itself must not swallow clicks meant for the page — only
+       the card is interactive. This is what keeps "carry on without choosing"
+       available rather than trapped behind an invisible sheet. */
+    pointer-events: none;
+  }
+
+  .dds-consentgate[hidden] {
+    display: none;
+  }
+
+  .dds-consentgate > .dds-banner {
+    pointer-events: auto;
+
+    inline-size: 100%;
+    /* Full width on a phone; capped at a readable measure on a wide screen so
+       it reads as a card, not a stripe. Adapts with no breakpoint. */
+    max-inline-size: var(--dds-measure-default);
+
+    /* It floats now, so the banner's edge-to-edge, no-radius reasoning no
+       longer applies: give it the full frame of a raised surface. */
+    border: var(--dds-border-thin) solid var(--dds-color-border-default);
+    border-radius: var(--dds-radius-md);
+    box-shadow: var(--dds-elevation-lg);
+  }
+
+  /* The two buttons are peers: equal weight, side by side, wrapping together.
+     Declining must never be the quiet option. */
+  .dds-consentgate-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--dds-space-xs);
+    margin-block-start: var(--dds-space-sm);
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .dds-consentgate > .dds-banner {
+      transition: translate var(--dds-duration-fast) var(--dds-ease-standard),
+        opacity var(--dds-duration-fast) var(--dds-ease-standard);
+    }
+
+    @starting-style {
+      .dds-consentgate > .dds-banner {
+        translate: 0 100%;
+        opacity: 0;
       }
     }
   }

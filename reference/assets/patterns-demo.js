@@ -219,7 +219,50 @@
     });
   }
 
+  /* =========================================================================
+     Consent gate demo
+     =========================================================================
+     `consent-gate.js` ships `DDS.consent` and the banner behaviour. This wiring
+     is the product's half: a policy version, and the `onChange` subscription
+     that would inject the analytics script — here it just narrates what would
+     happen, so the reference does not actually load a tracker.
+     ========================================================================= */
+
+  var CONSENT_NAME = 'analytics-demo';
+
+  var CONSENT_STATUS = {
+    granted: 'Granted — the product would inject the analytics script now, and again on every future visit.',
+    denied: 'Declined — nothing is loaded, now or on return visits, until the choice is changed.',
+    none: 'No decision yet — the gated script stays unloaded.',
+  };
+
+  function initConsentDemo() {
+    if (!DDS.consent) return;
+
+    // The policy version is declared in the page head
+    // (<meta name="dds-consent-policy">), the same as a real product would — so
+    // it is in place before the gate is enhanced. Nothing to configure here.
+
+    var status = document.getElementById('ref-consent-status');
+    if (status) {
+      DDS.consent.onChange(CONSENT_NAME, function (event) {
+        status.textContent = CONSENT_STATUS[event.state || 'none'];
+      });
+    }
+
+    var reset = document.getElementById('ref-consent-reset');
+    if (reset) {
+      reset.addEventListener('click', function () {
+        DDS.consent.clear(CONSENT_NAME);
+        var gate = document.querySelector('[data-dds-consent="' + CONSENT_NAME + '"]');
+        if (gate) gate.hidden = false;
+      });
+    }
+  }
+
   function init() {
+    initConsentDemo();
+
     var buttons = Array.prototype.slice.call(
       document.querySelectorAll('[data-ref-provider]')
     );

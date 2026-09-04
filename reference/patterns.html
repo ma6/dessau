@@ -9,6 +9,8 @@
 <title>Patterns — Dessau DS</title>
 <meta name="description" content="Dessau DS pattern reference: address search, autocomplete, accessible form validation, search and results, conditional fields and empty states.">
 <meta name="color-scheme" content="dark light">
+<!-- The consent-gate demo reads this: bump it and every stored decision goes stale. -->
+<meta name="dds-consent-policy" content="2026-09-01">
 <link rel="icon" href="assets/brand/dessau-icon.svg" type="image/svg+xml">
 <script src="../dds/js/theme-init.js?v=eb2c6b3a"></script>
 <link rel="preload" href="assets/fonts/Inter-Variable-latin-ext.woff2" as="font"
@@ -16,7 +18,7 @@
 <link rel="preload" href="assets/fonts/SpaceGrotesk-Variable-latin-ext.woff2" as="font"
       type="font/woff2" crossorigin>
 <link rel="stylesheet" href="assets/fonts.css?v=7ed937e9">
-<link rel="stylesheet" href="../dds/dds.css?v=46aa7cbb">
+<link rel="stylesheet" href="../dds/dds.css?v=3f2fd7e4">
 <link rel="stylesheet" href="assets/reference.css?v=ba64d6f2">
 </head>
 <body>
@@ -333,6 +335,7 @@
               <li><a href="#auth">Authentication</a></li>
               <li><a href="#filtering">Filtering</a></li>
               <li><a href="#conditional">Conditional fields</a></li>
+              <li><a href="#consent-gate">Consent gate</a></li>
             </ul>
             <!-- REF_TOC:END -->
           </nav>
@@ -1548,6 +1551,101 @@
         </div>
       </section>
 
+      <!-- ======================================================= consent gate -->
+      <section class="ref-section" id="consent-gate">
+        <div class="ref-section-head">
+          <h2>Consent gate</h2>
+          <p class="dds-text-subtle dds-measure-default dds-mbs-xs">
+            A page-level, <em>remembered</em> opt-in for something that would
+            otherwise load unasked — a self-hosted analytics script. No new
+            component: <code class="dds-code">.dds-banner</code> as a non-modal
+            <code class="dds-code">role="dialog"</code>, pinned to the bottom of
+            the viewport. The pattern is the choice, the memory of it, and the
+            <code class="dds-code">DDS.consent</code> contract the product's
+            script-injection code subscribes to.
+          </p>
+        </div>
+
+        <div class="ref-specimen">
+          <p class="dds-text-sm dds-text-subtle dds-measure-default dds-mbs-sm">
+            Normally at the end of <code class="dds-code">&lt;body&gt;</code> and
+            <code class="dds-code">position: fixed</code>; shown
+            <code class="dds-code">static</code> here so it stays inside this
+            example. The gated script is not real — the line below stands in for
+            <q>the product would inject the analytics script now</q>.
+          </p>
+
+          <div class="dds-consentgate" role="dialog" aria-labelledby="ref-consent-title"
+               data-dds-consent="analytics-demo"
+               style="position: static; z-index: auto"
+               hidden>
+            <form class="dds-banner" method="post" action="#consent-gate">
+              <svg class="dds-icon" aria-hidden="true" focusable="false"><use href="#dds-icon-info"/></svg>
+              <div class="dds-banner-body">
+                <p class="dds-banner-title" id="ref-consent-title">Analytics that stays on our servers</p>
+                <p>
+                  We would like to load a self-hosted analytics script to see
+                  which pages get used. No advertising cookies, nothing shared
+                  with anyone else. <a href="#">What we measure</a>.
+                </p>
+                <div class="dds-consentgate-actions">
+                  <button type="submit" class="dds-button dds-button-primary"
+                          data-dds-consent-set="granted" name="consent" value="granted">
+                    Allow analytics
+                  </button>
+                  <button type="submit" class="dds-button dds-button-secondary"
+                          data-dds-consent-set="denied" name="consent" value="denied">
+                    Decline
+                  </button>
+                </div>
+              </div>
+            </form>
+          </div>
+
+          <div class="dds-cluster dds-cluster-sm dds-mbs-md">
+            <button type="button" class="dds-button dds-button-subtle dds-button-sm"
+                    data-dds-consent-reopen="analytics-demo">
+              Privacy choices
+            </button>
+            <button type="button" class="dds-button dds-button-subtle dds-button-sm"
+                    id="ref-consent-reset">
+              Reset this choice
+            </button>
+          </div>
+
+          <p class="dds-hint dds-mbs-sm" role="status" id="ref-consent-status">
+            No decision yet — the gated script stays unloaded.
+          </p>
+
+          <div class="ref-note dds-mbs-md">
+            <h3 class="dds-text-sm dds-weight-semibold">Decline is not the quiet option</h3>
+            <p class="dds-text-sm dds-text-subtle dds-mbs-2xs">
+              Both buttons are real <code class="dds-code">&lt;button&gt;</code>s of
+              peer weight — <code class="dds-code">data-dds-consent-set="denied"</code>
+              is never a link and never <code class="dds-code">.dds-button-subtle</code>.
+              There is no dismiss control, Escape does nothing, and the bar is not
+              dismissible without a choice: under TTDSG §25, silence is not a yes.
+            </p>
+            <p class="dds-text-sm dds-text-subtle dds-mbs-xs">
+              The bar is non-modal and <code class="dds-code">pointer-events: none</code>
+              bar the card, so the page stays usable while the choice is pending —
+              doing nothing has to be a genuine third option. Focus moves into the
+              bar only when it is re-opened from <q>Privacy choices</q>, and
+              returns there once a choice is made. It never traps.
+            </p>
+            <p class="dds-text-sm dds-text-subtle dds-mbs-xs">
+              <code class="dds-code">DDS.consent.onChange('analytics', fn)</code>
+              fires once immediately and on every later change, so the product
+              writes one branch that injects the script on
+              <code class="dds-code">granted</code> and covers both the first
+              decision and every return visit. A bumped
+              <code class="dds-code">&lt;meta name="dds-consent-policy"&gt;</code>
+              makes every stored decision stale and re-opens the bar.
+            </p>
+          </div>
+        </div>
+      </section>
+
         </div>
       </div>
     </div>
@@ -1570,6 +1668,7 @@
 <script src="../dds/js/patterns/upload-flow.js?v=1b4178dd" defer></script>
 <script src="../dds/js/patterns/form-validation.js?v=174901cf" defer></script>
 <script src="../dds/js/patterns/conditional-fields.js?v=a4027025" defer></script>
+<script src="../dds/js/patterns/consent-gate.js?v=07ef0827" defer></script>
 <script src="../dds/js/patterns/wizard.js?v=4be31a39" defer></script>
 <script src="../dds/js/patterns/derived-output.js?v=fc903306" defer></script>
 <script src="../dds/js/patterns/auth.js?v=1a130f01" defer></script>
@@ -1577,6 +1676,6 @@
 <script src="../dds/js/patterns/address-search.js?v=7f0f1a24" defer></script>
 <script src="assets/reference.js?v=4390e1aa" defer></script>
 <script src="assets/reference-tools.js?v=cb237f74" defer></script>
-<script src="assets/patterns-demo.js?v=18c61295" defer></script>
+<script src="assets/patterns-demo.js?v=f64e9f25" defer></script>
 </body>
 </html>

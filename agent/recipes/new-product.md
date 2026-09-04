@@ -158,6 +158,7 @@ platform does not provide — the shell above loads the first three.
 | `js/patterns/wizard.js` | Multi-step form |
 | `js/patterns/derived-output.js` | A read-only value resolved from input |
 | `js/patterns/auth.js` | Confirming a new password against its repeat |
+| `js/patterns/consent-gate.js` | `DDS.consent` plus the remembered, page-level consent bar that blocks a script until it is granted |
 
 All `defer`, all in that order. Adding markup later? `DDS.enhance(element)` — that
 is the whole integration for dynamic content.

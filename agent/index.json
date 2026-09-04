@@ -1493,6 +1493,27 @@
       ],
       "accessibility": "A rejection says why and what to do. One failure does not discard the others.",
       "responsive": "none — nothing about it changes with width"
+    },
+    {
+      "name": "consent-gate",
+      "purpose": "A page-level, remembered opt-in that blocks a script until it is granted.",
+      "notFor": "One third-party embed — use the embed component, which forgets the choice.",
+      "classes": [
+        ".dds-consentgate",
+        ".dds-consentgate-actions"
+      ],
+      "css": "dds/css/patterns.css",
+      "spec": "## Consent gate — `.dds-consentgate`",
+      "reference": "reference/patterns.html#consent-gate",
+      "js": "dds/js/patterns/consent-gate.js",
+      "hooks": [
+        "data-dds-consent",
+        "data-dds-consent-set",
+        "data-dds-consent-reopen",
+        "data-dds-consent-label"
+      ],
+      "accessibility": "role=dialog, non-modal. No implicit consent: no dismiss, Escape does nothing. Decline is equal weight, never subtle. Focus moves in only on re-open, never traps. Announced politely.",
+      "responsive": "self — full-width on a phone, capped at a readable measure on a wide screen"
     }
   ]
 }

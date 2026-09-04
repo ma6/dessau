@@ -34,10 +34,11 @@ a `.ref-note` on the rendered page. This is the index of it.
 | `address-search` | dds-address (inline-size > 26rem) |
 | `filtering` | dds-filtering (inline-size >= 52rem) |
 
-**Adapts by itself, with no threshold** — 4
+**Adapts by itself, with no threshold** — 5
 
 | | |
 | --- | --- |
+| `consent-gate` | full-width on a phone, capped at a readable measure on a wide screen |
 | `derived-output` | the label column is a share of the row and wraps beyond it |
 | `form` | wraps when it runs out of room |
 | `review` | wraps when it runs out of room |
@@ -566,6 +567,138 @@ because the wording *is* the pattern.
 - The confirming button carries the verb; the cancelling one says what happens
   instead ("Keep project").
 - The destructive button is **not** the default focus target.
+
+---
+
+## Consent gate — `.dds-consentgate`
+
+**For:** a page-level, *remembered* opt-in for something that would otherwise
+load without asking — a self-hosted analytics script, a marketing tag.
+
+**Not for:** one third-party embed — use the `.dds-embed` component, which gates
+a single iframe and forgets the choice on purpose. This pattern is the
+remembered sibling: under TTDSG §25 + GDPR a page-wide analytics opt-in has to
+be remembered, revocable, and re-asked when the privacy notice changes.
+
+**Behaviour:** `dds/js/patterns/consent-gate.js`
+
+```html
+<!-- at the end of <body> -->
+<div class="dds-consentgate" role="dialog" aria-labelledby="consent-analytics-title"
+     data-dds-consent="analytics" hidden>
+  <form class="dds-banner" method="post" action="/consent/analytics">
+    <svg class="dds-icon" aria-hidden="true"><use href="#dds-icon-info"/></svg>
+    <div class="dds-banner-body">
+      <p class="dds-banner-title" id="consent-analytics-title">Analytics that stays on our servers</p>
+      <p>
+        We would like to load a self-hosted analytics script to see which pages
+        get used. No advertising cookies, nothing shared with anyone else.
+        <a href="/privacy">What we measure</a>.
+      </p>
+      <div class="dds-consentgate-actions">
+        <button type="submit" class="dds-button dds-button-primary"
+                data-dds-consent-set="granted" name="consent" value="granted">Allow analytics</button>
+        <button type="submit" class="dds-button dds-button-secondary"
+                data-dds-consent-set="denied" name="consent" value="denied">Decline</button>
+      </div>
+    </div>
+  </form>
+</div>
+```
+
+```html
+<!-- the revocation control, e.g. in .dds-sitefooter -->
+<button type="button" class="dds-button dds-button-subtle dds-button-sm"
+        data-dds-consent-reopen="analytics">Privacy choices</button>
+```
+
+```html
+<!-- the policy version — bump it when the notice materially changes -->
+<meta name="dds-consent-policy" content="2026-09-01">
+```
+
+### `DDS.consent` — DDS names the contract, the product owns the value
+
+| Call | Does |
+| --- | --- |
+| `DDS.consent.get(name)` | `'granted'` \| `'denied'` \| `null`. A decision stamped with an **older policy version counts as `null`** — the gate re-opens. |
+| `DDS.consent.record(name)` | the raw `{ state, policy, at }`, ignoring policy staleness. |
+| `DDS.consent.set(name, state)` | persist the choice, stamp it with the current policy + an ISO timestamp, fire `dds:consent`. |
+| `DDS.consent.clear(name)` | forget it; fires with `state: null`. |
+| `DDS.consent.onChange(name, fn)` | `fn({ name, state, policy })` on every change **and once, synchronously, with the current state**. Returns an unsubscribe function. |
+| `DDS.consent.configure({ policy, storage })` | override the policy string; swap in a cookie-backed `{ get, set, remove }`. |
+| `DDS.consent.policy` | the current policy version string. |
+
+Storage defaults to `localStorage`, key `dds-consent:<name>`, value
+`{"state":"granted","policy":"2026-09-01","at":"…"}`. The consent decision is
+not PII, so `localStorage` is an acceptable home — unlike a session token. A
+product that needs the value *before* the page renders passes its own
+cookie-backed backend to `configure`. If storage is unavailable (private mode),
+`get` returns `null` and `set` still fires the event — gating works for the
+current page, it is just not remembered.
+
+### Gating the script — the recommended shape
+
+```js
+DDS.consent.onChange('analytics', function (e) {
+  if (e.state !== 'granted') return;               // denied or undecided
+  if (document.getElementById('analytics-js')) return;
+  var s = document.createElement('script');
+  s.id = 'analytics-js';
+  s.src = 'https://analytics.example/matomo.js';
+  s.async = true;
+  document.head.appendChild(s);
+});
+```
+
+`onChange` fires once immediately, so this one block covers both the first
+decision and every later visit. On `denied` there is nothing to do — a running
+script cannot be recalled; revocation takes effect on the next load, and the
+product should also clear the cookies that script set.
+
+### Rules, and why each exists
+
+1. **Nothing loads before the choice.** The gated `<script>` is injected by the
+   product only on `granted`, never speculatively. The module records the
+   decision; it never injects anything itself.
+
+2. **No implicit consent.** No dismiss control, Escape does nothing, and the
+   gate is not dismissible without pressing one of the buttons. A bar you can
+   wave away is a bar that counts silence as a yes — which TTDSG §25 does not.
+
+3. **Declining is exactly as easy as accepting.** Both are real `<button>`s of
+   peer weight — `data-dds-consent-set="denied"` is never a link and never
+   `.dds-button-subtle`. The gate is also non-modal and does not eat clicks
+   (`.dds-consentgate` is `pointer-events: none` bar the card), so carrying on
+   without choosing is a genuine third option.
+
+4. **It does not block first paint and does not steal focus on load.** On a
+   fresh visit the bar appears at the end of the document, reachable by Tab
+   where it sits — last, matching its pinned-to-the-bottom position. Focus moves
+   into it **only** when someone re-opens it from the revocation control, where
+   it behaves like a dialog they summoned; focus returns to that control once
+   they choose. It does **not** trap focus in either case.
+
+5. **Announced politely, never as an alert.** The re-open and the recorded
+   choice go through `DDS.announce` (`role="status"`). Interrupting a
+   screen-reader user to announce a consent bar is hostile.
+
+6. **Revocable.** A persistent `[data-dds-consent-reopen="<name>"]` control —
+   recommended in `.dds-sitefooter` — re-opens the gate. Consent that cannot be
+   withdrawn is not lawful consent.
+
+7. **A policy change re-prompts.** `<meta name="dds-consent-policy">` (or
+   `DDS.consent.configure({ policy })`) carries a version string. Bump it when
+   the privacy notice materially changes and every stored decision goes stale.
+
+### Without JavaScript
+
+The gated script never loads — the privacy-safe default holds. The two buttons
+are `type="submit"` inside a `<form method="post" action="…">` pointing at a
+product endpoint that records the choice in a cookie and redirects back. DDS
+documents that shape; the endpoint is the product's, the same way the upload
+flow's `upload` function is. With JavaScript the module intercepts the submit
+and never navigates.
 
 ---
 

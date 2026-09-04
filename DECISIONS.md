@@ -3151,3 +3151,73 @@ re-stamped the `dds.js` hash. The GitHub matrix runs only on the tag push
 `8e71763` tree.
 
 **Reversal condition.** None. The number describes what changed.
+
+## 070 — the consent gate is a pattern, and it ships `DDS.consent` (#158)
+
+**Decision.** A new **pattern**, "Consent gate" (`.dds-consentgate` +
+`dds/js/patterns/consent-gate.js`), for the common case neither `.dds-banner`
+nor `.dds-embed` covered: a page-level, *remembered* opt-in that blocks an
+analytics or marketing script until it is granted, with the EU/DE constraints
+from TTDSG §25 + GDPR — nothing loads before the choice, declining is as easy
+as accepting, the choice is revocable, and a policy change re-prompts.
+
+No new component and no token change. The visual is `.dds-banner` as a non-modal
+`role="dialog"`; the pattern layer pins it to the bottom of the viewport, floats
+it clear of the content, and — with `pointer-events: none` bar the card — lets
+the page carry on behind it. Neon inherits unchanged.
+
+**Why a pattern, not a component.** It is `.dds-banner` plus behaviour plus a
+storage contract plus a revocation control — a composition solving a recurring
+user task, which is the definition (rule 9). `.dds-embed` stays the component
+for the other case: one third-party iframe, choice deliberately *not*
+remembered, because re-consenting a single frame is cheap and a page-wide opt-in
+is not.
+
+**Why it ships `DDS.consent`, answering the issue's open question.** The
+alternative was a pure documented pattern with all storage left to the product.
+Rejected: the issue's own framing is that every consumer then either reinvents
+this or reaches for a third-party CMP — which injects third-party JS and sets
+its own cookies, counterproductive for a privacy control. A ~60-line first-party
+helper (`get` / `record` / `set` / `clear` / `onChange` / `configure` /
+`policy`, plus a `dds:consent` event) removes that pressure. `onChange` fires
+once synchronously with the current state, so the product's script-injection
+code is one branch that covers both the first decision and every return visit.
+
+**Why the helper lives in the pattern module, not `dds.js`.** `dds.js` is core
+that every page loads — register / enhance / announce / theme. Consent
+read/write is needed only by pages that gate a script, so it rides with
+`consent-gate.js`. A product that wants only the helper still loads one small
+file; a product that wants neither pays nothing. Same shape as `DDS.results`,
+`DDS.uploadFlow` and the other pattern-scoped surface.
+
+**Why DDS names the contract and the product owns the value.** Storage
+transport is a deployment decision: `localStorage` (the default, key
+`dds-consent:<name>`, value `{state, policy, at}`) versus a cookie the server
+can read before the page renders. The consent decision is not PII, so
+`localStorage` is a defensible default — unlike a session token. `configure`
+takes a cookie-backed `{ get, set, remove }` for the server-side case. If
+storage is unavailable, `get` returns `null` and `set` still fires the event, so
+gating works for the page — it is just not remembered.
+
+**Focus and timing.** Non-modal, and it must not block first paint. On a fresh
+visit the bar just appears at the end of `<body>`, reachable by Tab where it
+sits — last, matching its pinned position. Focus moves into it **only** when it
+is re-opened from the persistent `[data-dds-consent-reopen]` control, where it
+behaves like a summoned dialog and returns focus to that control on a choice. It
+never traps. The appearance-on-reopen and the recorded choice are announced
+politely through `DDS.announce` (`role="status"`), never as an alert. There is
+no dismiss control and Escape does nothing — TTDSG §25 does not count silence as
+consent.
+
+**Without JavaScript.** The gated script never loads — the safe default holds.
+The two buttons are `type="submit"` in a `<form method="post" action="…">`
+pointing at a product endpoint that records the choice in a cookie and redirects
+back. DDS documents that shape; the endpoint is the product's, the same
+division as the upload flow's `upload` function.
+
+**Reversal condition.** If a first-party consent helper turns out to need
+server-side rendering coupling DDS cannot express without taking a position on
+the product's framework — the same collision that pushed URL ownership out of
+the filtering pattern (#25) — `DDS.consent` retreats to a documented storage
+contract and the helper is withdrawn. The pattern text and the markup stay
+either way.
