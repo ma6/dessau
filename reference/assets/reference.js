@@ -812,7 +812,20 @@
     );
   }
 
+  /**
+   * The version number in the front page's footer credit line
+   * (`[data-ref-version]`, empty in the markup). Read from `DDS.version` at
+   * runtime rather than typed by hand — a hand-kept number goes stale the next
+   * time a release is cut and nothing here would notice (the same reasoning
+   * `foundations.html`'s contrast-pair count left unprinted for).
+   */
+  function renderVersion() {
+    var el = document.querySelector('[data-ref-version]');
+    if (el && DDS && DDS.version) el.textContent = ', v' + DDS.version;
+  }
+
   function init() {
+    renderVersion();
     wireHeaderScrollState();
     wireConsumerPrompt(document);
 
