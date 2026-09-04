@@ -589,15 +589,15 @@ be remembered, revocable, and re-asked when the privacy notice changes.
   <form class="dds-banner" method="post" action="/consent/analytics">
     <svg class="dds-icon" aria-hidden="true"><use href="#dds-icon-info"/></svg>
     <div class="dds-banner-body">
-      <p class="dds-banner-title" id="consent-analytics-title">Analytics that stays on our servers</p>
+      <p class="dds-banner-title" id="consent-analytics-title">Help us improve this service</p>
       <p>
-        We would like to load a self-hosted analytics script to see which pages
-        get used. No advertising cookies, nothing shared with anyone else.
-        <a href="/privacy">What we measure</a>.
+        We would like to use optional technologies to understand how this service
+        is used and improve it. These technologies are not required for the
+        service to work. <a href="/privacy">What we use and why</a>.
       </p>
       <div class="dds-consentgate-actions">
         <button type="submit" class="dds-button dds-button-primary"
-                data-dds-consent-set="granted" name="consent" value="granted">Allow analytics</button>
+                data-dds-consent-set="granted" name="consent" value="granted">Allow</button>
         <button type="submit" class="dds-button dds-button-secondary"
                 data-dds-consent-set="denied" name="consent" value="denied">Decline</button>
       </div>

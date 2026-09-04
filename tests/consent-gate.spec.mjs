@@ -56,7 +56,7 @@ test('declining hides the bar, is recorded, and is honoured on reload', async ({
 });
 
 test('allowing is recorded as granted', async ({ page }) => {
-  await gate(page).getByRole('button', { name: 'Allow analytics' }).click();
+  await gate(page).getByRole('button', { name: 'Allow', exact: true }).click();
 
   await expect(gate(page)).toBeHidden();
   expect(await page.evaluate((n) => window.DDS.consent.get(n), NAME)).toBe('granted');
@@ -93,7 +93,7 @@ test('Privacy choices re-opens the bar, moves focus in, and hands it back on a c
   // Focus moves to the title when the bar is summoned, like a dialog.
   await expect(page.locator('#ref-consent-title')).toBeFocused();
 
-  await gate(page).getByRole('button', { name: 'Allow analytics' }).click();
+  await gate(page).getByRole('button', { name: 'Allow', exact: true }).click();
 
   await expect(gate(page)).toBeHidden();
   // …and returns to the control that opened it (WCAG 2.4.3).
@@ -118,7 +118,7 @@ test('a decision made under an older policy is treated as no decision', async ({
 });
 
 test('onChange fires once immediately with the current state', async ({ page }) => {
-  await gate(page).getByRole('button', { name: 'Allow analytics' }).click();
+  await gate(page).getByRole('button', { name: 'Allow', exact: true }).click();
 
   const seen = await page.evaluate((n) => {
     return new Promise((resolve) => {
