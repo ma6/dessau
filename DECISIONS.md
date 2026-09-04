@@ -3221,3 +3221,43 @@ the product's framework — the same collision that pushed URL ownership out of
 the filtering pattern (#25) — `DDS.consent` retreats to a documented storage
 contract and the helper is withdrawn. The pattern text and the markup stay
 either way.
+
+## 071 — 1.3.0: the consent gate, a real new capability
+
+**Decision.** `package.json` and `DDS.version` move to `1.3.0`. A MINOR bump:
+`1.2.1` plus one new pattern — the consent gate (`070`) — which is a genuine
+new capability, not a fix.
+
+**What is in the tag.** Landed on `main` after `v1.2.1` was cut at `8253e00`:
+
+- `#158` `feat(patterns)` — **Consent gate**. A page-level, remembered opt-in
+  that blocks an analytics or marketing script until it is granted, with the
+  EU/DE constraints from TTDSG §25 + GDPR. New pattern module
+  `dds/js/patterns/consent-gate.js` (the `DDS.consent` helper —
+  `get` / `record` / `set` / `clear` / `onChange` / `configure` / `policy`, plus
+  a `dds:consent` event — and the `[data-dds-consent]` / `[data-dds-consent-reopen]`
+  wiring); new `.dds-consentgate` positioner in `patterns.css` over the existing
+  `.dds-banner`. No new component, no token change, Neon inherits unchanged.
+  `fc0cd7f` reworded the visible example copy to a service-neutral opt-in and is
+  part of the same capability. Full reasoning in `070`.
+
+**Why MINOR, not PATCH.** A new public API surface (`DDS.consent`), a new
+enhancement pair, a new CSS class and a new `patterns.md` entry. Additive and
+backward-compatible — nothing that shipped in `1.2.x` changes — which is exactly
+the SemVer shape of a MINOR. Same call as `063` (the breadcrumb's scrollable
+middle) and `053` (search-and-results, upload flow).
+
+**Why it is allowed today.** `v1.2.1` was cut yesterday (2026-09-03); `059`'s
+cap is one tagged version per calendar day, and none has been cut on
+2026-09-04. No exception needed.
+
+**How it was cut.** `npm run check` clean (`check:version` verified the two
+bumps agree). Full Playwright suite green on all three engines — 823 real
+passes; the two failures on the full run were webkit timeouts under load on
+`grid` and `upload-flow`, each passing in isolation, neither on a surface this
+change touches. `sync-cache-busting.mjs` re-stamped the `dds.js` hash across the
+nine reference pages that load it. The GitHub matrix runs only on the tag push
+(`062`) and the account's Actions billing block fails it before it starts, so
+`npm run build` and the release-and-attach are by hand as in `064` / `069`.
+
+**Reversal condition.** None. The number describes what changed.
