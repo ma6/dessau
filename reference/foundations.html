@@ -16,7 +16,7 @@
 <link rel="preload" href="assets/fonts/SpaceGrotesk-Variable-latin-ext.woff2" as="font"
       type="font/woff2" crossorigin>
 <link rel="stylesheet" href="assets/fonts.css?v=7ed937e9">
-<link rel="stylesheet" href="../dds/dds.css?v=70b7859a">
+<link rel="stylesheet" href="../dds/dds.css?v=3f2fd7e4">
 <link rel="stylesheet" href="assets/reference.css?v=ba64d6f2">
 </head>
 <body>
@@ -894,11 +894,11 @@
 
           <div class="ref-specimen dds-stack dds-stack-md">
             <p class="ref-specimen-label">Scale</p>
-            <p class="dds-text-4xl dds-font-display dds-weight-bold">4xl — Display opener, <code class="dds-code dds-text-sm">.dds-display</code> only <span class="dds-text-xs dds-text-muted dds-font-body">--dds-font-size-4xl</span></p>
-            <p class="dds-text-3xl dds-font-display dds-weight-semibold">3xl — Page heading, <code class="dds-code dds-text-sm">h1</code> <span class="dds-text-xs dds-text-muted dds-font-body">--dds-font-size-3xl</span></p>
-            <p class="dds-text-2xl dds-font-display dds-weight-semibold">2xl — Section heading, <code class="dds-code dds-text-sm">h2</code> <span class="dds-text-xs dds-text-muted dds-font-body">--dds-font-size-2xl</span></p>
-            <p class="dds-text-xl dds-font-display dds-weight-semibold">xl — Subsection, <code class="dds-code dds-text-sm">h3</code>; card title <span class="dds-text-xs dds-text-muted dds-font-body">--dds-font-size-xl</span></p>
-            <p class="dds-text-lg">lg — Minor heading, <code class="dds-code dds-text-sm">h4</code>; lead paragraph <span class="dds-text-xs dds-text-muted">--dds-font-size-lg</span></p>
+            <p class="dds-text-4xl dds-font-display dds-weight-bold">4xl — Display <span class="dds-text-xs dds-text-muted dds-font-body">--dds-font-size-4xl</span></p>
+            <p class="dds-text-3xl dds-font-display dds-weight-semibold">3xl — Section heading <span class="dds-text-xs dds-text-muted dds-font-body">--dds-font-size-3xl</span></p>
+            <p class="dds-text-2xl dds-font-display dds-weight-semibold">2xl — Subsection <span class="dds-text-xs dds-text-muted dds-font-body">--dds-font-size-2xl</span></p>
+            <p class="dds-text-xl dds-font-display dds-weight-semibold">xl — Card title <span class="dds-text-xs dds-text-muted dds-font-body">--dds-font-size-xl</span></p>
+            <p class="dds-text-lg">lg — Lead paragraph <span class="dds-text-xs dds-text-muted">--dds-font-size-lg</span></p>
             <p class="dds-text-md">md — Body. The default, and the minimum size for a form control. <span class="dds-text-xs dds-text-muted">--dds-font-size-md</span></p>
             <p class="dds-text-sm">sm — Hints, table cells, secondary detail. <span class="dds-text-xs dds-text-muted">--dds-font-size-sm</span></p>
             <p class="dds-text-xs">xs — Badges, metadata. <span class="dds-text-muted">--dds-font-size-xs</span></p>
@@ -1040,27 +1040,27 @@
         <div class="ref-specimen">
           <div class="dds-stack dds-stack-md">
             <div>
-              <p class="ref-specimen-label">h1 · --dds-font-size-3xl · tight leading, tight tracking</p>
+              <p class="ref-specimen-label">h1 · --dds-font-size-4xl · tight leading, tight tracking</p>
               <h1 style="margin: 0">Rebuilding the harbour</h1>
             </div>
             <div>
-              <p class="ref-specimen-label">h2 · --dds-font-size-2xl</p>
+              <p class="ref-specimen-label">h2 · --dds-font-size-3xl</p>
               <h2 style="margin: 0">What changes for residents</h2>
             </div>
             <div>
-              <p class="ref-specimen-label">h3 · --dds-font-size-xl</p>
+              <p class="ref-specimen-label">h3 · --dds-font-size-2xl</p>
               <h3 style="margin: 0">Access during construction</h3>
             </div>
             <div>
-              <p class="ref-specimen-label">h4 · --dds-font-size-lg</p>
+              <p class="ref-specimen-label">h4 · --dds-font-size-xl</p>
               <h4 style="margin: 0">Deliveries and waste collection</h4>
             </div>
             <div>
-              <p class="ref-specimen-label">h5 · --dds-font-size-md</p>
+              <p class="ref-specimen-label">h5 · --dds-font-size-lg</p>
               <h5 style="margin: 0">Weekend closures</h5>
             </div>
             <div>
-              <p class="ref-specimen-label">h6 · --dds-font-size-sm · wide tracking</p>
+              <p class="ref-specimen-label">h6 · --dds-font-size-md · wide tracking</p>
               <h6 style="margin: 0">Contact the site office</h6>
             </div>
           </div>
@@ -1107,15 +1107,6 @@
             <code class="dds-code">h2</code> to <code class="dds-code">h4</code>
             leaves a gap in the outline that a screen-reader user reads as a missing
             section (WCAG 1.3.1).
-          </p>
-          <p class="dds-text-sm dds-text-subtle dds-mbs-xs">
-            The other direction is the same rule. The element ramp tops out at
-            <code class="dds-code">--dds-font-size-3xl</code> on
-            <code class="dds-code">h1</code>; an opener that should read larger than
-            that takes <code class="dds-code">.dds-display</code>
-            (<code class="dds-code">--dds-font-size-4xl</code>) on the
-            <code class="dds-code">h1</code> it already is — not a bump to a level
-            that is not there.
           </p>
           <p class="dds-text-sm dds-text-subtle dds-mbs-xs">
             <code class="dds-code">text-wrap: balance</code> is applied to every

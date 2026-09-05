@@ -92,23 +92,17 @@
     text-wrap: balance;
   }
 
-  /* The ramp starts at `3xl`, one step below the top of the scale. `4xl` is
-     reserved for `.dds-display` — the deliberate opt-in for a page or section
-     opener that should read larger than its heading level would imply. Keeping
-     the structural default here means a plain `<h1>`, and every level below it
-     including authored headings inside `.dds-prose`, is sized consistently with
-     no per-product restyling (#160). */
   h1 {
-    font-size: var(--dds-font-size-3xl);
+    font-size: var(--dds-font-size-4xl);
     line-height: var(--dds-line-height-tight);
     letter-spacing: var(--dds-letter-spacing-tight);
   }
-  h2 { font-size: var(--dds-font-size-2xl); }
-  h3 { font-size: var(--dds-font-size-xl); }
-  h4 { font-size: var(--dds-font-size-lg); }
-  h5 { font-size: var(--dds-font-size-md); }
+  h2 { font-size: var(--dds-font-size-3xl); }
+  h3 { font-size: var(--dds-font-size-2xl); }
+  h4 { font-size: var(--dds-font-size-xl); }
+  h5 { font-size: var(--dds-font-size-lg); }
   h6 {
-    font-size: var(--dds-font-size-sm);
+    font-size: var(--dds-font-size-md);
     letter-spacing: var(--dds-letter-spacing-wide);
   }
 
