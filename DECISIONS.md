@@ -3261,3 +3261,74 @@ nine reference pages that load it. The GitHub matrix runs only on the tag push
 `npm run build` and the release-and-attach are by hand as in `064` / `069`.
 
 **Reversal condition.** None. The number describes what changed.
+
+## 072 — the element heading ramp starts at `3xl`, not `4xl` (#160)
+
+**Decision.** `dds/css/base.css` maps the six heading elements one step lower on
+the scale:
+
+| | before | after |
+| --- | --- | --- |
+| `h1` | `4xl` | `3xl` |
+| `h2` | `3xl` | `2xl` |
+| `h3` | `2xl` | `xl` |
+| `h4` | `xl` | `lg` |
+| `h5` | `lg` | `md` |
+| `h6` | `md` | `sm` |
+
+`.dds-display` is unchanged at `--dds-font-size-4xl`. The top of the scale is now
+reached only by opting in, and the structural default is one notch quieter.
+
+**Context.** Both direct consumers (portfolio.26, onygo.26) had already put
+`.dds-text-3xl` on the page `<h1>` in every template, because `4xl` read too
+large for their content. The override stopped at the `<h1>`: authored body
+content inside `.dds-prose` kept the element defaults, so a page's first body
+`<h2>` rendered at `3xl` — identical to the hand-downscaled `<h1>` above it.
+`.dds-prose` is vertical rhythm only, by design, so there was no per-consumer fix
+short of styling every level in every template. When both consumers
+independently make the same adjustment at the same place, the default is what is
+wrong.
+
+**Why the whole ramp, not just `h1`.** The complaint was not "`h1` is too big",
+it was "the relationship is off". Lowering only `h1` collapses it onto `h2`.
+Shifting all six preserves six distinct steps — the scale has nine, headings use
+six of them either way — and keeps the proportions the design was drawn with,
+just seated one step down.
+
+**Why `.dds-display` stays at `4xl`.** This is the existing separation between
+visual scale and document level (the foundations page has stated it all along):
+a page opener that should read larger than its level takes `.dds-display` on the
+`<h1>` it already is. Moving the structural default down makes that separation
+load-bearing instead of theoretical — `4xl` is now a deliberate choice rather
+than what you get by default.
+
+**Why the consumers' current markup is safe.** `<h1 class="dds-text-3xl
+dds-font-display">` now resolves to exactly the bare-`<h1>` rendering:
+`.dds-text-3xl` is the same token the element rule sets, and `base.css` already
+gives every heading `--dds-font-display`. Both classes are no-ops, not a second
+downshift, so the change can land and be adopted before the templates are
+cleaned up, in any order.
+
+**Scope.** `base.css` and the `reference/foundations.html` Headlines specimen +
+type-scale labels. Component-scoped heading sizes set deliberately (the hero and
+page-header sizes in `components-content.css`) are left alone; a follow-up can
+revisit whether any should track the new `h1`.
+
+**SemVer.** Left for the release that ships it. It is not additive — a direct
+consumer that never overrode a heading sees every one get smaller — so the
+honest call is MAJOR (`2.0.0`), the first in Dessau's history. A derived system
+in the layer Dessau is primarily for absorbs it silently by re-pointing, but a
+direct consumer is a supported case (`036`) and this is a visible break for it.
+The `1.x` history has bumped MINOR for new capability and PATCH for fixes; there
+is no precedent for a changed default, and this should get its own note at
+release rather than being folded into a routine bump.
+
+**Verification.** `npm run check` clean. `viewport.spec.mjs` green on all three
+engines — headings still fit at 320. `sync-cache-busting.mjs` re-stamped
+`dds.css` and the ten pages that link it.
+
+**Reversal condition.** If a direct consumer turns out to need the `4xl` `h1`
+default and cannot express it as `.dds-display` — e.g. a CMS that emits bare
+`<h1>` with no class hook — the ramp moves back and the two consumers keep their
+per-template `.dds-text-3xl`. The `.dds-display` = `4xl` separation stays either
+way.
