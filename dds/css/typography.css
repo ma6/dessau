@@ -126,6 +126,62 @@
   .dds-prose-wide { --dds-prose-measure: var(--dds-measure-wide); }
   .dds-prose-narrow { --dds-prose-measure: var(--dds-measure-narrow); }
 
+  /* --------------------------------------------------------- lead paragraph */
+  /* An opt-in step up from body text for an article's opening paragraph.
+     Applied per-paragraph, not to `.dds-prose > :first-child`: which
+     paragraph reads as the lead is an editorial call, not a position in the
+     markup — a lead image or caption often sits before it. Independent of
+     `.dds-dropcap` below; use either, both, or neither on a given paragraph. */
+  .dds-lead {
+    font-size: var(--dds-font-size-lg);
+    font-weight: var(--dds-font-weight-medium);
+    line-height: var(--dds-line-height-normal);
+  }
+
+  /* ------------------------------------------------------------- drop cap */
+  /* A large initial letter on whichever paragraph carries the class — no
+     markup change, so the letter stays in the paragraph's text for screen
+     readers exactly as authored. `.dds-dropcap` sinks two lines, the
+     default; `.dds-dropcap-3` sinks three, for a wider column that can carry
+     the larger mass. `initial-letter` positions the glyph natively where
+     supported; where it is not, a float approximates the same shape.
+
+     Needs a paragraph with at least as many lines as the sink: a sink taller
+     than its own paragraph overlaps whatever follows, in both the supported
+     and fallback path — the same constraint a drop cap has always had in
+     print. */
+  .dds-dropcap::first-letter,
+  .dds-dropcap-3::first-letter {
+    float: inline-start;
+    padding-inline-end: var(--dds-space-xs);
+    font-family: var(--dds-font-display);
+    font-weight: var(--dds-font-weight-bold);
+  }
+
+  .dds-dropcap::first-letter   { font-size: 2.4em; line-height: 0.9; }
+  .dds-dropcap-3::first-letter { font-size: 3.6em; line-height: 0.88; }
+
+  @supports (initial-letter: 2) or (-webkit-initial-letter: 2) {
+    /* The UA computes the glyph's own size and line-height from
+       `initial-letter`; the fallback values above would only fight it. */
+    .dds-dropcap::first-letter,
+    .dds-dropcap-3::first-letter {
+      float: none;
+      font-size: inherit;
+      line-height: normal;
+    }
+
+    .dds-dropcap::first-letter {
+      initial-letter: 2;
+      -webkit-initial-letter: 2;
+    }
+
+    .dds-dropcap-3::first-letter {
+      initial-letter: 3;
+      -webkit-initial-letter: 3;
+    }
+  }
+
   /* -------------------------------------------------------------- numerals */
   /* Equal-width digits, for any number a reader compares against another
      number. Also disables the ligature-style grouping some faces apply to
