@@ -151,6 +151,7 @@ const NOT_COMPONENTS = new Set([
   'dds-split', 'dds-center', 'dds-scroll', 'dds-visually', 'dds-skip', 'dds-defer',
   // typography and utilities
   'dds-text', 'dds-weight', 'dds-font', 'dds-display', 'dds-eyebrow', 'dds-prose',
+  'dds-lead', 'dds-dropcap',
   'dds-numeric', 'dds-code', 'dds-truncate', 'dds-clamp', 'dds-nowrap',
   'dds-measure', 'dds-mbs', 'dds-mbe', 'dds-hidden', 'dds-sr', 'dds-decorative',
   'dds-surface', 'dds-elevation', 'dds-radius', 'dds-w', 'dds-no',
