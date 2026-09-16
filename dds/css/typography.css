@@ -162,8 +162,8 @@
      margin is what actually pushes the following text away, in both this
      path and the float fallback below. The three-line sink gets more of it
      than the two-line one; a fixed value looks crowded on the larger glyph. */
-  .dds-dropcap::first-letter   { margin-inline-end: var(--dds-space-md); font-size: 2.4em; line-height: 0.9; }
-  .dds-dropcap-3::first-letter { margin-inline-end: var(--dds-space-lg); font-size: 3.6em; line-height: 0.88; }
+  .dds-dropcap::first-letter   { margin-inline-end: var(--dds-space-2xs); font-size: 2.4em; line-height: 0.9; }
+  .dds-dropcap-3::first-letter { margin-inline-end: var(--dds-space-xs); font-size: 3.6em; line-height: 0.88; }
 
   @supports (initial-letter: 2) or (-webkit-initial-letter: 2) {
     /* The UA computes the glyph's own size and line-height from
