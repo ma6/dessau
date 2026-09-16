@@ -3261,3 +3261,64 @@ nine reference pages that load it. The GitHub matrix runs only on the tag push
 `npm run build` and the release-and-attach are by hand as in `064` / `069`.
 
 **Reversal condition.** None. The number describes what changed.
+
+## 072 — 1.4.0: the opening paragraph, two independent typography options
+
+**Decision.** `package.json` and `DDS.version` move to `1.4.0`. A MINOR bump:
+`1.3.0` plus two new opt-in typography utilities, genuine new capability
+rather than a fix.
+
+**What is in the tag.** Landed on `main` after `v1.3.0` was cut at `66068e9`:
+
+- `#161` `feat(typography)` — **`.dds-lead`**. A per-paragraph step up from
+  body text (`--dds-font-size-lg`, medium weight) for an article's opening
+  paragraph. Opt-in, applied to whichever paragraph an editor names — never
+  automatically to `.dds-prose > :first-child`, since a lead image or caption
+  often sits before it.
+- `#162` `feat(typography)` — **`.dds-dropcap` / `.dds-dropcap-3`**. A large
+  initial letter via `::first-letter`, no markup change. `initial-letter`
+  positions the glyph natively behind `@supports (initial-letter: 2) or
+  (-webkit-initial-letter: 2)`, the same progressive-enhancement shape as
+  anchor positioning (`components-navigation.css`) and `subgrid`
+  (`components-content.css`); a float approximates the same shape where it is
+  not supported. `.dds-dropcap` sinks two lines (the default), `.dds-dropcap-3`
+  three. Both requested directly, against a reference screenshot of
+  Tagesspiegel's article template.
+- Both demonstrated in a new "Opening paragraph" section of
+  `reference/foundations.html`, between "Headlines" and "Vertical spacing" —
+  neither heading treatment nor spacing rule, so neither existing section's
+  intro sentence covered them (`fa28031`).
+
+**The one real implementation trap, worth recording because it will recur.**
+`padding` on a `::first-letter` that also carries `initial-letter` computes to
+`0px` in Chromium — confirmed with `getComputedStyle(el, '::first-letter')`,
+not by eye. A UA that supports `initial-letter` lays the glyph out in its own
+exclusion box and does not honour padding on it; `margin` does, in both that
+path and the float fallback. Two commits (`38f8e1a`, `dcea7b5`) went by before
+this was found — the first "fix" changed a value that was never being applied,
+and looked identical before and after.
+
+**Why MINOR, not PATCH.** Two new public CSS classes and a new
+`foundations.html` section: additive and backward-compatible — nothing that
+shipped in `1.3.x` changes — the SemVer shape of a MINOR. Same call as `071`
+(consent gate) and `063` (breadcrumb).
+
+**Why it is allowed today.** `v1.3.0` was cut 2026-09-04; `059`'s cap is one
+tagged version per calendar day, and none has been cut on 2026-09-16. No
+exception needed.
+
+**How it was cut.** `npm run check` clean, including `check:index` — the two
+new utilities needed adding to `check-agent-index.mjs`'s `NOT_COMPONENTS` set
+(`48e09d1`), the same list `dds-eyebrow`, `dds-display` and `dds-prose` are
+already in: typography utilities documented in `foundations.md`, not
+components with their own index entry. That gate was only caught in CI
+(`35126390426`), because the local pre-commit pass ran the individual
+`check-*.mjs` scripts a task needed rather than the full `npm run check` —
+worth remembering for next time. Full Playwright suite green on all three
+engines, 823 passes, 0 failures, 2 skipped. `sync-cache-busting.mjs`
+re-stamped the hash across the ten reference pages that load it. The GitHub
+matrix runs only on the tag push (`062`) and the account's Actions billing
+block fails it before it starts, so `npm run build` and the release-and-attach
+are by hand as in `064` / `069` / `071`.
+
+**Reversal condition.** None. The number describes what changed.
