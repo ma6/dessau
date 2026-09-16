@@ -344,6 +344,7 @@
               <li><a href="#colour">Colour</a></li>
               <li><a href="#typography">Typography</a></li>
               <li><a href="#headlines">Headlines</a></li>
+              <li><a href="#opening-paragraph">Opening paragraph</a></li>
               <li><a href="#vertical-spacing">Vertical spacing</a></li>
               <li><a href="#spacing">Spacing</a></li>
               <li><a href="#breakpoints">Breakpoints</a></li>
@@ -1097,14 +1098,52 @@
           </div>
         </div>
 
-        <div class="ref-specimen ref-specimen-plain dds-mbs-md">
-          <h3 class="dds-text-sm dds-weight-semibold">Lead and drop cap — two independent opening-paragraph options</h3>
+        <div class="ref-note dds-mbs-md">
+          <h3 class="dds-text-sm dds-weight-semibold">Level is structure, size is a class</h3>
+          <p class="dds-text-sm dds-text-subtle dds-mbs-2xs">
+            Never skip a level to get a size. A section heading that needs to look
+            small is still the next level down, with
+            <code class="dds-code">.dds-text-sm</code> on it — which is how the
+            headings on this page are done. Skipping from
+            <code class="dds-code">h2</code> to <code class="dds-code">h4</code>
+            leaves a gap in the outline that a screen-reader user reads as a missing
+            section (WCAG 1.3.1).
+          </p>
+          <p class="dds-text-sm dds-text-subtle dds-mbs-xs">
+            <code class="dds-code">text-wrap: balance</code> is applied to every
+            heading, so a two-line headline does not end in one orphaned word. It is
+            capped by the browser at a few lines, so it stays cheap even on long
+            ones. Body text gets <code class="dds-code">text-wrap: pretty</code>
+            instead — same idea, but it only fixes the last line, which is what
+            paragraphs need.
+          </p>
+          <p class="dds-text-sm dds-text-subtle dds-mbs-xs">
+            Headings carry no margin of their own. Vertical rhythm is the job of the
+            container — see below — so a heading can sit at the very top of a card
+            or a dialog with nothing to strip off.
+          </p>
+        </div>
+      </section>
+
+      <!-- ============================================== opening paragraph -->
+      <section class="ref-section" id="opening-paragraph">
+        <div class="ref-section-head">
+          <h2>Opening paragraph</h2>
+          <p class="dds-text-subtle dds-measure-default dds-mbs-xs">
+            Two independent, opt-in options for the paragraph that opens a
+            piece — a size step up, a large initial letter, or neither. Applied
+            per-paragraph rather than to <code class="dds-code">.dds-prose >
+            :first-child</code>: which paragraph reads as the opener is an
+            editorial call, not a position in the markup.
+          </p>
+        </div>
+
+        <div class="ref-specimen ref-specimen-plain">
+          <h3 class="dds-text-sm dds-weight-semibold">.dds-lead</h3>
           <p class="dds-text-sm dds-text-subtle dds-mbs-2xs dds-measure-default">
-            <code class="dds-code">.dds-lead</code> and
-            <code class="dds-code">.dds-dropcap</code> are opt-in, per-paragraph
-            classes, not automatic first-child styling — an editor decides which
-            paragraph opens the piece, and whether it gets one option, both, or
-            neither.
+            A step up from body text — larger, slightly heavier, a touch
+            tighter — with no relation to <code class="dds-code">.dds-dropcap</code>
+            below. Use either, both, or neither on a given paragraph.
           </p>
 
           <div class="dds-prose dds-mbs-md" style="background: var(--dds-color-surface-sunken); padding: var(--dds-space-md); border-radius: var(--dds-radius-md)">
@@ -1118,13 +1157,19 @@
               continue by arrangement only for the duration of the work.
             </p>
           </div>
+        </div>
 
-          <p class="dds-text-xs dds-text-muted dds-mbs-md">
-            <code class="dds-code">.dds-dropcap</code> sinks two lines, the
-            default; <code class="dds-code">.dds-dropcap-3</code> sinks three,
-            for a wider column that can carry the larger mass. Either needs a
-            paragraph with at least as many lines as the sink, the same
-            constraint print layout has always had.
+        <div class="ref-specimen ref-specimen-plain dds-mbs-md">
+          <h3 class="dds-text-sm dds-weight-semibold">.dds-dropcap and .dds-dropcap-3</h3>
+          <p class="dds-text-sm dds-text-subtle dds-mbs-2xs dds-measure-default">
+            A large initial letter via <code class="dds-code">::first-letter</code> —
+            no markup change, so a screen reader reads the paragraph exactly as
+            authored. <code class="dds-code">.dds-dropcap</code> sinks two
+            lines, the default; <code class="dds-code">.dds-dropcap-3</code>
+            sinks three, for a wider column that can carry the larger mass.
+            Either needs a paragraph with at least as many lines as the sink —
+            a sink taller than its own paragraph overlaps whatever follows,
+            the same constraint print layout has always had.
           </p>
 
           <div class="dds-prose dds-mbs-md" style="background: var(--dds-color-surface-sunken); padding: var(--dds-space-md); border-radius: var(--dds-radius-md)">
@@ -1155,32 +1200,6 @@
               continue by arrangement only for the duration of the work.
             </p>
           </div>
-        </div>
-
-        <div class="ref-note dds-mbs-md">
-          <h3 class="dds-text-sm dds-weight-semibold">Level is structure, size is a class</h3>
-          <p class="dds-text-sm dds-text-subtle dds-mbs-2xs">
-            Never skip a level to get a size. A section heading that needs to look
-            small is still the next level down, with
-            <code class="dds-code">.dds-text-sm</code> on it — which is how the
-            headings on this page are done. Skipping from
-            <code class="dds-code">h2</code> to <code class="dds-code">h4</code>
-            leaves a gap in the outline that a screen-reader user reads as a missing
-            section (WCAG 1.3.1).
-          </p>
-          <p class="dds-text-sm dds-text-subtle dds-mbs-xs">
-            <code class="dds-code">text-wrap: balance</code> is applied to every
-            heading, so a two-line headline does not end in one orphaned word. It is
-            capped by the browser at a few lines, so it stays cheap even on long
-            ones. Body text gets <code class="dds-code">text-wrap: pretty</code>
-            instead — same idea, but it only fixes the last line, which is what
-            paragraphs need.
-          </p>
-          <p class="dds-text-sm dds-text-subtle dds-mbs-xs">
-            Headings carry no margin of their own. Vertical rhythm is the job of the
-            container — see below — so a heading can sit at the very top of a card
-            or a dialog with nothing to strip off.
-          </p>
         </div>
       </section>
 
